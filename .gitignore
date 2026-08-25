@@ -1,0 +1,11 @@
+build/
+build-flatpak/
+.flatpak-builder/
+__pycache__/
+*.pyc
+*.mo
+*.pot~
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
