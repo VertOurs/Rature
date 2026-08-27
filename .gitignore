@@ -9,3 +9,11 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+
+# Editors
+.idea/
+.vscode/
+
+# Local agent settings
+.claude/settings.local.json
+.claude/*.tmp.*
