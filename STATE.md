@@ -99,9 +99,10 @@ Session C, notes :
 - **C3, documentation.** `README.md`, `CHANGELOG.md` (Keep a Changelog, section
   `[Unreleased]`), `CONTRIBUTING.md`. Pas de mention de l'assistance IA dans
   le README, décision repoussée au chantier 5.
-- **C4, en attente, côté GitHub avec VertOurs.** Générer la clé GPG, la
-  configurer, rétro-signer `main..HEAD`, pousser, ouvrir la PR unique, activer
-  « Require status checks » une fois la CI verte, confirmer squash seul.
+- **C4.** Clé GPG générée, git configuré, branche rétro-signée (voir plus
+  bas). Restent, côté VertOurs : ajouter la clé publique à GitHub, pousser,
+  ouvrir la PR unique, activer « Require status checks » une fois la CI verte,
+  confirmer squash seul.
 
 Session A, notes :
 
@@ -114,13 +115,17 @@ Session A, notes :
 - `pyproject.toml` n'a pas de table `[build-system]` : le build passe par
   Meson, ce fichier ne sert qu'aux métadonnées et à `ruff` / `pytest`.
 
-Signature des commits, à régler avant la PR du chantier 0 :
+Signature des commits, réglée le 29 août 2026 :
 
-- Aucune config de signature sur la machine. Méthode non tranchée, SSH ou GPG.
-- Rétro-signer uniquement les commits propres à la branche, `git rebase`
-  limité à `main..HEAD`, tant que la branche n'est pas poussée.
-- Ne jamais réécrire `1356198` : déjà sur `main`, protégée et poussée. Le
-  commit fondateur reste non signé, c'est accepté.
+- Clé GPG ed25519 `25DA27801D5F4ECA1DAA2101E89227EAC418BC4A`, `[SC]`, expire
+  le 2028-08-28.
+- `git config --local user.signingkey` + `commit.gpgsign true` dans ce dépôt.
+- Les 10 commits de `build/python-skeleton` rétro-signés via
+  `git rebase --exec 'git commit --amend --no-edit -S' main`. Tous vérifiés
+  `G`.
+- `1356198` sur `main` reste non signé, hors `main..HEAD`, jamais touché.
+- Reste à faire côté VertOurs : ajouter la clé publique à GitHub pour la
+  mention « Verified ».
 
 ## Documents
 
