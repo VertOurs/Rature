@@ -133,13 +133,11 @@ style avant que le chantier 1 n'écrive du code.
   renvoi mort dans les documents de cadrage, les fichiers de `core/` cités
   dans `ARCHITECTURE.md` sont des cibles du chantier 1, pas des liens.
 
-## Décision en attente
+## Règle §5.2, tranchée le 29 août 2026
 
-**Règle `CLAUDE.md` §5.2.** Le mode agent enchaîne souvent cinq à dix
-commits par passe ; la règle « attendre l'accord message par message » n'est
-pas tenue. Arbitrage à rendre par VertOurs : (a) autoriser une validation
-groupée sur un plan de commits présenté d'avance, ou (b) maintenir la règle
-stricte. Rien n'est commité sur ce point avant l'accord.
+Option (a) retenue : la validation d'un plan de commits présenté d'avance
+vaut pour tous les commits qu'il liste. `git push` reste soumis à un accord
+distinct. `CLAUDE.md` §5.2 réécrit en conséquence.
 
 ## Chantier 1, à venir
 

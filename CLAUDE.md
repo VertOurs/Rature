@@ -374,7 +374,10 @@ négociables.
 
 1. **Jamais de travail sur `main`.** Une branche par tâche, toujours.
 2. **Jamais de `git commit` ni de `git push` sans validation explicite.**
-   Proposer le message de commit, attendre l'accord.
+   Présenter le plan complet des commits, un message par commit, avant d'en
+   écrire un seul. Un accord unique sur ce plan vaut pour tous les commits
+   qu'il liste. Toute intention absente du plan demande une nouvelle
+   validation. Le `git push` reste soumis à un accord distinct.
 3. **Une modification à la fois.** Pas de refactoring massif non demandé,
    même s'il paraît évident. Le proposer, ne pas le faire.
 4. **Lire avant d'écrire.** Consulter l'état réel des fichiers plutôt que de
