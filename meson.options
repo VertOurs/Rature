@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+
+option(
+  'python',
+  type: 'string',
+  value: 'python3',
+  description: 'Python interpreter the installed launcher runs under',
+)

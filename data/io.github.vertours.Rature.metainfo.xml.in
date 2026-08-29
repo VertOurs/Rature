@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<component type="desktop-application">
+  <id>io.github.vertours.Rature</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>Rature</name>
+  <summary>Your day, one line at a time</summary>
+
+  <description>
+    <p>
+      Rature keeps one numbered list for the day. You add tasks one by one,
+      in no particular order, and strike them through as the day goes. Struck
+      tasks stay visible in a block at the top: there is no planning, no
+      categories, no scoring, no encouragement.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.vertours.Rature.desktop</launchable>
+
+  <url type="homepage">https://github.com/VertOurs/Rature</url>
+  <url type="bugtracker">https://github.com/VertOurs/Rature/issues</url>
+  <url type="vcs-browser">https://github.com/VertOurs/Rature</url>
+
+  <developer id="io.github.vertours">
+    <name>VertOurs</name>
+  </developer>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="0.1.0" date="2026-08-29">
+      <description>
+        <p>Project foundations. Not a functional release.</p>
+      </description>
+    </release>
+  </releases>
+</component>

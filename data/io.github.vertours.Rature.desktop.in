@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Rature
+Comment=Your day, one line at a time
+Type=Application
+Exec=rature
+Icon=io.github.vertours.Rature
+Terminal=false
+Categories=GTK;Utility;
+Keywords=todo;list;tasks;daily;
+StartupNotify=true
