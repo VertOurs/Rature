@@ -37,7 +37,8 @@ cd ~/Documents/DEV/rature
 git init -b main
 ```
 
-Créer `.gitignore` :
+Créer `.gitignore`. Version en vigueur, à recopier depuis le vrai fichier
+à la racine si elle diverge :
 
 ```
 build/
@@ -46,8 +47,23 @@ build-flatpak/
 __pycache__/
 *.pyc
 *.mo
+/po/rature.pot
+*.pot~
 .pytest_cache/
 .ruff_cache/
+.coverage
+htmlcov/
+
+# Local environment
+.venv/
+
+# Editors
+.idea/
+.vscode/
+
+# Local agent settings
+.claude/settings.local.json
+.claude/*.tmp.*
 ```
 
 ---
