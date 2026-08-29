@@ -24,7 +24,8 @@ Mis à jour en fin de chaque session. Le cadrage stable est dans `CLAUDE.md`.
   `git config --local commit.gpgsign true`. Clé publique à ajouter à GitHub
   pour la mention « Verified » sur les futurs commits
 - **Ouvert, côté VertOurs** : activer « Require status checks » dans le
-  ruleset `main`, jobs `lint`, `test`, `flatpak`, maintenant que la CI existe
+  ruleset `main`, jobs `lint`, `test`, `meson`, `flatpak`, maintenant que la
+  CI existe
 
 ## Versions retenues
 
@@ -58,9 +59,16 @@ Faits durables à garder pour la suite :
 - Le paquet s'installe sous `<datadir>/rature/rature`, le lanceur ajoute ce
   dossier à `sys.path`. Indépendant du prefix.
 - Plancher Meson `1.9` : version de `org.gnome.Sdk//50`.
-- `meson test` enchaîne `desktop-file-validate`,
-  `appstreamcli validate --no-net` et `pytest` (résolu sur le `PATH`, donc le
-  venv activé).
+- `meson test` en local enchaîne `desktop-file-validate`,
+  `appstreamcli-validate` et `pytest` (résolu sur le `PATH`, donc le venv
+  activé). En CI, le job `meson` ne lance que les deux tests de métadonnées
+  par leur nom, `pytest` a son propre job. La séquence CI est
+  `meson setup` puis `meson compile` puis `meson test`, le compile est
+  nécessaire, les fichiers fusionnés ne sont pas dans le rebuild implicite
+  de `meson test`.
+- Dépendances de dev déclarées dans `pyproject.toml`,
+  `[dependency-groups] dev` (PEP 735) : `ruff`, `pytest`, `pytest-cov`.
+  Installation `pip install --group dev`, pip 25.1 ou plus.
 - Démonstration gettext : le label « Empty window » de `data/ui/window.ui`,
   traduit « Fenêtre vide ». Placeholder retiré au chantier 3.
 - `appstreamcli validate` passe. Seule remarque `--pedantic` :
@@ -73,6 +81,27 @@ Faits durables à garder pour la suite :
   `org.flatpak.Builder` n'est pas installé en local.
 - `pyproject.toml` n'a pas de table `[build-system]` : le build passe par
   Meson.
+
+## Revue externe du 29 août 2026
+
+Revue reçue dans `review/SESSION-C-BRIEF.md`, visait le commit `a8f98ea`.
+Partie 3 déjà couverte par la session C. Partie 2, les neuf correctifs,
+appliquée sur la branche `chore/post-review-cleanup` :
+
+- `.venv/` ignoré explicitement, bloc d'exemple de `CHANTIER-0.md` rafraîchi
+- chemins réels dans `CLAUDE.md` §11
+- `test_version_sources_agree` : accord entre `__init__.py`, `pyproject.toml`,
+  `meson.build` et la dernière `<release>` du metainfo. Un bump laisse la
+  suite rouge tant que l'entrée metainfo n'est pas écrite, c'est voulu
+- job CI `meson`, suppression des deux tests pytest de validation redondants
+- `POTFILES.in` réduit aux fichiers portant des chaînes marquées
+- `[dependency-groups] dev` ajouté
+- `STATE.md` désigné source unique de l'avancement, en-tête ajouté sur
+  `ROADMAP.md` et `CHANTIER-0.md`, listes de préfixes de branche unifiées
+- ADR 0006 sur l'installation sous `datadir`
+
+Le fichier `review/` n'est pas versionné, décision prise : une revue datée
+devient fausse au fil des correctifs.
 
 ## Chantier 1, à venir
 
