@@ -5,6 +5,9 @@ qui ne fait rien. Aucune fonctionnalité ici, c'est volontaire.
 
 Durée réaliste : deux à trois sessions courtes.
 
+> **L'avancement réel vit dans `STATE.md`.** Les cases de ce document
+> décrivent le périmètre, pas l'état.
+
 ---
 
 ## Étape 0.1 : figer le nom

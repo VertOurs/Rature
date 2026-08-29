@@ -504,7 +504,8 @@ BREAKING CHANGE: data file layout changed, see migrations.py
 
 ### Historique
 
-- Une branche par tâche : `feat/`, `fix/`, `refactor/`, `docs/`, `ci/`
+- Une branche par tâche, préfixée par le type de commit : `feat/`, `fix/`,
+  `refactor/`, `build/`, `ci/`, `docs/`, `test/`, `chore/`
 - Fusion par pull request, jamais de commit direct sur `main`
 - Fusion en squash uniquement, un commit par pull request. Les options
   « merge commit » et « rebase and merge » sont désactivées dans les
