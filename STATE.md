@@ -45,7 +45,7 @@ rien publier sur une 50 en fin de vie.
 |---|---|---|
 | A | Arborescence Python, `pyproject.toml`, deux tests | Terminée |
 | B | Meson, gettext, fenêtre vide | Terminée |
-| C | Manifeste Flatpak, CI, README, CHANGELOG, CONTRIBUTING | À faire |
+| C | Manifeste Flatpak, CI, README, CHANGELOG, CONTRIBUTING | C1 à C3 faites, C4 en attente |
 
 La règle « Require status checks » sera ajoutée au ruleset GitHub à la fin de
 la session C, une fois la CI existante.
@@ -78,6 +78,30 @@ Session B, notes :
   délibérée (`CLAUDE.md` §3), sans effet sur la validation.
 - Métadonnées volontairement minimales : captures d'écran et couleur de
   marque du metainfo sont repoussées au chantier 5 (ROADMAP §5.1).
+
+Session C, notes :
+
+- **C1, manifeste Flatpak.** `build-aux/flatpak/io.github.vertours.Rature.yml`,
+  source `type: dir`, `finish-args` réduit à wayland, fallback-x11, dri, ipc.
+  `flatpak-builder` + `flatpak run io.github.vertours.Rature` : la fenêtre
+  s'ouvre. `appstreamcli compose` réussit pendant le build.
+- Plancher Meson abaissé `1.11 → 1.9` : c'est la version de `org.gnome.Sdk//50`.
+- `flatpak-builder-lint` non lancé en local, `org.flatpak.Builder` n'est pas
+  installé. Il tourne dans la CI et redeviendra un point de contrôle au
+  chantier 5.
+- **C2, CI.** `.github/workflows/ci.yml`, sur `pull_request`, trois jobs :
+  lint (ruff), test (pytest avec `desktop-file-utils` et `appstream`), flatpak
+  (`flatpak-builder@v6`, conteneur `gnome-50`). Dépendances installées par
+  `pip`, pas d'`uv`, choix validé.
+- La CI n'est vérifiable qu'avec une vraie PR. Points à surveiller au premier
+  run : existence du tag d'image `ghcr.io/flathub-infra/flatpak-github-actions:gnome-50`,
+  noms exacts des entrées de `flatpak-builder@v6`.
+- **C3, documentation.** `README.md`, `CHANGELOG.md` (Keep a Changelog, section
+  `[Unreleased]`), `CONTRIBUTING.md`. Pas de mention de l'assistance IA dans
+  le README, décision repoussée au chantier 5.
+- **C4, en attente, côté GitHub avec VertOurs.** Générer la clé GPG, la
+  configurer, rétro-signer `main..HEAD`, pousser, ouvrir la PR unique, activer
+  « Require status checks » une fois la CI verte, confirmer squash seul.
 
 Session A, notes :
 
