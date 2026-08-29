@@ -18,8 +18,11 @@ before writing code.
 
 ## Development setup
 
+The venv is only for ruff, pytest and meson; running the app is handled by
+`-Dpython` below, not by the venv seeing system packages.
+
 ```
-python3 -m venv --system-site-packages .venv
+python3 -m venv .venv
 . .venv/bin/activate
 pip install --group dev
 meson setup build
@@ -28,8 +31,7 @@ meson test -C build
 ```
 
 The installed launcher runs under the interpreter Meson picks at setup time.
-On a host where the tooling interpreter has no PyGObject, point the launcher
-at one that does:
+On a host where that interpreter has no PyGObject, point it at one that does:
 
 ```
 meson setup build -Dpython=/usr/bin/python3
