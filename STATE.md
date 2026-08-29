@@ -2,12 +2,132 @@
 
 Mis à jour en fin de chaque session. Le cadrage stable est dans `CLAUDE.md`.
 
+## Avancement
+
 - **Chantier en cours** : 0, fondations
-- **Étape suivante** : créer le dépôt public `Rature` sur GitHub
-- **Dépôt git** : pas encore créé
-- **Dernière version publiée** : aucune
+- **Étape suivante** : session C, manifeste Flatpak, CI, README, CHANGELOG,
+  CONTRIBUTING
 - **Cible `0.9.x`** : chantiers 0 à 4 terminés, non publié
 - **Cible `1.0.0`** : chantier 5 terminé, publié sur le dépôt auto-hébergé
-- **Mode de travail** : agent dans l'IDE
+- **Mode de travail** : agent dans l'IDE, PyCharm
 - **POC** : abandonné, aucune donnée à reprendre
-- **Documents** : cadrage relu et corrigé, contradictions résolues
+
+## Dépôt
+
+- `github.com/VertOurs/Rature`, public
+- Branche `main` protégée, pull request obligatoire, poussée directe interdite
+- Fusion en squash uniquement, merge commit et rebase désactivés
+- Un seul commit sur `main` : `docs: add project specification and decision
+  records`. C'était l'exception fondatrice, la protection ne pouvant pas
+  précéder l'existence du dépôt
+- Branche en cours : `build/python-skeleton`, sessions A et B commitées,
+  session C sur la même branche, une seule PR pour tout le chantier 0
+
+## Versions retenues
+
+Revérifiées le 29 août 2026, à revérifier avant toute mise à jour du
+manifeste, conformément à `CLAUDE.md` §4 règle 8.
+
+| Élément | Version | Motif |
+|---|---|---|
+| Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
+| Python cible | 3.13 | Celui du runtime 50, et non le 3.14 de la machine de développement |
+| Version du projet | `0.1.0` | Premier jalon, rien de publiable |
+| Meson minimal | 1.9 | Version fournie par `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
+
+**Bump vers GNOME 51 à faire à partir du 16 septembre 2026** : manifeste,
+CI, `STATE.md`. Le chantier 0 ne publie rien, donc pas d'urgence, mais ne
+rien publier sur une 50 en fin de vie.
+
+## Découpage restant du chantier 0
+
+| Session | Contenu | État |
+|---|---|---|
+| A | Arborescence Python, `pyproject.toml`, deux tests | Terminée |
+| B | Meson, gettext, fenêtre vide | Terminée |
+| C | Manifeste Flatpak, CI, README, CHANGELOG, CONTRIBUTING | C1 à C3 faites, C4 en attente |
+
+La règle « Require status checks » sera ajoutée au ruleset GitHub à la fin de
+la session C, une fois la CI existante.
+
+Session B, notes :
+
+- **Deux interpréteurs sur la machine.** Le venv du projet est en Python
+  3.13 sans `gi` ; le `python3` système est en 3.14 avec `gi` (GTK 4.22,
+  libadwaita 1.9.3). Le venv sert à `ruff` et `pytest`, le système à lancer
+  l'application hors Flatpak.
+- Option Meson `python` (défaut `python3`) : cible de l'interpréteur du
+  lanceur installé. En local, `meson setup build -Dpython=/usr/bin/python3`.
+  Sous Flatpak et en CI, laisser le défaut.
+- Le paquet s'installe sous `<datadir>/rature/rature` et le lanceur ajoute
+  ce dossier à `sys.path`. Indépendant du prefix, pas de dépendance au
+  `site-packages` de l'interpréteur.
+- `meson test` : trois tests, `desktop-file-validate`,
+  `appstreamcli validate --no-net`, et `pytest` (résolu sur le `PATH`, donc
+  le venv activé).
+- Vérification locale de la fenêtre :
+  `meson setup build --prefix="$PWD/build/local-install" -Dpython=/usr/bin/python3`
+  puis `meson compile -C build && meson install -C build` puis
+  `./build/local-install/bin/rature`. La fenêtre s'ouvre, sans erreur en
+  sortie. Rendu visuel non vérifié, contrôle humain requis (`CLAUDE.md` §6).
+- Chaîne de démonstration gettext : le label « Empty window » de
+  `data/ui/window.ui`, traduit « Fenêtre vide ». Placeholder retiré au
+  chantier 3.
+- `appstreamcli validate` passe. Une seule remarque `--pedantic` :
+  `cid-contains-uppercase-letter` sur le `R` de `Rature`, majuscule
+  délibérée (`CLAUDE.md` §3), sans effet sur la validation.
+- Métadonnées volontairement minimales : captures d'écran et couleur de
+  marque du metainfo sont repoussées au chantier 5 (ROADMAP §5.1).
+
+Session C, notes :
+
+- **C1, manifeste Flatpak.** `build-aux/flatpak/io.github.vertours.Rature.yml`,
+  source `type: dir`, `finish-args` réduit à wayland, fallback-x11, dri, ipc.
+  `flatpak-builder` + `flatpak run io.github.vertours.Rature` : la fenêtre
+  s'ouvre. `appstreamcli compose` réussit pendant le build.
+- Plancher Meson abaissé `1.11 → 1.9` : c'est la version de `org.gnome.Sdk//50`.
+- `flatpak-builder-lint` non lancé en local, `org.flatpak.Builder` n'est pas
+  installé. Il tourne dans la CI et redeviendra un point de contrôle au
+  chantier 5.
+- **C2, CI.** `.github/workflows/ci.yml`, sur `pull_request`, trois jobs :
+  lint (ruff), test (pytest avec `desktop-file-utils` et `appstream`), flatpak
+  (`flatpak-builder@v6`, conteneur `gnome-50`). Dépendances installées par
+  `pip`, pas d'`uv`, choix validé.
+- La CI n'est vérifiable qu'avec une vraie PR. Points à surveiller au premier
+  run : existence du tag d'image `ghcr.io/flathub-infra/flatpak-github-actions:gnome-50`,
+  noms exacts des entrées de `flatpak-builder@v6`.
+- **C3, documentation.** `README.md`, `CHANGELOG.md` (Keep a Changelog, section
+  `[Unreleased]`), `CONTRIBUTING.md`. Pas de mention de l'assistance IA dans
+  le README, décision repoussée au chantier 5.
+- **C4.** Clé GPG générée, git configuré, branche rétro-signée (voir plus
+  bas). Restent, côté VertOurs : ajouter la clé publique à GitHub, pousser,
+  ouvrir la PR unique, activer « Require status checks » une fois la CI verte,
+  confirmer squash seul.
+
+Session A, notes :
+
+- En-tête court retenu, en tête de chaque fichier source :
+  `# SPDX-License-Identifier: GPL-3.0-or-later`
+  puis `# SPDX-FileCopyrightText: 2026 VertOurs`
+- `data/`, `po/`, `build-aux/flatpak/` sont créés sur disque mais vides, donc
+  absents de git. Ils entreront dans l'index en sessions B et C avec du
+  contenu réel.
+- `pyproject.toml` n'a pas de table `[build-system]` : le build passe par
+  Meson, ce fichier ne sert qu'aux métadonnées et à `ruff` / `pytest`.
+
+Signature des commits, réglée le 29 août 2026 :
+
+- Clé GPG ed25519 `25DA27801D5F4ECA1DAA2101E89227EAC418BC4A`, `[SC]`, expire
+  le 2028-08-28.
+- `git config --local user.signingkey` + `commit.gpgsign true` dans ce dépôt.
+- Les 10 commits de `build/python-skeleton` rétro-signés via
+  `git rebase --exec 'git commit --amend --no-edit -S' main`. Tous vérifiés
+  `G`.
+- `1356198` sur `main` reste non signé, hors `main..HEAD`, jamais touché.
+- Reste à faire côté VertOurs : ajouter la clé publique à GitHub pour la
+  mention « Verified ».
+
+## Documents
+
+Cadrage relu, contradictions résolues, six cas limites tranchés en `CLAUDE.md`
+§2.7 le 25 août 2026.

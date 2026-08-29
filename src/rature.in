@@ -1,0 +1,38 @@
+#!@PYTHON@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+
+"""Installed entry point for Rature, configured by Meson from rature.in."""
+
+import gettext
+import locale
+import os
+import signal
+import sys
+
+VERSION = "@VERSION@"
+PKGDATADIR = "@PKGDATADIR@"
+LOCALEDIR = "@LOCALEDIR@"
+
+sys.path.insert(1, PKGDATADIR)
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+if hasattr(locale, "bindtextdomain"):
+    locale.bindtextdomain("rature", LOCALEDIR)
+    locale.textdomain("rature")
+gettext.install("rature", LOCALEDIR)
+
+
+def _load_resources() -> None:
+    from gi.repository import Gio
+
+    resource = Gio.Resource.load(os.path.join(PKGDATADIR, "rature.gresource"))
+    Gio.resources_register(resource)
+
+
+if __name__ == "__main__":
+    _load_resources()
+    from rature.main import main
+
+    sys.exit(main(VERSION))

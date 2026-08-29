@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+
+# Rature is built and installed by Meson, not by a Python build backend.
+# This file only carries project metadata and the configuration of the
+# development tools (ruff, pytest). It is deliberately free of a
+# [build-system] table so nothing invites `pip install .`.
+
+[project]
+name = "rature"
+version = "0.1.0"
+description = "Your day, one line at a time"
+requires-python = ">=3.13"
+license = "GPL-3.0-or-later"
+authors = [{ name = "VertOurs", email = "vertours.dev@gmail.com" }]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific rules
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"

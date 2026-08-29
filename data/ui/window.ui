@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="RatureWindow" parent="AdwApplicationWindow">
+    <property name="title" translatable="no">Rature</property>
+    <property name="default-width">360</property>
+    <property name="default-height">600</property>
+    <property name="content">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar"/>
+        </child>
+        <property name="content">
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Empty window</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <style>
+              <class name="dim-label"/>
+              <class name="title-2"/>
+            </style>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>

@@ -4,8 +4,17 @@ build-flatpak/
 __pycache__/
 *.pyc
 *.mo
+/po/rature.pot
 *.pot~
 .pytest_cache/
 .ruff_cache/
 .coverage
 htmlcov/
+
+# Editors
+.idea/
+.vscode/
+
+# Local agent settings
+.claude/settings.local.json
+.claude/*.tmp.*

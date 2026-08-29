@@ -1,0 +1,55 @@
+# French translation for Rature.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: rature\n"
+"Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
+"POT-Creation-Date: 2026-08-29 09:28+0200\n"
+"PO-Revision-Date: 2026-08-29 09:30+0200\n"
+"Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: data/io.github.vertours.Rature.desktop.in:2
+#: data/io.github.vertours.Rature.metainfo.xml.in:9
+msgid "Rature"
+msgstr "Rature"
+
+#: data/io.github.vertours.Rature.desktop.in:3
+#: data/io.github.vertours.Rature.metainfo.xml.in:10
+msgid "Your day, one line at a time"
+msgstr "Votre journée, une ligne à la fois"
+
+#: data/io.github.vertours.Rature.desktop.in:9
+msgid "todo;list;tasks;daily;"
+msgstr "à faire;liste;tâches;quotidien;jour;todo;"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:13
+msgid ""
+"Rature keeps one numbered list for the day. You add tasks one by one, in no "
+"particular order, and strike them through as the day goes. Struck tasks stay "
+"visible in a block at the top: there is no planning, no categories, no "
+"scoring, no encouragement."
+msgstr ""
+"Rature tient une seule liste numérotée pour la journée. On ajoute les tâches "
+"une par une, sans ordre imposé, et on les raye au fil de la journée. Les "
+"tâches rayées restent visibles dans un bloc en haut : pas de planification, "
+"pas de catégories, pas de score, pas d'encouragement."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:28
+msgid "VertOurs"
+msgstr "VertOurs"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:36
+msgid "Project foundations. Not a functional release."
+msgstr "Fondations du projet. Ce n'est pas une version fonctionnelle."
+
+#: data/ui/window.ui:19
+msgid "Empty window"
+msgstr "Fenêtre vide"
