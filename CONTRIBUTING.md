@@ -21,7 +21,7 @@ before writing code.
 ```
 python3 -m venv --system-site-packages .venv
 . .venv/bin/activate
-pip install ruff pytest
+pip install --group dev
 meson setup build
 meson compile -C build
 meson test -C build
@@ -72,7 +72,7 @@ most 72 characters. One intent per commit. Scopes follow the tree: `core`,
 ## Branches and merging
 
 - One branch per task, prefixed with the commit type: `feat/`, `fix/`,
-  `build/`, `ci/`, `docs/`.
+  `refactor/`, `build/`, `ci/`, `docs/`, `test/`, `chore/`.
 - Merge through a pull request, never a direct push to `main`.
 - Squash merge only. History stays linear.
 - Commits are GPG-signed.

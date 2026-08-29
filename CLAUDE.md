@@ -299,7 +299,8 @@ Discutées et tranchées. **Ne pas les rouvrir** sans demande explicite.
 
 Les décisions qui ont une histoire sont documentées dans `docs/adr/` :
 rejet de Flathub (0001), séparation `core` et `ui` (0002), fichier JSON
-unique (0003), abandon du prototype (0004), journal de suppressions (0005).
+unique (0003), abandon du prototype (0004), journal de suppressions (0005),
+installation du paquet sous `datadir` (0006).
 
 ### Décisions encore ouvertes
 
@@ -504,7 +505,8 @@ BREAKING CHANGE: data file layout changed, see migrations.py
 
 ### Historique
 
-- Une branche par tâche : `feat/`, `fix/`, `refactor/`, `docs/`, `ci/`
+- Une branche par tâche, préfixée par le type de commit : `feat/`, `fix/`,
+  `refactor/`, `build/`, `ci/`, `docs/`, `test/`, `chore/`
 - Fusion par pull request, jamais de commit direct sur `main`
 - Fusion en squash uniquement, un commit par pull request. Les options
   « merge commit » et « rebase and merge » sont désactivées dans les
@@ -599,8 +601,10 @@ flatpak-builder --user --install --force-clean build-flatpak \
 flatpak run io.github.vertours.Rature
 
 # Validation des métadonnées
-appstreamcli validate data/io.github.vertours.Rature.metainfo.xml
-desktop-file-validate data/io.github.vertours.Rature.desktop
+# appstreamcli accepte la source ; desktop-file-validate exige un .desktop,
+# donc le fichier fusionné, présent après `meson compile`.
+appstreamcli validate data/io.github.vertours.Rature.metainfo.xml.in
+desktop-file-validate build/data/io.github.vertours.Rature.desktop
 flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
   manifest build-aux/flatpak/io.github.vertours.Rature.yml
 ```

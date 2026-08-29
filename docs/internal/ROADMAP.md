@@ -6,6 +6,9 @@ spécification.
 Chaque chantier a un critère de fin. On ne passe pas au suivant tant qu'il
 n'est pas atteint.
 
+> **L'avancement réel vit dans `STATE.md`.** Les cases à cocher de ce
+> document décrivent le périmètre de chaque chantier, pas son état.
+
 ---
 
 ## Vue d'ensemble

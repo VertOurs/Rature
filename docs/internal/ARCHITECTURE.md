@@ -46,7 +46,7 @@ rature/
 │   ├── *.metainfo.xml.in
 │   └── *.gschema.xml           Préférences, si besoin
 ├── po/                         LINGUAS, POTFILES.in, fr.po
-├── tests/                      pytest, sur core/ uniquement
+├── tests/                      pytest : core/, empaquetage, versions
 ├── build-aux/flatpak/          Manifeste Flatpak
 ├── docs/
 ├── meson.build

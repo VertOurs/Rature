@@ -1,6 +1,5 @@
+# Only sources that carry strings marked for translation.
+# The Python UI modules return here in milestone 3, when they gain _() calls.
 data/io.github.vertours.Rature.desktop.in
 data/io.github.vertours.Rature.metainfo.xml.in
 data/ui/window.ui
-src/rature/main.py
-src/rature/ui/application.py
-src/rature/ui/window.py

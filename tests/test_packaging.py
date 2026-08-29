@@ -1,13 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
-"""Guards on the packaging wiring: gettext lists, gresource, desktop entry."""
+"""Packaging wiring guards; merged-file validation runs in the meson CI job."""
 
-import shutil
-import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
-
-import pytest
 
 REPO = Path(__file__).parent.parent
 DATA = REPO / "data"
@@ -49,43 +45,3 @@ def test_desktop_entry_points_at_the_launcher_and_icon() -> None:
 def test_scalable_icon_is_installed_under_the_app_id() -> None:
     icon = DATA / "icons/hicolor/scalable/apps" / f"{APP_ID}.svg"
     assert icon.is_file()
-
-
-@pytest.mark.skipif(
-    shutil.which("desktop-file-validate") is None,
-    reason="desktop-file-validate is not installed",
-)
-def test_desktop_file_validates(tmp_path: Path) -> None:
-    candidate = tmp_path / f"{APP_ID}.desktop"
-    candidate.write_text(
-        (DATA / f"{APP_ID}.desktop.in").read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
-    result = subprocess.run(
-        ["desktop-file-validate", str(candidate)],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, result.stdout + result.stderr
-
-
-@pytest.mark.skipif(
-    shutil.which("appstreamcli") is None,
-    reason="appstreamcli is not installed",
-)
-def test_metainfo_has_no_validation_errors() -> None:
-    result = subprocess.run(
-        [
-            "appstreamcli",
-            "validate",
-            "--no-net",
-            "--explain",
-            str(DATA / f"{APP_ID}.metainfo.xml.in"),
-        ],
-        capture_output=True,
-        text=True,
-    )
-    errors = [
-        line for line in result.stdout.splitlines() if line.lstrip().startswith("E:")
-    ]
-    assert not errors, "\n".join(errors)
