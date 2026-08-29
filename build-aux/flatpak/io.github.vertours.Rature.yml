@@ -13,13 +13,6 @@ finish-args:
   - --device=dri
   - --share=ipc
 
-cleanup:
-  - /include
-  - /lib/pkgconfig
-  - /share/man
-  - '*.a'
-  - '*.la'
-
 modules:
   - name: rature
     buildsystem: meson
