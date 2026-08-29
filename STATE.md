@@ -84,9 +84,9 @@ Faits durables à garder pour la suite :
 
 ## Revue externe du 29 août 2026
 
-Revue reçue dans `review/SESSION-C-BRIEF.md`, visait le commit `a8f98ea`.
-Partie 3 déjà couverte par la session C. Partie 2, les neuf correctifs,
-appliquée sur la branche `chore/post-review-cleanup` :
+Revue externe reçue le 29 août 2026, non versionnée, visait le commit
+`a8f98ea`. Partie 3 déjà couverte par la session C. Partie 2, les neuf
+correctifs, appliquée sur la branche `chore/post-review-cleanup` :
 
 - `.venv/` ignoré explicitement, bloc d'exemple de `CHANTIER-0.md` rafraîchi
 - chemins réels dans `CLAUDE.md` §11
@@ -100,8 +100,8 @@ appliquée sur la branche `chore/post-review-cleanup` :
   `ROADMAP.md` et `CHANTIER-0.md`, listes de préfixes de branche unifiées
 - ADR 0006 sur l'installation sous `datadir`
 
-Le fichier `review/` n'est pas versionné, décision prise : une revue datée
-devient fausse au fil des correctifs.
+Les fichiers de revue ne sont pas versionnés (`review/` est dans
+`.gitignore`) : une revue datée devient fausse au fil des correctifs.
 
 ## Chantier 1, à venir
 

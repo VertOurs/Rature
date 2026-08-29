@@ -60,6 +60,9 @@ htmlcov/
 # Local environment
 .venv/
 
+# Session reviews, not versioned
+review/
+
 # Editors
 .idea/
 .vscode/
