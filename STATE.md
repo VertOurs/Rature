@@ -21,11 +21,12 @@ Mis à jour en fin de chaque session. Le cadrage stable est dans `CLAUDE.md`.
   (chantier 0, squash de la PR #1)
 - Signature GPG active : clé ed25519
   `25DA27801D5F4ECA1DAA2101E89227EAC418BC4A`,
-  `git config --local commit.gpgsign true`. Clé publique à ajouter à GitHub
-  pour la mention « Verified » sur les futurs commits
-- **Ouvert, côté VertOurs** : activer « Require status checks » dans le
-  ruleset `main`, jobs `lint`, `test`, `meson`, `flatpak`, maintenant que la
-  CI existe
+  `git config --local commit.gpgsign true`.
+- **Ouvert, côté VertOurs** :
+  - activer « Require status checks » dans le ruleset `main`, jobs `lint`,
+    `test`, `meson`, `flatpak`
+  - ajouter la clé GPG publique à GitHub pour la mention « Verified »
+  - supprimer le dossier local `review/` (désormais dans `.gitignore`)
 
 ## Versions retenues
 
@@ -88,7 +89,8 @@ Revue externe reçue le 29 août 2026, non versionnée, visait le commit
 `a8f98ea`. Partie 3 déjà couverte par la session C. Partie 2, les neuf
 correctifs, appliquée sur la branche `chore/post-review-cleanup` :
 
-- `.venv/` ignoré explicitement, bloc d'exemple de `CHANTIER-0.md` rafraîchi
+- `.venv/` ignoré explicitement, bloc d'exemple de
+  `docs/internal/CHANTIER-0.md` rafraîchi
 - chemins réels dans `CLAUDE.md` §11
 - `test_version_sources_agree` : accord entre `__init__.py`, `pyproject.toml`,
   `meson.build` et la dernière `<release>` du metainfo. Un bump laisse la
@@ -97,11 +99,47 @@ correctifs, appliquée sur la branche `chore/post-review-cleanup` :
 - `POTFILES.in` réduit aux fichiers portant des chaînes marquées
 - `[dependency-groups] dev` ajouté
 - `STATE.md` désigné source unique de l'avancement, en-tête ajouté sur
-  `ROADMAP.md` et `CHANTIER-0.md`, listes de préfixes de branche unifiées
+  `docs/internal/ROADMAP.md` et `docs/internal/CHANTIER-0.md`, listes de
+  préfixes de branche unifiées
 - ADR 0006 sur l'installation sous `datadir`
 
 Les fichiers de revue ne sont pas versionnés (`review/` est dans
 `.gitignore`) : une revue datée devient fausse au fil des correctifs.
+
+## Correctifs pré-chantier 1, 29 août 2026
+
+Deuxième passe, branche `chore/pre-milestone-1`. Fusionne une seconde revue
+externe et un audit de cohérence interne. Les correctifs 1 à 3 fixent le
+style avant que le chantier 1 n'écrive du code.
+
+- **Règle de style reformulée** (`CLAUDE.md` §8, `CONTRIBUTING.md`). La
+  paraphrase reste interdite, mais un commentaire est attendu quand il porte
+  une raison (import local, appel système, contournement), une référence à
+  la spécification, ou un marqueur de temporaire. Les trois docstrings de la
+  session A sont conformes à la règle reformulée, elles ne sont pas
+  raccourcies.
+- Restaurés : le motif de l'import dans `main()`, le commentaire `SIGINT`
+  du lanceur, le placeholder du `GtkLabel`.
+- `review/` sorti du dépôt, renvoi mort de `STATE.md` retiré.
+- README aligné sur le chantier courant.
+- CHANGELOG corrigé (quatre jobs CI, groupe de dépendances).
+- CI durcie : déclenchée aussi sur `push` vers `main`, `pip` mis à niveau
+  avant `--group`, `meson` borné `>=1.9,<2`.
+- `CONTRIBUTING.md` : `--system-site-packages` retiré, sans effet sur le
+  double interpréteur.
+- Manifeste Flatpak : section `cleanup` supprimée, elle ne visait rien.
+- Vérifications de fond : `flatpak-builder@v6` courant (v6.7, maintenu),
+  image `gnome-50` validée par le job `flatpak` vert de la PR #3. Aucun
+  renvoi mort dans les documents de cadrage, les fichiers de `core/` cités
+  dans `ARCHITECTURE.md` sont des cibles du chantier 1, pas des liens.
+
+## Décision en attente
+
+**Règle `CLAUDE.md` §5.2.** Le mode agent enchaîne souvent cinq à dix
+commits par passe ; la règle « attendre l'accord message par message » n'est
+pas tenue. Arbitrage à rendre par VertOurs : (a) autoriser une validation
+groupée sur un plan de commits présenté d'avance, ou (b) maintenir la règle
+stricte. Rien n'est commité sur ce point avant l'accord.
 
 ## Chantier 1, à venir
 
