@@ -436,6 +436,16 @@ testable, ce qui est dans `ui/` ne l'est pas. Plus la logique remonte dans
 Le dépôt doit tenir devant un lecteur exigeant. L'historique git est la
 première chose qu'un recruteur technique regarde.
 
+### Style de code
+
+Pas de commentaires explicatifs inline (#) dans le code. Une fonction bien
+écrite se documente elle-même par son nom et sa structure. Si un commentaire
+semble nécessaire, c'est le signe que la fonction doit être refactorisée ou
+renommée, pas commentée.
+
+Docstrings courtes autorisées (une ligne, but de la fonction/classe/module).
+Pas de docstrings longues ou explicatives.
+
 ### Messages de commit : Conventional Commits 1.0.0
 
 Standard le plus répandu dans l'industrie, lisible par un humain et
