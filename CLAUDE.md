@@ -599,8 +599,10 @@ flatpak-builder --user --install --force-clean build-flatpak \
 flatpak run io.github.vertours.Rature
 
 # Validation des métadonnées
-appstreamcli validate data/io.github.vertours.Rature.metainfo.xml
-desktop-file-validate data/io.github.vertours.Rature.desktop
+# appstreamcli accepte la source ; desktop-file-validate exige un .desktop,
+# donc le fichier fusionné, présent après `meson compile`.
+appstreamcli validate data/io.github.vertours.Rature.metainfo.xml.in
+desktop-file-validate build/data/io.github.vertours.Rature.desktop
 flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
   manifest build-aux/flatpak/io.github.vertours.Rature.yml
 ```
