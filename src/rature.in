@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
 
-"""Installed entry point for Rature. Configured by Meson from rature.in."""
+"""Installed entry point for Rature, configured by Meson from rature.in."""
 
 import gettext
 import locale
@@ -16,8 +16,6 @@ LOCALEDIR = "@LOCALEDIR@"
 
 sys.path.insert(1, PKGDATADIR)
 
-# Ctrl+C in a terminal should kill the app, not raise KeyboardInterrupt
-# inside the GTK main loop.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 if hasattr(locale, "bindtextdomain"):
@@ -35,7 +33,6 @@ def _load_resources() -> None:
 
 if __name__ == "__main__":
     _load_resources()
-
     from rature.main import main
 
     sys.exit(main(VERSION))

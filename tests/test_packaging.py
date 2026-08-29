@@ -1,11 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
-"""Guards on the packaging wiring: gettext lists, gresource, desktop entry.
-
-These stay free of ``gi`` so they run on the tooling interpreter, which has
-no PyGObject. The GTK window itself is only checked by launching the app,
-see ``docs/internal/CHANTIER-0.md`` step 0.6.
-"""
+"""Guards on the packaging wiring: gettext lists, gresource, desktop entry."""
 
 import shutil
 import subprocess
@@ -61,8 +56,6 @@ def test_scalable_icon_is_installed_under_the_app_id() -> None:
     reason="desktop-file-validate is not installed",
 )
 def test_desktop_file_validates(tmp_path: Path) -> None:
-    # The source carries a .desktop.in suffix; the validator insists on
-    # .desktop, and its keys are plain (no translation merge needed to lint).
     candidate = tmp_path / f"{APP_ID}.desktop"
     candidate.write_text(
         (DATA / f"{APP_ID}.desktop.in").read_text(encoding="utf-8"),
