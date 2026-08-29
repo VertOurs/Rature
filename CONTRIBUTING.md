@@ -21,7 +21,7 @@ before writing code.
 ```
 python3 -m venv --system-site-packages .venv
 . .venv/bin/activate
-pip install ruff pytest
+pip install --group dev
 meson setup build
 meson compile -C build
 meson test -C build

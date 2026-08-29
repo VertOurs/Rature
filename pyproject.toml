@@ -2,8 +2,8 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 
 # Rature is built and installed by Meson, not by a Python build backend.
-# This file only carries project metadata and the configuration of the
-# development tools (ruff, pytest). It is deliberately free of a
+# This file carries project metadata, the development dependency group, and
+# the configuration of the development tools. It is deliberately free of a
 # [build-system] table so nothing invites `pip install .`.
 
 [project]
@@ -13,6 +13,14 @@ description = "Your day, one line at a time"
 requires-python = ">=3.13"
 license = "GPL-3.0-or-later"
 authors = [{ name = "VertOurs", email = "vertours.dev@gmail.com" }]
+
+# PEP 735. Install with `pip install --group dev` (pip 25.1+).
+[dependency-groups]
+dev = [
+    "ruff>=0.16",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+]
 
 [tool.ruff]
 line-length = 88
