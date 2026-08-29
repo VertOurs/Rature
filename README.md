@@ -23,13 +23,15 @@ The method it reproduces:
 
 ## Status
 
-Pre-release, built from a written specification. Not yet functionally
-complete: milestone 0, the foundations, is in progress. Design decisions and
-the roadmap live under `docs/internal/` (in French).
+Pre-release, built from a written specification. The foundations
+(milestone 0) are done; milestone 1, the business logic, is in progress.
+Nothing is functional yet and nothing is published. Design decisions and the
+roadmap live under `docs/internal/` (in French).
 
 ## Building from source
 
-Requires Meson, GTK 4, libadwaita and Python 3.13 or newer.
+Requires Meson, GTK 4, libadwaita, GLib and gettext development tools, and
+Python 3.13 or newer.
 
 ```
 meson setup build
