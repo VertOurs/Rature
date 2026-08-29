@@ -25,15 +25,19 @@ Mis à jour en fin de chaque session. Le cadrage stable est dans `CLAUDE.md`.
 
 ## Versions retenues
 
-Vérifiées le 26 août 2026, à revérifier avant toute mise à jour du manifeste,
-conformément à `CLAUDE.md` §4 règle 8.
+Revérifiées le 29 août 2026, à revérifier avant toute mise à jour du
+manifeste, conformément à `CLAUDE.md` §4 règle 8.
 
 | Élément | Version | Motif |
 |---|---|---|
-| Runtime | `org.gnome.Platform//50` | Seule stable courante, la 49 arrive en fin de vie |
+| Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
 | Python cible | 3.13 | Celui du runtime 50, et non le 3.14 de la machine de développement |
 | Version du projet | `0.1.0` | Premier jalon, rien de publiable |
-| Meson minimal | 1.11 | Version présente sur la machine |
+| Meson minimal | 1.9 | Version fournie par `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
+
+**Bump vers GNOME 51 à faire à partir du 16 septembre 2026** : manifeste,
+CI, `STATE.md`. Le chantier 0 ne publie rien, donc pas d'urgence, mais ne
+rien publier sur une 50 en fin de vie.
 
 ## Découpage restant du chantier 0
 

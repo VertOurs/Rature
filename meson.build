@@ -5,7 +5,7 @@ project(
   'rature',
   version: '0.1.0',
   license: 'GPL-3.0-or-later',
-  meson_version: '>= 1.11',
+  meson_version: '>= 1.9',
 )
 
 i18n = import('i18n')
