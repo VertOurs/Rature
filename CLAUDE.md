@@ -299,7 +299,8 @@ Discutées et tranchées. **Ne pas les rouvrir** sans demande explicite.
 
 Les décisions qui ont une histoire sont documentées dans `docs/adr/` :
 rejet de Flathub (0001), séparation `core` et `ui` (0002), fichier JSON
-unique (0003), abandon du prototype (0004), journal de suppressions (0005).
+unique (0003), abandon du prototype (0004), journal de suppressions (0005),
+installation du paquet sous `datadir` (0006).
 
 ### Décisions encore ouvertes
 
