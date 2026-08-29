@@ -16,8 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - gettext plumbing with a French catalogue.
 - An empty main window built from a `.ui` template.
 - Flatpak manifest building against the GNOME 50 runtime.
-- Continuous integration: ruff, pytest and a Flatpak build on every pull
-  request.
+- Continuous integration on every pull request: four jobs covering ruff,
+  pytest, metadata validation with meson, and a Flatpak build.
+- A PEP 735 development dependency group in `pyproject.toml`.
 - Repository conventions, including a code-style rule.
 
 [Unreleased]: https://github.com/VertOurs/Rature/commits/main
