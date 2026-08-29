@@ -14,6 +14,7 @@
           <object class="AdwHeaderBar"/>
         </child>
         <property name="content">
+          <!-- Placeholder for milestone 0. Replaced by the day view in milestone 3. -->
           <object class="GtkLabel">
             <property name="label" translatable="yes">Empty window</property>
             <property name="halign">center</property>

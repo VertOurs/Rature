@@ -16,6 +16,8 @@ LOCALEDIR = "@LOCALEDIR@"
 
 sys.path.insert(1, PKGDATADIR)
 
+# Ctrl+C in a terminal must kill the app, not surface as a KeyboardInterrupt
+# inside the GTK main loop.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 if hasattr(locale, "bindtextdomain"):

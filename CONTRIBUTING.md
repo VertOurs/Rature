@@ -18,8 +18,11 @@ before writing code.
 
 ## Development setup
 
+The venv is only for ruff, pytest and meson; running the app is handled by
+`-Dpython` below, not by the venv seeing system packages.
+
 ```
-python3 -m venv --system-site-packages .venv
+python3 -m venv .venv
 . .venv/bin/activate
 pip install --group dev
 meson setup build
@@ -28,8 +31,7 @@ meson test -C build
 ```
 
 The installed launcher runs under the interpreter Meson picks at setup time.
-On a host where the tooling interpreter has no PyGObject, point the launcher
-at one that does:
+On a host where that interpreter has no PyGObject, point it at one that does:
 
 ```
 meson setup build -Dpython=/usr/bin/python3
@@ -47,10 +49,14 @@ CI runs the same checks and a Flatpak build.
 
 ## Code style
 
-- No inline explanatory comments. A function that seems to need one should be
-  renamed or split.
-- One-line docstrings only, stating the purpose of a module, class or
-  function.
+- No comment that paraphrases the code. If a comment states what a line
+  does, fix the name or the structure instead.
+- A comment is expected when it carries something the code cannot: the
+  reason for a counter-intuitive choice (a local import, a system call, a
+  library workaround), a reference to the spec as `CLAUDE.md §2.7.1`, or the
+  temporary nature of an element and the milestone that replaces it.
+- One-line docstrings for modules, classes and functions. Longer only when
+  the why fits nowhere else.
 - Every user-visible string goes through `_()` and is marked translatable in
   `.ui` files.
 - English everywhere in the repository: names, comments, commit messages. The
