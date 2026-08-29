@@ -439,13 +439,18 @@ première chose qu'un recruteur technique regarde.
 
 ### Style de code
 
-Pas de commentaires explicatifs inline (#) dans le code. Une fonction bien
-écrite se documente elle-même par son nom et sa structure. Si un commentaire
-semble nécessaire, c'est le signe que la fonction doit être refactorisée ou
-renommée, pas commentée.
+Pas de commentaire qui paraphrase le code. Si un commentaire décrit ce
+que fait la ligne, c'est le nom ou la structure qu'il faut corriger.
 
-Docstrings courtes autorisées (une ligne, but de la fonction/classe/module).
-Pas de docstrings longues ou explicatives.
+Un commentaire est en revanche attendu quand il porte une information
+que le code ne peut pas porter :
+- la raison d'un choix contre-intuitif (import local, appel système,
+  contournement d'une limite d'une bibliothèque)
+- une référence à la spécification, sous la forme `CLAUDE.md §2.7.1`
+- le caractère temporaire d'un élément, avec le chantier qui le remplace
+
+Docstrings d'une ligne pour les modules, classes et fonctions. Plus long
+seulement si le pourquoi ne tient pas ailleurs.
 
 ### Messages de commit : Conventional Commits 1.0.0
 
