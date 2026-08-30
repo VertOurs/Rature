@@ -1,0 +1,103 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+
+"""XDG paths, atomic writes and day archiving. Holds no business logic."""
+
+from __future__ import annotations
+
+import json
+import os
+from dataclasses import dataclass, field
+from datetime import date
+from pathlib import Path
+
+from rature.core.models import RecurringItem, ReserveItem
+from rature.core.session import Day
+
+FILE_VERSION = 1
+_MAIN_FILE = "data.json"
+_ARCHIVE_DIR = "archive"
+
+
+def xdg_data_dir() -> Path:
+    root = os.environ.get("XDG_DATA_HOME")
+    base = Path(root) if root else Path.home() / ".local" / "share"
+    return base / "rature"
+
+
+@dataclass(kw_only=True)
+class Store:
+    """The whole data file: the current day plus the reserve and templates."""
+
+    day: Day
+    reserve: list[ReserveItem] = field(default_factory=list)
+    recurring: list[RecurringItem] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return {
+            "version": FILE_VERSION,
+            **self.day.to_dict(),
+            "reserve": [item.to_dict() for item in self.reserve],
+            "recurring": [item.to_dict() for item in self.recurring],
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Store:
+        return cls(
+            day=Day.from_dict(data),
+            reserve=[ReserveItem.from_dict(item) for item in data.get("reserve", [])],
+            recurring=[
+                RecurringItem.from_dict(item) for item in data.get("recurring", [])
+            ],
+        )
+
+
+def _atomic_write_json(path: Path, obj: dict) -> None:
+    # docs/adr/0003-fichier-json-unique.md: temp file in the same directory,
+    # flush, fsync the file, replace, then fsync the directory.
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    with open(tmp, "w", encoding="utf-8") as handle:
+        json.dump(obj, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(tmp, path)
+    dir_fd = os.open(path.parent, os.O_RDONLY)
+    try:
+        os.fsync(dir_fd)
+    finally:
+        os.close(dir_fd)
+
+
+def load(*, data_dir: Path | None = None) -> Store:
+    path = (data_dir or xdg_data_dir()) / _MAIN_FILE
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if raw.get("version") != FILE_VERSION:
+        # migrations.py plugs in here once a second version exists.
+        raise ValueError(f"unsupported data version {raw.get('version')!r}")
+    return Store.from_dict(raw)
+
+
+def save(store: Store, *, data_dir: Path | None = None) -> None:
+    target = data_dir or xdg_data_dir()
+    target.mkdir(parents=True, exist_ok=True)
+    _atomic_write_json(target / _MAIN_FILE, store.to_dict())
+
+
+def archive(day: Day, *, data_dir: Path | None = None) -> Path:
+    directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
+    directory.mkdir(parents=True, exist_ok=True)
+    path = _free_archive_path(directory, day.date)
+    _atomic_write_json(path, {"version": FILE_VERSION, **day.to_dict()})
+    return path
+
+
+def _free_archive_path(directory: Path, day_date: date) -> Path:
+    stem = day_date.isoformat()
+    candidate = directory / f"{stem}.json"
+    suffix = 2
+    while candidate.exists():
+        # ARCHITECTURE.md: never overwrite an archive.
+        candidate = directory / f"{stem}-{suffix}.json"
+        suffix += 1
+    return candidate
