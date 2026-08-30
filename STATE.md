@@ -6,9 +6,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 1, logique métier
-- **Étape suivante** : `core/models.py`, dataclasses `Task`, `ReserveItem`,
-  `RecurringItem`, sérialisation dict aller-retour. Découpage complet dans
+- **Chantier en cours** : 2, réserve et récurrentes (logique)
+- **Étape suivante** : réserve — ajouter, renommer, supprimer, envoyer au
+  jour ; puis récurrentes et passage du jour. Découpage complet dans
   `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
@@ -56,10 +56,14 @@ manifeste (`CLAUDE.md` §4 règle 8).
 - **Deux passes de correctifs**, PR #3 et #4 : revue externe et audit
   interne, règle de style reformulée, CI durcie, manifeste nettoyé. `CLAUDE.md`
   §5.2 tranchée, option (a).
-- **Déduplication documentaire**, deux sessions, PR #5 puis suivante :
-  spécification extraite dans `docs/internal/SPECIFICATION.md`, conventions
-  dans `CONTRIBUTING.md`, `CLAUDE.md` réduit de ~27 ko à ~11 ko, renvois
+- **Déduplication documentaire**, deux sessions, PR #5 et #6 : spécification
+  extraite dans `docs/internal/SPECIFICATION.md`, conventions dans
+  `CONTRIBUTING.md`, `CLAUDE.md` réduit de ~27 ko à ~11 ko, renvois
   normalisés sur `SPECIFICATION.md §X`.
+- **Chantier 1**, PR #7 à #11 : logique métier de `core/` —
+  `models` (Task, ReserveItem, RecurringItem, Deletion), `session` (liste du
+  jour et ses opérations), `storage` (JSON atomique, archivage), `migrations`
+  (socle). Couverture `rature.core` gatée à 90 % en CI, aucun import `gi`.
 
 ## Documents
 
