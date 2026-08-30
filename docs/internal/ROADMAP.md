@@ -1,7 +1,7 @@
 # Roadmap
 
-Le POC est abandonné. Cette roadmap décrit la construction, à partir de la
-spécification.
+Cette roadmap décrit la construction, à partir de la spécification. Le POC
+est abandonné, voir `docs/adr/0004-abandon-du-poc.md`.
 
 Chaque chantier a un critère de fin. On ne passe pas au suivant tant qu'il
 n'est pas atteint.
@@ -21,12 +21,6 @@ n'est pas atteint.
 | 3 | Interface reconstruite | Oui, beaucoup |
 | 4 | Confort et traductions | Oui |
 | 5 | Publication : dépôt auto-hébergé, AUR, COPR | Oui |
-
-Le POC est abandonné. Il n'est ni utilisé, ni migré, ni consulté, ni
-recopié, même partiellement. La construction repart de la spécification.
-
-L'auteur continue d'utiliser ses conversations Claude au quotidien en
-attendant. Aucune donnée à migrer, aucune urgence fonctionnelle.
 
 `0.9.x` correspond aux chantiers 0 à 4 terminés : fonctionnellement
 complet, non publié. `1.0.0` correspond au chantier 5 terminé :
@@ -86,12 +80,12 @@ La réserve et les récurrentes, côté logique uniquement.
 - [ ] Détection du changement de date à l'ouverture
 - [ ] Réserve et récurrentes présentes dès la version 1 du format,
       aucune migration à écrire
-- [ ] Une tâche tirée de la réserve puis renommée y retourne renommée (§2.7.1)
-- [ ] Une récurrente à `weekdays` vide est refusée par core (§2.7.2)
-- [ ] Supprimer une tâche issue de la réserve ne la fait pas revenir (§2.7.3)
-- [ ] Le passage du jour dédoublonne, l'ajout manuel en réserve non (§2.7.4)
-- [ ] Une journée remplie à 01:00 est archivée sous la date de la veille (§2.7.5)
-- [ ] Les horodatages stockés portent leur décalage horaire (§2.7.6)
+- [ ] Une tâche tirée de la réserve puis renommée y retourne renommée (`SPECIFICATION.md` §2.7.1)
+- [ ] Une récurrente à `weekdays` vide est refusée par core (`SPECIFICATION.md` §2.7.2)
+- [ ] Supprimer une tâche issue de la réserve ne la fait pas revenir (`SPECIFICATION.md` §2.7.3)
+- [ ] Le passage du jour dédoublonne, l'ajout manuel en réserve non (`SPECIFICATION.md` §2.7.4)
+- [ ] Une journée remplie à 01:00 est archivée sous la date de la veille (`SPECIFICATION.md` §2.7.5)
+- [ ] Les horodatages stockés portent leur décalage horaire (`SPECIFICATION.md` §2.7.6)
 
 **Critère de fin** : tous les cas de passage du jour sont testés, y compris
 le passage de plusieurs jours d'un coup et le passage à cheval sur minuit.
@@ -134,12 +128,9 @@ fenêtre Statistiques n'affiche aucune appréciation, seulement des nombres.
 
 ## Chantier 5 : publication
 
-Flathub est écarté. Sa politique interdit depuis mai 2026 tout contenu
-généré ou assisté par IA, ce qui exclut ce projet. Décision prise le
-24 août 2026, ne pas y revenir.
-
-Les exigences de qualité sont conservées telles quelles : elles servaient
-la maintenabilité autant que la conformité.
+Flathub est écarté, voir `docs/adr/0001-rejet-de-flathub.md`. Les exigences
+de qualité qu'il imposait sont conservées : elles servaient la
+maintenabilité autant que la conformité.
 
 ### 5.1 Qualité, inchangé
 

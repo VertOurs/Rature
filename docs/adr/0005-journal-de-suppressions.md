@@ -38,11 +38,11 @@ c'était l'absence de trace dans l'interface.
 - Le comptage des suppressions devient possible, par jour et par origine
 - L'annulation de suppression restaure la tâche à l'identique, sans
   reconstruction approximative
-- La formule de §2.2 a dû être reformulée. La disparition est
-  fonctionnelle : la tâche quitte toutes les vues et n'est jamais réaffichée.
-  Elle n'est pas une garantie de confidentialité, le texte restant lisible
-  pour qui ouvre le fichier d'archive à la main. Le document le dit
-  explicitement plutôt que de laisser croire l'inverse
+- La formule de `docs/internal/SPECIFICATION.md` §2.2 a dû être reformulée.
+  La disparition est fonctionnelle : la tâche quitte toutes les vues et
+  n'est jamais réaffichée. Elle n'est pas une garantie de confidentialité,
+  le texte restant lisible pour qui ouvre le fichier d'archive à la main. Le
+  document le dit explicitement plutôt que de laisser croire l'inverse
 - Interdiction permanente : la fenêtre Statistiques ne doit exposer le
   contenu du journal sous aucune forme, ni aperçu, ni recherche, ni export.
   Toute demande future en ce sens se heurte à ce choix, et c'est voulu
