@@ -12,7 +12,7 @@ from pathlib import Path
 
 from rature.core.migrations import CURRENT_VERSION, migrate
 from rature.core.models import RecurringItem, ReserveItem
-from rature.core.session import Day
+from rature.core.session import Day, Session
 
 FILE_VERSION = CURRENT_VERSION
 _MAIN_FILE = "data.json"
@@ -50,6 +50,17 @@ class Store:
                 RecurringItem.from_dict(item) for item in data.get("recurring", [])
             ],
         )
+
+    @classmethod
+    def from_session(cls, session: Session) -> Store:
+        return cls(
+            day=session.day,
+            reserve=session.reserve,
+            recurring=session.recurring,
+        )
+
+    def into_session(self) -> Session:
+        return Session(self.day, reserve=self.reserve, recurring=self.recurring)
 
 
 def _atomic_write_json(path: Path, obj: dict) -> None:

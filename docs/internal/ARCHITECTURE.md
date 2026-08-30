@@ -114,7 +114,7 @@ Fichier unique, versionné, dans `$XDG_DATA_HOME/rature/`.
     {"id": "uuid", "num": 1, "text": "...", "done": true,
      "done_at": "2026-08-24T14:32:07+02:00",
      "origin": "day|reserve|recurring",
-     "source_id": null, "template_id": null}
+     "source_id": null, "source_created": null, "template_id": null}
   ],
   "reserve": [
     {"id": "uuid", "text": "...", "created": "2026-08-20"}
@@ -138,14 +138,15 @@ Champs des tâches :
 | `done_at` | horodatage ISO local de la rature, `null` sinon. La rature est une trace de ce qui a été fait, encore faut-il savoir quand |
 | `origin` | `day`, `reserve` ou `recurring` |
 | `source_id` | uuid de l'item de réserve d'origine, `null` sinon. C'est lui, et non le texte, qui pilote le retour en réserve |
+| `source_created` | date `created` de l'item de réserve d'origine, copiée au tirage, `null` sinon. Relue au passage du jour pour restaurer l'item avec sa date d'origine |
 | `template_id` | uuid de la récurrente d'origine, `null` sinon |
 
 `weekdays` ne peut pas être vide, voir `SPECIFICATION.md` §2.7.2. Lundi vaut 0.
 « Tous les jours » s'écrit `[0,1,2,3,4,5,6]`.
 
 `done_at` et `deleted_at` portent toujours leur décalage horaire, voir
-`SPECIFICATION.md` §2.7.6. Le champ `created` des items de réserve reste une
-date simple, sans heure.
+`SPECIFICATION.md` §2.7.6. Les champs `created` des items de réserve et
+`source_created` des tâches restent des dates simples, sans heure.
 
 `deletions` est le journal de suppressions décrit dans `SPECIFICATION.md`
 §2.2. Il conserve l'entrée complète, texte compris, ce qui permet à
