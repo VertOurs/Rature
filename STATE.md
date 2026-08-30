@@ -91,7 +91,7 @@ correctifs, appliquée sur la branche `chore/post-review-cleanup` :
 
 - `.venv/` ignoré explicitement, bloc d'exemple de
   `docs/internal/CHANTIER-0.md` rafraîchi
-- chemins réels dans `CLAUDE.md` §11
+- chemins réels dans les commandes de validation des métadonnées
 - `test_version_sources_agree` : accord entre `__init__.py`, `pyproject.toml`,
   `meson.build` et la dernière `<release>` du metainfo. Un bump laisse la
   suite rouge tant que l'entrée metainfo n'est pas écrite, c'est voulu

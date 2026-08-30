@@ -151,13 +151,32 @@ frequent action has a shortcut.
 
 ## Translations
 
-gettext, catalogues in `po/`, French first. Regenerate the template and
-merge new strings with:
+gettext, catalogues in `po/`, French first. Regenerate the template, merge
+new strings, and check completeness with:
 
 ```
 meson compile -C build rature-pot
 meson compile -C build rature-update-po
+msgfmt --statistics po/fr.po -o /dev/null
 ```
+
+## Reference commands
+
+Beyond the setup and pre-PR checks above:
+
+```bash
+# core/ coverage gate, enforced from milestone 1 on (see docs/internal/ROADMAP.md)
+pytest --cov=rature.core --cov-fail-under=90
+
+# Metadata (appstreamcli reads the source; desktop-file-validate needs the
+# merged .desktop, present after `meson compile`)
+appstreamcli validate data/io.github.vertours.Rature.metainfo.xml.in
+desktop-file-validate build/data/io.github.vertours.Rature.desktop
+flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
+  manifest build-aux/flatpak/io.github.vertours.Rature.yml
+```
+
+Building and running the Flatpak: see `README.md`.
 
 ## License
 

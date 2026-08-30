@@ -35,12 +35,10 @@ aussi pour l'historique git, les messages de commit, les tests, la CI, le
 README et la lisibilité de l'ensemble. Un dépôt se juge autant sur sa forme
 que sur ce qu'il fait.
 
-**Le POC est abandonné.** Il n'est ni utilisé, ni migré, ni consulté, ni
-recopié, même partiellement. La construction repart de la spécification
-(`docs/internal/SPECIFICATION.md`). L'auteur continue d'utiliser ses
-conversations Claude au quotidien en attendant que l'application soit prête,
-il n'y a donc aucune urgence fonctionnelle et aucune donnée existante à
-préserver.
+**Le POC est abandonné.** Voir `docs/adr/0004-abandon-du-poc.md`. La
+construction repart de la spécification (`docs/internal/SPECIFICATION.md`).
+Aucune urgence fonctionnelle, aucune donnée à préserver : l'auteur continue
+d'utiliser ses conversations Claude au quotidien en attendant.
 
 ---
 
@@ -95,8 +93,8 @@ installation du paquet sous `datadir` (0006).
 
 ## 4. Règles absolues
 
-1. **`core/` n'importe jamais `gi`, GTK, Adw ou Gdk.** Si une fonction a
-   besoin de GTK, elle n'appartient pas à `core/`. Aucune exception.
+1. **`core/` n'importe jamais `gi`, GTK, Adw ou Gdk.** Aucune exception. Le
+   pourquoi : `docs/adr/0002-separation-core-ui.md`.
 2. **Toute chaîne affichée passe par `_()`.** Jamais de texte en dur dans le
    code ou dans un `.ui` non marqué comme traduisible.
 3. **Anglais partout dans le dépôt** : variables, fonctions, noms de
@@ -105,15 +103,9 @@ installation du paquet sous `datadir` (0006).
 4. **Un chantier à la fois.** Ne pas proposer de fonctionnalité appartenant à
    un chantier ultérieur, même si elle est facile. La noter dans la roadmap
    et passer à autre chose.
-5. **Flathub est écarté définitivement.** La politique de Flathub, durcie le
-   29 mai 2026, interdit tout contenu généré ou assisté par IA, dans
-   l'application comme dans la soumission (manifeste, métadonnées,
-   correctifs, scripts de build, pull request). Elle n'est pas rétroactive
-   et prévoit des exceptions pour les projets matures et bien maintenus, ce
-   qui ne correspond pas à un projet qui démarre. GNOME Circle a par
-   ailleurs suspendu ses nouvelles soumissions le 30 mai 2026. Décision du
-   24 août 2026 : ni Flathub, ni GNOME Circle. Ne pas la reproposer, ne pas
-   la contourner, ne pas la commenter à chaque session.
+5. **Ni Flathub, ni GNOME Circle.** Écarté définitivement, voir
+   `docs/adr/0001-rejet-de-flathub.md`. Ne pas reproposer, ne pas contourner,
+   ne pas commenter à chaque session.
 6. **Pas de nouvelle dépendance sans validation explicite.** Trois
    catégories, à ne pas confondre :
    - Exécution : runtime GNOME (PyGObject, GTK, libadwaita) et bibliothèque
@@ -263,34 +255,8 @@ fusion, versionnage, releases, interface, traductions) vivent dans
 
 ## 11. Commandes de référence
 
-```bash
-# Développement
-meson setup build
-meson compile -C build
-meson test -C build
-
-# Qualité
-ruff check .
-ruff format --check .
-pytest
-pytest --cov=rature.core --cov-fail-under=90
-
-# Traductions
-msgfmt --statistics po/fr.po -o /dev/null
-
-# Flatpak local
-flatpak-builder --user --install --force-clean build-flatpak \
-  build-aux/flatpak/io.github.vertours.Rature.yml
-flatpak run io.github.vertours.Rature
-
-# Validation des métadonnées
-# appstreamcli accepte la source ; desktop-file-validate exige un .desktop,
-# donc le fichier fusionné, présent après `meson compile`.
-appstreamcli validate data/io.github.vertours.Rature.metainfo.xml.in
-desktop-file-validate build/data/io.github.vertours.Rature.desktop
-flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
-  manifest build-aux/flatpak/io.github.vertours.Rature.yml
-```
+Commandes de développement et de vérification : `CONTRIBUTING.md`. Build et
+lancement côté utilisateur : `README.md`.
 
 ---
 
