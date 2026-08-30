@@ -74,8 +74,7 @@ Discutées et tranchées. **Ne pas les rouvrir** sans demande explicite.
 | Données | JSON versionné, écriture atomique, migrations testées |
 | Qualité | ruff, pytest, CI GitHub Actions |
 | Sort du POC | Abandonné. Ni utilisé, ni migré, ni consulté, ni recopié |
-| Version 0.9.x | Chantiers 0 à 4 terminés, fonctionnellement complet, non publié |
-| Version 1.0.0 | Chantier 5 terminé, installable et mis à jour depuis le dépôt auto-hébergé |
+| Jalons | Sens de `0.9.x` et `1.0.0` : `docs/internal/ROADMAP.md` |
 
 Les décisions qui ont une histoire sont documentées dans `docs/adr/` :
 rejet de Flathub (0001), séparation `core` et `ui` (0002), fichier JSON

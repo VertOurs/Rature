@@ -7,16 +7,10 @@ structure change.
 
 ## La règle qui compte
 
-**`core/` ne connaît pas l'interface graphique.**
-
-Aucun fichier de `core/` n'importe `gi`, GTK, Adw ou Gdk. Conséquences :
-
-- La logique se teste sans écran, donc en intégration continue
-- Un bug se reproduit dans un test de dix lignes, pas en cliquant
-- L'interface peut être refaite sans toucher aux règles métier
-- Le code se relit sans connaître GTK
-
-Si une fonction a besoin de GTK, elle n'appartient pas à `core/`.
+**`core/` ne connaît pas l'interface graphique.** Aucun fichier de `core/`
+n'importe `gi`, GTK, Adw ou Gdk. Si une fonction a besoin de GTK, elle
+n'appartient pas à `core/`. Le pourquoi et ses conséquences :
+`docs/adr/0002-separation-core-ui.md`.
 
 ---
 
@@ -73,14 +67,9 @@ créée, ce qui permet de l'y remettre au passage du jour.
 Ne lit ni n'écrit aucun fichier. Reçoit et rend des objets.
 
 ### `core/storage.py`
-Chemins XDG, lecture, écriture atomique, archivage.
-
-Écriture atomique : écrire dans un fichier temporaire situé dans le même
-répertoire (donc le même système de fichiers), appeler `flush` puis
-`os.fsync` sur ce fichier, le fermer, faire `os.replace` vers le nom
-définitif, puis `os.fsync` sur le descripteur du répertoire. Sans le `fsync`
-du répertoire, le renommage peut être perdu lors d'une coupure et la
-garantie annoncée est fausse.
+Chemins XDG, lecture, écriture atomique, archivage. La procédure d'écriture
+atomique, `fsync` du répertoire compris, est dans
+`docs/adr/0003-fichier-json-unique.md`.
 
 ### `core/migrations.py`
 Une fonction par saut de version. Chaque migration a son test avec un
@@ -239,13 +228,11 @@ journée, pas une destination exclusive.
 
 Décisions de simplicité, à ne pas remettre en cause sans raison forte.
 
-- Pas de base de données, un fichier JSON suffit à cette échelle
 - Pas de dates d'échéance, ni de priorités, ni d'étiquettes
-- Pas de synchronisation réseau, ni de compte
-- Pas de client mobile, ni de fichier de capture externe. Décision prise le
-  24 août 2026 : l'application est de bureau, sur un seul poste. Elle serait
-  un autre projet autrement.
 - Pas de sous-tâches
+- Pas de base de données, un fichier JSON suffit à cette échelle. Voir
+  `docs/adr/0003-fichier-json-unique.md`
+- Pas de synchronisation réseau, ni de client mobile, ni de fichier de
+  capture externe. Voir `ROADMAP.md`, « Repoussé volontairement »
 - Pas de dépendance d'exécution hors runtime GNOME et bibliothèque standard
-  Python. Meson et gettext sont des dépendances de construction, ruff et
-  pytest des dépendances de développement. Voir `CLAUDE.md` §4 règle 6
+  Python. Voir `CLAUDE.md` §4 règle 6
