@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
-from rature.core.models import Deletion, Origin, Task
+from rature.core.models import Deletion, Origin, RecurringItem, ReserveItem, Task
 
 
 class LockedError(Exception):
@@ -58,10 +58,18 @@ class Day:
 
 
 class Session:
-    """Operations on a single day."""
+    """Operations on a day, its reserve and its recurring templates."""
 
-    def __init__(self, day: Day) -> None:
+    def __init__(
+        self,
+        day: Day,
+        *,
+        reserve: list[ReserveItem] | None = None,
+        recurring: list[RecurringItem] | None = None,
+    ) -> None:
         self.day = day
+        self.reserve = reserve if reserve is not None else []
+        self.recurring = recurring if recurring is not None else []
 
     @property
     def struck(self) -> list[Task]:
@@ -131,3 +139,37 @@ class Session:
 
     def unlock(self) -> None:
         self.day.locked = False
+
+    def _reserve_item(self, item_id: str) -> ReserveItem:
+        for item in self.reserve:
+            if item.id == item_id:
+                return item
+        raise KeyError(item_id)
+
+    def add_to_reserve(self, text: str, *, today: date | None = None) -> ReserveItem:
+        # SPECIFICATION.md §2.7.4: manual reserve entries are never de-duplicated.
+        item = ReserveItem(text=text, created=today or date.today())
+        self.reserve.append(item)
+        return item
+
+    def rename_reserve(self, item_id: str, text: str) -> None:
+        self._reserve_item(item_id).text = text
+
+    def delete_from_reserve(self, item_id: str) -> None:
+        self.reserve.remove(self._reserve_item(item_id))
+
+    def draw_from_reserve(self, item_id: str) -> Task:
+        if self.day.locked:
+            raise LockedError("the list is frozen")
+        item = self._reserve_item(item_id)
+        # SPECIFICATION.md §2.5: a move, not a copy; source_id links back.
+        task = Task(
+            num=self.day.counter,
+            text=item.text,
+            origin=Origin.RESERVE,
+            source_id=item.id,
+        )
+        self.day.counter += 1
+        self.day.tasks.append(task)
+        self.reserve.remove(item)
+        return task
