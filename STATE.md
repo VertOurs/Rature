@@ -112,7 +112,7 @@ Deuxième passe, branche `chore/pre-milestone-1`. Fusionne une seconde revue
 externe et un audit de cohérence interne. Les correctifs 1 à 3 fixent le
 style avant que le chantier 1 n'écrive du code.
 
-- **Règle de style reformulée** (`CLAUDE.md` §8, `CONTRIBUTING.md`). La
+- **Règle de style reformulée** (`CONTRIBUTING.md` « Code style »). La
   paraphrase reste interdite, mais un commentaire est attendu quand il porte
   une raison (import local, appel système, contournement), une référence à
   la spécification, ou un marqueur de temporaire. Les trois docstrings de la
