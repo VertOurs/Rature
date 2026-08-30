@@ -11,10 +11,11 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
+from rature.core.migrations import CURRENT_VERSION, migrate
 from rature.core.models import RecurringItem, ReserveItem
 from rature.core.session import Day
 
-FILE_VERSION = 1
+FILE_VERSION = CURRENT_VERSION
 _MAIN_FILE = "data.json"
 _ARCHIVE_DIR = "archive"
 
@@ -71,10 +72,7 @@ def _atomic_write_json(path: Path, obj: dict) -> None:
 
 def load(*, data_dir: Path | None = None) -> Store:
     path = (data_dir or xdg_data_dir()) / _MAIN_FILE
-    raw = json.loads(path.read_text(encoding="utf-8"))
-    if raw.get("version") != FILE_VERSION:
-        # migrations.py plugs in here once a second version exists.
-        raise ValueError(f"unsupported data version {raw.get('version')!r}")
+    raw = migrate(json.loads(path.read_text(encoding="utf-8")))
     return Store.from_dict(raw)
 
 
