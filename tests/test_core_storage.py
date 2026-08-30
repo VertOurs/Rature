@@ -126,6 +126,34 @@ def test_archive_keeps_the_deletion_journal(tmp_path: Path) -> None:
     assert archived["deletions"][0]["text"] == "gone"
 
 
+def test_store_from_session_captures_the_three_parts() -> None:
+    session = Session(Day(date=date(2026, 8, 24)))
+    session.add("day task")
+    session.add_to_reserve("later", today=date(2026, 8, 20))
+    session.add_recurring("weekly", [2])
+    store = Store.from_session(session)
+    assert store.day is session.day
+    assert store.reserve is session.reserve
+    assert store.recurring is session.recurring
+
+
+def test_store_into_session_hands_the_three_parts_back() -> None:
+    store = make_store()
+    session = store.into_session()
+    assert session.day is store.day
+    assert session.reserve is store.reserve
+    assert session.recurring is store.recurring
+
+
+def test_a_session_survives_save_from_session_then_into_session(tmp_path: Path) -> None:
+    session = Session(Day(date=date(2026, 8, 24)))
+    item = session.add_to_reserve("errand", today=date(2026, 8, 10))
+    drawn = session.draw_from_reserve(item.id)
+    save(Store.from_session(session), data_dir=tmp_path)
+    loaded = load(data_dir=tmp_path).into_session()
+    assert loaded.day.tasks[0].source_created == drawn.source_created
+
+
 def test_a_hand_written_task_round_trips(tmp_path: Path) -> None:
     day = Day(
         date=date(2026, 8, 24),
