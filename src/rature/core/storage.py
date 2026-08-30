@@ -57,12 +57,16 @@ def _atomic_write_json(path: Path, obj: dict) -> None:
     # docs/adr/0003-fichier-json-unique.md: temp file in the same directory,
     # flush, fsync the file, replace, then fsync the directory.
     tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    with open(tmp, "w", encoding="utf-8") as handle:
-        json.dump(obj, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    os.replace(tmp, path)
+    try:
+        with open(tmp, "w", encoding="utf-8") as handle:
+            json.dump(obj, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, path)
+    finally:
+        # A no-op after a successful replace; removes the orphan on failure.
+        tmp.unlink(missing_ok=True)
     dir_fd = os.open(path.parent, os.O_RDONLY)
     try:
         os.fsync(dir_fd)

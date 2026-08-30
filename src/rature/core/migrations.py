@@ -40,5 +40,8 @@ def migrate(
         if step is None:
             raise ValueError(f"no migration from version {version}")
         data = step(data)
-        version = data["version"]
+        new_version = data.get("version")
+        if not isinstance(new_version, int) or new_version <= version:
+            raise RuntimeError(f"migration from version {version} did not advance it")
+        version = new_version
     return data

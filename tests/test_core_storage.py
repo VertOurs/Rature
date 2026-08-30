@@ -13,6 +13,7 @@ from rature.core.session import Day, Session
 from rature.core.storage import (
     FILE_VERSION,
     Store,
+    _atomic_write_json,
     archive,
     load,
     save,
@@ -65,6 +66,12 @@ def test_save_creates_the_directory(tmp_path: Path) -> None:
 def test_save_leaves_no_temporary_file(tmp_path: Path) -> None:
     save(make_store(), data_dir=tmp_path)
     assert [p.name for p in tmp_path.iterdir()] == ["data.json"]
+
+
+def test_a_failed_write_leaves_no_temporary_file(tmp_path: Path) -> None:
+    with pytest.raises(TypeError):
+        _atomic_write_json(tmp_path / "data.json", {"bad": object()})
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_load_missing_file_raises(tmp_path: Path) -> None:
