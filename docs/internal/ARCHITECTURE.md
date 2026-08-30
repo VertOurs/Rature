@@ -161,8 +161,14 @@ nom de fichier est celle du jour archivé, jamais la date système au moment de
 l'archivage, voir `SPECIFICATION.md` §2.7.5.
 
 Chaque fichier d'archive porte un champ `version`, comme le fichier principal.
-Si le fichier existe déjà, écrire `AAAA-MM-JJ-2.json`, puis `-3`, et ainsi de
-suite. Ne jamais écraser une archive.
+
+L'archivage écrase un fichier de même date, c'est volontaire. L'appelant
+archive d'abord, sauvegarde ensuite ; un crash entre les deux rejoue le
+passage du jour au lancement suivant et réécrit la même archive avec le même
+contenu. Cette idempotence soutient la garantie « aucune donnée n'est
+perdue » de `SPECIFICATION.md` §2.5. Comme le passage du jour refuse de
+s'exécuter tant que la date de référence n'a pas avancé, deux journées
+distinctes ne peuvent pas porter la même date d'archive.
 
 ---
 

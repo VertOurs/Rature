@@ -104,12 +104,12 @@ def test_archive_is_named_after_the_day_date(tmp_path: Path) -> None:
     assert path == tmp_path / "archive" / "2026-08-24.json"
 
 
-def test_archive_never_overwrites(tmp_path: Path) -> None:
+def test_archive_overwrites_the_same_date(tmp_path: Path) -> None:
     first = archive(Day(date=date(2026, 8, 24), counter=5), data_dir=tmp_path)
     second = archive(Day(date=date(2026, 8, 24), counter=9), data_dir=tmp_path)
-    assert second.name == "2026-08-24-2.json"
-    assert json.loads(first.read_text(encoding="utf-8"))["counter"] == 5
+    assert first == second
     assert json.loads(second.read_text(encoding="utf-8"))["counter"] == 9
+    assert list((tmp_path / "archive").iterdir()) == [second]
 
 
 def test_archive_carries_a_version(tmp_path: Path) -> None:

@@ -122,7 +122,9 @@ changé, ou manuellement :
    début et de fin, insensible à la casse, accents conservés
 4. Les tâches non faites issues d'une récurrente sont abandonnées, elles
    reviendront d'elles-mêmes
-5. Le compteur repart à 1, la liste est déverrouillée
+5. Le compteur repart à 1, la liste est déverrouillée. Le journal de
+   suppressions part avec l'archive, la nouvelle journée démarre avec un
+   journal vide
 6. Les récurrentes du jour sont injectées
 
 Si plusieurs jours se sont écoulés depuis la dernière ouverture, le passage

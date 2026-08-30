@@ -50,3 +50,7 @@ c'était l'absence de trace dans l'interface.
   comptage dérive. À couvrir par un test au chantier 4
 - Le champ existe dès la version 1 du format, pour ne pas imposer une
   migration sur données réelles
+- Le journal est porté par la journée, pas global : il part avec l'archive
+  au passage du jour, la nouvelle journée en ouvre un vide. Chaque entrée
+  garde le texte complet et l'origine (`day`, `reserve` ou `recurring`),
+  jamais affichée

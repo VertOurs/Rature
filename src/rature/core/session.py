@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from rature.core.models import Deletion, Origin, RecurringItem, ReserveItem, Task
 from rature.core.recurrence import due_on
@@ -18,6 +18,16 @@ class LockedError(Exception):
 
 def _now() -> datetime:
     return datetime.now().astimezone()
+
+
+def reference_date(now: datetime) -> date:
+    """The day a moment belongs to; the boundary is 04:00 local time."""
+    return (now - timedelta(hours=4)).date()
+
+
+def _norm(text: str) -> str:
+    """Trim the ends and casefold; for the rollover duplicate check only."""
+    return text.strip().casefold()
 
 
 def _stamp(now: datetime | None) -> datetime:
@@ -169,6 +179,7 @@ class Session:
             text=item.text,
             origin=Origin.RESERVE,
             source_id=item.id,
+            source_created=item.created,
         )
         self.day.counter += 1
         self.day.tasks.append(task)
@@ -220,3 +231,32 @@ class Session:
             self.day.tasks.append(task)
             created.append(task)
         return created
+
+    def rollover_due(self, now: datetime) -> bool:
+        return reference_date(now) > self.day.date
+
+    def roll_over(self, now: datetime) -> Day:
+        """Run the SPECIFICATION.md §2.5 rollover; archive the old day, then save."""
+        if not self.rollover_due(now):
+            raise ValueError("no rollover is due")
+        old = self.day
+        new_date = reference_date(now)
+        for task in old.tasks:
+            if not task.done and task.origin == Origin.RESERVE:
+                self.reserve.append(
+                    ReserveItem(
+                        id=task.source_id,
+                        text=task.text,
+                        created=task.source_created,
+                    )
+                )
+        seen = {_norm(item.text) for item in self.reserve}
+        for task in old.tasks:
+            if not task.done and task.origin == Origin.DAY:
+                key = _norm(task.text)
+                if key not in seen:
+                    self.reserve.append(ReserveItem(text=task.text, created=new_date))
+                    seen.add(key)
+        self.day = Day(date=new_date)
+        self.inject_recurring(new_date.weekday())
+        return old
