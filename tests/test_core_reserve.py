@@ -64,6 +64,7 @@ def test_draw_moves_the_item_into_the_day() -> None:
     assert task.text == "do this"
     assert task.origin == Origin.RESERVE
     assert task.source_id == item.id
+    assert task.source_created == item.created
 
 
 def test_draw_assigns_the_next_number() -> None:

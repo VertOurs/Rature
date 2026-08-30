@@ -54,6 +54,19 @@ def test_cryptic_text_is_stored_verbatim() -> None:
     assert Task.from_dict(task.to_dict()).text == "  MTG w/ P re: Q3  "
 
 
+def test_source_created_round_trips() -> None:
+    task = Task(
+        num=3,
+        text="drawn",
+        origin=Origin.RESERVE,
+        source_id="r1",
+        source_created=date(2026, 8, 20),
+    )
+    restored = Task.from_dict(task.to_dict())
+    assert restored.source_created == date(2026, 8, 20)
+    assert restored == task
+
+
 def test_reserve_item_round_trips_with_a_plain_date() -> None:
     item = ReserveItem(text="someday thing", created=date(2026, 8, 20))
     assert item.to_dict()["created"] == "2026-08-20"
