@@ -34,6 +34,7 @@ class Task:
     done: bool = False
     done_at: datetime | None = None
     source_id: str | None = None
+    source_created: date | None = None
     template_id: str | None = None
 
     def __post_init__(self) -> None:
@@ -51,12 +52,16 @@ class Task:
             "done_at": self.done_at.isoformat() if self.done_at else None,
             "origin": self.origin.value,
             "source_id": self.source_id,
+            "source_created": (
+                self.source_created.isoformat() if self.source_created else None
+            ),
             "template_id": self.template_id,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> Task:
         done_at = data["done_at"]
+        source_created = data["source_created"]
         return cls(
             id=data["id"],
             num=data["num"],
@@ -65,6 +70,9 @@ class Task:
             done_at=datetime.fromisoformat(done_at) if done_at else None,
             origin=Origin(data["origin"]),
             source_id=data["source_id"],
+            source_created=(
+                date.fromisoformat(source_created) if source_created else None
+            ),
             template_id=data["template_id"],
         )
 

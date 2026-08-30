@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass, field
-from datetime import date
 from pathlib import Path
 
 from rature.core.migrations import CURRENT_VERSION, migrate
@@ -87,19 +86,9 @@ def save(store: Store, *, data_dir: Path | None = None) -> None:
 
 
 def archive(day: Day, *, data_dir: Path | None = None) -> Path:
+    """Write the day to archive/<day.date>.json, overwriting any earlier archive."""
     directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
     directory.mkdir(parents=True, exist_ok=True)
-    path = _free_archive_path(directory, day.date)
+    path = directory / f"{day.date.isoformat()}.json"
     _atomic_write_json(path, {"version": FILE_VERSION, **day.to_dict()})
     return path
-
-
-def _free_archive_path(directory: Path, day_date: date) -> Path:
-    stem = day_date.isoformat()
-    candidate = directory / f"{stem}.json"
-    suffix = 2
-    while candidate.exists():
-        # ARCHITECTURE.md: never overwrite an archive.
-        candidate = directory / f"{stem}-{suffix}.json"
-        suffix += 1
-    return candidate
