@@ -23,5 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Business logic in `core/`: the day list with its operations, the reserve
   and recurring models, atomic JSON storage with day archiving, and the
   migration base. No GUI. CI gates `core/` coverage at 90%.
+- Reserve and recurring logic in `core/`: reserve editing and the draw into
+  the day, recurring templates and which apply on a weekday, and the day
+  rollover with the 04:00 reference date, the reserve return, text
+  de-duplication, and the multi-day catch-up. Still no GUI.
 
 [Unreleased]: https://github.com/VertOurs/Rature/commits/main
