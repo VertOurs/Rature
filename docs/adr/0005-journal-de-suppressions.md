@@ -7,13 +7,13 @@
 
 Deux règles de la spécification s'opposaient directement.
 
-`CLAUDE.md` §2.2 pose que supprimer une tâche la fait disparaître sans
-laisser de trace. C'est le point le plus critique du produit : la distinction
+`docs/internal/SPECIFICATION.md` §2.2 pose que supprimer une tâche la fait
+disparaître sans laisser de trace. C'est le point le plus critique du produit : la distinction
 entre rayer, qui garde une trace de ce qui a été fait, et supprimer, qui
 efface un abandon.
 
-`CLAUDE.md` §2.6 autorise la fenêtre Statistiques à compter les tâches
-supprimées. Or on ne compte pas ce qui n'a laissé aucune trace.
+`docs/internal/SPECIFICATION.md` §2.6 autorise la fenêtre Statistiques à
+compter les tâches supprimées. Or on ne compte pas ce qui n'a laissé aucune trace.
 
 Trois issues étaient possibles : retirer les suppressions du périmètre
 statistique, journaliser sans le texte, ou journaliser l'entrée complète.

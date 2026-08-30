@@ -60,7 +60,7 @@ Détail commande par commande dans `docs/internal/CHANTIER-0.md`.
 ## Chantier 1 : logique métier
 
 Écrire la logique métier dans `core/`, en anglais, d'après la spécification
-de `CLAUDE.md` §2.
+de `SPECIFICATION.md`.
 
 - [ ] `models.py` : dataclasses Task, ReserveItem, RecurringItem
 - [ ] `session.py` : ajout, rayure, renommage, suppression, verrouillage
@@ -111,7 +111,7 @@ Reconstruction en `.ui`, branchée sur un coeur déjà testé.
 - [ ] Adaptation aux fenêtres étroites
 
 **Critère de fin** : l'application couvre toute la spécification de
-`CLAUDE.md` §2, réserve et récurrentes comprises.
+`SPECIFICATION.md`, réserve et récurrentes comprises.
 
 ---
 
@@ -124,7 +124,7 @@ Reconstruction en `.ui`, branchée sur un coeur déjà testé.
 - [ ] Recherche dans les archives
 - [ ] Export d'une journée en texte
 - [ ] Traduction française complète
-- [ ] Fenêtre Statistiques, périmètre défini en `CLAUDE.md` §2.6
+- [ ] Fenêtre Statistiques, périmètre défini en `SPECIFICATION.md` §2.6
 
 **Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
 traduite pour `fr`, aucune action fréquente n'est sans raccourci, et la

@@ -151,14 +151,15 @@ Champs des tâches :
 | `source_id` | uuid de l'item de réserve d'origine, `null` sinon. C'est lui, et non le texte, qui pilote le retour en réserve |
 | `template_id` | uuid de la récurrente d'origine, `null` sinon |
 
-`weekdays` ne peut pas être vide, voir `CLAUDE.md` §2.7.2. Lundi vaut 0.
+`weekdays` ne peut pas être vide, voir `SPECIFICATION.md` §2.7.2. Lundi vaut 0.
 « Tous les jours » s'écrit `[0,1,2,3,4,5,6]`.
 
 `done_at` et `deleted_at` portent toujours leur décalage horaire, voir
-`CLAUDE.md` §2.7.6. Le champ `created` des items de réserve reste une date
-simple, sans heure.
+`SPECIFICATION.md` §2.7.6. Le champ `created` des items de réserve reste une
+date simple, sans heure.
 
-`deletions` est le journal de suppressions décrit dans `CLAUDE.md` §2.2. Il
+`deletions` est le journal de suppressions décrit dans `SPECIFICATION.md`
+§2.2. Il
 conserve l'entrée complète, texte compris, ce qui permet à l'annulation de
 suppression de restaurer la tâche à l'identique. Il suit la journée en cours
 puis part dans son fichier d'archive.
@@ -169,7 +170,7 @@ cette entrée.
 
 Les journées archivées vont dans `<data>/archive/AAAA-MM-JJ.json`. La date du
 nom de fichier est celle du jour archivé, jamais la date système au moment de
-l'archivage, voir `CLAUDE.md` §2.7.5.
+l'archivage, voir `SPECIFICATION.md` §2.7.5.
 
 Chaque fichier d'archive porte un champ `version`, comme le fichier principal.
 Si le fichier existe déjà, écrire `AAAA-MM-JJ-2.json`, puis `-3`, et ainsi de
@@ -179,8 +180,8 @@ suite. Ne jamais écraser une archive.
 
 ## Règles de passage au jour suivant
 
-Spécifiées dans `CLAUDE.md` §2.5, y compris la définition de la date de
-référence et la bascule de 04:00. Source unique, ne pas recopier ici.
+Spécifiées dans `SPECIFICATION.md` §2.5, y compris la définition de la date
+de référence et la bascule de 04:00. Source unique, ne pas recopier ici.
 
 Côté implémentation, ces règles vivent dans `core/session.py` et
 `core/recurrence.py`. Aucune ne remonte dans `ui/`.
