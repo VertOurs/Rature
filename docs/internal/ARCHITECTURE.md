@@ -148,10 +148,9 @@ Champs des tâches :
 date simple, sans heure.
 
 `deletions` est le journal de suppressions décrit dans `SPECIFICATION.md`
-§2.2. Il
-conserve l'entrée complète, texte compris, ce qui permet à l'annulation de
-suppression de restaurer la tâche à l'identique. Il suit la journée en cours
-puis part dans son fichier d'archive.
+§2.2. Il conserve l'entrée complète, texte compris, ce qui permet à
+l'annulation de suppression de restaurer la tâche à l'identique. Il suit la
+journée en cours puis part dans son fichier d'archive.
 
 Il n'est jamais affiché. La fenêtre Statistiques n'en tire qu'un nombre.
 Annuler une suppression restaure la tâche depuis son entrée, puis retire

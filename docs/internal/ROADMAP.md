@@ -80,12 +80,12 @@ La réserve et les récurrentes, côté logique uniquement.
 - [ ] Détection du changement de date à l'ouverture
 - [ ] Réserve et récurrentes présentes dès la version 1 du format,
       aucune migration à écrire
-- [ ] Une tâche tirée de la réserve puis renommée y retourne renommée (§2.7.1)
-- [ ] Une récurrente à `weekdays` vide est refusée par core (§2.7.2)
-- [ ] Supprimer une tâche issue de la réserve ne la fait pas revenir (§2.7.3)
-- [ ] Le passage du jour dédoublonne, l'ajout manuel en réserve non (§2.7.4)
-- [ ] Une journée remplie à 01:00 est archivée sous la date de la veille (§2.7.5)
-- [ ] Les horodatages stockés portent leur décalage horaire (§2.7.6)
+- [ ] Une tâche tirée de la réserve puis renommée y retourne renommée (`SPECIFICATION.md` §2.7.1)
+- [ ] Une récurrente à `weekdays` vide est refusée par core (`SPECIFICATION.md` §2.7.2)
+- [ ] Supprimer une tâche issue de la réserve ne la fait pas revenir (`SPECIFICATION.md` §2.7.3)
+- [ ] Le passage du jour dédoublonne, l'ajout manuel en réserve non (`SPECIFICATION.md` §2.7.4)
+- [ ] Une journée remplie à 01:00 est archivée sous la date de la veille (`SPECIFICATION.md` §2.7.5)
+- [ ] Les horodatages stockés portent leur décalage horaire (`SPECIFICATION.md` §2.7.6)
 
 **Critère de fin** : tous les cas de passage du jour sont testés, y compris
 le passage de plusieurs jours d'un coup et le passage à cheval sur minuit.
