@@ -38,7 +38,7 @@ jobs:
           python-version: '3.13'
       - run: python -m pip install --upgrade pip
       - run: pip install --group dev
-      - run: pytest
+      - run: pytest --cov=rature.core --cov-fail-under=90
 
   meson:
     runs-on: ubuntu-latest
