@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 
 from rature.core.models import Deletion, Origin, RecurringItem, ReserveItem, Task
+from rature.core.recurrence import due_on
 
 
 class LockedError(Exception):
@@ -173,3 +174,49 @@ class Session:
         self.day.tasks.append(task)
         self.reserve.remove(item)
         return task
+
+    def _recurring_item(self, item_id: str) -> RecurringItem:
+        for item in self.recurring:
+            if item.id == item_id:
+                return item
+        raise KeyError(item_id)
+
+    def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
+        item = RecurringItem(text=text, weekdays=list(weekdays))
+        self.recurring.append(item)
+        return item
+
+    def edit_recurring(
+        self,
+        item_id: str,
+        *,
+        text: str | None = None,
+        weekdays: list[int] | None = None,
+    ) -> RecurringItem:
+        old = self._recurring_item(item_id)
+        new = RecurringItem(
+            id=old.id,
+            text=old.text if text is None else text,
+            weekdays=list(old.weekdays if weekdays is None else weekdays),
+        )
+        self.recurring[self.recurring.index(old)] = new
+        return new
+
+    def delete_recurring(self, item_id: str) -> None:
+        self.recurring.remove(self._recurring_item(item_id))
+
+    def inject_recurring(self, weekday: int) -> list[Task]:
+        if self.day.locked:
+            raise LockedError("the list is frozen")
+        created: list[Task] = []
+        for template in due_on(weekday, self.recurring):
+            task = Task(
+                num=self.day.counter,
+                text=template.text,
+                origin=Origin.RECURRING,
+                template_id=template.id,
+            )
+            self.day.counter += 1
+            self.day.tasks.append(task)
+            created.append(task)
+        return created
