@@ -70,6 +70,16 @@ def test_a_missing_step_is_rejected() -> None:
         migrate({"version": 1}, target=2, registry={})
 
 
+def test_a_step_that_does_not_advance_the_version_is_rejected() -> None:
+    with pytest.raises(RuntimeError):
+        migrate({"version": 1}, target=2, registry={1: lambda data: data})
+
+
+def test_a_step_that_drops_the_version_is_rejected() -> None:
+    with pytest.raises(RuntimeError):
+        migrate({"version": 1}, target=2, registry={1: lambda _: {}})
+
+
 def test_the_decorator_registers_a_step() -> None:
     @migrations._migration(1)
     def _fake(data: dict) -> dict:
