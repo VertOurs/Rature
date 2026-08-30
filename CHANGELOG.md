@@ -20,5 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pytest, metadata validation with meson, and a Flatpak build.
 - A PEP 735 development dependency group in `pyproject.toml`.
 - Repository conventions, including a code-style rule.
+- Business logic in `core/`: the day list with its operations, the reserve
+  and recurring models, atomic JSON storage with day archiving, and the
+  migration base. No GUI. CI gates `core/` coverage at 90%.
 
 [Unreleased]: https://github.com/VertOurs/Rature/commits/main
