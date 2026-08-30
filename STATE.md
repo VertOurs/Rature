@@ -139,6 +139,29 @@ Option (a) retenue : la validation d'un plan de commits présenté d'avance
 vaut pour tous les commits qu'il liste. `git push` reste soumis à un accord
 distinct. `CLAUDE.md` §5.2 réécrit en conséquence.
 
+## Déduplication documentaire, 30 août 2026, session 1 sur 2
+
+Principe : une information, un domicile ; ailleurs, un renvoi d'une ligne.
+Branche `docs/single-source-of-truth`.
+
+- **`docs/internal/SPECIFICATION.md`** créé : contenu de CLAUDE.md §2
+  (2.1-2.7) verbatim, numéros conservés. Source unique du comportement
+  produit. CLAUDE.md §2 → renvoi. CLAUDE.md gagne une instruction de lecture
+  ordonnée (lui-même, puis SPECIFICATION.md, puis STATE.md).
+- **`CONTRIBUTING.md`** devient le domicile unique des conventions du dépôt
+  (style, commits, branches, fusion, versionnage, releases, interface,
+  commandes de référence). CLAUDE.md §8 et §11 → renvois.
+- **`CLAUDE.md`** réduit de ~27 ko à ~11,6 ko : §1 POC → renvoi ADR 0004,
+  §4 règle 5 Flathub → renvoi ADR 0001, §4 règle 1 → renvoi ADR 0002.
+- **Arbitrage §11** : option (a) retenue, section supprimée, les commandes
+  vivent dans `CONTRIBUTING.md` et `README.md`.
+- Renvois `CLAUDE.md §2.x` et `§8` repointés dans les ADR, ROADMAP,
+  ARCHITECTURE, STATE. Aucun code touché : aucun incrément de version.
+
+**Session 2 à faire** : ARCHITECTURE, ROADMAP, ADR, condensation de
+`STATE.md`, passe exhaustive sur la forme des renvois (`§` / `section` /
+`règle N`).
+
 ## Chantier 1, à venir
 
 Logique métier dans `core/`, d'après `docs/internal/SPECIFICATION.md`.
@@ -150,5 +173,5 @@ Rappel : aucun fichier de `core/` n'importe `gi`, le test
 
 ## Documents
 
-Cadrage relu, contradictions résolues, six cas limites tranchés en `CLAUDE.md`
-§2.7 le 25 août 2026.
+Cadrage relu, contradictions résolues, six cas limites tranchés en
+`docs/internal/SPECIFICATION.md` §2.7 le 25 août 2026.
