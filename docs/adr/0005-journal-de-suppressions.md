@@ -48,6 +48,11 @@ c'était l'absence de trace dans l'interface.
   Toute demande future en ce sens se heurte à ce choix, et c'est voulu
 - L'annulation de suppression doit maintenir le journal, sans quoi le
   comptage dérive. À couvrir par un test au chantier 4
+- Le modèle `Deletion` porte aujourd'hui `id`, `num`, `text`, `origin`,
+  `source_id` et `deleted_at`. Il lui manque `done`, `done_at`,
+  `source_created` et `template_id` pour restaurer « à l'identique » une
+  tâche rayée ou tirée de la réserve. Le chantier 4 devra étendre `Deletion`
+  (changement de format, donc migration testée) ou revoir la promesse
 - Le champ existe dès la version 1 du format, pour ne pas imposer une
   migration sur données réelles
 - Le journal est porté par la journée, pas global : il part avec l'archive
