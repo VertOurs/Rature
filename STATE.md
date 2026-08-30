@@ -141,8 +141,8 @@ distinct. `CLAUDE.md` §5.2 réécrit en conséquence.
 
 ## Chantier 1, à venir
 
-Logique métier dans `core/`, d'après `CLAUDE.md` §2. Découpage dans
-`docs/internal/ROADMAP.md`. Premier pas : `core/models.py`, des `dataclass`
+Logique métier dans `core/`, d'après `docs/internal/SPECIFICATION.md`.
+Découpage dans `docs/internal/ROADMAP.md`. Premier pas : `core/models.py`, des `dataclass`
 pures avec sérialisation vers dictionnaire et retour.
 
 Rappel : aucun fichier de `core/` n'importe `gi`, le test

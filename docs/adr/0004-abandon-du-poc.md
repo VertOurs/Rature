@@ -17,7 +17,7 @@ absence de tests, format de données sans identifiants.
 
 Le prototype est abandonné. Il n'est ni utilisé, ni migré, ni consulté, ni
 recopié, même partiellement. La construction repart de la spécification
-écrite dans `CLAUDE.md` §2.
+écrite dans `docs/internal/SPECIFICATION.md`.
 
 L'auteur continue d'utiliser ses conversations quotidiennes en attendant que
 l'application soit prête.

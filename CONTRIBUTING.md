@@ -53,8 +53,8 @@ CI runs the same checks and a Flatpak build.
   does, fix the name or the structure instead.
 - A comment is expected when it carries something the code cannot: the
   reason for a counter-intuitive choice (a local import, a system call, a
-  library workaround), a reference to the spec as `CLAUDE.md §2.7.1`, or the
-  temporary nature of an element and the milestone that replaces it.
+  library workaround), a reference to the spec as `SPECIFICATION.md §2.7.1`,
+  or the temporary nature of an element and the milestone that replaces it.
 - One-line docstrings for modules, classes and functions. Longer only when
   the why fits nowhere else.
 - Every user-visible string goes through `_()` and is marked translatable in
