@@ -6,9 +6,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 2, réserve et récurrentes (logique)
-- **Étape suivante** : réserve — ajouter, renommer, supprimer, envoyer au
-  jour ; puis récurrentes et passage du jour. Découpage complet dans
+- **Chantier en cours** : 3, interface reconstruite en `.ui`
+- **Étape suivante** : fenêtre principale avec navigation latérale, puis
+  vue Jour (rayées en haut, en cours en dessous). Découpage complet dans
   `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
@@ -64,6 +64,11 @@ manifeste (`CLAUDE.md` §4 règle 8).
   `models` (Task, ReserveItem, RecurringItem, Deletion), `session` (liste du
   jour et ses opérations), `storage` (JSON atomique, archivage), `migrations`
   (socle). Couverture `rature.core` gatée à 90 % en CI, aucun import `gi`.
+- **Chantier 2**, PR #13 à #15 : réserve (CRUD + tirage), récurrentes
+  (CRUD + `recurrence.due_on`), passage du jour (`reference_date` bascule
+  04:00, `roll_over` en avant seulement, six étapes, multi-jours). `Task`
+  gagne `source_created` ; l'archivage écrase (idempotent, ADR 0003 +
+  ARCHITECTURE). Couverture `rature.core` 100 %.
 
 ## Documents
 
