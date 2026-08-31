@@ -7,10 +7,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : glisser-déposer de la réserve vers l'entrée Jour du
-  panneau latéral, appelant `RatureWindow.send_to_day` comme le bouton
-  d'envoi. Vue Jour et vue Réserve complètes en dehors de ça. Découpage
-  complet dans `docs/internal/ROADMAP.md`.
+- **Étape suivante** : vue Récurrentes, avec choix des jours (formulaire
+  `AdwDialog`, sept bascules, Save inactif sans texte ou sans jour). Vues
+  Jour et Réserve complètes, glisser-déposer réserve vers l'entrée Jour
+  compris. Découpage complet dans `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt

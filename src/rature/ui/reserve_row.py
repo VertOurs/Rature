@@ -75,6 +75,24 @@ class ReserveRow(Gtk.ListBoxRow):
         focus_controller.connect("leave", lambda _c: self.commit_pending_rename())
         self.rename_entry.add_controller(focus_controller)
 
+        # SPECIFICATION.md §3.3: the row is a drag source carrying the
+        # item id; the Day sidebar entry is the target. COPY, not MOVE:
+        # the move is draw_from_reserve's business consequence, not a
+        # drag-and-drop semantic, and MOVE would arm source-side deletion
+        # the window's refresh already handles.
+        drag_source = Gtk.DragSource(actions=Gdk.DragAction.COPY)
+        drag_source.connect("prepare", self._on_drag_prepare)
+        drag_source.connect("drag-begin", self._on_drag_begin)
+        self.add_controller(drag_source)
+
+    def _on_drag_prepare(
+        self, _source: Gtk.DragSource, _x: float, _y: float
+    ) -> Gdk.ContentProvider:
+        return Gdk.ContentProvider.new_for_value(self.item.id)
+
+    def _on_drag_begin(self, source: Gtk.DragSource, _drag: Gdk.Drag) -> None:
+        source.set_icon(Gtk.WidgetPaintable.new(self), 0, 0)
+
     def _on_send_clicked(self, _button: Gtk.Button) -> None:
         # SPECIFICATION.md §3.3: the button and the drag-and-drop drop
         # (chantier 3 step 7) call the same window method, never two
