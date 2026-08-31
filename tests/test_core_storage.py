@@ -19,6 +19,7 @@ from rature.core.storage import (
     list_archives,
     load,
     load_archive,
+    main_file_path,
     quarantine,
     save,
     xdg_data_dir,
@@ -76,6 +77,10 @@ def test_a_failed_write_leaves_no_temporary_file(tmp_path: Path) -> None:
     with pytest.raises(TypeError):
         _atomic_write_json(tmp_path / "data.json", {"bad": object()})
     assert list(tmp_path.iterdir()) == []
+
+
+def test_main_file_path_is_data_json_under_the_data_dir(tmp_path: Path) -> None:
+    assert main_file_path(data_dir=tmp_path) == tmp_path / "data.json"
 
 
 def test_load_missing_file_raises(tmp_path: Path) -> None:
