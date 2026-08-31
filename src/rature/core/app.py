@@ -55,11 +55,15 @@ class App:
         session: Session,
         clock: Callable[[], datetime],
         startup: StartupOutcome,
+        quarantined_path: Path | None = None,
     ) -> None:
         self.data_dir = data_dir
         self.session = session
         self.clock = clock
         self.startup = startup
+        # Set only when startup is RECOVERED_FROM_CORRUPTION: the file
+        # storage.quarantine() moved the unreadable data file to.
+        self.quarantined_path = quarantined_path
 
     @classmethod
     def open(
@@ -81,9 +85,13 @@ class App:
         except FileNotFoundError:
             app = cls._bootstrap(resolved_dir, clock, now, StartupOutcome.FIRST_LAUNCH)
         except (ValueError, KeyError, TypeError):
-            storage.quarantine(now, data_dir=resolved_dir)
+            quarantined_path = storage.quarantine(now, data_dir=resolved_dir)
             app = cls._bootstrap(
-                resolved_dir, clock, now, StartupOutcome.RECOVERED_FROM_CORRUPTION
+                resolved_dir,
+                clock,
+                now,
+                StartupOutcome.RECOVERED_FROM_CORRUPTION,
+                quarantined_path=quarantined_path,
             )
         else:
             app = cls(
@@ -102,10 +110,18 @@ class App:
         clock: Callable[[], datetime],
         now: datetime,
         startup: StartupOutcome,
+        *,
+        quarantined_path: Path | None = None,
     ) -> App:
         session = Session(Day(date=reference_date(now)))
         storage.save(Store.from_session(session), data_dir=data_dir)
-        return cls(data_dir=data_dir, session=session, clock=clock, startup=startup)
+        return cls(
+            data_dir=data_dir,
+            session=session,
+            clock=clock,
+            startup=startup,
+            quarantined_path=quarantined_path,
+        )
 
     def ensure_day(self) -> Day | None:
         """Run the SPECIFICATION.md §2.5 rollover if due, as a single step.

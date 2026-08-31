@@ -68,10 +68,18 @@ def test_open_quarantines_invalid_json_and_starts_fresh(tmp_path: Path) -> None:
     app = App.open(tmp_path, clock=clock_at(now))
     assert app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
     assert app.session.day.date == date(2026, 8, 24)
-    assert (tmp_path / "data.json.bad-20260824-143207").read_text(
-        encoding="utf-8"
-    ) == "not json"
+    assert app.quarantined_path == tmp_path / "data.json.bad-20260824-143207"
+    assert app.quarantined_path.read_text(encoding="utf-8") == "not json"
     assert (tmp_path / "data.json").exists()
+
+
+def test_quarantined_path_is_none_without_a_corruption(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    first_launch = App.open(tmp_path, clock=clock_at(now))
+    assert first_launch.quarantined_path is None
+
+    loaded = App.open(tmp_path, clock=clock_at(now))
+    assert loaded.quarantined_path is None
 
 
 def test_open_quarantines_a_missing_field_and_starts_fresh(tmp_path: Path) -> None:
