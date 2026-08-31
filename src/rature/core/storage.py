@@ -87,8 +87,13 @@ def _atomic_write_json(path: Path, obj: dict) -> None:
         os.close(dir_fd)
 
 
+def main_file_path(*, data_dir: Path | None = None) -> Path:
+    """Where the main data file lives, resolved the same way load/save do."""
+    return (data_dir or xdg_data_dir()) / _MAIN_FILE
+
+
 def load(*, data_dir: Path | None = None) -> Store:
-    path = (data_dir or xdg_data_dir()) / _MAIN_FILE
+    path = main_file_path(data_dir=data_dir)
     raw = migrate(json.loads(path.read_text(encoding="utf-8")))
     return Store.from_dict(raw)
 

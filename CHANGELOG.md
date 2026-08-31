@@ -7,12 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-31
+
 ### Added
 
 - `core/storage.py`: `list_archives`, listing archived days most recent
   first without opening any file's content, and `load_archive`, reading
   one back. `App.archives`/`App.read_archive` are the matching pass-throughs;
   `App.ensure_day` now returns the day it archived, or `None`.
+- The main window: sidebar navigation (Day, Reserve, Recurring, with
+  placeholder content until each view's own PR), window size and
+  maximized state persisted through GSettings, an About Rature dialog.
+  `RatureApplication` now owns the single `App` instance for the
+  process, built once, and shows an unrecoverable-error dialog if the
+  data file was written by a newer version of Rature. First visible
+  feature: this is the version this bump belongs to.
 
 ## [0.2.0] - 2026-08-31
 
@@ -59,5 +68,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/VertOurs/Rature/releases/tag/v0.3.0
 [0.2.0]: https://github.com/VertOurs/Rature/releases/tag/v0.2.0

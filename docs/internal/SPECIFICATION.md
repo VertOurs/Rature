@@ -591,6 +591,7 @@ d'abord.
 | Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |
 | Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
+| Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
 

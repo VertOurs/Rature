@@ -6,3 +6,5 @@ Holds every widget, template and application-level wiring. It reads the
 state produced by :mod:`rature.core` and forwards user actions back to it,
 never the reverse.
 """
+
+APP_ID = "io.github.vertours.Rature"
