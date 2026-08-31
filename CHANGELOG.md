@@ -27,5 +27,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the day, recurring templates and which apply on a weekday, and the day
   rollover with the 04:00 reference date, the reserve return, text
   de-duplication, and the multi-day catch-up. Still no GUI.
+- `Session.move_before`, an explicit "place this task before that one, or at
+  the end" reorder, built on the existing `reorder` permutation check.
+- The deletion journal (`Deletion`) now carries everything needed to
+  restore a deleted task exactly: its position in the day, whether it was
+  struck and when, and where it came from.
+
+### Changed
+
+- `Task` refuses a reserve-origin task built without both `source_id` and
+  `source_created`, closing a crash path that used to only surface at
+  serialisation.
+- `Session.add_to_reserve`, `strike` and `delete` now require the caller to
+  supply the reference date or timestamp explicitly. `core/` never reads
+  the system clock.
 
 [Unreleased]: https://github.com/VertOurs/Rature/commits/main
