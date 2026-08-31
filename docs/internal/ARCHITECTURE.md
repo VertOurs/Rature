@@ -78,6 +78,12 @@ Chemins XDG, lecture, écriture atomique, archivage. La procédure d'écriture
 atomique, `fsync` du répertoire compris, est dans
 `docs/adr/0003-fichier-json-unique.md`.
 
+`list_archives` rend les dates présentes dans `archive/`, du plus récent au
+plus ancien, en lisant les noms de fichiers seulement : elle n'ouvre aucun
+contenu et ne peut donc pas échouer sur une archive abîmée. `load_archive`
+lit, migre et rend un `Day`, et laisse remonter l'erreur si le fichier est
+illisible.
+
 ### `core/migrations.py`
 Une fonction par saut de version. Chaque migration a son test avec un
 échantillon de données de la version précédente.
@@ -99,7 +105,11 @@ laisse `migrations.FutureVersionError` traverser sans rien construire pour
 une version future. Avant de rendre la main, il exécute systématiquement
 `ensure_day`, la séquence `roll_over` puis `archive` puis `save` de
 `SPECIFICATION.md` §2.5 : l'appelant reçoit toujours une `App` déjà à jour,
-il n'a jamais à connaître ni à rejouer cette séquence.
+il n'a jamais à connaître ni à rejouer cette séquence. `ensure_day` rend la
+journée archivée, ou `None` si aucune bascule n'était due, pour que
+l'appelant sache s'il doit se rafraîchir. `archives` et `read_archive` sont
+les passe-plats de lecture des archives : `ui/` n'appelle jamais `storage`
+directement.
 
 Un enrobage par mutation de `Session` (`add`, `strike`, `delete`,
 `move_before`, `add_to_reserve`, etc.) fournit `now`/`today` depuis

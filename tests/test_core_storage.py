@@ -16,7 +16,9 @@ from rature.core.storage import (
     Store,
     _atomic_write_json,
     archive,
+    list_archives,
     load,
+    load_archive,
     quarantine,
     save,
     xdg_data_dir,
@@ -154,6 +156,70 @@ def test_archive_keeps_the_deletion_journal(tmp_path: Path) -> None:
     path = archive(session.day, data_dir=tmp_path)
     archived = json.loads(path.read_text(encoding="utf-8"))
     assert archived["deletions"][0]["text"] == "gone"
+
+
+def test_list_archives_is_empty_without_an_archive_directory(tmp_path: Path) -> None:
+    assert list_archives(data_dir=tmp_path) == []
+
+
+def test_list_archives_orders_most_recent_first(tmp_path: Path) -> None:
+    archive(Day(date=date(2026, 8, 20)), data_dir=tmp_path)
+    archive(Day(date=date(2026, 8, 24)), data_dir=tmp_path)
+    archive(Day(date=date(2026, 8, 22)), data_dir=tmp_path)
+    assert list_archives(data_dir=tmp_path) == [
+        date(2026, 8, 24),
+        date(2026, 8, 22),
+        date(2026, 8, 20),
+    ]
+
+
+def test_list_archives_ignores_a_corrupted_archives_content(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / "2026-08-24.json").write_text("not json", encoding="utf-8")
+    assert list_archives(data_dir=tmp_path) == [date(2026, 8, 24)]
+
+
+def test_list_archives_ignores_a_non_dated_name(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / "notes.json").write_text("{}", encoding="utf-8")
+    assert list_archives(data_dir=tmp_path) == []
+
+
+def test_list_archives_ignores_an_orphaned_tmp_file(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / ".2026-08-24.json.12345.tmp").write_text("{}", encoding="utf-8")
+    assert list_archives(data_dir=tmp_path) == []
+
+
+def test_list_archives_ignores_a_file_without_the_json_extension(
+    tmp_path: Path,
+) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / "2026-08-24.txt").write_text("{}", encoding="utf-8")
+    assert list_archives(data_dir=tmp_path) == []
+
+
+def test_load_archive_returns_the_day(tmp_path: Path) -> None:
+    day = Day(date=date(2026, 8, 24), counter=3)
+    archive(day, data_dir=tmp_path)
+    assert load_archive(date(2026, 8, 24), data_dir=tmp_path) == day
+
+
+def test_load_archive_raises_for_a_missing_date(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        load_archive(date(2026, 8, 24), data_dir=tmp_path)
+
+
+def test_load_archive_raises_for_invalid_json(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / "2026-08-24.json").write_text("not json", encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_archive(date(2026, 8, 24), data_dir=tmp_path)
 
 
 def test_store_from_session_captures_the_three_parts() -> None:

@@ -112,9 +112,48 @@ def test_ensure_day_is_a_no_op_when_nothing_is_due(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))
     day_before = app.session.day
-    app.ensure_day()
+    assert app.ensure_day() is None
     assert app.session.day is day_before
     assert not (tmp_path / "archive").exists()
+
+
+def test_ensure_day_returns_the_archived_day_when_due(tmp_path: Path) -> None:
+    save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(save_now))
+    app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
+    archived = app.ensure_day()
+    assert archived is not None
+    assert archived.date == date(2026, 8, 23)
+    assert app.session.day.date == date(2026, 8, 24)
+
+
+def test_archives_is_empty_before_any_rollover(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    assert app.archives() == []
+
+
+def test_archives_lists_dates_most_recent_first(tmp_path: Path) -> None:
+    save_now = datetime(2026, 8, 20, 10, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(save_now))
+    app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
+    app.ensure_day()
+    assert app.archives() == [date(2026, 8, 20)]
+
+
+def test_read_archive_returns_the_loaded_day(tmp_path: Path) -> None:
+    save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(save_now))
+    app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
+    app.ensure_day()
+    assert app.read_archive(date(2026, 8, 23)).date == date(2026, 8, 23)
+
+
+def test_read_archive_raises_for_an_unknown_date(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    with pytest.raises(FileNotFoundError):
+        app.read_archive(date(2026, 8, 1))
 
 
 def test_add_saves_immediately(tmp_path: Path) -> None:

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import enum
 from collections.abc import Callable
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from rature.core import storage
@@ -107,18 +107,29 @@ class App:
         storage.save(Store.from_session(session), data_dir=data_dir)
         return cls(data_dir=data_dir, session=session, clock=clock, startup=startup)
 
-    def ensure_day(self) -> None:
+    def ensure_day(self) -> Day | None:
         """Run the SPECIFICATION.md §2.5 rollover if due, as a single step.
 
         roll_over, archive, then save, in that order, so this sequence is
-        never again something a caller has to remember.
+        never again something a caller has to remember. Returns the day
+        that was archived, or None if none was due, so the caller knows
+        whether it needs to refresh.
         """
         now = self.clock()
         if not self.session.rollover_due(now):
-            return
+            return None
         old_day = self.session.roll_over(now)
         storage.archive(old_day, data_dir=self.data_dir)
         self._save()
+        return old_day
+
+    def archives(self) -> list[date]:
+        """Dates with an archived day, most recent first."""
+        return storage.list_archives(data_dir=self.data_dir)
+
+    def read_archive(self, day_date: date) -> Day:
+        """Load one archived day. See storage.load_archive for what can raise."""
+        return storage.load_archive(day_date, data_dir=self.data_dir)
 
     def _save(self) -> None:
         storage.save(Store.from_session(self.session), data_dir=self.data_dir)
