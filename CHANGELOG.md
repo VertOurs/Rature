@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-31
+
+### Added
+
+- Drag-and-drop reordering in the Day view: a row is dragged within its own
+  block and dropped before or after another row, calling `App.move_before`.
+  A drop onto the other block is refused with no "drop here" cue, since
+  `Session.view()` always lifts struck tasks above active ones and the move
+  would not show. Reordering stays available while the list is frozen
+  (SPECIFICATION.md §2.1 point 3). Completes chantier 3 step 5.
+
 ## [0.4.0] - 2026-08-31
 
 ### Added
@@ -86,7 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/VertOurs/Rature/releases/tag/v0.5.0
 [0.4.0]: https://github.com/VertOurs/Rature/releases/tag/v0.4.0
 [0.3.0]: https://github.com/VertOurs/Rature/releases/tag/v0.3.0
 [0.2.0]: https://github.com/VertOurs/Rature/releases/tag/v0.2.0

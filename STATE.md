@@ -7,10 +7,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : réordonnancement des tâches par glisser-déposer à
-  l'intérieur d'un bloc. Vue Jour en édition faite (ajouter, rayer,
-  dérayer, renommer, supprimer, figer). Découpage complet dans
-  `docs/internal/ROADMAP.md`.
+- **Étape suivante** : vue Réserve, avec bouton d'envoi vers le jour. Vue
+  Jour complète : ajouter, rayer, dérayer, renommer, supprimer, figer,
+  réordonner par glisser-déposer à l'intérieur d'un bloc. Découpage complet
+  dans `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -34,7 +34,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.4.0` | Vue Jour utilisable de bout en bout : ajouter, rayer, renommer, supprimer, figer |
+| Version du projet | `0.5.0` | Vue Jour complète : ajouter, rayer, renommer, supprimer, figer, réordonner par glisser-déposer |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,

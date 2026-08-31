@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from gettext import gettext as _
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import gi
 
@@ -26,6 +26,12 @@ class TaskRow(Gtk.ListBoxRow):
     """Number, text, strike button, row menu (Rename, then Delete)."""
 
     __gtype_name__ = "RatureTaskRow"
+
+    # SPECIFICATION.md §3.2: the row currently being dragged for a reorder.
+    # Shared across every row so a drop target can identify its source
+    # without waiting on asynchronous content negotiation. One drag at a
+    # time in one process, so a class attribute is enough.
+    _dragged: ClassVar[TaskRow | None] = None
 
     num_label: Gtk.Label = Gtk.Template.Child()
     text_label: Gtk.Label = Gtk.Template.Child()
@@ -74,6 +80,71 @@ class TaskRow(Gtk.ListBoxRow):
         focus_controller = Gtk.EventControllerFocus()
         focus_controller.connect("leave", lambda _c: self.commit_pending_rename())
         self.rename_entry.add_controller(focus_controller)
+
+        self._wire_drag_and_drop()
+
+    def _wire_drag_and_drop(self) -> None:
+        # SPECIFICATION.md §3.2: rows reorder by drag-and-drop within their
+        # own block. A drop onto the other block is refused and never shows
+        # a "drop here" cue, since view() always lifts struck tasks above
+        # active ones and the move would have no visible effect.
+        source = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
+        source.connect("prepare", self._on_drag_prepare)
+        source.connect("drag-begin", self._on_drag_begin)
+        source.connect("drag-end", self._on_drag_end)
+        self.add_controller(source)
+
+        target = Gtk.DropTarget(actions=Gdk.DragAction.MOVE)
+        target.set_gtypes([type(self).__gtype__])
+        target.connect("motion", self._on_drop_motion)
+        target.connect("drop", self._on_drop)
+        self.add_controller(target)
+
+    def _on_drag_prepare(
+        self, _source: Gtk.DragSource, _x: float, _y: float
+    ) -> Gdk.ContentProvider:
+        return Gdk.ContentProvider.new_for_value(self)
+
+    def _on_drag_begin(self, source: Gtk.DragSource, _drag: Gdk.Drag) -> None:
+        TaskRow._dragged = self
+        self.add_css_class("rature-drag-source")
+        source.set_icon(Gtk.WidgetPaintable.new(self), 0, 0)
+
+    def _on_drag_end(
+        self, _source: Gtk.DragSource, _drag: Gdk.Drag, _delete: bool
+    ) -> None:
+        TaskRow._dragged = None
+        self.remove_css_class("rature-drag-source")
+
+    def _dragged_peer(self) -> TaskRow | None:
+        """The row being dragged, or None if it may not drop on this one.
+
+        Refuses a row dropped on itself and a row from the other block:
+        struck and active tasks never mix (SPECIFICATION.md §2.1 point 5).
+        """
+        source = TaskRow._dragged
+        if source is None or source is self or source.task.done != self.task.done:
+            return None
+        return source
+
+    def _on_drop_motion(
+        self, _target: Gtk.DropTarget, _x: float, _y: float
+    ) -> Gdk.DragAction:
+        return Gdk.DragAction.MOVE if self._dragged_peer() else Gdk.DragAction(0)
+
+    def _on_drop(
+        self, _target: Gtk.DropTarget, _value: object, _x: float, y: float
+    ) -> bool:
+        source = self._dragged_peer()
+        if source is None:
+            return False
+        if y < self.get_height() / 2:
+            target_id: str | None = self.task.id
+        else:
+            sibling = self.get_next_sibling()
+            target_id = sibling.task.id if isinstance(sibling, TaskRow) else None
+        self.run_action(lambda: self.app.move_before(source.task.id, target_id))
+        return True
 
     def _on_strike_clicked(self, _button: Gtk.Button) -> None:
         if self.task.done:
