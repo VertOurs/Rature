@@ -17,6 +17,7 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 from rature.core.app import App, LockedError, StartupOutcome  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
+from rature.ui.recurring_view import RecurringView  # noqa: E402
 from rature.ui.reserve_view import ReserveView  # noqa: E402
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
@@ -25,7 +26,7 @@ _ENSURE_DAY_INTERVAL_SECONDS = 60
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/window.ui")
 class RatureWindow(Adw.ApplicationWindow):
-    """Owns the App instance. The Recurring pane is still a placeholder."""
+    """Owns the App instance and mounts the Day, Reserve and Recurring views."""
 
     __gtype_name__ = "RatureWindow"
 
@@ -50,6 +51,8 @@ class RatureWindow(Adw.ApplicationWindow):
             send_to_day=self.send_to_day,
         )
         self.reserve_page.set_child(self.reserve_view)
+        self.recurring_view = RecurringView(app=app, run_action=self._run_app_action)
+        self.recurring_page.set_child(self.recurring_view)
 
         # SPECIFICATION.md §3.3: a reserve row dragged onto the Day sidebar
         # entry draws it into the day. COPY, not MOVE: the source row
@@ -93,9 +96,9 @@ class RatureWindow(Adw.ApplicationWindow):
         return GLib.SOURCE_CONTINUE
 
     def _refresh_all(self) -> None:
-        # Recurring adds its own line here, chantier 3 step 8.
         self.day_view.refresh()
         self.reserve_view.refresh()
+        self.recurring_view.refresh()
 
     def send_to_day(self, item_id: str) -> None:
         # SPECIFICATION.md §3.3: the Reserve view's send button and the

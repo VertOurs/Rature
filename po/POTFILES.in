@@ -8,3 +8,6 @@ data/ui/task_row.ui
 data/ui/day_view.ui
 data/ui/reserve_row.ui
 data/ui/reserve_view.ui
+data/ui/recurring_row.ui
+data/ui/recurring_form.ui
+data/ui/recurring_view.ui

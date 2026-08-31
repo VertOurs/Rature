@@ -32,6 +32,16 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.7.0" date="2026-08-31">
+      <description>
+        <p>
+          The Recurring view: create, edit and delete task templates and
+          pick the weekdays they run on. A reserve row can now be dragged
+          onto the Day entry in the sidebar. Day and month names follow the
+          system language. This completes the interface rebuild.
+        </p>
+      </description>
+    </release>
     <release version="0.6.0" date="2026-08-31">
       <description>
         <p>

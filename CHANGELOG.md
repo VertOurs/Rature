@@ -7,8 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-31
+
 ### Added
 
+- The Recurring view: an `AdwActionRow` per template, text as title and
+  the weekdays as subtitle, Monday first. A header `+` button opens a
+  form; the row menu offers Edit (the same form, prefilled) and Delete.
+  The form is an `AdwDialog` with a text field and seven weekday toggles;
+  Save stays insensitive until there is text and at least one day
+  (SPECIFICATION.md §2.7.2), and only closes on a successful write so a
+  disk failure never discards the typed text. It keeps the template id,
+  not the object, so a rollover between opening and Save cannot misdirect
+  the write. Weekday names, in the subtitle and on the toggles, are
+  derived from the locale with `strftime`, not catalogue strings.
+  Completes chantier 3.
 - Drag a reserve row onto the Day entry in the sidebar to draw it into
   the day. The drop goes through the same `RatureWindow.send_to_day` as
   the row's send button, never a second path. The action is `COPY`: the
@@ -128,7 +141,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/VertOurs/Rature/releases/tag/v0.7.0
 [0.6.0]: https://github.com/VertOurs/Rature/releases/tag/v0.6.0
 [0.5.0]: https://github.com/VertOurs/Rature/releases/tag/v0.5.0
 [0.4.0]: https://github.com/VertOurs/Rature/releases/tag/v0.4.0
