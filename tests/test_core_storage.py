@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from rature.core.migrations import FutureVersionError
 from rature.core.models import Origin, RecurringItem, ReserveItem, Task
 from rature.core.session import Day, Session
 from rature.core.storage import (
@@ -16,6 +17,7 @@ from rature.core.storage import (
     _atomic_write_json,
     archive,
     load,
+    quarantine,
     save,
     xdg_data_dir,
 )
@@ -81,8 +83,36 @@ def test_load_missing_file_raises(tmp_path: Path) -> None:
 
 def test_load_rejects_an_unknown_version(tmp_path: Path) -> None:
     (tmp_path / "data.json").write_text('{"version": 99}', encoding="utf-8")
-    with pytest.raises(ValueError):
+    with pytest.raises(FutureVersionError):
         load(data_dir=tmp_path)
+
+
+def test_quarantine_renames_the_main_file(tmp_path: Path) -> None:
+    save(make_store(), data_dir=tmp_path)
+    dest = quarantine(STAMP, data_dir=tmp_path)
+    assert dest == tmp_path / "data.json.bad-20260824-143207"
+    assert dest.exists()
+    assert not (tmp_path / "data.json").exists()
+
+
+def test_quarantine_preserves_the_content(tmp_path: Path) -> None:
+    save(make_store(), data_dir=tmp_path)
+    original = (tmp_path / "data.json").read_text(encoding="utf-8")
+    dest = quarantine(STAMP, data_dir=tmp_path)
+    assert dest.read_text(encoding="utf-8") == original
+
+
+def test_quarantine_does_not_overwrite_a_same_second_collision(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "data.json.bad-20260824-143207").write_text("first", encoding="utf-8")
+    (tmp_path / "data.json").write_text("second", encoding="utf-8")
+    dest = quarantine(STAMP, data_dir=tmp_path)
+    assert dest == tmp_path / "data.json.bad-20260824-143207-2"
+    assert dest.read_text(encoding="utf-8") == "second"
+    assert (tmp_path / "data.json.bad-20260824-143207").read_text(
+        encoding="utf-8"
+    ) == "first"
 
 
 def test_reserve_and_recurring_survive_the_round_trip(tmp_path: Path) -> None:
