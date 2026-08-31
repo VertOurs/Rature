@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-31
+
 ### Added
 
 - The Day view, read-only: struck tasks in a block on top, active tasks
@@ -84,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/VertOurs/Rature/releases/tag/v0.4.0
 [0.3.0]: https://github.com/VertOurs/Rature/releases/tag/v0.3.0
 [0.2.0]: https://github.com/VertOurs/Rature/releases/tag/v0.2.0

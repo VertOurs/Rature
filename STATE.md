@@ -34,7 +34,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.3.0` | Première fonctionnalité visible : fenêtre principale, navigation latérale |
+| Version du projet | `0.4.0` | Vue Jour utilisable de bout en bout : ajouter, rayer, renommer, supprimer, figer |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
