@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-31
+
+### Added
+
+- The Reserve view: a single list plus an entry bar, the same shape as the
+  Day view. Add (Enter, keeps focus, scrolls to the new row, never
+  de-duplicated per SPECIFICATION.md §2.7.4), rename in place, delete (row
+  menu only), and a per-row send button that draws the item into the day
+  through `RatureWindow.send_to_day`, the one method the sidebar drop
+  target will share in step 7. The send button is insensitive while the day
+  list is frozen. The `created` date is never shown. Empty-reserve status
+  page. Completes chantier 3 step 6.
+
 ## [0.5.0] - 2026-08-31
 
 ### Added
@@ -97,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/VertOurs/Rature/releases/tag/v0.6.0
 [0.5.0]: https://github.com/VertOurs/Rature/releases/tag/v0.5.0
 [0.4.0]: https://github.com/VertOurs/Rature/releases/tag/v0.4.0
 [0.3.0]: https://github.com/VertOurs/Rature/releases/tag/v0.3.0

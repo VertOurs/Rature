@@ -17,6 +17,7 @@ from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
 from rature.core.app import App, LockedError, StartupOutcome  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
+from rature.ui.reserve_view import ReserveView  # noqa: E402
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
 _ENSURE_DAY_INTERVAL_SECONDS = 60
@@ -41,6 +42,13 @@ class RatureWindow(Adw.ApplicationWindow):
             app=app, run_action=self._run_app_action, perform=self._perform
         )
         self.day_page.set_child(self.day_view)
+        self.reserve_view = ReserveView(
+            app=app,
+            run_action=self._run_app_action,
+            perform=self._perform,
+            send_to_day=self.send_to_day,
+        )
+        self.reserve_page.set_child(self.reserve_view)
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
         self.connect("close-request", self._on_close_request)
@@ -74,9 +82,17 @@ class RatureWindow(Adw.ApplicationWindow):
         return GLib.SOURCE_CONTINUE
 
     def _refresh_all(self) -> None:
-        # Reserve and Recurring add their own line here, chantier 3 steps
-        # 6 and 8.
+        # Recurring adds its own line here, chantier 3 step 8.
         self.day_view.refresh()
+        self.reserve_view.refresh()
+
+    def send_to_day(self, item_id: str) -> None:
+        # SPECIFICATION.md §3.3: the Reserve view's send button and the
+        # sidebar entry's drop target (chantier 3 step 7) call this one
+        # method, never two parallel paths. A frozen list makes core raise
+        # LockedError; the send button is already insensitive by then, so
+        # _perform only ever logs it as the bug it would be.
+        self._run_app_action(lambda: self.app.draw_from_reserve(item_id))
 
     def _perform(self, action) -> bool:
         # SPECIFICATION.md §3.6 point 3: the one place that catches OSError,
