@@ -7,9 +7,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : lecture des archives dans `core` (liste des dates,
-  chargement d'une journée), puis fenêtre principale. Découpage complet
-  dans `docs/internal/ROADMAP.md`.
+- **Étape suivante** : fenêtre principale (`App` détenue par l'application,
+  erreurs de démarrage, taille de fenêtre, navigation latérale). Lecture
+  des archives dans `core` faite. Découpage complet dans
+  `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt

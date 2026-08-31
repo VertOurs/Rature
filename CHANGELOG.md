@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `core/storage.py`: `list_archives`, listing archived days most recent
+  first without opening any file's content, and `load_archive`, reading
+  one back. `App.archives`/`App.read_archive` are the matching pass-throughs;
+  `App.ensure_day` now returns the day it archived, or `None`.
+
 ## [0.2.0] - 2026-08-31
 
 ### Added
