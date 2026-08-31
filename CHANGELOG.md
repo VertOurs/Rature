@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The Day view, read-only: struck tasks in a block on top, active tasks
+  below, in `Session.view()` order, numbers never recalculated. Empty-day
+  status page. A single `AdwBanner` covers three cases with a strict
+  priority (write failure, then quarantine, then new day), each closable
+  and never returning once closed; a 60-second timer calls `App.ensure_day`
+  through the one OSError-catching wrapper every future action will reuse.
+  Adding, striking, renaming, deleting and freezing are chantier 3 step 4.
+
 ## [0.3.0] - 2026-08-31
 
 ### Added
