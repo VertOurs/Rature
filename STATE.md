@@ -17,12 +17,13 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - `github.com/VertOurs/Rature`, public. `main` protégée : PR obligatoire,
   squash seul, historique linéaire.
 - Signature GPG active : clé ed25519
-  `25DA27801D5F4ECA1DAA2101E89227EAC418BC4A`, `commit.gpgsign` local.
+  `25DA27801D5F4ECA1DAA2101E89227EAC418BC4A`, `commit.gpgsign` local, clé
+  publique déjà sur GitHub (le tag `v0.2.0` remonte `verified: true` côté
+  API, vérifié le 31 août 2026).
 - « Require status checks » actif dans le ruleset `main` : `lint`, `test`,
   `meson`, `flatpak`, mode strict, aucun contournement possible même par un
   admin. Vérifié le 31 août 2026 via `gh api repos/.../rulesets`.
 - **Ouvert, côté VertOurs** :
-  - ajouter la clé GPG publique à GitHub pour la mention « Verified »
   - supprimer le dossier local `review/` (dans `.gitignore`)
 
 ## Versions retenues
