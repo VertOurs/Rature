@@ -5,6 +5,7 @@
 """Installed entry point for Rature, configured by Meson from rature.in."""
 
 import gettext
+import locale
 import os
 import signal
 import sys
@@ -18,6 +19,15 @@ from rature.config import LOCALEDIR  # noqa: E402
 # Ctrl+C in a terminal must kill the app, not surface as a KeyboardInterrupt
 # inside the GTK main loop.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+# Adopt the environment's locale so strftime and GLib format dates and
+# names in the user's language: without this the C locale wins and every
+# strftime stays English. A broken LC_* in the environment must not stop
+# the app, so fall back to C on locale.Error.
+try:
+    locale.setlocale(locale.LC_ALL, "")
+except locale.Error:
+    pass
 
 # gettext's own bindtextdomain/textdomain, not locale's: they are what
 # backs gettext.gettext, and every module reaches it through

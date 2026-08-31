@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   where the entry is off screen; the send button covers that case
   (SPECIFICATION.md §3.7).
 
+### Fixed
+
+- The launcher now adopts the environment's locale, so the Day view's
+  date title shows day and month names in the user's language instead of
+  always in English.
+
 ## [0.6.0] - 2026-08-31
 
 ### Added
