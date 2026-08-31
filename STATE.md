@@ -72,8 +72,6 @@ manifeste (`CLAUDE.md` §4 règle 8).
 
 ## Rappels pour la suite
 
-- **Chantier 3** : l'UI doit passer `today=reference_date(now)` à
-  `add_to_reserve`. Le défaut `date.today()` ignore la bascule de 04:00.
 - **Chantier 3** : le passage du jour se fait
   `old = session.roll_over(now)` puis `storage.archive(old)` puis
   `storage.save(Store.from_session(session))`, dans cet ordre.
