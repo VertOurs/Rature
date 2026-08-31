@@ -23,8 +23,6 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - « Require status checks » actif dans le ruleset `main` : `lint`, `test`,
   `meson`, `flatpak`, mode strict, aucun contournement possible même par un
   admin. Vérifié le 31 août 2026 via `gh api repos/.../rulesets`.
-- **Ouvert, côté VertOurs** :
-  - supprimer le dossier local `review/` (dans `.gitignore`)
 
 ## Versions retenues
 
