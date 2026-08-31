@@ -32,6 +32,15 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.6.0" date="2026-08-31">
+      <description>
+        <p>
+          The Reserve view: add entries, rename them in place, delete them,
+          and send one into the day. The Recurring view and the archive
+          window are still to come.
+        </p>
+      </description>
+    </release>
     <release version="0.5.0" date="2026-08-31">
       <description>
         <p>

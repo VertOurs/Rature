@@ -98,12 +98,8 @@
   </template>
   <object class="AdwNavigationPage" id="reserve_page">
     <property name="title" translatable="yes">Reserve</property>
-    <!-- Placeholder. Replaced by the real Reserve view, ROADMAP.md chantier 3 step 6. -->
-    <property name="child">
-      <object class="AdwStatusPage">
-        <property name="title" translatable="yes">Reserve</property>
-      </object>
-    </property>
+    <!-- Content is ReserveView, attached in RatureWindow.__init__: it
+         needs App, which template XML has no way to pass in. -->
   </object>
   <object class="AdwNavigationPage" id="recurring_page">
     <property name="title" translatable="yes">Recurring</property>
