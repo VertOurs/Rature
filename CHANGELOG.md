@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Drag a reserve row onto the Day entry in the sidebar to draw it into
+  the day. The drop goes through the same `RatureWindow.send_to_day` as
+  the row's send button, never a second path. The action is `COPY`: the
+  row leaves the reserve as a consequence of `draw_from_reserve`, not a
+  drag-and-drop move. A frozen day list refuses the drop in the `accept`
+  callback, so the entry never highlights while the list is frozen
+  (SPECIFICATION.md §3.3). Unavailable in the collapsed narrow layout
+  where the entry is off screen; the send button covers that case
+  (SPECIFICATION.md §3.7).
+
 ## [0.6.0] - 2026-08-31
 
 ### Added

@@ -12,7 +12,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 
 from rature.core.app import App, LockedError, StartupOutcome  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
@@ -25,12 +25,13 @@ _ENSURE_DAY_INTERVAL_SECONDS = 60
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/window.ui")
 class RatureWindow(Adw.ApplicationWindow):
-    """Owns the App instance. Reserve and Recurring panes are placeholders."""
+    """Owns the App instance. The Recurring pane is still a placeholder."""
 
     __gtype_name__ = "RatureWindow"
 
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()
     sidebar_list: Gtk.ListBox = Gtk.Template.Child()
+    day_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     day_page: Adw.NavigationPage = Gtk.Template.Child()
     reserve_page: Adw.NavigationPage = Gtk.Template.Child()
     recurring_page: Adw.NavigationPage = Gtk.Template.Child()
@@ -49,6 +50,16 @@ class RatureWindow(Adw.ApplicationWindow):
             send_to_day=self.send_to_day,
         )
         self.reserve_page.set_child(self.reserve_view)
+
+        # SPECIFICATION.md §3.3: a reserve row dragged onto the Day sidebar
+        # entry draws it into the day. COPY, not MOVE: the source row
+        # leaves the reserve as a business consequence of draw_from_reserve,
+        # refreshed away by _refresh_all, never by a widget removal here.
+        drop_target = Gtk.DropTarget.new(GObject.TYPE_STRING, Gdk.DragAction.COPY)
+        drop_target.connect("accept", self._on_sidebar_drop_accept)
+        drop_target.connect("drop", self._on_sidebar_drop)
+        self.day_sidebar_row.add_controller(drop_target)
+
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
         self.connect("close-request", self._on_close_request)
@@ -88,11 +99,27 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def send_to_day(self, item_id: str) -> None:
         # SPECIFICATION.md §3.3: the Reserve view's send button and the
-        # sidebar entry's drop target (chantier 3 step 7) call this one
-        # method, never two parallel paths. A frozen list makes core raise
-        # LockedError; the send button is already insensitive by then, so
-        # _perform only ever logs it as the bug it would be.
+        # sidebar entry's drop target call this one method, never two
+        # parallel paths. Goes through _run_app_action like every mutation:
+        # the item may have vanished between drag start and drop (a day
+        # rollover on the timer, say), so an unknown id raises KeyError,
+        # which §3.6 already swallows and logs.
         self._run_app_action(lambda: self.app.draw_from_reserve(item_id))
+
+    def _on_sidebar_drop_accept(self, _target: Gtk.DropTarget, _drop: Gdk.Drop) -> bool:
+        # SPECIFICATION.md §3.3: a frozen day list refuses the drop and its
+        # row never highlights, so the refusal happens here in accept, not
+        # in drop. The lock is read live every attempt: the list can be
+        # frozen while the app runs. GdkDrop has not read the payload yet
+        # at this point, so this may only look at the lock and the type
+        # (the type is already filtered by the DropTarget's gtype).
+        return not self.app.session.day.locked
+
+    def _on_sidebar_drop(
+        self, _target: Gtk.DropTarget, value: str, _x: float, _y: float
+    ) -> bool:
+        self.send_to_day(value)
+        return True
 
     def _perform(self, action) -> bool:
         # SPECIFICATION.md §3.6 point 3: the one place that catches OSError,

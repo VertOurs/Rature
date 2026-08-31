@@ -39,7 +39,7 @@
                       <class name="navigation-sidebar"/>
                     </style>
                     <child>
-                      <object class="GtkListBoxRow">
+                      <object class="GtkListBoxRow" id="day_sidebar_row">
                         <property name="child">
                           <object class="GtkLabel">
                             <property name="label" translatable="yes">Day</property>
