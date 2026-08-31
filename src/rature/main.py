@@ -11,9 +11,9 @@ interpreter that has no ``gi``.
 import sys
 
 
-def main(version: str = "") -> int:
+def main() -> int:
     """Start the application and return its exit code."""
     from rature.ui.application import RatureApplication
 
-    app = RatureApplication(version)
+    app = RatureApplication()
     return app.run(sys.argv)

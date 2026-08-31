@@ -10,7 +10,6 @@ import os
 import signal
 import sys
 
-VERSION = "@VERSION@"
 PKGDATADIR = "@PKGDATADIR@"
 LOCALEDIR = "@LOCALEDIR@"
 
@@ -37,4 +36,4 @@ if __name__ == "__main__":
     _load_resources()
     from rature.main import main
 
-    sys.exit(main(VERSION))
+    sys.exit(main())

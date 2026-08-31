@@ -31,7 +31,6 @@ configure_file(
   output: 'rature',
   configuration: {
     'PYTHON': py.full_path(),
-    'VERSION': meson.project_version(),
     'PKGDATADIR': pkgdatadir,
     'LOCALEDIR': localedir,
   },

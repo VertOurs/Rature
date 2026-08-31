@@ -18,12 +18,11 @@ APP_ID = "io.github.vertours.Rature"
 class RatureApplication(Adw.Application):
     """Owns the single main window and the app-wide actions."""
 
-    def __init__(self, version: str = "") -> None:
+    def __init__(self) -> None:
         super().__init__(
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
-        self.version = version
         self._add_action("quit", self._on_quit, accels=["<primary>q"])
 
     def _add_action(self, name, callback, accels=None):
