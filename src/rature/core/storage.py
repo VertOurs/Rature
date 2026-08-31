@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from rature.core.migrations import CURRENT_VERSION, migrate
@@ -94,6 +95,26 @@ def save(store: Store, *, data_dir: Path | None = None) -> None:
     target = data_dir or xdg_data_dir()
     target.mkdir(parents=True, exist_ok=True)
     _atomic_write_json(target / _MAIN_FILE, store.to_dict())
+
+
+def quarantine(now: datetime, *, data_dir: Path | None = None) -> Path:
+    """Rename the unreadable main file aside; return its new path.
+
+    The stamp comes from the caller, not the system clock: storage never
+    reads it. On a name collision (two quarantines within the same
+    second), a numeric suffix is appended rather than overwriting the
+    earlier one.
+    """
+    target = data_dir or xdg_data_dir()
+    path = target / _MAIN_FILE
+    stamp = now.strftime("%Y%m%d-%H%M%S")
+    dest = path.with_name(f"{path.name}.bad-{stamp}")
+    suffix = 2
+    while dest.exists():
+        dest = path.with_name(f"{path.name}.bad-{stamp}-{suffix}")
+        suffix += 1
+    path.rename(dest)
+    return dest
 
 
 def archive(day: Day, *, data_dir: Path | None = None) -> Path:
