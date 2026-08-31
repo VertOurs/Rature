@@ -45,8 +45,29 @@ def test_task_rejects_a_timestamp_without_done() -> None:
 
 
 def test_origin_serialises_as_a_plain_string() -> None:
-    task = Task(num=7, text="from reserve", origin=Origin.RESERVE, source_id="abc")
+    task = Task(
+        num=7,
+        text="from reserve",
+        origin=Origin.RESERVE,
+        source_id="abc",
+        source_created=date(2026, 8, 20),
+    )
     assert task.to_dict()["origin"] == "reserve"
+
+
+def test_reserve_task_rejects_a_missing_source_id() -> None:
+    with pytest.raises(ValueError):
+        Task(
+            num=1,
+            text="x",
+            origin=Origin.RESERVE,
+            source_created=date(2026, 8, 20),
+        )
+
+
+def test_reserve_task_rejects_a_missing_source_created() -> None:
+    with pytest.raises(ValueError):
+        Task(num=1, text="x", origin=Origin.RESERVE, source_id="abc")
 
 
 def test_cryptic_text_is_stored_verbatim() -> None:

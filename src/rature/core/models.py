@@ -42,6 +42,12 @@ class Task:
             raise ValueError("done_at must carry a UTC offset")
         if self.done != (self.done_at is not None):
             raise ValueError("done and done_at must agree")
+        if self.origin == Origin.RESERVE and (
+            self.source_id is None or self.source_created is None
+        ):
+            raise ValueError(
+                "a reserve-origin task needs both source_id and source_created"
+            )
 
     def to_dict(self) -> dict:
         return {
