@@ -5,3 +5,4 @@ data/io.github.vertours.Rature.desktop.in
 data/io.github.vertours.Rature.metainfo.xml.in
 data/ui/window.ui
 data/ui/task_row.ui
+data/ui/day_view.ui

@@ -89,12 +89,8 @@
         <property name="content">
           <object class="AdwNavigationPage" id="day_page">
             <property name="title" translatable="yes">Day</property>
-            <!-- Placeholder. Replaced by the real Day view, ROADMAP.md chantier 3 step 3. -->
-            <property name="child">
-              <object class="AdwStatusPage">
-                <property name="title" translatable="yes">Day</property>
-              </object>
-            </property>
+            <!-- Content is DayView, attached in RatureWindow.__init__: it
+                 needs App, which template XML has no way to pass in. -->
           </object>
         </property>
       </object>

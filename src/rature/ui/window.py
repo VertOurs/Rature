@@ -12,11 +12,12 @@ from gi.repository import Adw, Gio, Gtk  # noqa: E402
 
 from rature.core.app import App  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
+from rature.ui.day_view import DayView  # noqa: E402
 
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/window.ui")
 class RatureWindow(Adw.ApplicationWindow):
-    """Owns the App instance for the process. Content is still a placeholder."""
+    """Owns the App instance. Reserve and Recurring panes are placeholders."""
 
     __gtype_name__ = "RatureWindow"
 
@@ -29,6 +30,8 @@ class RatureWindow(Adw.ApplicationWindow):
     def __init__(self, *, app: App, **kwargs) -> None:
         super().__init__(**kwargs)
         self.app = app
+        self.day_view = DayView(app=app)
+        self.day_page.set_child(self.day_view)
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
         self.connect("close-request", self._on_close_request)
