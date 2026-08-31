@@ -32,7 +32,6 @@ configure_file(
   configuration: {
     'PYTHON': py.full_path(),
     'PKGDATADIR': pkgdatadir,
-    'LOCALEDIR': localedir,
   },
   install: true,
   install_dir: bindir,
