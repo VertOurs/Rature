@@ -56,6 +56,10 @@ class DayView(Adw.Bin):
         self.refresh()
 
     def refresh(self) -> None:
+        # SPECIFICATION.md §3.2's "losing focus commits" applied to another
+        # trigger: rebuilding the rows would otherwise discard whatever the
+        # user was mid-typing, timer tick or not.
+        self._commit_pending_renames()
         session = self.app.session
         # SPECIFICATION.md §2.5: the reference date, never the calendar
         # date; between midnight and 04:00 they disagree.
@@ -67,6 +71,13 @@ class DayView(Adw.Bin):
         self.struck_list.set_visible(bool(session.struck))
         self.active_list.set_visible(bool(session.active))
         self.stack.set_visible_child_name("tasks" if session.day.tasks else "empty")
+
+    def _commit_pending_renames(self) -> None:
+        for list_box in (self.struck_list, self.active_list):
+            row = list_box.get_row_at_index(0)
+            while row is not None:
+                row.commit_pending_rename()
+                row = row.get_next_sibling()
 
     def _fill(self, list_box: Gtk.ListBox, tasks: Iterable[Task]) -> None:
         while (row := list_box.get_row_at_index(0)) is not None:
