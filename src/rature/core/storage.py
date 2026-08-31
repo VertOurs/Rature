@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from rature.core.migrations import CURRENT_VERSION, migrate
@@ -18,6 +19,7 @@ from rature.core.session import Day, Session
 FILE_VERSION = CURRENT_VERSION
 _MAIN_FILE = "data.json"
 _ARCHIVE_DIR = "archive"
+_ARCHIVE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 
 
 def xdg_data_dir() -> Path:
@@ -124,3 +126,39 @@ def archive(day: Day, *, data_dir: Path | None = None) -> Path:
     path = directory / f"{day.date.isoformat()}.json"
     _atomic_write_json(path, {"version": FILE_VERSION, **day.to_dict()})
     return path
+
+
+def list_archives(*, data_dir: Path | None = None) -> list[date]:
+    """Dates with an archive file, most recent first.
+
+    Reads file names only, never a file's content, so a corrupted
+    archive cannot make this fail. Only names matching AAAA-MM-JJ.json
+    count: _atomic_write_json's .<name>.<pid>.tmp sibling can survive
+    a crash mid-write, and archive/ is exactly where it would land.
+    """
+    directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
+    if not directory.is_dir():
+        return []
+    dates = [
+        date.fromisoformat(path.name.removesuffix(".json"))
+        for path in directory.iterdir()
+        if _ARCHIVE_NAME.match(path.name)
+    ]
+    return sorted(dates, reverse=True)
+
+
+def load_archive(day_date: date, *, data_dir: Path | None = None) -> Day:
+    """Load, migrate and return the archived Day for day_date.
+
+    Raises whatever the file's actual problem is, uncaught: OSError if
+    it is missing or unreadable, ValueError/KeyError/TypeError for
+    invalid JSON or a malformed Day, and migrations.FutureVersionError
+    for a version this build does not support. FutureVersionError does
+    not subclass ValueError on purpose (see migrations.py): a caller
+    copying App.open's except (ValueError, KeyError, TypeError)
+    verbatim would let it through uncaught.
+    """
+    directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
+    path = directory / f"{day_date.isoformat()}.json"
+    raw = migrate(json.loads(path.read_text(encoding="utf-8")))
+    return Day.from_dict(raw)
