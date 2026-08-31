@@ -19,6 +19,7 @@
   </description>
 
   <launchable type="desktop-id">io.github.vertours.Rature.desktop</launchable>
+  <translation type="gettext">rature</translation>
 
   <url type="homepage">https://github.com/VertOurs/Rature</url>
   <url type="bugtracker">https://github.com/VertOurs/Rature/issues</url>
