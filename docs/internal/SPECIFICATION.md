@@ -469,7 +469,7 @@ contient Edit, qui ouvre le même formulaire prérempli, puis Delete.
 │  [ Task text                          ]  │
 │                                          │
 │  Days                                    │
-│  ( M ) ( T ) ( W ) ( T ) ( F ) ( S ) (S) │
+│  (Mon)(Tue)(Wed)(Thu)(Fri)(Sat)(Sun)     │
 └──────────────────────────────────────────┘
 ```
 
@@ -477,6 +477,13 @@ Sept boutons bascules, lundi à gauche. **Save est insensible tant que le
 texte est vide ou qu'aucun jour n'est coché.** L'interdiction de §2.7.2 se
 traduit par un bouton inactif, jamais par une erreur affichée après coup.
 `core` refuse aussi la liste vide, cette double barrière est voulue.
+
+Les libellés des bascules, comme les jours du sous-titre de la ligne, sont
+les noms de jours abrégés de la locale, obtenus par `strftime` sur une
+semaine de référence commençant un lundi, le même mécanisme que le titre de
+date de la vue Jour. Pas de lettre seule : deux `T` ou deux `S` identiques à
+l'écran ne se distinguent pas. Chaque bascule porte le nom complet du jour
+en infobulle.
 
 Rien n'affiche « tous les jours » : sept boutons cochés se lisent
 directement.
@@ -589,10 +596,11 @@ d'abord.
 | Menu principal | `Archives`, `About Rature` |
 | Saisie du jour | `Add a task…` |
 | Saisie de la réserve | `Add to the reserve…` |
-| Menu de ligne | `Rename`, `Delete` |
+| Menu de ligne | `Rename`, `Edit`, `Delete` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
 | Infobulle d'envoi | `Send to the day` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
+| Infobulle d'ajout de récurrente | `Add a recurring task` |
 | Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Cancel`, `Save` |
 | Vue Jour vide | `The list is empty.` |
 | Réserve vide | `The reserve is empty.` |
@@ -606,6 +614,11 @@ d'abord.
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
+
+Les noms de jours, dans le sous-titre des lignes récurrentes et sur les
+bascules du formulaire, ne figurent pas dans cette liste : ils sont dérivés
+de la locale par `strftime` (§3.4), n'entrent jamais au catalogue et sont
+donc corrects dans toutes les langues sans traduction à écrire.
 
 ---
 

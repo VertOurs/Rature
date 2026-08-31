@@ -8,6 +8,9 @@
     <file preprocess="xml-stripblanks">ui/day_view.ui</file>
     <file preprocess="xml-stripblanks">ui/reserve_row.ui</file>
     <file preprocess="xml-stripblanks">ui/reserve_view.ui</file>
+    <file preprocess="xml-stripblanks">ui/recurring_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/recurring_form.ui</file>
+    <file preprocess="xml-stripblanks">ui/recurring_view.ui</file>
     <file compressed="true">style.css</file>
   </gresource>
 </gresources>
