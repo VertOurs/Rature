@@ -4,5 +4,7 @@
 <gresources>
   <gresource prefix="/io/github/vertours/Rature">
     <file preprocess="xml-stripblanks">ui/window.ui</file>
+    <file preprocess="xml-stripblanks">ui/task_row.ui</file>
+    <file compressed="true">style.css</file>
   </gresource>
 </gresources>
