@@ -17,7 +17,7 @@ from gi.repository import Adw, Gtk  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
     from rature.core.app import App
     from rature.core.models import Task
@@ -39,9 +39,20 @@ class DayView(Adw.Bin):
     active_list: Gtk.ListBox = Gtk.Template.Child()
     banner: Adw.Banner = Gtk.Template.Child()
 
-    def __init__(self, *, app: App, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        app: App,
+        run_action: Callable[[Callable[[], None]], bool],
+        perform: Callable[[Callable[[], None]], bool],
+        **kwargs,
+    ) -> None:
         super().__init__(**kwargs)
         self.app = app
+        # run_action refreshes after; perform does not (see task_row.py's
+        # rename, which updates its own label and never needs a rebuild).
+        self.run_action = run_action
+        self.perform = perform
         self.refresh()
 
     def refresh(self) -> None:

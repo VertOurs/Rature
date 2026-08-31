@@ -16,7 +16,10 @@ from pathlib import Path
 
 from rature.core import storage
 from rature.core.models import RecurringItem, ReserveItem, Task
-from rature.core.session import Day, Session, reference_date
+
+# LockedError re-exported: ui/ may only import rature.core.app, and its
+# mutation wrappers below raise it straight from Session.
+from rature.core.session import Day, LockedError, Session, reference_date  # noqa: F401
 from rature.core.storage import Store
 
 
