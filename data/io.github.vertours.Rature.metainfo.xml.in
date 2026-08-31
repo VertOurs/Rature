@@ -32,6 +32,15 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.5.0" date="2026-08-31">
+      <description>
+        <p>
+          Day view tasks can be reordered by dragging a row within its own
+          block. The Reserve and Recurring views and the archive window are
+          still to come.
+        </p>
+      </description>
+    </release>
     <release version="0.4.0" date="2026-08-31">
       <description>
         <p>
