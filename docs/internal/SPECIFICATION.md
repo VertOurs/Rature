@@ -539,6 +539,17 @@ et affiche une `AdwBanner`. L'application reste utilisable, aucune boîte
 modale, aucune fermeture forcée. La bannière disparaît à la première
 écriture réussie.
 
+**Une seule bannière, trois messages possibles.** Les situations 2 et 3
+partagent la même `AdwBanner`, avec le nouveau jour (§3.1) : jamais deux
+bannières à la fois, jamais de file d'attente. À chaque rafraîchissement,
+une fonction unique choisit le message le plus prioritaire parmi ceux
+encore actifs et non fermés, et le pose sur cette bannière : échec
+d'écriture d'abord, puis quarantaine, puis nouveau jour. Un échec
+d'écriture masque ainsi temporairement une bannière de quarantaine
+affichée, qui réapparaît dès que l'écriture suivante réussit. Fermer un
+message ne ferme pas les autres, et un message fermé ne revient jamais,
+y compris au rafraîchissement suivant.
+
 **Refus métier.** `LockedError`, `KeyError` et `ValueError` remontent de
 `core` mais ne doivent jamais atteindre l'utilisateur : l'interface rend
 insensibles les commandes impossibles au lieu de les laisser échouer. Une
@@ -591,6 +602,7 @@ d'abord.
 | Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |
 | Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
+| Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.

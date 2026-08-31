@@ -38,10 +38,10 @@ rature/
 │   │   └── archive_window.py   Fenêtre d'archives, §3.5
 │   └── main.py                 Point d'entrée
 ├── data/
-│   ├── ui/                     window.ui, day-view.ui, task-row.ui,
-│   │                           reserve-view.ui, reserve-row.ui,
-│   │                           recurring-view.ui, recurring-form.ui,
-│   │                           archive-window.ui
+│   ├── ui/                     window.ui, day_view.ui, task_row.ui,
+│   │                           reserve_view.ui, reserve_row.ui,
+│   │                           recurring_view.ui, recurring_form.ui,
+│   │                           archive_window.ui
 │   ├── icons/
 │   ├── *.desktop.in
 │   ├── *.metainfo.xml.in
@@ -125,6 +125,12 @@ aucune décision de comportement produit ne reste à prendre dans `ui/`.
 Ne contient aucune règle métier. Affiche l'état fourni par `core/`,
 transmet les actions de l'utilisateur, rien de plus. Si vous êtes tenté
 d'écrire une condition métier dans `ui/`, elle va dans `core/`.
+
+Chaque `.ui` porte le même nom que le module Python qui le charge
+(`task_row.py` ↔ `data/ui/task_row.ui`), tiret bas compris. Chaque classe
+`@Gtk.Template` fixe explicitement son `__gtype_name__`, préfixé `Rature` :
+les noms de types GObject forment un espace global au processus, une
+collision ne se détecte qu'au lancement.
 
 ---
 
