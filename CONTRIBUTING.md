@@ -182,7 +182,8 @@ Beyond the setup and pre-PR checks above:
 
 ```bash
 # core/ coverage gate, enforced from milestone 1 on (see docs/internal/ROADMAP.md)
-pytest --cov=rature.core --cov-fail-under=90
+# 100% with branch coverage since milestone 2's hardening PRs.
+pytest --cov=rature.core --cov-branch --cov-fail-under=100
 
 # Metadata (appstreamcli reads the source; desktop-file-validate needs the
 # merged .desktop, present after `meson compile`)

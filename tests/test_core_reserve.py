@@ -49,6 +49,14 @@ def test_reserve_edits_work_while_the_day_is_frozen() -> None:
     assert session.reserve == []
 
 
+def test_reserve_lookup_skips_past_a_non_matching_item() -> None:
+    session = make_session()
+    session.add_to_reserve("first", today=TODAY)
+    second = session.add_to_reserve("second", today=TODAY)
+    session.rename_reserve(second.id, "second, renamed")
+    assert session._reserve_item(second.id).text == "second, renamed"
+
+
 def test_an_unknown_reserve_id_is_a_key_error() -> None:
     session = make_session()
     with pytest.raises(KeyError):

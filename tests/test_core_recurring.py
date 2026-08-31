@@ -79,6 +79,14 @@ def test_delete_recurring_removes_it() -> None:
     assert session.recurring == []
 
 
+def test_recurring_lookup_skips_past_a_non_matching_item() -> None:
+    session = make_session()
+    session.add_recurring("first", [0])
+    second = session.add_recurring("second", [1])
+    edited = session.edit_recurring(second.id, text="second, renamed")
+    assert edited.text == "second, renamed"
+
+
 def test_an_unknown_recurring_id_is_a_key_error() -> None:
     session = make_session()
     with pytest.raises(KeyError):
