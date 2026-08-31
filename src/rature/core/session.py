@@ -16,10 +16,6 @@ class LockedError(Exception):
     """An operation was refused because the list is frozen."""
 
 
-def _now() -> datetime:
-    return datetime.now().astimezone()
-
-
 def reference_date(now: datetime) -> date:
     """The day a moment belongs to; the boundary is 04:00 local time."""
     return (now - timedelta(hours=4)).date()
@@ -30,9 +26,7 @@ def _norm(text: str) -> str:
     return text.strip().casefold()
 
 
-def _stamp(now: datetime | None) -> datetime:
-    if now is None:
-        return _now()
+def _stamp(now: datetime) -> datetime:
     if now.tzinfo is None:
         raise ValueError("now must carry a UTC offset")
     return now
@@ -108,7 +102,7 @@ class Session:
         self.day.tasks.append(task)
         return task
 
-    def strike(self, task_id: str, *, now: datetime | None = None) -> None:
+    def strike(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
         if task.done:
             raise ValueError(f"task {task.num} is already struck")
@@ -125,8 +119,9 @@ class Session:
     def rename(self, task_id: str, text: str) -> None:
         self._task(task_id).text = text
 
-    def delete(self, task_id: str, *, now: datetime | None = None) -> None:
+    def delete(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
+        index = self.day.tasks.index(task)
         self.day.deletions.append(
             Deletion(
                 id=task.id,
@@ -134,6 +129,11 @@ class Session:
                 text=task.text,
                 origin=task.origin,
                 source_id=task.source_id,
+                source_created=task.source_created,
+                template_id=task.template_id,
+                done=task.done,
+                done_at=task.done_at,
+                index=index,
                 deleted_at=_stamp(now),
             )
         )
@@ -144,6 +144,29 @@ class Session:
         if len(ordered_ids) != len(by_id) or set(ordered_ids) != set(by_id):
             raise ValueError("reorder needs a permutation of the current task ids")
         self.day.tasks = [by_id[task_id] for task_id in ordered_ids]
+
+    def move_before(self, task_id: str, target_id: str | None) -> None:
+        """Reorder day.tasks so task_id sits right before target_id.
+
+        target_id=None moves the task to the end of day.tasks. task_id
+        == target_id is a silent no-op: a drag-and-drop that drops a
+        row back where it was picked up.
+
+        day.tasks only orders the display within its own block: view()
+        always puts the struck tasks above the active ones. Moving an
+        active task "before" a struck one has no visible effect until
+        it is struck too.
+        """
+        self._task(task_id)
+        if task_id == target_id:
+            return
+        ordered = [task.id for task in self.day.tasks if task.id != task_id]
+        if target_id is None:
+            ordered.append(task_id)
+        else:
+            self._task(target_id)
+            ordered.insert(ordered.index(target_id), task_id)
+        self.reorder(ordered)
 
     def lock(self) -> None:
         self.day.locked = True
@@ -157,9 +180,9 @@ class Session:
                 return item
         raise KeyError(item_id)
 
-    def add_to_reserve(self, text: str, *, today: date | None = None) -> ReserveItem:
+    def add_to_reserve(self, text: str, *, today: date) -> ReserveItem:
         # SPECIFICATION.md §2.7.4: manual reserve entries are never de-duplicated.
-        item = ReserveItem(text=text, created=today or date.today())
+        item = ReserveItem(text=text, created=today)
         self.reserve.append(item)
         return item
 

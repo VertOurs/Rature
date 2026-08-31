@@ -40,7 +40,7 @@ def test_a_deleted_number_is_never_reused() -> None:
     session = make_session()
     first = session.add("first")
     session.add("second")
-    session.delete(first.id)
+    session.delete(first.id, now=STAMP)
     assert session.add("third").num == 3
 
 
@@ -50,14 +50,6 @@ def test_strike_sets_done_and_a_timestamp() -> None:
     session.strike(task.id, now=STAMP)
     assert task.done is True
     assert task.done_at == STAMP
-
-
-def test_strike_default_timestamp_is_timezone_aware() -> None:
-    session = make_session()
-    task = session.add("thing")
-    session.strike(task.id)
-    assert task.done_at is not None
-    assert task.done_at.tzinfo is not None
 
 
 def test_strike_rejects_a_naive_now() -> None:
@@ -99,7 +91,7 @@ def test_strike_rename_delete_reorder_work_while_frozen() -> None:
     session.strike(one.id, now=STAMP)
     session.rename(two.id, "two bis")
     session.reorder([two.id, one.id])
-    session.delete(one.id)
+    session.delete(one.id, now=STAMP)
     assert [task.text for task in session.day.tasks] == ["two bis"]
 
 
@@ -117,12 +109,20 @@ def test_delete_moves_a_full_entry_to_the_journal() -> None:
     session.delete(gone.id, now=STAMP)
     assert gone not in session.day.tasks
     (entry,) = session.day.deletions
-    assert (entry.id, entry.num, entry.text, entry.origin, entry.deleted_at) == (
+    assert (
+        entry.id,
+        entry.num,
+        entry.text,
+        entry.origin,
+        entry.deleted_at,
+        entry.index,
+    ) == (
         gone.id,
         2,
         "drop",
         Origin.DAY,
         STAMP,
+        1,
     )
 
 
@@ -150,6 +150,45 @@ def test_reorder_rejects_a_non_permutation() -> None:
         session.reorder([one.id])
 
 
+def test_move_before_places_the_task_ahead_of_the_target() -> None:
+    session = make_session()
+    session.add("1")
+    two, three = session.add("2"), session.add("3")
+    session.move_before(three.id, two.id)
+    assert [task.num for task in session.day.tasks] == [1, 3, 2]
+
+
+def test_move_before_none_moves_the_task_to_the_end() -> None:
+    session = make_session()
+    one = session.add("1")
+    session.add("2")
+    session.add("3")
+    session.move_before(one.id, None)
+    assert [task.num for task in session.day.tasks] == [2, 3, 1]
+
+
+def test_move_before_rejects_an_unknown_task_id() -> None:
+    session = make_session()
+    target = session.add("1")
+    with pytest.raises(KeyError):
+        session.move_before("no-such-id", target.id)
+
+
+def test_move_before_rejects_an_unknown_target_id() -> None:
+    session = make_session()
+    task = session.add("1")
+    with pytest.raises(KeyError):
+        session.move_before(task.id, "no-such-id")
+
+
+def test_move_before_itself_is_a_no_op() -> None:
+    session = make_session()
+    one = session.add("1")
+    session.add("2")
+    session.move_before(one.id, one.id)
+    assert [task.num for task in session.day.tasks] == [1, 2]
+
+
 def test_view_is_the_struck_block_then_the_active_tasks() -> None:
     session = make_session()
     one, two, three, four = (session.add(str(n)) for n in range(1, 5))
@@ -171,7 +210,7 @@ def test_lock_and_unlock_toggle_the_flag() -> None:
 def test_an_unknown_task_id_is_a_key_error() -> None:
     session = make_session()
     with pytest.raises(KeyError):
-        session.strike("no-such-id")
+        session.strike("no-such-id", now=STAMP)
 
 
 def test_day_round_trips() -> None:

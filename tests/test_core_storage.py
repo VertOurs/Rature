@@ -158,7 +158,15 @@ def test_a_hand_written_task_round_trips(tmp_path: Path) -> None:
     day = Day(
         date=date(2026, 8, 24),
         counter=2,
-        tasks=[Task(num=1, text="x", origin=Origin.RESERVE, source_id="abc")],
+        tasks=[
+            Task(
+                num=1,
+                text="x",
+                origin=Origin.RESERVE,
+                source_id="abc",
+                source_created=date(2026, 8, 20),
+            )
+        ],
     )
     save(Store(day=day), data_dir=tmp_path)
     assert load(data_dir=tmp_path).day == day
