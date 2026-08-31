@@ -24,7 +24,8 @@ rature/
 │   │   ├── session.py          Règles : ajout, rayure, passage du jour
 │   │   ├── recurrence.py       Quelles récurrentes s'appliquent aujourd'hui
 │   │   ├── storage.py          Lecture et écriture atomique du JSON
-│   │   └── migrations.py       socle de migration entre versions
+│   │   ├── migrations.py       socle de migration entre versions
+│   │   └── app.py              Coordination : App, une Session, une horloge
 │   ├── ui/                     Tout ce qui touche GTK
 │   │   ├── application.py      Adw.Application, actions, raccourcis
 │   │   ├── window.py           Fenêtre principale, navigation latérale
@@ -79,6 +80,31 @@ Le format naît en version 1 avec la réserve et les récurrentes. Aucune
 migration à écrire au démarrage, mais le socle existe dès le premier jour :
 l'ajouter après coup sur des données réelles est autrement plus risqué.
 
+### `core/app.py`
+La classe `App` coordonne une `Session` avec `storage`, derrière une
+horloge injectable unique (`clock`, un `Callable[[], datetime]`, par défaut
+l'horloge système). C'est la seule couture d'horloge du projet : `session.py`
+et `storage.py` reçoivent toujours `now`/`today` en paramètre, jamais ne
+lisent l'heure eux-mêmes.
+
+`App.open` charge le fichier ou en crée un au premier lancement, met en
+quarantaine un fichier illisible (`storage.quarantine`) et repart à vide,
+laisse `migrations.FutureVersionError` traverser sans rien construire pour
+une version future. Avant de rendre la main, il exécute systématiquement
+`ensure_day`, la séquence `roll_over` puis `archive` puis `save` de
+`SPECIFICATION.md` §2.5 : l'appelant reçoit toujours une `App` déjà à jour,
+il n'a jamais à connaître ni à rejouer cette séquence.
+
+Un enrobage par mutation de `Session` (`add`, `strike`, `delete`,
+`move_before`, `add_to_reserve`, etc.) fournit `now`/`today` depuis
+`clock` et sauvegarde après. Les erreurs métier (`LockedError`, `KeyError`,
+`ValueError`) remontent telles quelles, `App` ne les avale pas. Une
+sauvegarde qui échoue en cours de mutation n'annule pas la mutation en
+mémoire, décision assumée et documentée sur la classe elle-même.
+
+Une application graphique peut être écrite en n'appelant que `App` :
+aucune décision de comportement produit ne reste à prendre dans `ui/`.
+
 ### `ui/`
 Ne contient aucune règle métier. Affiche l'état fourni par `core/`,
 transmet les actions de l'utilisateur, rien de plus. Si vous êtes tenté
@@ -89,14 +115,14 @@ d'écrire une condition métier dans `ui/`, elle va dans `core/`.
 ## Flux de données
 
 ```
-utilisateur -> ui -> session (core) -> storage (core) -> disque
-                        |
-                        v
-                    ui rafraîchit l'affichage
+utilisateur -> ui -> app (core) -> session et storage (core) -> disque
+                       |
+                       v
+                   ui rafraîchit l'affichage
 ```
 
 L'interface ne modifie jamais l'état directement. Elle appelle une méthode
-de `session`, puis redemande l'état à afficher.
+d'`app`, puis redemande l'état à afficher (`app.session`).
 
 ---
 
