@@ -58,6 +58,14 @@ meson install -C build
 Re-run the last two lines after every change. Delete `build/install` along
 with `build/` to start over; neither is tracked by git.
 
+Once the window reads `Gio.Settings` (milestone 3), the schema must resolve
+through `XDG_DATA_DIRS`, or the process dies on launch with no catchable
+exception and no useful message:
+
+```
+XDG_DATA_DIRS="$PWD/build/install/share:$XDG_DATA_DIRS" ./build/install/bin/rature
+```
+
 ## Checks before a pull request
 
 ```

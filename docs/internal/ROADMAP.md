@@ -96,8 +96,11 @@ le passage de plusieurs jours d'un coup et le passage à cheval sur minuit.
 
 Reconstruction en `.ui`, branchée sur un coeur déjà testé.
 
-- [ ] Fenêtre principale avec navigation latérale
-- [ ] Vue Jour : rayées en haut, en cours en dessous
+- [ ] Lecture des archives dans `core` : liste des dates, chargement d'une journée
+- [ ] Fenêtre principale : `App` détenue par l'application, erreurs de démarrage, taille de fenêtre, navigation latérale
+- [ ] Vue Jour en lecture seule : rayées en haut, en cours en dessous, numéros stables
+- [ ] Vue Jour en édition : ajouter, rayer, dérayer, renommer, supprimer, figer
+- [ ] Réordonnancement des tâches par glisser-déposer à l'intérieur d'un bloc
 - [ ] Vue Réserve, avec bouton d'envoi vers le jour
 - [ ] Glisser-déposer de la réserve vers l'entrée Jour du panneau
 - [ ] Vue Récurrentes, avec choix des jours
@@ -105,7 +108,7 @@ Reconstruction en `.ui`, branchée sur un coeur déjà testé.
 - [ ] Adaptation aux fenêtres étroites
 
 **Critère de fin** : l'application couvre toute la spécification de
-`SPECIFICATION.md`, réserve et récurrentes comprises.
+`SPECIFICATION.md`, §2 et §3, réserve et récurrentes comprises.
 
 ---
 

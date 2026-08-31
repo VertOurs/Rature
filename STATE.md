@@ -7,9 +7,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : fenêtre principale avec navigation latérale, puis
-  vue Jour (rayées en haut, en cours en dessous). Découpage complet dans
-  `docs/internal/ROADMAP.md`.
+- **Étape suivante** : lecture des archives dans `core` (liste des dates,
+  chargement d'une journée), puis fenêtre principale. Découpage complet
+  dans `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -83,3 +83,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 
 Cadrage relu, contradictions résolues, six cas limites tranchés en
 `SPECIFICATION.md` §2.7 le 25 août 2026.
+
+`SPECIFICATION.md` §3, spécification d'interface, ajoutée le 31 août 2026 :
+fenêtre principale, les trois vues, fenêtre d'archives, démarrage et refus,
+fenêtres étroites, textes et icônes. Lue avant toute PR de chantier 3.
