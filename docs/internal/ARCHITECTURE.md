@@ -123,8 +123,10 @@ Fichier unique, versionné, dans `$XDG_DATA_HOME/rature/`.
     {"id": "uuid", "text": "...", "weekdays": [0,1,2,3,4]}
   ],
   "deletions": [
-    {"id": "uuid", "num": 4, "text": "...", "origin": "day",
-     "source_id": null, "deleted_at": "2026-08-24T14:32:07+02:00"}
+    {"id": "uuid", "num": 4, "text": "...", "origin": "day", "index": 1,
+     "source_id": null, "source_created": null, "template_id": null,
+     "done": false, "done_at": null,
+     "deleted_at": "2026-08-24T14:32:07+02:00"}
   ]
 }
 ```
@@ -137,9 +139,18 @@ Champs des tâches :
 | `num` | étiquette d'affichage, immuable, indépendante de l'ordre |
 | `done_at` | horodatage ISO local de la rature, `null` sinon. La rature est une trace de ce qui a été fait, encore faut-il savoir quand |
 | `origin` | `day`, `reserve` ou `recurring` |
-| `source_id` | uuid de l'item de réserve d'origine, `null` sinon. C'est lui, et non le texte, qui pilote le retour en réserve |
-| `source_created` | date `created` de l'item de réserve d'origine, copiée au tirage, `null` sinon. Relue au passage du jour pour restaurer l'item avec sa date d'origine |
+| `source_id` | uuid de l'item de réserve d'origine, `null` sinon. C'est lui, et non le texte, qui pilote le retour en réserve. Non nul si et seulement si `origin` vaut `reserve` : `core/models.py` refuse à la construction une tâche `reserve` sans `source_id` |
+| `source_created` | date `created` de l'item de réserve d'origine, copiée au tirage, `null` sinon. Relue au passage du jour pour restaurer l'item avec sa date d'origine. Même contrainte que `source_id` : obligatoire si et seulement si `origin` vaut `reserve` |
 | `template_id` | uuid de la récurrente d'origine, `null` sinon |
+
+Champs propres à une entrée de `deletions`, en plus de `id`, `num`, `text`,
+`origin`, `source_id`, `source_created`, `template_id` et `deleted_at`, qui
+reprennent le rôle décrit ci-dessus pour les champs de même nom :
+
+| Champ | Rôle |
+|---|---|
+| `index` | position de la tâche dans `day.tasks` au moment de la suppression, pour la réinsérer au même endroit à l'annulation (chantier 4) |
+| `done`, `done_at` | état de la rature au moment de la suppression, pour restaurer une tâche rayée telle quelle |
 
 `weekdays` ne peut pas être vide, voir `SPECIFICATION.md` §2.7.2. Lundi vaut 0.
 « Tous les jours » s'écrit `[0,1,2,3,4,5,6]`.
