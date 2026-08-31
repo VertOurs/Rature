@@ -242,3 +242,383 @@ nuit par an.
 
 Le champ `created` des items de réserve reste une date simple, sans heure. Il
 n'est pas concerné.
+
+---
+
+## 3. Spécification d'interface
+
+Cette section fixe ce que l'interface affiche et comment elle réagit. Elle a
+le même statut que §2 : sa numérotation est stable, elle tranche toute
+contradiction avec un autre document, et une proposition qui la contredit se
+refuse en la citant.
+
+§2 dit ce que l'application fait et ce qu'elle ne doit jamais faire. §3 dit à
+quoi ça ressemble. Quand les deux se croisent, §2 gagne.
+
+Les croquis sont schématiques. Ils fixent la disposition et la hiérarchie,
+jamais les pixels. Le contrôle du rendu réel reste humain, voir `CLAUDE.md`
+§6.
+
+---
+
+### 3.1 Fenêtre principale
+
+Une seule fenêtre, `AdwApplicationWindow`, contenant un
+`AdwNavigationSplitView`. Le panneau latéral porte trois entrées : Day,
+Reserve, Recurring. Chaque entrée affiche sa vue dans le panneau de contenu.
+
+Les archives ne sont pas une entrée du panneau. Elles s'ouvrent depuis le
+menu principal, dans une fenêtre distincte, voir §3.5.
+
+```
+┌──────────────────────────────┬──────────────────────────────────────────┐
+│ Rature                    ⋮  │  Monday 31 August                     🔒 │
+├──────────────────────────────┼──────────────────────────────────────────┤
+│  Day                         │  ┌────────────────────────────────────┐  │
+│  Reserve                     │  │  2   call the dentist       ↺   ⋮  │  │
+│  Recurring                   │  │  5   take out the bin       ↺   ⋮  │  │
+│                              │  └────────────────────────────────────┘  │
+│                              │  ┌────────────────────────────────────┐  │
+│                              │  │  1   finish the meson file  ✓   ⋮  │  │
+│                              │  │  3   answer Marie           ✓   ⋮  │  │
+│                              │  │  4   buy bread              ✓   ⋮  │  │
+│                              │  └────────────────────────────────────┘  │
+│                              │                                          │
+│                              ├──────────────────────────────────────────┤
+│                              │  [ Add a task…                        ]  │
+└──────────────────────────────┴──────────────────────────────────────────┘
+```
+
+Le menu principal (`open-menu-symbolic`, en tête du panneau latéral) contient
+au chantier 3 : Archives, puis About Rature. Les raccourcis clavier et les
+statistiques s'y ajoutent au chantier 4.
+
+**Taille et état.** La fenêtre lit `window-width`, `window-height` et
+`window-maximized` à la construction, et les écrit à la fermeture. Pas de
+liaison `Gio.Settings.bind` sur la largeur et la hauteur : elle enregistre
+les dimensions transitoires de l'état maximisé.
+
+**Propriété d'`App`.** `RatureApplication.do_activate` construit l'`App` une
+fois, avant toute fenêtre, et la garde. Le traitement des échecs de démarrage
+est en §3.6. Aucun autre objet n'appelle `App.open`.
+
+**Passage du jour en cours d'exécution.** Une minuterie de soixante secondes
+appelle `App.ensure_day`. Si elle rend une journée, les trois vues se
+rafraîchissent et une bannière neutre l'annonce, voir §3.8. Un délai fixe et
+court, plutôt qu'un réveil calculé jusqu'à 04:00, parce que le calcul se
+trompe une nuit par an au changement d'heure.
+
+---
+
+### 3.2 Vue Jour
+
+C'est la vue par défaut à l'ouverture.
+
+**Structure.** `AdwToolbarView`. En tête, un `AdwHeaderBar` dont le titre est
+la date de la journée en cours, en format long local. À droite, le bouton
+bascule de verrouillage. En pied, la barre de saisie. Au centre, un
+`GtkScrolledWindow` contenant deux listes empilées.
+
+**Les deux blocs.** Le bloc des rayées est toujours au-dessus, le bloc des
+tâches en cours au-dessous, conformément à §2.1 point 5. Chacun est un
+`GtkListBox` de style `boxed-list`. Un bloc vide n'est pas affiché : pas de
+cadre vide, pas de titre de section, aucun libellé qui compte ce qu'il n'y a
+pas.
+
+L'ordre à l'intérieur d'un bloc est celui rendu par `Session.view()`. Il
+n'est jamais recalculé dans l'interface.
+
+**Une ligne.** Un seul modèle de ligne pour les deux blocs.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  12   text of the task                            ✓      ⋮   │
+└──────────────────────────────────────────────────────────────┘
+   │     │                                          │       │
+   │     │                                          │       └ menu de ligne
+   │     │                                          └ rayer ou dérayer
+   │     └ texte, barré si la tâche est rayée
+   └ numéro, chiffres tabulaires, atténué, jamais recalculé
+```
+
+Le numéro affiché est `task.num`. Il ne dépend ni de la position, ni du bloc,
+conformément à §2.4.
+
+Le barré est porté par une classe CSS appliquée à l'étiquette de texte, pas
+par une construction de widget en Python.
+
+**Rayer et supprimer.** Le bouton de la ligne raye, ou déraye si la tâche est
+déjà rayée. Supprimer n'est jamais un bouton de ligne : c'est une entrée du
+menu de ligne, marquée destructive. Les deux actions ne sont donc jamais
+côte à côte et ne peuvent pas être confondues par un clic mal placé, ce
+qu'exige §2.2.
+
+Il n'y a aucune boîte de confirmation à la suppression, §2.3 l'interdit.
+C'est le second geste nécessaire pour ouvrir le menu qui protège, pas une
+question.
+
+**Menu de ligne.** Rename, puis Delete. Rien d'autre au chantier 3.
+
+**Renommer.** L'étiquette de texte est remplacée sur place par une zone de
+saisie contenant le texte actuel, sélectionné. Entrée valide, Échap annule,
+la perte du focus valide. Aucune fenêtre ne s'ouvre. Un texte vide après
+suppression des espaces annule le renommage sans rien changer.
+
+**Ajouter.** La barre de pied contient une `GtkEntry` seule, sans bouton :
+l'ajout se fait à la touche Entrée. Après ajout, la zone se vide, **garde le
+focus**, et la liste défile jusqu'à la nouvelle tâche. C'est la règle qui
+rend la dictée en rafale possible, elle n'est pas négociable. Un texte vide
+après suppression des espaces n'ajoute rien.
+
+**Liste figée.** Le bouton de verrouillage bascule entre `App.lock` et
+`App.unlock`, et change d'icône. Quand la liste est figée :
+
+- la zone de saisie est insensible
+- le dépôt d'un élément de réserve est refusé, voir §3.6
+- rayer, dérayer, renommer, supprimer et réordonner restent actifs
+
+Aucun autre changement d'apparence. Pas de bandeau, pas de message. L'état du
+bouton suffit.
+
+**Réordonner.** Les lignes sont déplaçables par glisser-déposer à
+l'intérieur de leur propre bloc. Un dépôt d'un bloc vers l'autre est refusé
+et ne produit aucun retour visuel de dépôt possible. Motif : `move_before`
+ordonne `day.tasks`, mais `view()` remonte toujours les rayées, donc un
+déplacement entre blocs n'aurait aucun effet visible et passerait pour un
+bogue.
+
+**Vue vide.** Un `AdwStatusPage` sans icône, texte en §3.8. Il remplace les
+deux blocs, jamais la barre de saisie, qui reste utilisable.
+
+---
+
+### 3.3 Vue Réserve
+
+```
+┌────────────────────────────────────────────────────┐
+│  Reserve                                           │
+├────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────┐  │
+│  │  repair the bike light               →   ⋮   │  │
+│  │  call the insurance                  →   ⋮   │  │
+│  │  sort the photos                     →   ⋮   │  │
+│  └──────────────────────────────────────────────┘  │
+├────────────────────────────────────────────────────┤
+│  [ Add to the reserve…                          ]  │
+└────────────────────────────────────────────────────┘
+```
+
+Même structure que la vue Jour : en-tête, liste unique, barre de saisie en
+pied. L'ajout suit les mêmes règles, focus conservé compris. Aucun
+dédoublonnage, §2.7.4.
+
+**La date `created` n'est jamais affichée.** Elle existe dans les données et
+sert au retour en réserve, elle n'a pas à être montrée. Une date d'entrée
+affichée à côté d'une tâche vieille de trois mois est un commentaire sur le
+comportement de l'utilisateur, ce que §2.3 interdit.
+
+**Bouton d'envoi** (`→`) : appelle `draw_from_reserve`. La ligne disparaît de
+la réserve, c'est un déplacement et non une copie, §2.5. Il est insensible
+quand la liste du jour est figée.
+
+**Menu de ligne** : Rename, puis Delete. Le renommage est en place, comme en
+§3.2.
+
+**Glisser-déposer.** Chaque ligne est une source de glissement portant
+l'identifiant de l'item. La cible est l'entrée Day du panneau latéral. Le
+dépôt et le bouton d'envoi appellent **la même méthode de la fenêtre**,
+jamais deux chemins parallèles. Quand la liste du jour est figée, la cible
+refuse le dépôt et ne s'illumine pas.
+
+---
+
+### 3.4 Vue Récurrentes
+
+```
+┌────────────────────────────────────────────────────┐
+│  Recurring                                    +    │
+├────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────┐  │
+│  │  water the plants                        ⋮   │  │
+│  │  Mon Thu                                     │  │
+│  ├──────────────────────────────────────────────┤  │
+│  │  weekly backup                           ⋮   │  │
+│  │  Sun                                         │  │
+│  └──────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────┘
+```
+
+Une `AdwActionRow` par modèle : le texte en titre, les jours en sous-titre,
+abrégés et dans l'ordre de la semaine, lundi premier. Pas de barre de saisie
+en pied : la création demande un texte et des jours, donc un formulaire.
+
+Le bouton `+` de l'en-tête ouvre le formulaire de création. Le menu de ligne
+contient Edit, qui ouvre le même formulaire prérempli, puis Delete.
+
+**Formulaire**, une `AdwDialog` :
+
+```
+┌──────────────────────────────────────────┐
+│  Cancel        Recurring task       Save │
+├──────────────────────────────────────────┤
+│  [ Task text                          ]  │
+│                                          │
+│  Days                                    │
+│  ( M ) ( T ) ( W ) ( T ) ( F ) ( S ) (S) │
+└──────────────────────────────────────────┘
+```
+
+Sept boutons bascules, lundi à gauche. **Save est insensible tant que le
+texte est vide ou qu'aucun jour n'est coché.** L'interdiction de §2.7.2 se
+traduit par un bouton inactif, jamais par une erreur affichée après coup.
+`core` refuse aussi la liste vide, cette double barrière est voulue.
+
+Rien n'affiche « tous les jours » : sept boutons cochés se lisent
+directement.
+
+---
+
+### 3.5 Fenêtre d'archives
+
+Fenêtre distincte, ouverte depuis le menu principal, en lecture seule.
+
+```
+┌──────────────────┬─────────────────────────────────────┐
+│ Archives         │  Friday 28 August                   │
+├──────────────────┼─────────────────────────────────────┤
+│  30 August 2026  │  ┌───────────────────────────────┐  │
+│  29 August 2026  │  │  1   answer Marie             │  │
+│▶ 28 August 2026  │  │  4   buy bread                │  │
+│  27 August 2026  │  └───────────────────────────────┘  │
+│                  │  ┌───────────────────────────────┐  │
+│                  │  │  2   call the dentist         │  │
+│                  │  │  3   read the meson docs      │  │
+│                  │  └───────────────────────────────┘  │
+└──────────────────┴─────────────────────────────────────┘
+```
+
+- Liste des dates fournie par `App.archives()`, du plus récent au plus
+  ancien. Aucun compte, aucun aperçu, aucun résumé à côté d'une date.
+- Le contenu d'une journée suit la disposition de §3.2 : rayées en haut, en
+  cours en dessous, mêmes numéros.
+- Aucun bouton sur les lignes, aucun menu, aucun glisser-déposer.
+- Le journal de suppressions n'est jamais affiché, §2.2. Les tâches
+  supprimées n'apparaissent pas non plus dans la journée archivée.
+- Une archive illisible affiche un texte neutre à la place du contenu, sans
+  empêcher de consulter les autres dates.
+- Aucune archive : `AdwStatusPage`, texte en §3.8.
+
+La recherche dans les archives est au chantier 4. Ne pas l'anticiper.
+
+---
+
+### 3.6 Démarrage, erreurs et refus
+
+Trois situations, trois traitements distincts. Aucune n'est un plantage.
+
+**1. Fichier écrit par une version future** (`FutureVersionError`, levée par
+`App.open`). Il n'y a pas encore de fenêtre, donc une `Gtk.AlertDialog`
+présentée sans parent, puis `quit`. L'application ne démarre pas. Écraser les
+données d'une version plus récente est la seule faute irréparable.
+
+**2. Fichier illisible mis en quarantaine**
+(`StartupOutcome.RECOVERED_FROM_CORRUPTION`). L'application démarre sur une
+journée vide. Une `AdwBanner` non modale en tête de la vue Jour indique que
+le fichier a été mis de côté et donne son nouveau nom. Fermable, elle ne
+revient pas. Sans elle, l'utilisateur croit avoir tout perdu.
+
+**3. Échec d'écriture pendant une mutation** (`OSError`). `App` ne défait pas
+la mutation en mémoire, c'est documenté sur la classe. L'interface attrape
+l'`OSError` **en un seul endroit**, l'enrobage commun de toutes les actions,
+et affiche une `AdwBanner`. L'application reste utilisable, aucune boîte
+modale, aucune fermeture forcée. La bannière disparaît à la première
+écriture réussie.
+
+**Refus métier.** `LockedError`, `KeyError` et `ValueError` remontent de
+`core` mais ne doivent jamais atteindre l'utilisateur : l'interface rend
+insensibles les commandes impossibles au lieu de les laisser échouer. Une
+telle exception qui survient malgré tout est un bogue, elle se journalise sur
+la sortie d'erreur et n'affiche rien.
+
+---
+
+### 3.7 Fenêtres étroites
+
+Un `AdwBreakpoint` sur la fenêtre principale. Sous 500 unités de largeur,
+`AdwNavigationSplitView` passe en mode replié : le panneau latéral devient
+une page, avec un bouton de retour dans l'en-tête de la vue.
+
+Contraintes qui restent vraies en étroit :
+
+- la barre de saisie reste visible et accessible au clavier
+- le texte d'une tâche s'enroule sur plusieurs lignes, il n'est jamais
+  tronqué par des points de suspension
+- le numéro et les boutons de ligne restent visibles
+
+Le glisser-déposer de la réserve vers l'entrée Day n'est pas disponible en
+mode replié, l'entrée n'étant pas à l'écran. Le bouton d'envoi couvre ce cas,
+c'est la raison pour laquelle les deux existent.
+
+---
+
+### 3.8 Textes affichés
+
+Liste fermée des chaînes de l'interface au chantier 3. Toutes traduisibles.
+Toute chaîne visible absente de cette liste est une chaîne à ajouter ici
+d'abord.
+
+| Emplacement | Texte |
+|---|---|
+| Entrée de navigation | `Day`, `Reserve`, `Recurring` |
+| Menu principal | `Archives`, `About Rature` |
+| Saisie du jour | `Add a task…` |
+| Saisie de la réserve | `Add to the reserve…` |
+| Menu de ligne | `Rename`, `Delete` |
+| Infobulle de rature | `Strike through`, `Undo the strike` |
+| Infobulle d'envoi | `Send to the day` |
+| Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
+| Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Cancel`, `Save` |
+| Vue Jour vide | `The list is empty.` |
+| Réserve vide | `The reserve is empty.` |
+| Récurrentes vides | `No recurring tasks.` |
+| Archives vides | `No archived days.` |
+| Archive illisible | `This archive cannot be read.` |
+| Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
+| Bannière d'écriture | `Changes could not be saved to disk.` |
+| Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
+
+Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
+
+---
+
+### 3.9 Icônes
+
+Noms symboliques du thème Adwaita. **À vérifier un par un dans le thème du
+runtime au moment de l'implémentation** : une icône absente s'affiche en
+image cassée, et ça ne se voit qu'à l'exécution.
+
+| Rôle | Nom |
+|---|---|
+| Rayer | `object-select-symbolic` |
+| Dérayer | `edit-undo-symbolic` |
+| Menu de ligne | `view-more-symbolic` |
+| Menu principal | `open-menu-symbolic` |
+| Supprimer | `user-trash-symbolic` |
+| Renommer | `document-edit-symbolic` |
+| Envoyer au jour | `go-next-symbolic` |
+| Figer | `changes-prevent-symbolic` |
+| Déverrouiller | `changes-allow-symbolic` |
+| Ajouter une récurrente | `list-add-symbolic` |
+
+---
+
+### 3.10 Ce que l'interface ne contient pas au chantier 3
+
+Rappel de périmètre, `CLAUDE.md` §4 règle 4.
+
+- Aucun raccourci clavier hors Entrée, Échap et `<primary>q` déjà en place
+- Aucune annulation de suppression
+- Aucune recherche, aucun export
+- Aucune fenêtre de statistiques
+- Aucune préférence, aucun écran de réglages
+- Aucun ajout direct d'une tâche déjà rayée
