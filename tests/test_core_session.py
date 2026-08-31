@@ -109,12 +109,20 @@ def test_delete_moves_a_full_entry_to_the_journal() -> None:
     session.delete(gone.id, now=STAMP)
     assert gone not in session.day.tasks
     (entry,) = session.day.deletions
-    assert (entry.id, entry.num, entry.text, entry.origin, entry.deleted_at) == (
+    assert (
+        entry.id,
+        entry.num,
+        entry.text,
+        entry.origin,
+        entry.deleted_at,
+        entry.index,
+    ) == (
         gone.id,
         2,
         "drop",
         Origin.DAY,
         STAMP,
+        1,
     )
 
 

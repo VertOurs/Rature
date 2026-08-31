@@ -121,6 +121,7 @@ class Session:
 
     def delete(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
+        index = self.day.tasks.index(task)
         self.day.deletions.append(
             Deletion(
                 id=task.id,
@@ -128,6 +129,11 @@ class Session:
                 text=task.text,
                 origin=task.origin,
                 source_id=task.source_id,
+                source_created=task.source_created,
+                template_id=task.template_id,
+                done=task.done,
+                done_at=task.done_at,
+                index=index,
                 deleted_at=_stamp(now),
             )
         )

@@ -140,18 +140,30 @@ class RecurringItem:
 
 @dataclass(kw_only=True)
 class Deletion:
-    """A journal entry for a deleted task. Never shown, see ADR 0005."""
+    """A journal entry for a deleted task. Never shown, see ADR 0005.
+
+    Carries enough of the task's state (done, done_at, source_created,
+    template_id, index) to restore it exactly, as milestone 4's undo
+    will need to.
+    """
 
     id: str
     num: int
     text: str
     origin: Origin
     deleted_at: datetime
+    index: int
     source_id: str | None = None
+    source_created: date | None = None
+    template_id: str | None = None
+    done: bool = False
+    done_at: datetime | None = None
 
     def __post_init__(self) -> None:
         if self.deleted_at.tzinfo is None:
             raise ValueError("deleted_at must carry a UTC offset")
+        if self.done != (self.done_at is not None):
+            raise ValueError("done and done_at must agree")
 
     def to_dict(self) -> dict:
         return {
@@ -160,16 +172,32 @@ class Deletion:
             "text": self.text,
             "origin": self.origin.value,
             "source_id": self.source_id,
+            "source_created": (
+                self.source_created.isoformat() if self.source_created else None
+            ),
+            "template_id": self.template_id,
+            "done": self.done,
+            "done_at": self.done_at.isoformat() if self.done_at else None,
+            "index": self.index,
             "deleted_at": self.deleted_at.isoformat(),
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> Deletion:
+        done_at = data["done_at"]
+        source_created = data["source_created"]
         return cls(
             id=data["id"],
             num=data["num"],
             text=data["text"],
             origin=Origin(data["origin"]),
             source_id=data["source_id"],
+            source_created=(
+                date.fromisoformat(source_created) if source_created else None
+            ),
+            template_id=data["template_id"],
+            done=data["done"],
+            done_at=datetime.fromisoformat(done_at) if done_at else None,
+            index=data["index"],
             deleted_at=datetime.fromisoformat(data["deleted_at"]),
         )

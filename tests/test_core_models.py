@@ -128,8 +128,29 @@ def test_deletion_round_trips() -> None:
         text="abandoned",
         origin=Origin.DAY,
         deleted_at=STAMP,
+        index=1,
     )
     assert Deletion.from_dict(entry.to_dict()) == entry
+
+
+def test_deletion_round_trips_with_every_field_set() -> None:
+    entry = Deletion(
+        id="task-uuid",
+        num=7,
+        text="drawn and struck",
+        origin=Origin.RESERVE,
+        deleted_at=STAMP,
+        index=2,
+        source_id="r1",
+        source_created=date(2026, 8, 20),
+        template_id="tmpl-1",
+        done=True,
+        done_at=STAMP,
+    )
+    restored = Deletion.from_dict(entry.to_dict())
+    assert restored == entry
+    assert restored.source_created == date(2026, 8, 20)
+    assert restored.done_at == STAMP
 
 
 def test_deletion_rejects_a_naive_timestamp() -> None:
@@ -140,6 +161,34 @@ def test_deletion_rejects_a_naive_timestamp() -> None:
             text="abandoned",
             origin=Origin.DAY,
             deleted_at=datetime(2026, 8, 24, 14, 32, 7),
+            index=0,
+        )
+
+
+def test_deletion_rejects_done_without_a_timestamp() -> None:
+    with pytest.raises(ValueError):
+        Deletion(
+            id="task-uuid",
+            num=4,
+            text="abandoned",
+            origin=Origin.DAY,
+            deleted_at=STAMP,
+            index=0,
+            done=True,
+        )
+
+
+def test_deletion_rejects_a_timestamp_without_done() -> None:
+    with pytest.raises(ValueError):
+        Deletion(
+            id="task-uuid",
+            num=4,
+            text="abandoned",
+            origin=Origin.DAY,
+            deleted_at=STAMP,
+            index=0,
+            done=False,
+            done_at=STAMP,
         )
 
 
