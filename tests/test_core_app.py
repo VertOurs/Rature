@@ -9,6 +9,7 @@ import pytest
 
 from rature.core.app import App, StartupOutcome
 from rature.core.migrations import FutureVersionError
+from rature.core.session import LockedError
 from rature.core.storage import Store, load, save
 
 PARIS = timezone(timedelta(hours=2))
@@ -114,3 +115,87 @@ def test_ensure_day_is_a_no_op_when_nothing_is_due(tmp_path: Path) -> None:
     app.ensure_day()
     assert app.session.day is day_before
     assert not (tmp_path / "archive").exists()
+
+
+def test_add_saves_immediately(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    app.add("first")
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert [task.text for task in reloaded.day.tasks] == ["first"]
+
+
+def test_mutation_wrappers_persist_through_a_full_walkthrough(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+
+    task = app.add("draft")
+    app.rename(task.id, "final")
+    app.strike(task.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.day.tasks[0].text == "final"
+    assert reloaded.day.tasks[0].done is True
+
+    app.unstrike(task.id)
+    other = app.add("second")
+    app.move_before(other.id, task.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert [t.text for t in reloaded.day.tasks] == ["second", "final"]
+
+    app.lock()
+    assert load(data_dir=tmp_path).into_session().day.locked is True
+    app.unlock()
+    assert load(data_dir=tmp_path).into_session().day.locked is False
+
+    item = app.add_to_reserve("someday")
+    app.rename_reserve(item.id, "someday, renamed")
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.reserve[0].text == "someday, renamed"
+
+    drawn = app.draw_from_reserve(item.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.reserve == []
+    assert reloaded.day.tasks[-1].id == drawn.id
+
+    other_item = app.add_to_reserve("gone")
+    app.delete_from_reserve(other_item.id)
+    assert load(data_dir=tmp_path).into_session().reserve == []
+
+    app.delete(drawn.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert drawn.id not in [t.id for t in reloaded.day.tasks]
+    assert len(reloaded.day.deletions) == 1
+
+    template = app.add_recurring("water plants", [0, 1, 2, 3, 4, 5, 6])
+    app.edit_recurring(template.id, weekdays=[0, 3])
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.recurring[0].weekdays == [0, 3]
+
+    app.delete_recurring(template.id)
+    assert load(data_dir=tmp_path).into_session().recurring == []
+
+
+def test_add_on_a_locked_list_raises_and_is_not_saved(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    app.lock()
+    before = (tmp_path / "data.json").read_text(encoding="utf-8")
+    with pytest.raises(LockedError):
+        app.add("nope")
+    assert (tmp_path / "data.json").read_text(encoding="utf-8") == before
+
+
+def test_strike_an_unknown_task_raises_key_error(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    with pytest.raises(KeyError):
+        app.strike("no-such-id")
+
+
+def test_striking_twice_raises_value_error(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    task = app.add("thing")
+    app.strike(task.id)
+    with pytest.raises(ValueError):
+        app.strike(task.id)

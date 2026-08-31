@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 
 from rature.core import storage
+from rature.core.models import RecurringItem, ReserveItem, Task
 from rature.core.session import Day, Session, reference_date
 from rature.core.storage import Store
 
@@ -121,3 +122,79 @@ class App:
 
     def _save(self) -> None:
         storage.save(Store.from_session(self.session), data_dir=self.data_dir)
+
+    # Mutations below wrap the matching Session method: supply now/today
+    # from self.clock() where the operation needs one, then save. Business
+    # errors (LockedError, KeyError, ValueError) come straight from Session
+    # and are not caught here.
+
+    def add(self, text: str) -> Task:
+        task = self.session.add(text)
+        self._save()
+        return task
+
+    def strike(self, task_id: str) -> None:
+        self.session.strike(task_id, now=self.clock())
+        self._save()
+
+    def unstrike(self, task_id: str) -> None:
+        self.session.unstrike(task_id)
+        self._save()
+
+    def rename(self, task_id: str, text: str) -> None:
+        self.session.rename(task_id, text)
+        self._save()
+
+    def delete(self, task_id: str) -> None:
+        self.session.delete(task_id, now=self.clock())
+        self._save()
+
+    def move_before(self, task_id: str, target_id: str | None) -> None:
+        self.session.move_before(task_id, target_id)
+        self._save()
+
+    def lock(self) -> None:
+        self.session.lock()
+        self._save()
+
+    def unlock(self) -> None:
+        self.session.unlock()
+        self._save()
+
+    def add_to_reserve(self, text: str) -> ReserveItem:
+        item = self.session.add_to_reserve(text, today=reference_date(self.clock()))
+        self._save()
+        return item
+
+    def rename_reserve(self, item_id: str, text: str) -> None:
+        self.session.rename_reserve(item_id, text)
+        self._save()
+
+    def delete_from_reserve(self, item_id: str) -> None:
+        self.session.delete_from_reserve(item_id)
+        self._save()
+
+    def draw_from_reserve(self, item_id: str) -> Task:
+        task = self.session.draw_from_reserve(item_id)
+        self._save()
+        return task
+
+    def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
+        item = self.session.add_recurring(text, weekdays)
+        self._save()
+        return item
+
+    def edit_recurring(
+        self,
+        item_id: str,
+        *,
+        text: str | None = None,
+        weekdays: list[int] | None = None,
+    ) -> RecurringItem:
+        item = self.session.edit_recurring(item_id, text=text, weekdays=weekdays)
+        self._save()
+        return item
+
+    def delete_recurring(self, item_id: str) -> None:
+        self.session.delete_recurring(item_id)
+        self._save()
