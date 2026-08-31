@@ -8,7 +8,25 @@
     <property name="child">
       <object class="AdwToolbarView">
         <child type="top">
-          <object class="AdwHeaderBar" id="header"/>
+          <object class="AdwHeaderBar" id="header">
+            <child type="end">
+              <object class="GtkButton" id="lock_button">
+                <property name="valign">center</property>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child type="bottom">
+          <object class="GtkEntry" id="entry">
+            <property name="placeholder-text" translatable="yes">Add a task…</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="margin-bottom">12</property>
+          </object>
         </child>
         <property name="content">
           <object class="GtkBox">

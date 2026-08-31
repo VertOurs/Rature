@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from gettext import gettext as _
 from typing import TYPE_CHECKING
 
 import gi
@@ -34,6 +35,8 @@ class DayView(Adw.Bin):
     __gtype_name__ = "RatureDayView"
 
     header: Adw.HeaderBar = Gtk.Template.Child()
+    lock_button: Gtk.Button = Gtk.Template.Child()
+    entry: Gtk.Entry = Gtk.Template.Child()
     stack: Gtk.Stack = Gtk.Template.Child()
     struck_list: Gtk.ListBox = Gtk.Template.Child()
     active_list: Gtk.ListBox = Gtk.Template.Child()
@@ -53,6 +56,8 @@ class DayView(Adw.Bin):
         # rename, which updates its own label and never needs a rebuild).
         self.run_action = run_action
         self.perform = perform
+        self.entry.connect("activate", self._on_entry_activate)
+        self.lock_button.connect("clicked", self._on_lock_clicked)
         self.refresh()
 
     def refresh(self) -> None:
@@ -71,6 +76,47 @@ class DayView(Adw.Bin):
         self.struck_list.set_visible(bool(session.struck))
         self.active_list.set_visible(bool(session.active))
         self.stack.set_visible_child_name("tasks" if session.day.tasks else "empty")
+
+        # SPECIFICATION.md §3.2: recomputed from session state every time,
+        # never a widget's own toggled state. roll_over unlocks the list
+        # (SPECIFICATION.md §2.5 point 5) without this widget knowing, and
+        # a GtkToggleButton would need its "toggled" signal blocked during
+        # every programmatic update to avoid fighting that.
+        if session.day.locked:
+            self.lock_button.set_icon_name("changes-allow-symbolic")
+            self.lock_button.set_tooltip_text(_("Unfreeze the list"))
+        else:
+            self.lock_button.set_icon_name("changes-prevent-symbolic")
+            self.lock_button.set_tooltip_text(_("Freeze the list"))
+        self.entry.set_sensitive(not session.day.locked)
+
+    def _on_entry_activate(self, entry: Gtk.Entry) -> None:
+        text = entry.get_text().strip()
+        if not text:
+            return
+        if self.run_action(lambda: self.app.add(text)):
+            entry.set_text("")
+            self._scroll_to_last_active_row()
+            entry.grab_focus()
+
+    def _scroll_to_last_active_row(self) -> None:
+        # No direct "scroll to widget" API in GTK4: focusing the row makes
+        # its ancestor GtkScrolledWindow scroll it into view on its own,
+        # then focus moves right back to the entry. Only safe because the
+        # entry lives in the toolbar's bottom bar, outside that scrolled
+        # window, so grabbing the row's focus cannot itself trigger a
+        # second, competing auto-scroll. If this flickers under real
+        # rendering, replace it with a single vadjustment set to its upper
+        # bound inside a GLib.idle_add, not both.
+        last_row = self.active_list.get_last_child()
+        if last_row is not None:
+            last_row.grab_focus()
+
+    def _on_lock_clicked(self, _button: Gtk.Button) -> None:
+        if self.app.session.day.locked:
+            self.run_action(self.app.unlock)
+        else:
+            self.run_action(self.app.lock)
 
     def _commit_pending_renames(self) -> None:
         for list_box in (self.struck_list, self.active_list):
