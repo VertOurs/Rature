@@ -3,6 +3,8 @@
 
 """The main window. Its layout lives in data/ui/window.ui."""
 
+import sys
+import traceback
 from gettext import gettext as _
 
 import gi
@@ -12,12 +14,9 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
 
-from rature.core.app import App, StartupOutcome  # noqa: E402
+from rature.core.app import App, LockedError, StartupOutcome  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
-
-# Marks a _run_app_action failure apart from a legitimate None result.
-_ACTION_FAILED = object()
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
 _ENSURE_DAY_INTERVAL_SECONDS = 60
@@ -38,7 +37,9 @@ class RatureWindow(Adw.ApplicationWindow):
     def __init__(self, *, app: App, **kwargs) -> None:
         super().__init__(**kwargs)
         self.app = app
-        self.day_view = DayView(app=app)
+        self.day_view = DayView(
+            app=app, run_action=self._run_app_action, perform=self._perform
+        )
         self.day_page.set_child(self.day_view)
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
@@ -63,12 +64,13 @@ class RatureWindow(Adw.ApplicationWindow):
         GLib.source_remove(self._timer_id)
 
     def _on_ensure_day_tick(self) -> bool:
-        archived = self._run_app_action(self.app.ensure_day)
-        if archived not in (None, _ACTION_FAILED):
-            self._new_day_pending = True
-            self._new_day_dismissed = False
-            self._refresh_all()
-        self._update_banner()
+        def tick() -> None:
+            archived = self.app.ensure_day()
+            if archived is not None:
+                self._new_day_pending = True
+                self._new_day_dismissed = False
+
+        self._run_app_action(tick)
         return GLib.SOURCE_CONTINUE
 
     def _refresh_all(self) -> None:
@@ -76,18 +78,35 @@ class RatureWindow(Adw.ApplicationWindow):
         # 6 and 8.
         self.day_view.refresh()
 
-    def _run_app_action(self, action):
-        # SPECIFICATION.md §3.6 point 3: the one place that catches OSError
-        # for every action. ensure_day is the first caller; user-initiated
-        # mutations reuse this once they exist (chantier 3 step 4).
+    def _perform(self, action) -> bool:
+        # SPECIFICATION.md §3.6 point 3: the one place that catches OSError,
+        # for every action. LockedError/KeyError/ValueError are refused
+        # business commands the interface should have made impossible by
+        # disabling the control; per §3.6's "Refus métier" they are a bug,
+        # logged and swallowed, never shown.
         try:
-            result = action()
+            action()
         except OSError:
             self._write_failure_active = True
-            return _ACTION_FAILED
+            success = False
+        except (LockedError, KeyError, ValueError):
+            traceback.print_exc(file=sys.stderr)
+            success = False
         else:
             self._write_failure_active = False
-            return result
+            success = True
+        self._update_banner()
+        return success
+
+    def _run_app_action(self, action) -> bool:
+        # App does not roll back an in-memory mutation on a save failure
+        # (documented on the class), so the view refreshes unconditionally:
+        # skipping it would leave the screen contradicting the session
+        # until the next timer tick. For a business error nothing changed,
+        # and the redraw is a no-op.
+        success = self._perform(action)
+        self._refresh_all()
+        return success
 
     def _update_banner(self) -> None:
         # SPECIFICATION.md §3.6: one AdwBanner, one message at a time,

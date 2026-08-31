@@ -32,6 +32,15 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.4.0" date="2026-08-31">
+      <description>
+        <p>
+          The Day view works: add, strike, unstrike, rename in place, delete
+          and freeze the list. Drag-and-drop reordering, the Reserve and
+          Recurring views, and the archive window are still to come.
+        </p>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-08-31">
       <description>
         <p>

@@ -29,6 +29,61 @@
             <property name="wrap-mode">word-char</property>
           </object>
         </child>
+        <child>
+          <object class="GtkEntry" id="rename_entry">
+            <property name="hexpand">True</property>
+            <property name="visible">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="strike_button">
+            <property name="valign">center</property>
+            <style>
+              <class name="flat"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuButton" id="menu_button">
+            <property name="icon-name">view-more-symbolic</property>
+            <property name="valign">center</property>
+            <style>
+              <class name="flat"/>
+            </style>
+            <property name="popover">
+              <object class="GtkPopover" id="row_popover">
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
+                    <child>
+                      <object class="GtkButton" id="rename_button">
+                        <property name="label" translatable="yes">Rename</property>
+                        <property name="halign">fill</property>
+                        <style>
+                          <class name="flat"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="delete_button">
+                        <property name="label" translatable="yes">Delete</property>
+                        <property name="halign">fill</property>
+                        <style>
+                          <class name="flat"/>
+                          <class name="destructive-action"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
       </object>
     </property>
   </template>

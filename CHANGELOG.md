@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-31
+
 ### Added
 
 - The Day view, read-only: struck tasks in a block on top, active tasks
@@ -15,7 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   priority (write failure, then quarantine, then new day), each closable
   and never returning once closed; a 60-second timer calls `App.ensure_day`
   through the one OSError-catching wrapper every future action will reuse.
-  Adding, striking, renaming, deleting and freezing are chantier 3 step 4.
+- Editing in the Day view: strike/unstrike, rename in place (Enter or
+  losing focus commits, Escape discards), delete (row menu only, never a
+  line button, no confirmation), an entry to add a task (Enter, keeps
+  focus, scrolls to it), and freezing the list. Business errors the
+  interface should have made impossible (a locked list, an unknown task)
+  are logged to stderr and never shown. Drag-and-drop reordering is
+  chantier 3 step 5, still to come.
 
 ## [0.3.0] - 2026-08-31
 
@@ -78,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/VertOurs/Rature/releases/tag/v0.4.0
 [0.3.0]: https://github.com/VertOurs/Rature/releases/tag/v0.3.0
 [0.2.0]: https://github.com/VertOurs/Rature/releases/tag/v0.2.0
