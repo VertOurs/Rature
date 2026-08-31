@@ -42,6 +42,22 @@ On a host where that interpreter has no PyGObject, point it at one that does:
 meson setup build -Dpython=/usr/bin/python3
 ```
 
+## Running from a local install
+
+`meson install` needs `sudo` under the default `/usr/local` prefix. To
+iterate on the interface, build into a prefix under the source tree instead,
+so every `ninja install` is a normal user operation:
+
+```
+meson setup build --prefix="$PWD/build/install" -Dpython=/usr/bin/python3
+meson compile -C build
+meson install -C build
+./build/install/bin/rature
+```
+
+Re-run the last two lines after every change. Delete `build/install` along
+with `build/` to start over; neither is tracked by git.
+
 ## Checks before a pull request
 
 ```
