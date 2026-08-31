@@ -42,6 +42,22 @@ On a host where that interpreter has no PyGObject, point it at one that does:
 meson setup build -Dpython=/usr/bin/python3
 ```
 
+## Running from a local install
+
+`meson install` needs `sudo` under the default `/usr/local` prefix. To
+iterate on the interface, build into a prefix under the source tree instead,
+so every `ninja install` is a normal user operation:
+
+```
+meson setup build --prefix="$PWD/build/install" -Dpython=/usr/bin/python3
+meson compile -C build
+meson install -C build
+./build/install/bin/rature
+```
+
+Re-run the last two lines after every change. Delete `build/install` along
+with `build/` to start over; neither is tracked by git.
+
 ## Checks before a pull request
 
 ```
@@ -142,7 +158,8 @@ What `0.9.x` and `1.0.0` mean for this project: see
 ## Releases
 
 One tag per version, one CHANGELOG entry in the Keep a Changelog format,
-never a release without green CI.
+never a release without green CI. Tag form: `v` followed by the version,
+e.g. `v0.2.0`, matching the tag a GitHub release publishes under.
 
 ## Interface
 
@@ -166,7 +183,8 @@ Beyond the setup and pre-PR checks above:
 
 ```bash
 # core/ coverage gate, enforced from milestone 1 on (see docs/internal/ROADMAP.md)
-pytest --cov=rature.core --cov-fail-under=90
+# 100% with branch coverage since milestone 2's hardening PRs.
+pytest --cov=rature.core --cov-branch --cov-fail-under=100
 
 # Metadata (appstreamcli reads the source; desktop-file-validate needs the
 # merged .desktop, present after `meson compile`)

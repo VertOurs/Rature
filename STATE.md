@@ -33,7 +33,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.1.0` | Premier jalon, rien de publiable |
+| Version du projet | `0.2.0` | Cœur métier et couche `App` complets, toujours sans interface |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
@@ -69,6 +69,15 @@ manifeste (`CLAUDE.md` §4 règle 8).
   04:00, `roll_over` en avant seulement, six étapes, multi-jours). `Task`
   gagne `source_created` ; l'archivage écrase (idempotent, ADR 0003 +
   ARCHITECTURE). Couverture `rature.core` 100 %.
+- **Durcissement avant chantier 3**, PR #18 à #20 : `Task`/`Deletion`
+  validés à la construction, horloges obligatoires partout dans `core/`,
+  `Session.move_before` ; couche de coordination `App` (`core/app.py`,
+  ouverture/premier lancement/quarantaine, passage du jour automatique,
+  enrobage des mutations) ; `config.py` adopté, traductions par
+  `gettext.bindtextdomain`/`textdomain`, schéma GSettings de fenêtre posé
+  sans être lu, porte de couverture CI à 100 % avec `--cov-branch`,
+  dependabot, version 0.2.0. Le chantier 3 peut commencer sans toucher au
+  build.
 
 ## Documents
 

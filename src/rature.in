@@ -5,25 +5,26 @@
 """Installed entry point for Rature, configured by Meson from rature.in."""
 
 import gettext
-import locale
 import os
 import signal
 import sys
 
-VERSION = "@VERSION@"
 PKGDATADIR = "@PKGDATADIR@"
-LOCALEDIR = "@LOCALEDIR@"
 
 sys.path.insert(1, PKGDATADIR)
+
+from rature.config import LOCALEDIR  # noqa: E402
 
 # Ctrl+C in a terminal must kill the app, not surface as a KeyboardInterrupt
 # inside the GTK main loop.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-if hasattr(locale, "bindtextdomain"):
-    locale.bindtextdomain("rature", LOCALEDIR)
-    locale.textdomain("rature")
-gettext.install("rature", LOCALEDIR)
+# gettext's own bindtextdomain/textdomain, not locale's: they are what
+# backs gettext.gettext, and every module reaches it through
+# `from gettext import gettext as _` (CLAUDE.md §4 rule 7). Not
+# gettext.install(): that would put _ in builtins instead.
+gettext.bindtextdomain("rature", LOCALEDIR)
+gettext.textdomain("rature")
 
 
 def _load_resources() -> None:
@@ -37,4 +38,4 @@ if __name__ == "__main__":
     _load_resources()
     from rature.main import main
 
-    sys.exit(main(VERSION))
+    sys.exit(main())

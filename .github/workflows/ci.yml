@@ -36,9 +36,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      # msgfmt, for tests/test_translations.py: no skipif, it must run here.
+      - run: sudo apt-get update && sudo apt-get install --yes gettext
       - run: python -m pip install --upgrade pip
       - run: pip install --group dev
-      - run: pytest --cov=rature.core --cov-fail-under=90
+      - run: pytest --cov=rature.core --cov-branch --cov-fail-under=100
 
   meson:
     runs-on: ubuntu-latest
@@ -57,7 +59,7 @@ jobs:
       - run: meson compile -C build
       - run: >
           meson test -C build --print-errorlogs
-          desktop-file-validate appstreamcli-validate
+          desktop-file-validate appstreamcli-validate glib-compile-schemas-validate
 
   flatpak:
     runs-on: ubuntu-latest

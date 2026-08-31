@@ -19,6 +19,7 @@
   </description>
 
   <launchable type="desktop-id">io.github.vertours.Rature.desktop</launchable>
+  <translation type="gettext">rature</translation>
 
   <url type="homepage">https://github.com/VertOurs/Rature</url>
   <url type="bugtracker">https://github.com/VertOurs/Rature/issues</url>
@@ -31,6 +32,15 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.2.0" date="2026-08-31">
+      <description>
+        <p>
+          Complete core business logic and the App coordination layer: the
+          day list and its operations, the reserve, recurring templates, the
+          day rollover, atomic JSON storage. Still no graphical interface.
+        </p>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-08-29">
       <description>
         <p>Project foundations. Not a functional release.</p>
