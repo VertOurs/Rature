@@ -1,0 +1,123 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+
+"""Coordinates a Session with storage behind a single injectable clock.
+
+No gi import: this is what a graphical interface calls into, never the
+other way around.
+"""
+
+from __future__ import annotations
+
+import enum
+from collections.abc import Callable
+from datetime import datetime
+from pathlib import Path
+
+from rature.core import storage
+from rature.core.session import Day, Session, reference_date
+from rature.core.storage import Store
+
+
+class StartupOutcome(enum.Enum):
+    """What App.open had to do to produce a ready App.
+
+    A file newer than this build supports has no place here: it raises
+    migrations.FutureVersionError straight out of open(), and no App is
+    built at all, so the interface never has to handle a half-valid one.
+    """
+
+    LOADED = enum.auto()
+    FIRST_LAUNCH = enum.auto()
+    RECOVERED_FROM_CORRUPTION = enum.auto()
+
+
+def _default_clock() -> datetime:
+    return datetime.now().astimezone()
+
+
+class App:
+    """Coordinates a Session with storage, behind a single injectable clock.
+
+    A save failure in the middle of a mutation raises, and the in-memory
+    Session mutation it followed is not rolled back. Undoing it would need
+    a snapshot and restore around every mutation, harder to get right than
+    it looks, for a failure mode (disk I/O erroring mid-write) that already
+    surfaces immediately as a raised exception the caller cannot silently
+    ignore.
+    """
+
+    def __init__(
+        self,
+        *,
+        data_dir: Path,
+        session: Session,
+        clock: Callable[[], datetime],
+        startup: StartupOutcome,
+    ) -> None:
+        self.data_dir = data_dir
+        self.session = session
+        self.clock = clock
+        self.startup = startup
+
+    @classmethod
+    def open(
+        cls,
+        data_dir: Path | None = None,
+        *,
+        clock: Callable[[], datetime] = _default_clock,
+    ) -> App:
+        """Load or create the data file, then catch up on any due rollover.
+
+        Returns an App whose day already matches the current reference
+        date (SPECIFICATION.md §2.5): the caller never has to know a
+        rollover happened, let alone run it itself.
+        """
+        resolved_dir = data_dir if data_dir is not None else storage.xdg_data_dir()
+        now = clock()
+        try:
+            store = storage.load(data_dir=resolved_dir)
+        except FileNotFoundError:
+            app = cls._bootstrap(resolved_dir, clock, now, StartupOutcome.FIRST_LAUNCH)
+        except (ValueError, KeyError, TypeError):
+            storage.quarantine(now, data_dir=resolved_dir)
+            app = cls._bootstrap(
+                resolved_dir, clock, now, StartupOutcome.RECOVERED_FROM_CORRUPTION
+            )
+        else:
+            app = cls(
+                data_dir=resolved_dir,
+                session=store.into_session(),
+                clock=clock,
+                startup=StartupOutcome.LOADED,
+            )
+        app.ensure_day()
+        return app
+
+    @classmethod
+    def _bootstrap(
+        cls,
+        data_dir: Path,
+        clock: Callable[[], datetime],
+        now: datetime,
+        startup: StartupOutcome,
+    ) -> App:
+        session = Session(Day(date=reference_date(now)))
+        storage.save(Store.from_session(session), data_dir=data_dir)
+        return cls(data_dir=data_dir, session=session, clock=clock, startup=startup)
+
+    def ensure_day(self) -> None:
+        """Run the SPECIFICATION.md §2.5 rollover if due, as a single step.
+
+        roll_over, archive, then save, in that order, so this sequence is
+        never again something a caller has to remember.
+        """
+        now = self.clock()
+        if not self.session.rollover_due(now):
+            return
+        old_day = self.session.roll_over(now)
+        storage.archive(old_day, data_dir=self.data_dir)
+        self._save()
+
+    def _save(self) -> None:
+        storage.save(Store.from_session(self.session), data_dir=self.data_dir)

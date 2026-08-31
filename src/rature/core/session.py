@@ -259,7 +259,11 @@ class Session:
         return reference_date(now) > self.day.date
 
     def roll_over(self, now: datetime) -> Day:
-        """Run the SPECIFICATION.md §2.5 rollover; archive the old day, then save."""
+        """Run the SPECIFICATION.md §2.5 rollover and return the old day.
+
+        Archiving it and saving the new one is the caller's job; App.ensure_day
+        is where that full sequence lives.
+        """
         if not self.rollover_due(now):
             raise ValueError("no rollover is due")
         old = self.day
