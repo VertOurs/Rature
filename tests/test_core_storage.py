@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from rature.core.migrations import FutureVersionError
 from rature.core.models import Origin, RecurringItem, ReserveItem, Task
 from rature.core.session import Day, Session
 from rature.core.storage import (
@@ -81,7 +82,7 @@ def test_load_missing_file_raises(tmp_path: Path) -> None:
 
 def test_load_rejects_an_unknown_version(tmp_path: Path) -> None:
     (tmp_path / "data.json").write_text('{"version": 99}', encoding="utf-8")
-    with pytest.raises(ValueError):
+    with pytest.raises(FutureVersionError):
         load(data_dir=tmp_path)
 
 

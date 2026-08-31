@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from rature.core import migrations
-from rature.core.migrations import CURRENT_VERSION, migrate
+from rature.core.migrations import CURRENT_VERSION, FutureVersionError, migrate
 from rature.core.session import Day
 from rature.core.storage import Store, load, save
 
@@ -39,7 +39,7 @@ def test_a_version_below_one_is_rejected() -> None:
 
 
 def test_a_future_version_is_rejected() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(FutureVersionError):
         migrate({"version": CURRENT_VERSION + 1})
 
 

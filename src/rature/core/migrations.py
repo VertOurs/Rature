@@ -9,6 +9,16 @@ from collections.abc import Callable
 
 CURRENT_VERSION = 1
 
+
+class FutureVersionError(Exception):
+    """The data file was written by a newer version of Rature than this one.
+
+    Deliberately not a ValueError subclass: a caller distinguishing this
+    case from a genuinely corrupted file (see App.open) must not depend on
+    the order of its except clauses to do it correctly.
+    """
+
+
 # One entry per version step, keyed by the version it upgrades from. Each
 # function returns the data with "version" bumped. Empty until a version 2.
 _MIGRATIONS: dict[int, Callable[[dict], dict]] = {}
@@ -34,7 +44,9 @@ def migrate(
     if not isinstance(version, int) or isinstance(version, bool) or version < 1:
         raise ValueError(f"missing or invalid data version: {version!r}")
     if version > target:
-        raise ValueError(f"data version {version} is newer than supported {target}")
+        raise FutureVersionError(
+            f"data version {version} is newer than supported {target}"
+        )
     while version < target:
         step = steps.get(version)
         if step is None:
