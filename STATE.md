@@ -70,14 +70,6 @@ manifeste (`CLAUDE.md` §4 règle 8).
   gagne `source_created` ; l'archivage écrase (idempotent, ADR 0003 +
   ARCHITECTURE). Couverture `rature.core` 100 %.
 
-## Rappels pour la suite
-
-- **Chantier 3** : le passage du jour se fait
-  `old = session.roll_over(now)` puis `storage.archive(old)` puis
-  `storage.save(Store.from_session(session))`, dans cet ordre.
-- **Chantier 4** : `Deletion` est incomplet pour restaurer « à l'identique ».
-  Détail et arbitrage dans `docs/adr/0005-journal-de-suppressions.md`.
-
 ## Documents
 
 Cadrage relu, contradictions résolues, six cas limites tranchés en

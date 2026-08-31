@@ -32,6 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The deletion journal (`Deletion`) now carries everything needed to
   restore a deleted task exactly: its position in the day, whether it was
   struck and when, and where it came from.
+- `App`, in `core/app.py`: the application coordination layer, behind a
+  single injectable clock. `App.open` loads the data file or creates one on
+  first launch, quarantines it and starts fresh if it is unreadable, and
+  rejects a future data version outright. It always returns an App whose
+  day already matches today, running the rollover/archive/save sequence
+  itself. A mutation wrapper for every `Session` operation supplies the
+  clock and saves after. A GUI can now be written calling only `App`. Still
+  no GUI.
 
 ### Changed
 
