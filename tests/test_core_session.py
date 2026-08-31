@@ -40,7 +40,7 @@ def test_a_deleted_number_is_never_reused() -> None:
     session = make_session()
     first = session.add("first")
     session.add("second")
-    session.delete(first.id)
+    session.delete(first.id, now=STAMP)
     assert session.add("third").num == 3
 
 
@@ -50,14 +50,6 @@ def test_strike_sets_done_and_a_timestamp() -> None:
     session.strike(task.id, now=STAMP)
     assert task.done is True
     assert task.done_at == STAMP
-
-
-def test_strike_default_timestamp_is_timezone_aware() -> None:
-    session = make_session()
-    task = session.add("thing")
-    session.strike(task.id)
-    assert task.done_at is not None
-    assert task.done_at.tzinfo is not None
 
 
 def test_strike_rejects_a_naive_now() -> None:
@@ -99,7 +91,7 @@ def test_strike_rename_delete_reorder_work_while_frozen() -> None:
     session.strike(one.id, now=STAMP)
     session.rename(two.id, "two bis")
     session.reorder([two.id, one.id])
-    session.delete(one.id)
+    session.delete(one.id, now=STAMP)
     assert [task.text for task in session.day.tasks] == ["two bis"]
 
 
@@ -171,7 +163,7 @@ def test_lock_and_unlock_toggle_the_flag() -> None:
 def test_an_unknown_task_id_is_a_key_error() -> None:
     session = make_session()
     with pytest.raises(KeyError):
-        session.strike("no-such-id")
+        session.strike("no-such-id", now=STAMP)
 
 
 def test_day_round_trips() -> None:

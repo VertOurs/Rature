@@ -16,10 +16,6 @@ class LockedError(Exception):
     """An operation was refused because the list is frozen."""
 
 
-def _now() -> datetime:
-    return datetime.now().astimezone()
-
-
 def reference_date(now: datetime) -> date:
     """The day a moment belongs to; the boundary is 04:00 local time."""
     return (now - timedelta(hours=4)).date()
@@ -30,9 +26,7 @@ def _norm(text: str) -> str:
     return text.strip().casefold()
 
 
-def _stamp(now: datetime | None) -> datetime:
-    if now is None:
-        return _now()
+def _stamp(now: datetime) -> datetime:
     if now.tzinfo is None:
         raise ValueError("now must carry a UTC offset")
     return now
@@ -108,7 +102,7 @@ class Session:
         self.day.tasks.append(task)
         return task
 
-    def strike(self, task_id: str, *, now: datetime | None = None) -> None:
+    def strike(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
         if task.done:
             raise ValueError(f"task {task.num} is already struck")
@@ -125,7 +119,7 @@ class Session:
     def rename(self, task_id: str, text: str) -> None:
         self._task(task_id).text = text
 
-    def delete(self, task_id: str, *, now: datetime | None = None) -> None:
+    def delete(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
         self.day.deletions.append(
             Deletion(
