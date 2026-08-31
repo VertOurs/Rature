@@ -51,3 +51,17 @@ install_data(
   'icons/hicolor/scalable/apps' / app_id + '.svg',
   install_dir: datadir / 'icons/hicolor/scalable/apps',
 )
+
+install_data(
+  app_id + '.gschema.xml',
+  install_dir: datadir / 'glib-2.0/schemas',
+)
+
+glib_compile_schemas = find_program('glib-compile-schemas', required: false)
+if glib_compile_schemas.found()
+  test(
+    'glib-compile-schemas-validate',
+    glib_compile_schemas,
+    args: ['--strict', '--dry-run', meson.current_source_dir()],
+  )
+endif

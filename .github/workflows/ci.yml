@@ -59,7 +59,7 @@ jobs:
       - run: meson compile -C build
       - run: >
           meson test -C build --print-errorlogs
-          desktop-file-validate appstreamcli-validate
+          desktop-file-validate appstreamcli-validate glib-compile-schemas-validate
 
   flatpak:
     runs-on: ubuntu-latest
