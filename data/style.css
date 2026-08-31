@@ -1,0 +1,8 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* SPDX-FileCopyrightText: 2026 VertOurs */
+
+/* SPECIFICATION.md §3.2: struck text is a CSS class on the label, never a
+   Python-built widget swap. */
+.rature-struck {
+  text-decoration-line: line-through;
+}

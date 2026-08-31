@@ -7,10 +7,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : vue Jour en lecture seule (rayées en haut, en cours
-  en dessous, numéros stables), avec la bannière de quarantaine reportée
-  depuis la fenêtre principale. Fenêtre principale faite. Découpage
-  complet dans `docs/internal/ROADMAP.md`.
+- **Étape suivante** : vue Jour en édition (ajouter, rayer, dérayer,
+  renommer, supprimer, figer). Vue Jour en lecture seule faite, bannière
+  de quarantaine résolue. Découpage complet dans
+  `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="RatureTaskRow" parent="GtkListBoxRow">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <property name="spacing">12</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-top">8</property>
+        <property name="margin-bottom">8</property>
+        <child>
+          <object class="GtkLabel" id="num_label">
+            <property name="xalign">1</property>
+            <property name="width-chars">3</property>
+            <style>
+              <class name="dim-label"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="text_label">
+            <property name="xalign">0</property>
+            <property name="hexpand">True</property>
+            <property name="wrap">True</property>
+            <property name="wrap-mode">word-char</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

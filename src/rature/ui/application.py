@@ -11,7 +11,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gio, Gtk  # noqa: E402
 
 from rature import config  # noqa: E402
 from rature.core import storage  # noqa: E402
@@ -32,6 +32,16 @@ class RatureApplication(Adw.Application):
         self._app: App | None = None
         self._add_action("quit", self._on_quit, accels=["<primary>q"])
         self._add_action("about", self._on_about)
+
+    def do_startup(self) -> None:
+        Adw.Application.do_startup(self)
+        provider = Gtk.CssProvider()
+        provider.load_from_resource("/io/github/vertours/Rature/style.css")
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+        )
 
     def _add_action(self, name, callback, accels=None):
         action = Gio.SimpleAction.new(name, None)

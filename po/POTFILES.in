@@ -1,5 +1,8 @@
-# Only sources that carry strings marked for translation.
-# The Python UI modules return here in milestone 3, when they gain _() calls.
+# Every data/ui/*.ui file, whether or not it carries translatable strings
+# yet (tests/test_ui_wiring.py enforces this), plus the other sources that
+# do. The Python UI modules return here too once they gain _() calls.
 data/io.github.vertours.Rature.desktop.in
 data/io.github.vertours.Rature.metainfo.xml.in
 data/ui/window.ui
+data/ui/task_row.ui
+data/ui/day_view.ui
