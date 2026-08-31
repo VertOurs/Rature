@@ -158,7 +158,8 @@ What `0.9.x` and `1.0.0` mean for this project: see
 ## Releases
 
 One tag per version, one CHANGELOG entry in the Keep a Changelog format,
-never a release without green CI.
+never a release without green CI. Tag form: `v` followed by the version,
+e.g. `v0.2.0`, matching the tag a GitHub release publishes under.
 
 ## Interface
 

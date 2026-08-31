@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-31
+
 ### Added
 
 - Python package skeleton with the `core` and `ui` split, plus ruff and
@@ -50,4 +52,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/commits/main
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/VertOurs/Rature/releases/tag/v0.2.0
