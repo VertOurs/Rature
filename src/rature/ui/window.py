@@ -20,12 +20,29 @@ class RatureWindow(Adw.ApplicationWindow):
 
     __gtype_name__ = "RatureWindow"
 
+    split_view: Adw.NavigationSplitView = Gtk.Template.Child()
+    sidebar_list: Gtk.ListBox = Gtk.Template.Child()
+    day_page: Adw.NavigationPage = Gtk.Template.Child()
+    reserve_page: Adw.NavigationPage = Gtk.Template.Child()
+    recurring_page: Adw.NavigationPage = Gtk.Template.Child()
+
     def __init__(self, *, app: App, **kwargs) -> None:
         super().__init__(**kwargs)
         self.app = app
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
         self.connect("close-request", self._on_close_request)
+        self.sidebar_list.connect("row-selected", self._on_row_selected)
+
+    def _on_row_selected(
+        self, _list_box: Gtk.ListBox, row: Gtk.ListBoxRow | None
+    ) -> None:
+        if row is None:
+            return
+        # Fixed order, matching the sidebar rows in window.ui:
+        # Day, Reserve, Recurring (SPECIFICATION.md §3.1).
+        pages = (self.day_page, self.reserve_page, self.recurring_page)
+        self.split_view.set_content(pages[row.get_index()])
 
     def _restore_geometry(self) -> None:
         self.set_default_size(
