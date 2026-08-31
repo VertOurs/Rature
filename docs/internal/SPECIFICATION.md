@@ -112,7 +112,7 @@ la journée de la veille. Au changement d'heure, la bascule suit l'heure
 locale, sans compensation.
 
 **Passage du jour**, déclenché à l'ouverture si la date de référence a
-changé, ou manuellement :
+changé, et vérifié périodiquement tant que l'application reste ouverte :
 
 1. La journée en cours est archivée telle quelle
 2. Les tâches non faites issues de la réserve y retournent, identifiées par
@@ -136,6 +136,11 @@ Aucune donnée n'est perdue lors d'un passage de jour. C'est cette garantie
 qui autorise à le déclencher sans demander confirmation. Une tâche supprimée
 fait exception : la suppression est un abandon volontaire, elle ne revient
 donc pas en réserve, y compris si la tâche en était issue.
+
+Il n'existe aucun moyen de forcer un passage du jour dont la date de
+référence n'a pas encore avancé. Une bascule anticipée archiverait la
+journée en cours sous une date que la bascule suivante réécrirait, ce qui
+contredirait la garantie ci-dessus.
 
 ### 2.6 Statistiques
 
