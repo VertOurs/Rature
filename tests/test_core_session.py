@@ -150,6 +150,45 @@ def test_reorder_rejects_a_non_permutation() -> None:
         session.reorder([one.id])
 
 
+def test_move_before_places_the_task_ahead_of_the_target() -> None:
+    session = make_session()
+    session.add("1")
+    two, three = session.add("2"), session.add("3")
+    session.move_before(three.id, two.id)
+    assert [task.num for task in session.day.tasks] == [1, 3, 2]
+
+
+def test_move_before_none_moves_the_task_to_the_end() -> None:
+    session = make_session()
+    one = session.add("1")
+    session.add("2")
+    session.add("3")
+    session.move_before(one.id, None)
+    assert [task.num for task in session.day.tasks] == [2, 3, 1]
+
+
+def test_move_before_rejects_an_unknown_task_id() -> None:
+    session = make_session()
+    target = session.add("1")
+    with pytest.raises(KeyError):
+        session.move_before("no-such-id", target.id)
+
+
+def test_move_before_rejects_an_unknown_target_id() -> None:
+    session = make_session()
+    task = session.add("1")
+    with pytest.raises(KeyError):
+        session.move_before(task.id, "no-such-id")
+
+
+def test_move_before_itself_is_a_no_op() -> None:
+    session = make_session()
+    one = session.add("1")
+    session.add("2")
+    session.move_before(one.id, one.id)
+    assert [task.num for task in session.day.tasks] == [1, 2]
+
+
 def test_view_is_the_struck_block_then_the_active_tasks() -> None:
     session = make_session()
     one, two, three, four = (session.add(str(n)) for n in range(1, 5))

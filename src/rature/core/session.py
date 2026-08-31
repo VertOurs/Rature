@@ -145,6 +145,29 @@ class Session:
             raise ValueError("reorder needs a permutation of the current task ids")
         self.day.tasks = [by_id[task_id] for task_id in ordered_ids]
 
+    def move_before(self, task_id: str, target_id: str | None) -> None:
+        """Reorder day.tasks so task_id sits right before target_id.
+
+        target_id=None moves the task to the end of day.tasks. task_id
+        == target_id is a silent no-op: a drag-and-drop that drops a
+        row back where it was picked up.
+
+        day.tasks only orders the display within its own block: view()
+        always puts the struck tasks above the active ones. Moving an
+        active task "before" a struck one has no visible effect until
+        it is struck too.
+        """
+        self._task(task_id)
+        if task_id == target_id:
+            return
+        ordered = [task.id for task in self.day.tasks if task.id != task_id]
+        if target_id is None:
+            ordered.append(task_id)
+        else:
+            self._task(target_id)
+            ordered.insert(ordered.index(target_id), task_id)
+        self.reorder(ordered)
+
     def lock(self) -> None:
         self.day.locked = True
 
