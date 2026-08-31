@@ -157,9 +157,9 @@ class Session:
                 return item
         raise KeyError(item_id)
 
-    def add_to_reserve(self, text: str, *, today: date | None = None) -> ReserveItem:
+    def add_to_reserve(self, text: str, *, today: date) -> ReserveItem:
         # SPECIFICATION.md §2.7.4: manual reserve entries are never de-duplicated.
-        item = ReserveItem(text=text, created=today or date.today())
+        item = ReserveItem(text=text, created=today)
         self.reserve.append(item)
         return item
 
