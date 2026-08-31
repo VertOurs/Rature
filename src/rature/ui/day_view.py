@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
 
-"""The Day view: SPECIFICATION.md §3.2. Read-only for chantier 3 step 3."""
+"""The Day view: SPECIFICATION.md §3.2."""
 
 from __future__ import annotations
 
@@ -68,9 +68,15 @@ class DayView(Adw.Bin):
         self.active_list.set_visible(bool(session.active))
         self.stack.set_visible_child_name("tasks" if session.day.tasks else "empty")
 
-    @staticmethod
-    def _fill(list_box: Gtk.ListBox, tasks: Iterable[Task]) -> None:
+    def _fill(self, list_box: Gtk.ListBox, tasks: Iterable[Task]) -> None:
         while (row := list_box.get_row_at_index(0)) is not None:
             list_box.remove(row)
         for task in tasks:
-            list_box.append(TaskRow(task))
+            list_box.append(
+                TaskRow(
+                    task,
+                    app=self.app,
+                    run_action=self.run_action,
+                    perform=self.perform,
+                )
+            )
