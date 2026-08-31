@@ -28,14 +28,20 @@ rature/
 │   │   └── app.py              Coordination : App, une Session, une horloge
 │   ├── ui/                     Tout ce qui touche GTK
 │   │   ├── application.py      Adw.Application, actions, raccourcis
-│   │   ├── window.py           Fenêtre principale, navigation latérale
-│   │   ├── day_view.py
-│   │   ├── reserve_view.py
-│   │   ├── recurring_view.py
-│   │   └── archive_window.py
+│   │   ├── window.py           Fenêtre principale, App, minuterie, navigation
+│   │   ├── day_view.py         Vue Jour, SPECIFICATION.md §3.2
+│   │   ├── task_row.py         Ligne partagée par les deux blocs de la vue Jour
+│   │   ├── reserve_view.py     Vue Réserve, §3.3
+│   │   ├── reserve_row.py      Ligne de réserve : bouton d'envoi, source de glissement
+│   │   ├── recurring_view.py   Vue Récurrentes, §3.4
+│   │   ├── recurring_form.py   AdwDialog de création/édition d'une récurrente
+│   │   └── archive_window.py   Fenêtre d'archives, §3.5
 │   └── main.py                 Point d'entrée
 ├── data/
-│   ├── ui/                     Fichiers .ui GTK Builder
+│   ├── ui/                     window.ui, day-view.ui, task-row.ui,
+│   │                           reserve-view.ui, reserve-row.ui,
+│   │                           recurring-view.ui, recurring-form.ui,
+│   │                           archive-window.ui
 │   ├── icons/
 │   ├── *.desktop.in
 │   ├── *.metainfo.xml.in
