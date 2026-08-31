@@ -7,10 +7,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : fenêtre principale (`App` détenue par l'application,
-  erreurs de démarrage, taille de fenêtre, navigation latérale). Lecture
-  des archives dans `core` faite. Découpage complet dans
-  `docs/internal/ROADMAP.md`.
+- **Étape suivante** : vue Jour en lecture seule (rayées en haut, en cours
+  en dessous, numéros stables), avec la bannière de quarantaine reportée
+  depuis la fenêtre principale. Fenêtre principale faite. Découpage
+  complet dans `docs/internal/ROADMAP.md`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -34,7 +34,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.2.0` | Cœur métier et couche `App` complets, toujours sans interface |
+| Version du projet | `0.3.0` | Première fonctionnalité visible : fenêtre principale, navigation latérale |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
