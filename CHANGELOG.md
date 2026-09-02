@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Search the archives (SPECIFICATION.md §3.13): a search entry in the
+  Archives window sidebar filters the date list as you type, keeping only
+  the days that hold a task whose text matches. Matching is case- and
+  accent-insensitive. The deletions journal is never searched. No count,
+  no preview, no match highlighting; a blank query restores the full
+  list, and "No matching days." shows when nothing matches.
 - Copy a day as plain text (SPECIFICATION.md §3.12): a Copy as text button
   in the Day view and the Archives window header puts the shown day on the
   clipboard — the long-form date, then one `[x]`/`[ ]` line per task in the

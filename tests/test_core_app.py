@@ -277,6 +277,16 @@ def test_search_archives_on_a_fresh_app_is_empty(tmp_path: Path) -> None:
     assert app.search_archives("anything") == []
 
 
+def test_archive_matches_tests_an_already_loaded_day(tmp_path: Path) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    app.add("Réparer le vélo")
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    day = app.read_archive(date(2026, 8, 20))
+    assert app.archive_matches(day, "reparer") is True
+    assert app.archive_matches(day, "helicopter") is False
+
+
 def test_add_saves_immediately(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))

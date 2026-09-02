@@ -17,6 +17,15 @@
                 <child type="top">
                   <object class="AdwHeaderBar"/>
                 </child>
+                <child type="top">
+                  <object class="GtkSearchEntry" id="search_entry">
+                    <property name="placeholder-text" translatable="yes">Search the archives…</property>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
+                  </object>
+                </child>
                 <property name="content">
                   <object class="GtkStack" id="sidebar_stack">
                     <child>
@@ -43,6 +52,16 @@
                         <property name="child">
                           <object class="AdwStatusPage">
                             <property name="title" translatable="yes">No archived days.</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkStackPage">
+                        <property name="name">no-match</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="title" translatable="yes">No matching days.</property>
                           </object>
                         </property>
                       </object>
@@ -142,6 +161,16 @@
                         <property name="child">
                           <object class="AdwStatusPage">
                             <property name="title" translatable="yes">No archived days.</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkStackPage">
+                        <property name="name">no-match</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="title" translatable="yes">No matching days.</property>
                           </object>
                         </property>
                       </object>
