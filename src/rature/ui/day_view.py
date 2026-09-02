@@ -37,7 +37,6 @@ class DayView(Adw.Bin):
 
     header: Adw.HeaderBar = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
-    undo_delete_button: Gtk.Button = Gtk.Template.Child()
     lock_button: Gtk.Button = Gtk.Template.Child()
     entry: Gtk.Entry = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
@@ -68,7 +67,6 @@ class DayView(Adw.Bin):
         key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
         key_controller.connect("key-pressed", self._on_entry_key_pressed)
         self.entry.add_controller(key_controller)
-        self.undo_delete_button.connect("clicked", self._on_undo_delete_clicked)
         self.lock_button.connect("clicked", self._on_lock_clicked)
         self.refresh()
 
@@ -87,10 +85,6 @@ class DayView(Adw.Bin):
         self.struck_list.set_visible(bool(session.struck))
         self.active_list.set_visible(bool(session.active))
         self.stack.set_visible_child_name("tasks" if session.day.tasks else "empty")
-
-        # SPECIFICATION.md §3.2: insensitive when the day's journal is
-        # empty, so undo can only ever act on a real deletion.
-        self.undo_delete_button.set_sensitive(bool(session.day.deletions))
 
         # SPECIFICATION.md §3.2: recomputed from session state every time,
         # never a widget's own toggled state. roll_over unlocks the list
@@ -133,12 +127,6 @@ class DayView(Adw.Bin):
                 )
             else:
                 list_helpers.scroll_to_bottom(self.scrolled_window)
-
-    def _on_undo_delete_clicked(self, _button: Gtk.Button) -> None:
-        # SPECIFICATION.md §3.2: no feedback, the task just reappears. An
-        # empty journal raises ValueError, which _perform swallows; the
-        # button's own insensitivity is the real guard.
-        self.run_action(self.app.undo_last_deletion)
 
     def _on_lock_clicked(self, _button: Gtk.Button) -> None:
         if self.app.session.day.locked:

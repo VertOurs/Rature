@@ -29,6 +29,7 @@
                 <property name="icon-name">document-revert-symbolic</property>
                 <property name="valign">center</property>
                 <property name="tooltip-text" translatable="yes">Undo delete</property>
+                <property name="action-name">win.undo-delete</property>
                 <style>
                   <class name="flat"/>
                 </style>
