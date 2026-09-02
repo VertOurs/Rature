@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Undo the last deletion (SPECIFICATION.md §3.2): a header button in the
+  Day view restores the most recently deleted task of the current day at
+  its original position and number, struck if it was struck, then drops
+  its journal entry so the deletion count stays exact. Insensitive when
+  nothing has been deleted today, active even while the list is frozen,
+  and it shows no message. A task drawn from the reserve and restored
+  this way returns to the reserve at the next day rollover if left
+  unstruck.
+
 ### Fixed
 
 - A data file (or an archived day) whose top-level JSON is not an object,

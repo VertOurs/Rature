@@ -22,6 +22,18 @@
                 </style>
               </object>
             </child>
+            <!-- Packed after lock_button, so it sits to its left:
+                 SPECIFICATION.md §3.2, "undo, then the lock toggle". -->
+            <child type="end">
+              <object class="GtkButton" id="undo_delete_button">
+                <property name="icon-name">document-revert-symbolic</property>
+                <property name="valign">center</property>
+                <property name="tooltip-text" translatable="yes">Undo delete</property>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
           </object>
         </child>
         <child type="bottom">
