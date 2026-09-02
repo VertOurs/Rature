@@ -66,6 +66,12 @@ class RecurringForm(Adw.Dialog):
             toggle = toggle.get_next_sibling()
             weekday += 1
 
+        # The loop above maps day box children to weekday indices 0..6 by
+        # position; a changed .ui must not slide that mapping silently.
+        assert len(self._day_toggles) == 7, (
+            "recurring_form.ui: days_box must hold exactly seven toggles"
+        )
+
         if item is not None:
             self.text_entry.set_text(item.text)
             for day in item.weekdays:

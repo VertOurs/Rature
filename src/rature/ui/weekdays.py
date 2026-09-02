@@ -16,14 +16,22 @@ from datetime import date, timedelta
 _REFERENCE_MONDAY = date(2024, 1, 1)
 
 
+def _check(weekday: int) -> int:
+    # Without this, timedelta would happily wrap: abbrev(7) would return
+    # Monday again rather than signal a caller that lost track of the range.
+    if not 0 <= weekday <= 6:
+        raise ValueError(f"weekday out of range 0..6: {weekday}")
+    return weekday
+
+
 def abbrev(weekday: int) -> str:
     """Abbreviated name for a weekday, Monday is 0 (e.g. ``Mon``, ``lun.``)."""
-    return (_REFERENCE_MONDAY + timedelta(days=weekday)).strftime("%a")
+    return (_REFERENCE_MONDAY + timedelta(days=_check(weekday))).strftime("%a")
 
 
 def full(weekday: int) -> str:
     """Full name for a weekday, Monday is 0 (e.g. ``Monday``, ``lundi``)."""
-    return (_REFERENCE_MONDAY + timedelta(days=weekday)).strftime("%A")
+    return (_REFERENCE_MONDAY + timedelta(days=_check(weekday))).strftime("%A")
 
 
 def subtitle(weekdays: list[int]) -> str:
