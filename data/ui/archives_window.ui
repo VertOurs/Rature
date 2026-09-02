@@ -61,9 +61,9 @@
                 <child type="top">
                   <object class="AdwHeaderBar" id="header">
                     <property name="title-widget">
-                      <!-- Text set from ArchivesWindow._show_day; see the
+                      <!-- Title set from ArchivesWindow._show_day; see the
                            matching note in day_view.ui. -->
-                      <object class="GtkLabel" id="title"/>
+                      <object class="AdwWindowTitle" id="title"/>
                     </property>
                   </object>
                 </child>

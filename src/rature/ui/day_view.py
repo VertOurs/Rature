@@ -36,7 +36,7 @@ class DayView(Adw.Bin):
     __gtype_name__ = "RatureDayView"
 
     header: Adw.HeaderBar = Gtk.Template.Child()
-    title: Gtk.Label = Gtk.Template.Child()
+    title: Adw.WindowTitle = Gtk.Template.Child()
     lock_button: Gtk.Button = Gtk.Template.Child()
     entry: Gtk.Entry = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
@@ -70,9 +70,9 @@ class DayView(Adw.Bin):
         self._commit_pending_renames()
         session = self.app.session
         # SPECIFICATION.md §2.5: the reference date, never the calendar
-        # date; between midnight and 04:00 they disagree. The label lives
+        # date; between midnight and 04:00 they disagree. The widget lives
         # in the .ui; refresh only rewrites its text.
-        self.title.set_label(session.day.date.strftime("%A %d %B"))
+        self.title.set_title(session.day.date.strftime("%A %d %B"))
         self._fill(self.struck_list, session.struck)
         self._fill(self.active_list, session.active)
         self.struck_list.set_visible(bool(session.struck))

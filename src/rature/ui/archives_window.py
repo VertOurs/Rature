@@ -39,7 +39,7 @@ class ArchivesWindow(Adw.Window):
     sidebar_stack: Gtk.Stack = Gtk.Template.Child()
     date_list: Gtk.ListBox = Gtk.Template.Child()
     header: Adw.HeaderBar = Gtk.Template.Child()
-    title: Gtk.Label = Gtk.Template.Child()
+    title: Adw.WindowTitle = Gtk.Template.Child()
     content_stack: Gtk.Stack = Gtk.Template.Child()
     struck_list: Gtk.ListBox = Gtk.Template.Child()
     active_list: Gtk.ListBox = Gtk.Template.Child()
@@ -75,9 +75,9 @@ class ArchivesWindow(Adw.Window):
 
     def _show_day(self, day_date: date) -> None:
         # SPECIFICATION.md §3.2's header format, reused as-is: same
-        # weekday-day-month long form as the Day view's title. The label
+        # weekday-day-month long form as the Day view's title. The widget
         # lives in the .ui; only its text changes as the selection moves.
-        self.title.set_label(day_date.strftime("%A %d %B"))
+        self.title.set_title(day_date.strftime("%A %d %B"))
         list_helpers.clear(self.struck_list)
         list_helpers.clear(self.active_list)
         try:

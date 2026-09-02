@@ -10,12 +10,9 @@
         <child type="top">
           <object class="AdwHeaderBar" id="header">
             <property name="title-widget">
-              <!-- Text set from DayView.refresh: the reference date, long
-                   form. No label property here, so nothing to translate.
-                   Kept a bare GtkLabel to match what the Python-built
-                   widget rendered; the .title style class is the polish
-                   to consider during the visual pass. -->
-              <object class="GtkLabel" id="title"/>
+              <!-- Title set from DayView.refresh: the reference date, long
+                   form. No title property here, so nothing to translate. -->
+              <object class="AdwWindowTitle" id="title"/>
             </property>
             <child type="end">
               <object class="GtkButton" id="lock_button">
