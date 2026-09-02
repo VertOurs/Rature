@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- French translation (SPECIFICATION.md §3.8): the interface is fully
+  translated. Day and month names, the header dates and the interface
+  strings stay in one language: the launcher realigns `LC_TIME` with the
+  message language, so a machine with `LANGUAGE=fr` and `LC_TIME=en_US`
+  no longer shows French text with English dates.
 - A Statistics window (SPECIFICATION.md §3.14): a new Statistics menu
   entry opens a read-only table, one row per archived day most recent
   first, counting tasks added, struck, deleted and sent to the reserve,
