@@ -23,6 +23,12 @@ def test_missing_version_is_rejected() -> None:
         migrate({"date": "2026-08-24"})
 
 
+@pytest.mark.parametrize("not_an_object", [[], ["version", 1], "1", 1, None])
+def test_a_non_object_top_level_is_rejected(not_an_object: object) -> None:
+    with pytest.raises(ValueError):
+        migrate(not_an_object)
+
+
 def test_a_non_integer_version_is_rejected() -> None:
     with pytest.raises(ValueError):
         migrate({"version": "1"})

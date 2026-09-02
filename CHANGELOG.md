@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A data file (or an archived day) whose top-level JSON is not an object,
+  such as a bare list or string, now lands on the corrupted-file recovery
+  path instead of crashing: `migrate` rejected it with an `AttributeError`
+  that neither startup nor the Archives window caught.
+
 ## [0.9.0] - 2026-09-02
 
 ### Added
