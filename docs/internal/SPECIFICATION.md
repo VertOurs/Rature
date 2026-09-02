@@ -296,8 +296,9 @@ menu principal, dans une fenêtre distincte, voir §3.5.
 ```
 
 Le menu principal (`open-menu-symbolic`, en tête du panneau latéral) contient
-au chantier 3 : Archives, puis About Rature. Les raccourcis clavier et les
-statistiques s'y ajoutent au chantier 4.
+au chantier 3 : Archives, puis About Rature. Au chantier 4, Keyboard
+Shortcuts rejoint le menu, groupé avec About Rature (§3.11) ; l'entrée des
+statistiques suivra avec sa propre fonctionnalité (§2.6).
 
 **Taille et état.** La fenêtre lit `window-width`, `window-height` et
 `window-maximized` à la construction, et les écrit à la fermeture. Pas de
@@ -623,12 +624,14 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Emplacement | Texte |
 |---|---|
 | Entrée de navigation | `Day`, `Reserve`, `Recurring` |
-| Menu principal | `Archives`, `About Rature` |
+| Menu principal | `Archives`, `Keyboard Shortcuts`, `About Rature` |
 | Saisie du jour | `Add a task…` |
 | Saisie de la réserve | `Add to the reserve…` |
 | Menu de ligne | `Rename`, `Edit`, `Delete` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
 | Infobulle d'annulation de suppression | `Undo delete` |
+| Fenêtre des raccourcis, titres de groupe | `General`, `Navigation`, `Tasks` |
+| Fenêtre des raccourcis, descriptions | `Quit`, `Keyboard Shortcuts`, `Show the Day view`, `Show the Reserve view`, `Show the Recurring view`, `Add a task`, `Add a task already struck`, `Undo the last deletion`, `Cancel an edit` |
 | Infobulle d'envoi | `Send to the day` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
 | Infobulle d'ajout de récurrente | `Add a recurring task` |
@@ -685,3 +688,41 @@ Rappel de périmètre, `CLAUDE.md` §4 règle 4.
 - Aucune fenêtre de statistiques
 - Aucune préférence, aucun écran de réglages
 - Aucun ajout direct d'une tâche déjà rayée
+
+---
+
+### 3.11 Raccourcis clavier et fenêtre d'aide
+
+Ajouté au chantier 4. Le jeu se limite à des raccourcis à convention forte ;
+rien de propre à l'application au-delà de ce qui existait déjà.
+
+**Accélérateurs.**
+
+| Raccourci | Action | État |
+|---|---|---|
+| `Entrée` | Ajouter une tâche | déjà en place, §3.2 |
+| `Maj+Entrée` | Ajouter une tâche déjà rayée | déjà en place, §3.2 |
+| `Échap` | Annuler un renommage en cours | déjà en place, §3.2 |
+| `Ctrl+Q` | Quitter | déjà en place |
+| `Ctrl+Z` | Annuler la dernière suppression | nouveau, déclenche l'action de §3.2 |
+| `Ctrl+1`, `Ctrl+2`, `Ctrl+3` | Aller à Day, Reserve, Recurring | nouveau |
+| `Ctrl+?`, `F1` | Ouvrir la fenêtre d'aide | nouveau |
+
+Rien pour figer la liste ni pour rayer une tâche : aucune touche standard, et
+§2.3 veut que la suppression comme la rature restent des gestes explicites, à
+la souris ou au menu. `Ctrl+1/2/3` changent seulement la vue affichée, sans
+rien sélectionner dans les listes.
+
+**Fenêtre d'aide.** Un `GtkShortcutsWindow` chargé depuis un `.ui`, posé sur
+la fenêtre principale par `Adw.ApplicationWindow.set_help_overlay`. Cet appel
+crée l'action `win.show-help-overlay` et son accélérateur `Ctrl+?` ; `F1` est
+ajouté en plus. Une section, trois groupes :
+
+- **General** : Quitter, Keyboard Shortcuts
+- **Navigation** : les trois vues
+- **Tasks** : Ajouter une tâche, Ajouter une tâche déjà rayée, Annuler la
+  dernière suppression, Annuler un renommage
+
+Le contenu est entièrement déclaratif, sans logique. L'entrée Keyboard
+Shortcuts du menu principal déclenche la même action `win.show-help-overlay`.
+Tous les libellés affichés sont en §3.8.
