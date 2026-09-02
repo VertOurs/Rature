@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="RatureStatisticsRow" parent="GtkBox">
+    <!-- Every cell's text is set from Python: a locale-formatted date and
+         locale-formatted integers, none of them catalogue strings. The
+         column geometry here matches the header and total rows of
+         statistics_window.ui so the columns line up. -->
+    <property name="spacing">12</property>
+    <property name="margin-start">12</property>
+    <property name="margin-end">12</property>
+    <property name="margin-top">6</property>
+    <property name="margin-bottom">6</property>
+    <child>
+      <object class="GtkLabel" id="date_cell">
+        <property name="hexpand">true</property>
+        <property name="xalign">0</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="added_cell">
+        <property name="width-chars">8</property>
+        <property name="xalign">1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="struck_cell">
+        <property name="width-chars">8</property>
+        <property name="xalign">1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="deleted_cell">
+        <property name="width-chars">8</property>
+        <property name="xalign">1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="reserve_cell">
+        <property name="width-chars">10</property>
+        <property name="xalign">1</property>
+      </object>
+    </child>
+  </template>
+</interface>

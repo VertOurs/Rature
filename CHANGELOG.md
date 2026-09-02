@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A Statistics window (SPECIFICATION.md §3.14): a new Statistics menu
+  entry opens a read-only table, one row per archived day most recent
+  first, counting tasks added, struck, deleted and sent to the reserve,
+  with a Total row. Numbers only, no chart, no average, no trend, no
+  colour. "To reserve" is the unfinished non-recurring tasks of the day,
+  an approximation before the rollover de-duplicates. Deleted tasks are
+  counted from the journal, never their text.
 - Search the archives (SPECIFICATION.md §3.13): a search entry in the
   Archives window sidebar filters the date list as you type, keeping only
   the days that hold a task whose text matches. Matching is case- and

@@ -14,6 +14,8 @@
     <file preprocess="xml-stripblanks">ui/archive_date_row.ui</file>
     <file preprocess="xml-stripblanks">ui/archive_task_row.ui</file>
     <file preprocess="xml-stripblanks">ui/archives_window.ui</file>
+    <file preprocess="xml-stripblanks">ui/statistics_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/statistics_window.ui</file>
     <file preprocess="xml-stripblanks">ui/shortcuts.ui</file>
     <file compressed="true">style.css</file>
   </gresource>
