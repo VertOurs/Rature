@@ -321,8 +321,9 @@ C'est la vue par défaut à l'ouverture.
 
 **Structure.** `AdwToolbarView`. En tête, un `AdwHeaderBar` dont le titre est
 la date de la journée en cours, en format long local. À droite, le bouton
-bascule de verrouillage. En pied, la barre de saisie. Au centre, un
-`GtkScrolledWindow` contenant deux listes empilées.
+d'annulation de la dernière suppression, puis le bouton bascule de
+verrouillage. En pied, la barre de saisie. Au centre, un `GtkScrolledWindow`
+contenant deux listes empilées.
 
 **Les deux blocs.** Le bloc des rayées est toujours au-dessus, le bloc des
 tâches en cours au-dessous, conformément à §2.1 point 5. Chacun est un
@@ -362,6 +363,25 @@ Il n'y a aucune boîte de confirmation à la suppression, §2.3 l'interdit.
 C'est le second geste nécessaire pour ouvrir le menu qui protège, pas une
 question.
 
+**Annuler la dernière suppression.** Un bouton dans l'en-tête, jamais un
+contrôle de ligne : la ligne a disparu. Il restaure la dernière entrée du
+journal `deletions` de la journée en cours, conformément à §2.2 et à
+l'ADR 0005 :
+
+- la tâche réapparaît à sa position d'origine (`index` du journal), avec son
+  numéro d'origine, rayée si elle l'était, non rayée sinon
+- l'entrée de journal est ensuite retirée. Le journal doit rester juste,
+  sinon le comptage de §2.6 dérive
+- une seule entrée à la fois, et seulement la journée en cours : le journal
+  part avec l'archive au passage du jour, il n'y a plus rien à annuler après
+
+Le bouton est insensible quand le journal de la journée est vide. Aucun
+autre retour : la tâche réapparaît, sans bandeau ni message, §2.3. Le bouton
+reste actif quand la liste est figée, comme la suppression elle-même.
+
+Une tâche tirée de la réserve puis restaurée repart en réserve au passage du
+jour suivant si elle n'a pas été rayée, par le mécanisme normal (§2.7.3).
+
 **Menu de ligne.** Rename, puis Delete. Rien d'autre au chantier 3.
 
 **Renommer.** L'étiquette de texte est remplacée sur place par une zone de
@@ -380,7 +400,8 @@ après suppression des espaces n'ajoute rien.
 
 - la zone de saisie est insensible
 - le dépôt d'un élément de réserve est refusé, voir §3.6
-- rayer, dérayer, renommer, supprimer et réordonner restent actifs
+- rayer, dérayer, renommer, supprimer, annuler une suppression et
+  réordonner restent actifs
 
 Aucun autre changement d'apparence. Pas de bandeau, pas de message. L'état du
 bouton suffit.
@@ -586,9 +607,8 @@ c'est la raison pour laquelle les deux existent.
 
 ### 3.8 Textes affichés
 
-Liste fermée des chaînes de l'interface au chantier 3. Toutes traduisibles.
-Toute chaîne visible absente de cette liste est une chaîne à ajouter ici
-d'abord.
+Liste fermée des chaînes de l'interface. Toutes traduisibles. Toute chaîne
+visible absente de cette liste est une chaîne à ajouter ici d'abord.
 
 | Emplacement | Texte |
 |---|---|
@@ -598,6 +618,7 @@ d'abord.
 | Saisie de la réserve | `Add to the reserve…` |
 | Menu de ligne | `Rename`, `Edit`, `Delete` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
+| Infobulle d'annulation de suppression | `Undo delete` |
 | Infobulle d'envoi | `Send to the day` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
 | Infobulle d'ajout de récurrente | `Add a recurring task` |
@@ -632,6 +653,7 @@ image cassée, et ça ne se voit qu'à l'exécution.
 |---|---|
 | Rayer | `object-select-symbolic` |
 | Dérayer | `edit-undo-symbolic` |
+| Annuler la dernière suppression | `document-revert-symbolic` |
 | Menu de ligne | `view-more-symbolic` |
 | Menu principal | `open-menu-symbolic` |
 | Supprimer | `user-trash-symbolic` |
