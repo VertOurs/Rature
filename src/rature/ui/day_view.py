@@ -13,7 +13,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gtk  # noqa: E402
 
 from rature.ui import list_helpers  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
@@ -61,6 +61,13 @@ class DayView(Adw.Bin):
         self.run_action = run_action
         self.perform = perform
         self.entry.connect("activate", self._on_entry_activate)
+        # SPECIFICATION.md §3.2: Shift+Enter adds the task already struck.
+        # A capture-phase controller sees Return before the entry turns it
+        # into "activate", so the two paths never both fire.
+        key_controller = Gtk.EventControllerKey()
+        key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        key_controller.connect("key-pressed", self._on_entry_key_pressed)
+        self.entry.add_controller(key_controller)
         self.undo_delete_button.connect("clicked", self._on_undo_delete_clicked)
         self.lock_button.connect("clicked", self._on_lock_clicked)
         self.refresh()
@@ -98,14 +105,34 @@ class DayView(Adw.Bin):
             self.lock_button.set_tooltip_text(_("Freeze the list"))
         self.entry.set_sensitive(not session.day.locked)
 
-    def _on_entry_activate(self, entry: Gtk.Entry) -> None:
-        text = entry.get_text().strip()
+    def _on_entry_activate(self, _entry: Gtk.Entry) -> None:
+        self._submit(struck=False)
+
+    def _on_entry_key_pressed(
+        self, _controller: Gtk.EventControllerKey, keyval: int, _keycode: int, state
+    ) -> bool:
+        enter = keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_ISO_Enter)
+        if enter and state & Gdk.ModifierType.SHIFT_MASK:
+            self._submit(struck=True)
+            return True
+        return False
+
+    def _submit(self, *, struck: bool) -> None:
+        text = self.entry.get_text().strip()
         if not text:
             return
-        if self.run_action(lambda: self.app.add(text)):
-            entry.set_text("")
-            entry.grab_focus()
-            list_helpers.scroll_to_bottom(self.scrolled_window)
+        add = self.app.add_struck if struck else self.app.add
+        if self.run_action(lambda: add(text)):
+            self.entry.set_text("")
+            self.entry.grab_focus()
+            if struck:
+                # SPECIFICATION.md §3.2: the new task is last in the struck
+                # block, at the top of the list, so scroll up to it.
+                list_helpers.scroll_into_view(
+                    self.scrolled_window, self.struck_list.get_last_child()
+                )
+            else:
+                list_helpers.scroll_to_bottom(self.scrolled_window)
 
     def _on_undo_delete_clicked(self, _button: Gtk.Button) -> None:
         # SPECIFICATION.md §3.2: no feedback, the task just reappears. An

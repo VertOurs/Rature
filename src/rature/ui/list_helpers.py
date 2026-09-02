@@ -47,3 +47,30 @@ def scroll_to_bottom(scrolled_window: Gtk.ScrolledWindow) -> None:
         return GLib.SOURCE_REMOVE
 
     GLib.idle_add(scroll_once)
+
+
+def scroll_into_view(
+    scrolled_window: Gtk.ScrolledWindow, widget: Gtk.Widget | None
+) -> None:
+    """Scroll on the next idle so ``widget`` is fully visible.
+
+    Moves the adjustment the least amount needed, up or down; a no-op when
+    the widget already fits. ``None`` is tolerated (an empty block).
+    """
+    if widget is None:
+        return
+
+    def scroll_once() -> bool:
+        found, bounds = widget.compute_bounds(scrolled_window)
+        if found:
+            adjustment = scrolled_window.get_vadjustment()
+            page = adjustment.get_page_size()
+            top = bounds.get_y()
+            bottom = top + bounds.get_height()
+            if bottom > page:
+                adjustment.set_value(adjustment.get_value() + bottom - page)
+            elif top < 0:
+                adjustment.set_value(adjustment.get_value() + top)
+        return GLib.SOURCE_REMOVE
+
+    GLib.idle_add(scroll_once)
