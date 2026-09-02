@@ -10,11 +10,6 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Étape suivante** : à choisir avec l'auteur parmi la liste du
   chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé entre
   ses points.
-- **En attente de fusion** : PR #38, suite de la revue du 2 septembre
-  2026. `_on_row_selected` liait chaque ligne de la sidebar à sa page
-  par un index positionnel dépendant de l'ordre du `.ui` ; chaque ligne
-  porte désormais sa page cible en attribut. Sans effet fonctionnel,
-  CI verte.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
