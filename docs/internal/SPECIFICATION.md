@@ -83,7 +83,8 @@ le comportement de l'utilisateur est hors sujet.
 ### 2.4 Comportements attendus
 
 - Ajouter une tâche puis la rayer immédiatement est un usage normal, c'est de
-  la journalisation rétroactive, pas une erreur à corriger
+  la journalisation rétroactive, pas une erreur à corriger. Maj+Entrée dans
+  la zone de saisie du jour le fait en un geste (§3.2)
 - Le numéro d'une tâche est une étiquette attribuée à l'ajout. Il ne change
   jamais, ni à la rature, ni à la suppression, ni au réordonnancement, ni au
   passage d'une tâche dans le bloc « Rayées »
@@ -394,6 +395,15 @@ l'ajout se fait à la touche Entrée. Après ajout, la zone se vide, **garde le
 focus**, et la liste défile jusqu'à la nouvelle tâche. C'est la règle qui
 rend la dictée en rafale possible, elle n'est pas négociable. Un texte vide
 après suppression des espaces n'ajoute rien.
+
+**Ajouter une tâche déjà rayée.** Maj+Entrée dans la même zone de saisie
+ajoute la tâche directement dans le bloc des rayées, en un geste au lieu
+d'ajouter puis rayer. C'est le raccourci de la journalisation rétroactive
+de §2.4. Même attribution de numéro qu'un ajout normal ; la zone se vide et
+garde le focus de la même façon ; la liste défile jusqu'à la nouvelle tâche,
+en haut cette fois. Refusé sur une liste figée, comme tout ajout (§2.1
+point 3). Aucun contrôle visible : le geste est répertorié dans la fenêtre
+d'aide des raccourcis (autre point du chantier 4).
 
 **Liste figée.** Le bouton de verrouillage bascule entre `App.lock` et
 `App.unlock`, et change d'icône. Quand la liste est figée :
