@@ -297,8 +297,8 @@ menu principal, dans une fenêtre distincte, voir §3.5.
 
 Le menu principal (`open-menu-symbolic`, en tête du panneau latéral) contient
 au chantier 3 : Archives, puis About Rature. Au chantier 4, Keyboard
-Shortcuts rejoint le menu, groupé avec About Rature (§3.11) ; l'entrée des
-statistiques suivra avec sa propre fonctionnalité (§2.6).
+Shortcuts rejoint le menu, groupé avec About Rature (§3.11), et Statistics
+rejoint Archives dans le premier groupe (§3.14).
 
 **Taille et état.** La fenêtre lit `window-width`, `window-height` et
 `window-maximized` à la construction, et les écrit à la fermeture. Pas de
@@ -627,7 +627,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Emplacement | Texte |
 |---|---|
 | Entrée de navigation | `Day`, `Reserve`, `Recurring` |
-| Menu principal | `Archives`, `Keyboard Shortcuts`, `About Rature` |
+| Menu principal | `Archives`, `Statistics`, `Keyboard Shortcuts`, `About Rature` |
 | Saisie du jour | `Add a task…` |
 | Saisie de la réserve | `Add to the reserve…` |
 | Recherche dans les archives | `Search the archives…` |
@@ -647,6 +647,8 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Archives vides | `No archived days.` |
 | Archives sans correspondance | `No matching days.` |
 | Archive illisible | `This archive cannot be read.` |
+| Fenêtre Statistiques, en-têtes de colonne | `Day`, `Added`, `Struck`, `Deleted`, `To reserve` |
+| Fenêtre Statistiques, ligne de total | `Total` |
 | Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |
 | Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
@@ -838,3 +840,81 @@ Côté `core`, une fonction pure travaille sur le contenu des archives.
 `App.search_archives(query)` rend les dates correspondantes, du plus récent
 au plus ancien, dans le même ordre qu'`App.archives()`. Une requête vide ou
 uniquement composée d'espaces rend la même liste qu'`App.archives()`.
+
+---
+
+### 3.14 Fenêtre Statistiques
+
+Ajoutée au chantier 4. Périmètre produit en §2.6 : lecture seule, sur les
+archives, **rien que des nombres, aucune appréciation**. Cette section fixe
+la forme.
+
+Fenêtre distincte, un `AdwWindow` comme la fenêtre d'archives, ouverte depuis
+l'entrée Statistics du menu principal (§3.1). Rien n'y est modifiable, aucun
+bouton d'action, aucun contrôle : pas de sélecteur de période, pas de
+graphique, pas de couleur qui distingue une valeur d'une autre. Un tableau,
+et c'est tout. La période, c'est l'ensemble des archives ; la répartition
+dans le temps, ce sont les lignes ; le « par période » de §2.6, c'est la
+ligne de total.
+
+**Le tableau.** Une ligne par journée archivée, du plus récent au plus
+ancien, exactement l'ordre d'`App.archives()`. Cinq colonnes, en-têtes en
+§3.8 :
+
+```
+┌────────────────┬───────┬────────┬─────────┬────────────┐
+│ Day            │ Added │ Struck │ Deleted │ To reserve │
+├────────────────┼───────┼────────┼─────────┼────────────┤
+│ 30 August 2026 │   7   │   5    │    1    │     2      │
+│ 29 August 2026 │   4   │   4    │    0    │     0      │
+│ 28 August 2026 │   9   │   6    │    2    │     1      │
+├────────────────┼───────┼────────┼─────────┼────────────┤
+│ Total          │  20   │   15   │    3    │     3      │
+└────────────────┴───────┴────────┴─────────┴────────────┘
+```
+
+- **Day** : la date de la journée, format long local, comme le titre de la
+  vue Jour et de la fenêtre d'archives.
+- **Added** : `len(day.tasks) + len(day.deletions)`, c'est à dire toute
+  tâche ayant reçu un numéro ce jour-là, égal à `day.counter - 1`. Le
+  journal `deletions` n'est utilisé que pour son **nombre d'entrées**,
+  jamais pour leur texte (§2.2, §2.6).
+- **Struck** : les tâches `done` de la journée archivée. Une tâche rayée
+  puis supprimée ne compte pas ici : elle a disparu de la journée
+  archivée (§3.5) et n'est comptée que dans Deleted.
+- **Deleted** : `len(day.deletions)`.
+- **To reserve** : les tâches de la journée archivée qui ne sont ni faites
+  ni issues d'une récurrente. C'est ce que le passage du jour renvoie en
+  réserve (§2.5 points 2 et 3), **avant** son dédoublonnage. Le nombre
+  exact déplacé n'est pas dans l'archive : elle est écrite avant le
+  déplacement, et le dédoublonnage n'y laisse pas de trace. Ce comptage
+  peut donc dépasser d'une unité ou deux le nombre réellement ajouté à la
+  réserve, uniquement quand deux textes identiques y coexistaient. Écart
+  assumé : §2.6 demande des nombres, pas une comptabilité au corps près.
+
+Les cinq colonnes sont des comptages **indépendants**. Elles ne se
+partitionnent pas : `Added` n'est pas la somme des autres, et `To reserve`
+recoupe les tâches non rayées.
+
+**Ligne de total.** Une dernière ligne `Total` (§3.8) somme chaque colonne
+sur toutes les journées listées. Aucune moyenne, aucun ratio, aucune
+projection : §2.6 interdit toute valeur présentée comme un objectif.
+
+**Archive illisible.** Ignorée, silencieusement, comme pour la recherche
+(§3.13) : elle n'a pas de ligne et n'entre dans aucun total. Une archive
+qui ne se lit pas ne fait jamais échouer la fenêtre entière.
+
+**Aucune archive.** Un `AdwStatusPage`, texte `No archived days.` (§3.8),
+à la place du tableau.
+
+**Rien n'est poussé.** La fenêtre ne s'ouvre que sur action de
+l'utilisateur, ne notifie jamais, ne se rouvre pas seule, et n'apparaît
+dans aucune autre vue. §2.6 : un chiffre qu'on va chercher est une
+consultation ; poussé, il devient un commentaire.
+
+Côté `core`, une fonction pure `day_counts(day)` rend les quatre nombres
+d'une journée (un petit dataclass de compteurs). `App.statistics()` les
+expose à l'interface sous la forme d'une liste `(date, compteurs)` du plus
+récent au plus ancien, dans le même ordre qu'`App.archives()`, les archives
+illisibles omises. Les totaux se somment dans l'interface, ils n'ont pas
+besoin de `core`.
