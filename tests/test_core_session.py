@@ -36,6 +36,42 @@ def test_add_on_a_frozen_list_is_refused() -> None:
         session.add("nope")
 
 
+def test_add_struck_creates_a_struck_task() -> None:
+    session = make_session()
+    task = session.add_struck("  called back  ", now=STAMP)
+    assert (task.done, task.done_at, task.text) == (True, STAMP, "  called back  ")
+    assert session.struck == [task]
+    assert session.active == []
+
+
+def test_add_struck_takes_the_next_number_and_advances_the_counter() -> None:
+    session = make_session()
+    first = session.add("live")
+    struck = session.add_struck("done", now=STAMP)
+    assert (first.num, struck.num) == (1, 2)
+    assert session.day.counter == 3
+
+
+def test_add_struck_lands_in_the_struck_block() -> None:
+    session = make_session()
+    live = session.add("live")
+    struck = session.add_struck("done", now=STAMP)
+    assert session.view() == [struck, live]
+
+
+def test_add_struck_on_a_frozen_list_is_refused() -> None:
+    session = make_session()
+    session.lock()
+    with pytest.raises(LockedError):
+        session.add_struck("nope", now=STAMP)
+
+
+def test_add_struck_requires_an_aware_timestamp() -> None:
+    session = make_session()
+    with pytest.raises(ValueError):
+        session.add_struck("done", now=datetime(2026, 8, 24, 14, 0, 0))
+
+
 def test_a_deleted_number_is_never_reused() -> None:
     session = make_session()
     first = session.add("first")
