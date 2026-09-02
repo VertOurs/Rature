@@ -45,7 +45,7 @@ class RatureApplication(Adw.Application):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         )
 
-    def _add_action(self, name, callback, accels=None):
+    def _add_action(self, name, callback, accels=None) -> None:
         action = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
         self.add_action(action)
