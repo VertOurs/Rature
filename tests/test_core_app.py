@@ -10,6 +10,7 @@ import pytest
 from rature.core.app import App, StartupOutcome
 from rature.core.migrations import FutureVersionError
 from rature.core.session import LockedError
+from rature.core.stats import DayCounts
 from rature.core.storage import Store, load, save
 
 PARIS = timezone(timedelta(hours=2))
@@ -285,6 +286,41 @@ def test_archive_matches_tests_an_already_loaded_day(tmp_path: Path) -> None:
     day = app.read_archive(date(2026, 8, 20))
     assert app.archive_matches(day, "reparer") is True
     assert app.archive_matches(day, "helicopter") is False
+
+
+def test_statistics_is_empty_without_archives(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    assert app.statistics() == []
+
+
+def test_statistics_counts_each_archived_day_most_recent_first(tmp_path: Path) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    done = app.add("done one")
+    app.strike(done.id)
+    app.add("left unfinished")
+    gone = app.add("to be deleted")
+    app.delete(gone.id)
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    app.add("only this one")
+    app.clock = clock_at(datetime(2026, 8, 22, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    assert app.statistics() == [
+        (date(2026, 8, 21), DayCounts(added=1, struck=0, deleted=0, to_reserve=1)),
+        (date(2026, 8, 20), DayCounts(added=3, struck=1, deleted=1, to_reserve=1)),
+    ]
+
+
+def test_statistics_skips_an_unreadable_archive(tmp_path: Path) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    app.add("kept")
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    (tmp_path / "archive" / "2026-08-19.json").write_text("not json", encoding="utf-8")
+    assert app.statistics() == [
+        (date(2026, 8, 20), DayCounts(added=1, struck=0, deleted=0, to_reserve=1)),
+    ]
 
 
 def test_add_saves_immediately(tmp_path: Path) -> None:
