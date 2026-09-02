@@ -10,10 +10,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Étape suivante** : à choisir avec l'auteur parmi la liste du
   chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé entre
   ses points.
-- **Revue de code du 2 septembre 2026** : traitée. Deux refactors sans
-  effet fonctionnel, fusionnés (PR #38, liaison ligne de la sidebar vers
-  sa page ; PR #39, annotations de retour dans `RatureApplication`).
-  Rien d'ouvert côté revue.
+- **Revue de code du 2 septembre 2026** : soldée. PR #38 à #44. La revue
+  externe (ordre positionnel des lignes de sidebar, annotations de
+  retour) puis l'autocritique du chantier 3 : couplage à l'ordre et à la
+  structure des `.ui` supprimé, widgets d'en-tête sortis du Python,
+  logique dupliquée des vues factorisée dans `inline_rename`,
+  `list_helpers` et `reorder` (ce dernier testé), et un vrai bug corrigé
+  (`migrate` plantait au démarrage sur un JSON dont la racine n'est pas
+  un objet). Deux points laissés tels quels, commentés : rebuild
+  ré-entrant des lignes, lecture d'archive synchrone. Le chantier 4
+  démarre sans dette connue.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -39,6 +45,9 @@ manifeste (`CLAUDE.md` §4 règle 8).
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
+
+Un correctif non publié attend dans `CHANGELOG.md` sous `[Unreleased]`
+(PR #44) : au prochain release, incrément **patch**, `0.9.1`.
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
 `STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
