@@ -59,7 +59,13 @@
             <property name="child">
               <object class="AdwToolbarView">
                 <child type="top">
-                  <object class="AdwHeaderBar" id="header"/>
+                  <object class="AdwHeaderBar" id="header">
+                    <property name="title-widget">
+                      <!-- Text set from ArchivesWindow._show_day; see the
+                           matching note in day_view.ui. -->
+                      <object class="GtkLabel" id="title"/>
+                    </property>
+                  </object>
                 </child>
                 <property name="content">
                   <object class="GtkStack" id="content_stack">
