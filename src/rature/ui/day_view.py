@@ -37,6 +37,7 @@ class DayView(Adw.Bin):
 
     header: Adw.HeaderBar = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
+    copy_button: Gtk.Button = Gtk.Template.Child()
     lock_button: Gtk.Button = Gtk.Template.Child()
     entry: Gtk.Entry = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
@@ -67,6 +68,7 @@ class DayView(Adw.Bin):
         key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
         key_controller.connect("key-pressed", self._on_entry_key_pressed)
         self.entry.add_controller(key_controller)
+        self.copy_button.connect("clicked", self._on_copy_clicked)
         self.lock_button.connect("clicked", self._on_lock_clicked)
         self.refresh()
 
@@ -127,6 +129,13 @@ class DayView(Adw.Bin):
                 )
             else:
                 list_helpers.scroll_to_bottom(self.scrolled_window)
+
+    def _on_copy_clicked(self, _button: Gtk.Button) -> None:
+        # SPECIFICATION.md §3.12: the shown day to the clipboard, plain
+        # text, no feedback.
+        self.get_clipboard().set_content(
+            Gdk.ContentProvider.new_for_value(self.app.day_text())
+        )
 
     def _on_lock_clicked(self, _button: Gtk.Button) -> None:
         if self.app.session.day.locked:

@@ -12,7 +12,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gtk  # noqa: E402
 
 from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import list_helpers  # noqa: E402
@@ -40,6 +40,7 @@ class ArchivesWindow(Adw.Window):
     date_list: Gtk.ListBox = Gtk.Template.Child()
     header: Adw.HeaderBar = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
+    copy_button: Gtk.Button = Gtk.Template.Child()
     content_stack: Gtk.Stack = Gtk.Template.Child()
     struck_list: Gtk.ListBox = Gtk.Template.Child()
     active_list: Gtk.ListBox = Gtk.Template.Child()
@@ -47,6 +48,11 @@ class ArchivesWindow(Adw.Window):
     def __init__(self, *, app: App, **kwargs) -> None:
         super().__init__(**kwargs)
         self.app = app
+        # SPECIFICATION.md §3.12: the date the Copy as text button acts on,
+        # or None while nothing readable is shown.
+        self._shown_date = None
+        self.copy_button.set_sensitive(False)
+        self.copy_button.connect("clicked", self._on_copy_clicked)
         # SPECIFICATION.md §3.5: most recent first, exactly App.archives'
         # order, never re-sorted here.
         self._dates = app.archives()
@@ -87,7 +93,11 @@ class ArchivesWindow(Adw.Window):
             session = self.app.archived_session(day_date)
         except (OSError, ValueError, KeyError, TypeError, FutureVersionError):
             self.content_stack.set_visible_child_name("unreadable")
+            self._shown_date = None
+            self.copy_button.set_sensitive(False)
             return
+        self._shown_date = day_date
+        self.copy_button.set_sensitive(True)
         for task in session.struck:
             self.struck_list.append(ArchiveTaskRow(task))
         for task in session.active:
@@ -97,3 +107,15 @@ class ArchivesWindow(Adw.Window):
         self.content_stack.set_visible_child_name(
             "tasks" if session.day.tasks else "empty"
         )
+
+    def _on_copy_clicked(self, _button: Gtk.Button) -> None:
+        # SPECIFICATION.md §3.12: the shown archived day to the clipboard,
+        # plain text, no feedback. The button is insensitive when nothing
+        # readable is shown, so _shown_date is set here.
+        if self._shown_date is None:
+            return
+        try:
+            text = self.app.archived_day_text(self._shown_date)
+        except (OSError, ValueError, KeyError, TypeError, FutureVersionError):
+            return
+        self.get_clipboard().set_content(Gdk.ContentProvider.new_for_value(text))
