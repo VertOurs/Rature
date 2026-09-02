@@ -19,6 +19,7 @@ from rature.core.app import App  # noqa: E402
 from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.archives_window import ArchivesWindow  # noqa: E402
+from rature.ui.statistics_window import StatisticsWindow  # noqa: E402
 from rature.ui.window import RatureWindow  # noqa: E402
 
 
@@ -34,6 +35,7 @@ class RatureApplication(Adw.Application):
         self._add_action("quit", self._on_quit, accels=["<primary>q"])
         self._add_action("about", self._on_about)
         self._add_action("archives", self._on_archives)
+        self._add_action("statistics", self._on_statistics)
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
@@ -92,6 +94,14 @@ class RatureApplication(Adw.Application):
 
     def _on_archives(self, _action, _param) -> None:
         window = ArchivesWindow(
+            app=self._app,
+            application=self,
+            transient_for=self.props.active_window,
+        )
+        window.present()
+
+    def _on_statistics(self, _action, _param) -> None:
+        window = StatisticsWindow(
             app=self._app,
             application=self,
             transient_for=self.props.active_window,

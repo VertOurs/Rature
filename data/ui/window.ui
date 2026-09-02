@@ -10,6 +10,10 @@
         <attribute name="label" translatable="yes">Archives</attribute>
         <attribute name="action">app.archives</attribute>
       </item>
+      <item>
+        <attribute name="label" translatable="yes">Statistics</attribute>
+        <attribute name="action">app.statistics</attribute>
+      </item>
     </section>
     <section>
       <item>

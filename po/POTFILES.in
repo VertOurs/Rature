@@ -14,4 +14,6 @@ data/ui/recurring_view.ui
 data/ui/archive_date_row.ui
 data/ui/archive_task_row.ui
 data/ui/archives_window.ui
+data/ui/statistics_row.ui
+data/ui/statistics_window.ui
 data/ui/shortcuts.ui
