@@ -14,6 +14,9 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gdk, Gtk  # noqa: E402
 
+from rature.ui import reorder  # noqa: E402
+from rature.ui.inline_rename import InlineRename  # noqa: E402
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -70,16 +73,14 @@ class TaskRow(Gtk.ListBoxRow):
         self.rename_button.connect("clicked", self._on_rename_clicked)
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
-        self._editing = False
-        self.rename_entry.connect(
-            "activate", lambda _entry: self.commit_pending_rename()
+        self._rename = InlineRename(
+            entry=self.rename_entry,
+            label=self.text_label,
+            current_text=lambda: self.task.text,
+            commit=lambda text: self.perform(
+                lambda: self.app.rename(self.task.id, text)
+            ),
         )
-        key_controller = Gtk.EventControllerKey()
-        key_controller.connect("key-pressed", self._on_rename_key_pressed)
-        self.rename_entry.add_controller(key_controller)
-        focus_controller = Gtk.EventControllerFocus()
-        focus_controller.connect("leave", lambda _c: self.commit_pending_rename())
-        self.rename_entry.add_controller(focus_controller)
 
         self._wire_drag_and_drop()
 
@@ -138,11 +139,9 @@ class TaskRow(Gtk.ListBoxRow):
         source = self._dragged_peer()
         if source is None:
             return False
-        if y < self.get_height() / 2:
-            target_id: str | None = self.task.id
-        else:
-            sibling = self.get_next_sibling()
-            target_id = sibling.task.id if isinstance(sibling, TaskRow) else None
+        sibling = self.get_next_sibling()
+        next_id = sibling.task.id if isinstance(sibling, TaskRow) else None
+        target_id = reorder.drop_target_id(y, self.get_height(), self.task.id, next_id)
         self.run_action(lambda: self.app.move_before(source.task.id, target_id))
         return True
 
@@ -158,43 +157,8 @@ class TaskRow(Gtk.ListBoxRow):
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
-        self._editing = True
-        self.rename_entry.set_text(self.task.text)
-        self.text_label.set_visible(False)
-        self.rename_entry.set_visible(True)
-        self.rename_entry.grab_focus()
-        self.rename_entry.select_region(0, -1)
-
-    def _on_rename_key_pressed(
-        self, _controller: Gtk.EventControllerKey, keyval: int, _keycode: int, _state
-    ) -> bool:
-        if keyval == Gdk.KEY_Escape:
-            self._cancel_rename()
-            return True
-        return False
-
-    def _cancel_rename(self) -> None:
-        # SPECIFICATION.md §3.2: Escape discards the typed text outright,
-        # unlike Enter or losing focus, which both commit.
-        if not self._editing:
-            return
-        self._editing = False
-        self.rename_entry.set_visible(False)
-        self.text_label.set_visible(True)
+        self._rename.begin()
 
     def commit_pending_rename(self) -> None:
-        """Validate an in-progress rename. A no-op if not editing.
-
-        Never triggers a view refresh: called both on Enter/focus-out and,
-        by DayView, to flush a pending edit before it rebuilds every row.
-        The label is updated locally instead, which is enough either way.
-        """
-        if not self._editing:
-            return
-        text = self.rename_entry.get_text().strip()
-        self._editing = False
-        self.rename_entry.set_visible(False)
-        self.text_label.set_visible(True)
-        if text and text != self.task.text:
-            self.text_label.set_label(text)
-            self.perform(lambda: self.app.rename(self.task.id, text))
+        """Flush a pending edit, e.g. before DayView rebuilds every row."""
+        self._rename.commit()
