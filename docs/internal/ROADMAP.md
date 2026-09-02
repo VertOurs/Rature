@@ -123,11 +123,16 @@ Reconstruction en `.ui`, branchée sur un coeur déjà testé.
 - [ ] Recherche dans les archives
 - [ ] Export d'une journée en texte
 - [ ] Traduction française complète
+- [ ] Traduction espéranto. S'appuie sur la même chaîne gettext que `fr` ;
+      « français en priorité » (décisions figées) reste vrai, `eo` est
+      additif
 - [ ] Fenêtre Statistiques, périmètre défini en `SPECIFICATION.md` §2.6
 
 **Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
 traduite pour `fr`, aucune action fréquente n'est sans raccourci, et la
 fenêtre Statistiques n'affiche aucune appréciation, seulement des nombres.
+La complétude de `eo` n'est pas un critère de passage : le catalogue
+existe et se construit, son taux de traduction est libre.
 
 ---
 
