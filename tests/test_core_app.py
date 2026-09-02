@@ -230,6 +230,11 @@ def test_mutation_wrappers_persist_through_a_full_walkthrough(tmp_path: Path) ->
     assert drawn.id not in [t.id for t in reloaded.day.tasks]
     assert len(reloaded.day.deletions) == 1
 
+    app.undo_last_deletion()
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert drawn.id in [t.id for t in reloaded.day.tasks]
+    assert reloaded.day.deletions == []
+
     template = app.add_recurring("water plants", [0, 1, 2, 3, 4, 5, 6])
     app.edit_recurring(template.id, weekdays=[0, 3])
     reloaded = load(data_dir=tmp_path).into_session()
