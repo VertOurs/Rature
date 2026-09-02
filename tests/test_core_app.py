@@ -182,6 +182,19 @@ def test_archived_session_raises_for_an_unknown_date(tmp_path: Path) -> None:
         app.archived_session(date(2026, 8, 1))
 
 
+def test_archive_session_from_wraps_a_day_the_caller_already_holds(
+    tmp_path: Path,
+) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    app.add("kept task")
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    day = app.read_archive(date(2026, 8, 20))
+    session = app.archive_session_from(day)
+    assert session.day is day
+    assert [task.text for task in session.active] == ["kept task"]
+
+
 def test_day_text_renders_the_current_day(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))

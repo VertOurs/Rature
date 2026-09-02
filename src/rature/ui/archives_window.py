@@ -150,16 +150,17 @@ class ArchivesWindow(Adw.Window):
         self.title.set_title(day_date.strftime("%A %d %B"))
         list_helpers.clear(self.struck_list)
         list_helpers.clear(self.active_list)
-        try:
-            # SPECIFICATION.md §3.2: block order is Session.view()'s, never
-            # recomputed here. archived_session hands back the same
-            # struck/active split the Day view reads from a live Session.
-            session = self.app.archived_session(day_date)
-        except (OSError, ValueError, KeyError, TypeError, FutureVersionError):
+        day = self._archived_day(day_date)
+        if day is None:
             self.content_stack.set_visible_child_name("unreadable")
             self._shown_date = None
             self.copy_button.set_sensitive(False)
             return
+        # SPECIFICATION.md §3.2: block order is Session.view()'s, never
+        # recomputed here. archive_session_from wraps the Day _archived_day
+        # already parsed and cached, so moving between dates does no file
+        # I/O once each archive has been read.
+        session = self.app.archive_session_from(day)
         self._shown_date = day_date
         self.copy_button.set_sensitive(True)
         for task in session.struck:
