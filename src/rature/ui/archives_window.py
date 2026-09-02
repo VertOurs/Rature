@@ -62,7 +62,10 @@ class ArchivesWindow(Adw.Window):
     ) -> None:
         if row is None:
             return
-        self._show_day(self._dates[row.get_index()])
+        # Read the date the row carries, never self._dates[row.get_index()]:
+        # that couples correctness to the row order in the ListBox, the
+        # coupling removed from RatureWindow in #38.
+        self._show_day(row.day_date)
 
     def _show_day(self, day_date: date) -> None:
         # SPECIFICATION.md §3.2's header format, reused as-is: same
