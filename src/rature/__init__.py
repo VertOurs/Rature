@@ -2,4 +2,4 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """Rature, a daily list desktop application for GNOME."""
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"

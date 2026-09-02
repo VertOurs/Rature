@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-02
+
+### Added
+
+- The Archives window (SPECIFICATION.md §3.5): a read-only secondary
+  window opened from the main menu, listing every archived date most
+  recent first in a sidebar and showing the matching day's content on
+  the right, struck above active with the same numbers as the Day view.
+  `App.archived_session` wraps a loaded archived day in a `Session` so
+  the struck/active split is never recomputed in the interface. A row
+  carries no button, menu, or drag-and-drop, per spec. An archive that
+  fails to load (corrupted, or written by a future version) shows a
+  neutral message and never blocks the other dates.
+
 ## [0.7.0] - 2026-08-31
 
 ### Added
@@ -141,7 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/VertOurs/Rature/releases/tag/v0.8.0
 [0.7.0]: https://github.com/VertOurs/Rature/releases/tag/v0.7.0
 [0.6.0]: https://github.com/VertOurs/Rature/releases/tag/v0.6.0
 [0.5.0]: https://github.com/VertOurs/Rature/releases/tag/v0.5.0
