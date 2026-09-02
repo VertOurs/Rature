@@ -14,6 +14,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.ui import list_helpers  # noqa: E402
 from rature.ui.recurring_form import RecurringForm  # noqa: E402
 from rature.ui.recurring_row import RecurringRow  # noqa: E402
 
@@ -52,8 +53,7 @@ class RecurringView(Adw.Bin):
 
     def refresh(self) -> None:
         recurring = self.app.session.recurring
-        while (row := self.item_list.get_row_at_index(0)) is not None:
-            self.item_list.remove(row)
+        list_helpers.clear(self.item_list)
         for item in recurring:
             self.item_list.append(
                 RecurringRow(item, app=self.app, run_action=self.run_action)
