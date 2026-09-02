@@ -9,9 +9,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Chantier en cours** : 4, confort et traductions. Démarré le
   2 septembre 2026, dette d'avant-chantier soldée (voir « Chantiers
   terminés »).
-- **Étape suivante** : à choisir avec l'auteur parmi la liste du
-  chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé entre
-  ses points.
+- **Fait au chantier 4** : annulation de la dernière suppression
+  (`SPECIFICATION.md` §3.2 rédigée en PR #49, `Session.undo_last_deletion`
+  en PR #51, bouton d'en-tête de la vue Jour en PR #52).
+- **Étape suivante** : à choisir avec l'auteur parmi les points restants
+  du chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -38,9 +40,10 @@ manifeste (`CLAUDE.md` §4 règle 8).
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
-Deux correctifs non publiés attendent sous `[Unreleased]` dans
-`CHANGELOG.md` (PR #44, plantage au démarrage ; PR #46, titre d'en-tête) :
-au prochain release, incrément **patch**, `0.9.1`.
+`[Unreleased]` dans `CHANGELOG.md` accumule une fonctionnalité (annulation
+de la dernière suppression) et deux correctifs (PR #44, plantage au
+démarrage ; PR #46, titre d'en-tête). La fonctionnalité impose un
+incrément **mineur** : la prochaine release sera `0.10.0`.
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
 `STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
