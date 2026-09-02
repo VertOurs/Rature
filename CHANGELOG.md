@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Keyboard shortcuts and a help window (SPECIFICATION.md §3.11):
+  Ctrl+1/2/3 switch to the Day, Reserve and Recurring views, Ctrl+Z undoes
+  the last deletion, and Ctrl+? or F1 open an `AdwShortcutsDialog` listing
+  every shortcut, also reachable from the new Keyboard Shortcuts menu
+  item.
 - Add a task already struck (SPECIFICATION.md §3.2): Shift+Enter in the
   Day view entry logs the task straight into the struck block in one
   gesture instead of add-then-strike, for retroactive logging. Same

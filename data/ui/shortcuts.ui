@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.8"/>
+  <!-- Built with Gtk.Builder, not @Gtk.Template: AdwShortcutsDialog is
+       final. Opened from RatureWindow via present(). -->
+  <object class="AdwShortcutsDialog" id="help_overlay">
+    <child>
+      <object class="AdwShortcutsSection">
+        <property name="title" translatable="yes">General</property>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Quit</property>
+            <property name="action-name">app.quit</property>
+            <property name="accelerator">&lt;Control&gt;q</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Keyboard Shortcuts</property>
+            <property name="action-name">win.show-help-overlay</property>
+            <property name="accelerator">&lt;Control&gt;question F1</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwShortcutsSection">
+        <property name="title" translatable="yes">Navigation</property>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Show the Day view</property>
+            <property name="action-name">win.view-day</property>
+            <property name="accelerator">&lt;Control&gt;1</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Show the Reserve view</property>
+            <property name="action-name">win.view-reserve</property>
+            <property name="accelerator">&lt;Control&gt;2</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Show the Recurring view</property>
+            <property name="action-name">win.view-recurring</property>
+            <property name="accelerator">&lt;Control&gt;3</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwShortcutsSection">
+        <property name="title" translatable="yes">Tasks</property>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Add a task</property>
+            <property name="accelerator">Return</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Add a task already struck</property>
+            <property name="accelerator">&lt;Shift&gt;Return</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Undo the last deletion</property>
+            <property name="action-name">win.undo-delete</property>
+            <property name="accelerator">&lt;Control&gt;z</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Cancel an edit</property>
+            <property name="accelerator">Escape</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

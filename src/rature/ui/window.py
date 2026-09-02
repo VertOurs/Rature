@@ -82,6 +82,7 @@ class RatureWindow(Adw.ApplicationWindow):
         self.connect("destroy", self._on_destroy)
         self.sidebar_list.connect("row-selected", self._on_row_selected)
         self.sidebar_list.connect("row-activated", self._on_row_activated)
+        self._install_shortcuts()
 
         self._write_failure_active = False
         self._quarantine_dismissed = False
@@ -95,6 +96,51 @@ class RatureWindow(Adw.ApplicationWindow):
         self._timer_id = GLib.timeout_add_seconds(
             _ENSURE_DAY_INTERVAL_SECONDS, self._on_ensure_day_tick
         )
+
+    def _install_shortcuts(self) -> None:
+        # SPECIFICATION.md §3.11. AdwShortcutsDialog, not GtkShortcutsWindow
+        # (deprecated): built here rather than via set_help_overlay, so the
+        # win.show-help-overlay action and its accelerators are set by hand.
+        builder = Gtk.Builder.new_from_resource(
+            "/io/github/vertours/Rature/ui/shortcuts.ui"
+        )
+        self._help_overlay = builder.get_object("help_overlay")
+
+        rows = {
+            "view-day": self.day_sidebar_row,
+            "view-reserve": self.reserve_sidebar_row,
+            "view-recurring": self.recurring_sidebar_row,
+        }
+        for name, row in rows.items():
+            action = Gio.SimpleAction.new(name, None)
+            action.connect("activate", lambda _a, _p, r=row: self._show_view(r))
+            self.add_action(action)
+
+        undo = Gio.SimpleAction.new("undo-delete", None)
+        undo.connect(
+            "activate",
+            lambda _a, _p: self._run_app_action(self.app.undo_last_deletion),
+        )
+        undo.set_enabled(bool(self.app.session.day.deletions))
+        self.add_action(undo)
+        self._undo_delete_action = undo
+
+        help_action = Gio.SimpleAction.new("show-help-overlay", None)
+        help_action.connect("activate", lambda _a, _p: self._help_overlay.present(self))
+        self.add_action(help_action)
+
+        app = self.get_application()
+        app.set_accels_for_action("win.view-day", ["<Control>1"])
+        app.set_accels_for_action("win.view-reserve", ["<Control>2"])
+        app.set_accels_for_action("win.view-recurring", ["<Control>3"])
+        app.set_accels_for_action("win.undo-delete", ["<Control>z"])
+        app.set_accels_for_action("win.show-help-overlay", ["<Control>question", "F1"])
+
+    def _show_view(self, row: Gtk.ListBoxRow) -> None:
+        self.sidebar_list.select_row(row)
+        # SPECIFICATION.md §3.7: reveal the content page in the collapsed
+        # layout too, where selecting a row alone would keep the sidebar up.
+        self.split_view.set_show_content(True)
 
     def _on_destroy(self, _window: Gtk.Window) -> None:
         GLib.source_remove(self._timer_id)
@@ -113,6 +159,9 @@ class RatureWindow(Adw.ApplicationWindow):
         self.day_view.refresh()
         self.reserve_view.refresh()
         self.recurring_view.refresh()
+        # SPECIFICATION.md §3.2: the undo control, header button and
+        # Ctrl+Z alike, follows the day's deletion journal.
+        self._undo_delete_action.set_enabled(bool(self.app.session.day.deletions))
 
     def send_to_day(self, item_id: str) -> None:
         # SPECIFICATION.md §3.3: the Reserve view's send button and the
