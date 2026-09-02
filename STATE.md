@@ -6,11 +6,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 3, interface reconstruite en `.ui`
-- **Étape suivante** : adaptation aux fenêtres étroites
-  (`SPECIFICATION.md` §3.7), dernière étape du chantier 3. Vues Jour,
-  Réserve, Récurrentes et fenêtre d'archives complètes. Découpage
-  complet dans `docs/internal/ROADMAP.md`.
+- **Chantier en cours** : 4, confort et traductions
+- **Étape suivante** : à choisir avec l'auteur parmi la liste du
+  chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé entre
+  ses points.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -34,7 +33,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.8.0` | Fenêtre d'archives, en lecture seule, ouverte depuis le menu principal |
+| Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
@@ -79,6 +78,15 @@ manifeste (`CLAUDE.md` §4 règle 8).
   sans être lu, porte de couverture CI à 100 % avec `--cov-branch`,
   dependabot, version 0.2.0. Le chantier 3 peut commencer sans toucher au
   build.
+- **Chantier 3**, versions `0.3.0` à `0.9.0` (détail dans `CHANGELOG.md`) :
+  interface reconstruite en `.ui` — fenêtre principale (navigation
+  latérale, taille et état persistés par GSettings, À propos), vue Jour
+  (lecture, édition, réordonnancement par glisser-déposer), vue Réserve
+  (+ glisser-déposer d'un élément vers l'entrée Day), vue Récurrentes,
+  fenêtre d'archives en lecture seule (`App.archived_session`), et
+  l'adaptation aux fenêtres étroites (`AdwBreakpoint` sous 500 unités,
+  panneau latéral replié avec bouton retour). Couvre `SPECIFICATION.md`
+  §2 et §3 en entier.
 
 ## Documents
 
@@ -87,4 +95,5 @@ Cadrage relu, contradictions résolues, six cas limites tranchés en
 
 `SPECIFICATION.md` §3, spécification d'interface, ajoutée le 31 août 2026 :
 fenêtre principale, les trois vues, fenêtre d'archives, démarrage et refus,
-fenêtres étroites, textes et icônes. Lue avant toute PR de chantier 3.
+fenêtres étroites, textes et icônes. Entièrement couverte par le
+chantier 3, terminé.

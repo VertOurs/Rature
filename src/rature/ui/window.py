@@ -54,6 +54,11 @@ class RatureWindow(Adw.ApplicationWindow):
         self.recurring_view = RecurringView(app=app, run_action=self._run_app_action)
         self.recurring_page.set_child(self.recurring_view)
 
+        # SPECIFICATION.md §3.7: collapsed AdwNavigationSplitView shows the
+        # sidebar page unless show-content is set, so a narrow window would
+        # otherwise open on the sidebar list instead of the Day view.
+        self.split_view.set_show_content(True)
+
         # SPECIFICATION.md §3.3: a reserve row dragged onto the Day sidebar
         # entry draws it into the day. COPY, not MOVE: the source row
         # leaves the reserve as a business consequence of draw_from_reserve,
@@ -68,6 +73,7 @@ class RatureWindow(Adw.ApplicationWindow):
         self.connect("close-request", self._on_close_request)
         self.connect("destroy", self._on_destroy)
         self.sidebar_list.connect("row-selected", self._on_row_selected)
+        self.sidebar_list.connect("row-activated", self._on_row_activated)
 
         self._write_failure_active = False
         self._quarantine_dismissed = False
@@ -201,6 +207,13 @@ class RatureWindow(Adw.ApplicationWindow):
         # Day, Reserve, Recurring (SPECIFICATION.md §3.1).
         pages = (self.day_page, self.reserve_page, self.recurring_page)
         self.split_view.set_content(pages[row.get_index()])
+
+    def _on_row_activated(self, _list_box: Gtk.ListBox, _row: Gtk.ListBoxRow) -> None:
+        # SPECIFICATION.md §3.7: a click always navigates to the content
+        # page while collapsed, even when the row was already selected
+        # (returning to Day after the back button), a case "row-selected"
+        # does not fire for since the selection itself did not change.
+        self.split_view.set_show_content(True)
 
     def _restore_geometry(self) -> None:
         self.set_default_size(
