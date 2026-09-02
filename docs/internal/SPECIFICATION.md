@@ -555,7 +555,7 @@ Fenêtre distincte, ouverte depuis le menu principal, en lecture seule.
   empêcher de consulter les autres dates.
 - Aucune archive : `AdwStatusPage`, texte en §3.8.
 
-La recherche dans les archives est au chantier 4. Ne pas l'anticiper.
+La recherche dans les archives est spécifiée en §3.13.
 
 ---
 
@@ -630,6 +630,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Menu principal | `Archives`, `Keyboard Shortcuts`, `About Rature` |
 | Saisie du jour | `Add a task…` |
 | Saisie de la réserve | `Add to the reserve…` |
+| Recherche dans les archives | `Search the archives…` |
 | Menu de ligne | `Rename`, `Edit`, `Delete` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
 | Infobulle d'annulation de suppression | `Undo delete` |
@@ -644,6 +645,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Réserve vide | `The reserve is empty.` |
 | Récurrentes vides | `No recurring tasks.` |
 | Archives vides | `No archived days.` |
+| Archives sans correspondance | `No matching days.` |
 | Archive illisible | `This archive cannot be read.` |
 | Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |
@@ -774,3 +776,65 @@ Monday 31 August
 Côté `core`, une fonction pure `day_text(session)` produit ce texte.
 `App.day_text` et `App.archived_day_text(date)` l'exposent à l'interface, qui
 ne fait que l'écrire dans le presse-papier.
+
+---
+
+### 3.13 Recherche dans les archives
+
+Ajoutée au chantier 4. Un `GtkSearchEntry` en tête de la barre latérale de la
+fenêtre d'archives (§3.5), texte d'invite en §3.8. Il **filtre la liste des
+dates** : ne restent affichées que les journées contenant au moins une tâche,
+rayée ou en cours, dont le texte correspond à la requête. L'ordre est celui
+d'`App.archives()`, du plus récent au plus ancien, jamais retrié. Rien
+d'autre ne change dans la barre latérale : pas de compteur, pas d'aperçu,
+pas de résumé à côté d'une date, §3.5 reste vrai.
+
+**Correspondance.** Sous-chaîne, insensible à la casse **et aux accents**.
+Les deux côtés sont normalisés de la même façon : décomposition Unicode NFKD,
+retrait des marques diacritiques, puis `casefold`. Taper `reparer` trouve
+donc `réparer`. La requête est débarrassée de ses espaces de début et de fin
+avant comparaison. C'est un écart assumé avec le dédoublonnage du passage du
+jour (§2.5 point 3, « accents conservés ») : une recherche tolère l'à-peu-près,
+un dédoublonnage non.
+
+**Périmètre.** Seul le texte des tâches est recherché. Jamais la date, jamais
+le journal `deletions` : §2.2 et §2.6 interdisent d'exposer son contenu sous
+quelque forme que ce soit, recherche comprise. Une tâche supprimée n'est donc
+jamais trouvée.
+
+**Requête vide.** Toutes les dates, exactement le comportement d'avant la
+fonctionnalité, journaux illisibles compris.
+
+**Zéro résultat.** La barre latérale affiche un `AdwStatusPage`, texte
+`No matching days.` en §3.8. Le panneau de contenu est vidé, aucune journée
+n'est montrée, et le bouton Copy as text redevient inactif (§3.12).
+
+**Sélection.** Après application du filtre, si la date affichée figure encore
+dans la liste réduite elle reste sélectionnée ; sinon la première date
+restante est sélectionnée et affichée. Quand la requête est effacée, la liste
+complète revient et la date affichée, s'il y en a une, reste sélectionnée.
+
+**Au fil de la frappe.** Le filtre s'applique à chaque modification de la
+zone de saisie, après un court délai anti-rebond. La fenêtre garde en mémoire
+les archives déjà analysées pour toute sa durée de vie, afin de ne pas
+relire chaque fichier à chaque caractère. La fenêtre étant reconstruite à
+chaque ouverture (§3.5), ce cache ne survit jamais à une modification du
+dossier d'archives.
+
+**Archive illisible.** Une archive qui ne se lit pas ne peut pas être
+comparée : elle est absente des résultats dès qu'une requête est saisie. Elle
+n'apparaît que dans la liste non filtrée, où la sélectionner affiche le texte
+neutre prévu en §3.5. Une archive illisible ne fait jamais échouer la
+recherche entière.
+
+**Pas de mise en évidence.** Le panneau de contenu rend la journée comme en
+§3.5, sans marquer les tâches qui correspondent. La date filtrée suffit à
+indiquer où regarder.
+
+**Lecture seule.** Comme le reste de la fenêtre, la recherche ne modifie rien
+sur le disque.
+
+Côté `core`, une fonction pure travaille sur le contenu des archives.
+`App.search_archives(query)` rend les dates correspondantes, du plus récent
+au plus ancien, dans le même ordre qu'`App.archives()`. Une requête vide ou
+uniquement composée d'espaces rend la même liste qu'`App.archives()`.
