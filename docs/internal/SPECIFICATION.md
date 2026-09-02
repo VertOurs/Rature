@@ -713,10 +713,11 @@ Rien pour figer la liste ni pour rayer une tâche : aucune touche standard, et
 la souris ou au menu. `Ctrl+1/2/3` changent seulement la vue affichée, sans
 rien sélectionner dans les listes.
 
-**Fenêtre d'aide.** Un `GtkShortcutsWindow` chargé depuis un `.ui`, posé sur
-la fenêtre principale par `Adw.ApplicationWindow.set_help_overlay`. Cet appel
-crée l'action `win.show-help-overlay` et son accélérateur `Ctrl+?` ; `F1` est
-ajouté en plus. Une section, trois groupes :
+**Fenêtre d'aide.** Un `AdwShortcutsDialog` chargé depuis un `.ui`, ouvert
+par `present`. `GtkShortcutsWindow` est écarté : déprécié depuis GTK 4.18,
+et `CLAUDE.md` §9 impose les API stables. `set_help_overlay` n'acceptant
+qu'un `GtkShortcutsWindow`, l'action `win.show-help-overlay` et ses
+accélérateurs `Ctrl+?` et `F1` sont posés à la main. Trois sections :
 
 - **General** : Quitter, Keyboard Shortcuts
 - **Navigation** : les trois vues
