@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-02
+
+### Added
+
+- The main window adapts to narrow widths (SPECIFICATION.md §3.7): an
+  `AdwBreakpoint` collapses the `AdwNavigationSplitView` under 500 units
+  wide, turning the sidebar into its own page with a back button. The
+  Day view's entry bar and a task's full, unwrapped-into-ellipsis text
+  stay reachable in that layout, already true by construction. The
+  Reserve-to-Day sidebar drag is unavailable while collapsed, since the
+  sidebar entry it targets is off screen; the Reserve view's send
+  button already covers that case. Completes chantier 3.
+
+### Fixed
+
+- The sidebar list now always navigates to the selected page on click,
+  including re-selecting the row already active after using the back
+  button: `AdwNavigationSplitView.show-content` needs setting on every
+  activation, since `GtkListBox` does not re-emit `row-selected` for a
+  click that does not change the selection.
+
 ## [0.8.0] - 2026-09-02
 
 ### Added
@@ -155,7 +176,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/VertOurs/Rature/releases/tag/v0.9.0
 [0.8.0]: https://github.com/VertOurs/Rature/releases/tag/v0.8.0
 [0.7.0]: https://github.com/VertOurs/Rature/releases/tag/v0.7.0
 [0.6.0]: https://github.com/VertOurs/Rature/releases/tag/v0.6.0

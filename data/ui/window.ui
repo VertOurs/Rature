@@ -99,6 +99,15 @@
         </property>
       </object>
     </property>
+    <child>
+      <object class="AdwBreakpoint">
+        <!-- SPECIFICATION.md §3.7: under 500 units wide, the sidebar
+             becomes a page of its own, with a back button libadwaita
+             adds automatically to the content page's AdwHeaderBar. -->
+        <condition>max-width: 500sp</condition>
+        <setter object="split_view" property="collapsed">True</setter>
+      </object>
+    </child>
   </template>
   <object class="AdwNavigationPage" id="reserve_page">
     <property name="title" translatable="yes">Reserve</property>

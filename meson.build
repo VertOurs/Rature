@@ -3,7 +3,7 @@
 
 project(
   'rature',
-  version: '0.8.0',
+  version: '0.9.0',
   license: 'GPL-3.0-or-later',
   meson_version: '>= 1.9',
 )
