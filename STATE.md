@@ -9,13 +9,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Chantier en cours** : 4, confort et traductions. Démarré le
   2 septembre 2026, dette d'avant-chantier soldée (voir « Chantiers
   terminés »).
-- **Fait au chantier 4** (chaque item : spec, puis `core`, puis `ui`) :
+- **Fait au chantier 4** :
   - Annulation de la dernière suppression. PR #49, #51, #52.
   - Ajout d'une tâche déjà rayée par Maj+Entrée. PR #55, #56, #57.
+  - Raccourcis clavier et fenêtre d'aide (`AdwShortcutsDialog`,
+    `GtkShortcutsWindow` déprécié). `Ctrl+1/2/3`, `Ctrl+Z`, `Ctrl+?`/`F1`,
+    item de menu ; Maj+Entrée y est listé. PR #59, #60.
 - **Étape suivante** : à choisir avec l'auteur parmi les points restants
-  du chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé.
-  À faire un jour : lister Maj+Entrée dans la future fenêtre d'aide des
-  raccourcis, seul point d'accès à l'ajout rayé.
+  du chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé
+  (recherche archives, export texte, traduction FR complète,
+  fenêtre Statistiques).
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -42,11 +45,11 @@ manifeste (`CLAUDE.md` §4 règle 8).
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
-`[Unreleased]` dans `CHANGELOG.md` accumule deux fonctionnalités
-(annulation de la dernière suppression, ajout d'une tâche déjà rayée) et
-deux correctifs (PR #44, plantage au démarrage ; PR #46, titre d'en-tête).
-Une fonctionnalité impose un incrément **mineur** : la prochaine release
-sera `0.10.0`.
+`[Unreleased]` dans `CHANGELOG.md` accumule trois fonctionnalités
+(annulation de la dernière suppression, ajout d'une tâche déjà rayée,
+raccourcis clavier et fenêtre d'aide) et deux correctifs (PR #44, plantage
+au démarrage ; PR #46, titre d'en-tête). Une fonctionnalité impose un
+incrément **mineur** : la prochaine release sera `0.10.0`.
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
 `STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
