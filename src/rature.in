@@ -15,6 +15,7 @@ PKGDATADIR = "@PKGDATADIR@"
 sys.path.insert(1, PKGDATADIR)
 
 from rature.config import LOCALEDIR  # noqa: E402
+from rature.i18n import align_time_locale  # noqa: E402
 
 # Ctrl+C in a terminal must kill the app, not surface as a KeyboardInterrupt
 # inside the GTK main loop.
@@ -28,6 +29,11 @@ try:
     locale.setlocale(locale.LC_ALL, "")
 except locale.Error:
     pass
+
+# setlocale(LC_ALL, "") follows LC_TIME/LANG but ignores LANGUAGE, so the
+# dates could stay in a different language than the interface. Realign
+# LC_TIME with the message language (SPECIFICATION.md §3.8).
+align_time_locale(environ=os.environ)
 
 # gettext's own bindtextdomain/textdomain, not locale's: they are what
 # backs gettext.gettext, and every module reaches it through
