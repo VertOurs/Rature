@@ -15,9 +15,12 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   - Raccourcis clavier et fenêtre d'aide (`AdwShortcutsDialog`,
     `GtkShortcutsWindow` déprécié). `Ctrl+1/2/3`, `Ctrl+Z`, `Ctrl+?`/`F1`,
     item de menu ; Maj+Entrée y est listé. PR #59, #60.
+  - Export d'une journée en texte : bouton Copy as text dans l'en-tête de
+    la vue Jour et de la fenêtre d'archives, vers le presse-papier.
+    `core.export.day_text`. PR #62, #63, #64.
 - **Étape suivante** : à choisir avec l'auteur parmi les points restants
   du chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé
-  (recherche archives, export texte, traduction FR complète,
+  (recherche archives, traduction FR complète,
   fenêtre Statistiques).
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
@@ -45,11 +48,12 @@ manifeste (`CLAUDE.md` §4 règle 8).
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
-`[Unreleased]` dans `CHANGELOG.md` accumule trois fonctionnalités
+`[Unreleased]` dans `CHANGELOG.md` accumule quatre fonctionnalités
 (annulation de la dernière suppression, ajout d'une tâche déjà rayée,
-raccourcis clavier et fenêtre d'aide) et deux correctifs (PR #44, plantage
-au démarrage ; PR #46, titre d'en-tête). Une fonctionnalité impose un
-incrément **mineur** : la prochaine release sera `0.10.0`.
+raccourcis clavier et fenêtre d'aide, export d'une journée en texte) et
+deux correctifs (PR #44, plantage au démarrage ; PR #46, titre d'en-tête).
+Une fonctionnalité impose un incrément **mineur** : la prochaine release
+sera `0.10.0`.
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
 `STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
