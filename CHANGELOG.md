@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Copy a day as plain text (SPECIFICATION.md §3.12): a Copy as text button
+  in the Day view and the Archives window header puts the shown day on the
+  clipboard — the long-form date, then one `[x]`/`[ ]` line per task in the
+  on-screen order. Deleted tasks never appear. No file, no dialog, no
+  confirmation.
 - Keyboard shortcuts and a help window (SPECIFICATION.md §3.11):
   Ctrl+1/2/3 switch to the Day, Reserve and Recurring views, Ctrl+Z undoes
   the last deletion, and Ctrl+? or F1 open an `AdwShortcutsDialog` listing

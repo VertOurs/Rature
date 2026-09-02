@@ -35,6 +35,17 @@
                 </style>
               </object>
             </child>
+            <!-- Leftmost of the three: SPECIFICATION.md §3.2 / §3.12. -->
+            <child type="end">
+              <object class="GtkButton" id="copy_button">
+                <property name="icon-name">edit-copy-symbolic</property>
+                <property name="valign">center</property>
+                <property name="tooltip-text" translatable="yes">Copy as text</property>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
           </object>
         </child>
         <child type="bottom">
