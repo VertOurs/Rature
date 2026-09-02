@@ -205,3 +205,7 @@ Noté ici pour ne pas y penser pendant les chantiers.
 - **Synchronisation entre machines.** Écartée.
 - **Version mobile et capture depuis le téléphone.** Écartées le 24 août
   2026. Le projet reste une application de bureau sur un seul poste.
+- **Traduction espéranto.** Hors MVP v1. Le pipeline gettext la rendrait
+  possible sans travail d'infrastructure, un simple catalogue `eo/` ; à
+  réévaluer après la 1.0 si le besoin se confirme. « Français en priorité »
+  reste la seule langue engagée (décisions figées, `CLAUDE.md` §3).
