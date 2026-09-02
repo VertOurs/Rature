@@ -189,6 +189,16 @@ def test_add_saves_immediately(tmp_path: Path) -> None:
     assert [task.text for task in reloaded.day.tasks] == ["first"]
 
 
+def test_add_struck_saves_a_struck_task(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    task = app.add_struck("already done")
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert task.num == 1
+    assert reloaded.day.tasks[0].done is True
+    assert reloaded.day.tasks[0].done_at == now
+
+
 def test_mutation_wrappers_persist_through_a_full_walkthrough(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))

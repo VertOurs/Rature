@@ -173,6 +173,11 @@ class App:
         self._save()
         return task
 
+    def add_struck(self, text: str) -> Task:
+        task = self.session.add_struck(text, now=self.clock())
+        self._save()
+        return task
+
     def strike(self, task_id: str) -> None:
         self.session.strike(task_id, now=self.clock())
         self._save()

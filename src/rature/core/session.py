@@ -102,6 +102,27 @@ class Session:
         self.day.tasks.append(task)
         return task
 
+    def add_struck(self, text: str, *, now: datetime) -> Task:
+        """Add a task already struck: SPECIFICATION.md §2.4's retroactive
+        logging in one gesture instead of add then strike.
+
+        Same as add() plus an immediate strike; view() lifts it into the
+        struck block. Refused on a frozen list, like any add (§2.1
+        point 3).
+        """
+        if self.day.locked:
+            raise LockedError("the list is frozen")
+        task = Task(
+            num=self.day.counter,
+            text=text,
+            origin=Origin.DAY,
+            done=True,
+            done_at=_stamp(now),
+        )
+        self.day.counter += 1
+        self.day.tasks.append(task)
+        return task
+
     def strike(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
         if task.done:
