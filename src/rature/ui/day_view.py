@@ -108,7 +108,12 @@ class DayView(Adw.Bin):
         self, _controller: Gtk.EventControllerKey, keyval: int, _keycode: int, state
     ) -> bool:
         enter = keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_ISO_Enter)
-        if enter and state & Gdk.ModifierType.SHIFT_MASK:
+        # SPECIFICATION.md §3.2: Shift+Enter, and only that. Mask against
+        # the accelerator modifiers so a chord that also holds Ctrl, Alt or
+        # Super does not slip through and silently add a struck task.
+        accel_mods = Gtk.accelerator_get_default_mod_mask()
+        bare_shift = state & accel_mods == Gdk.ModifierType.SHIFT_MASK
+        if enter and bare_shift:
             self._submit(struck=True)
             return True
         return False
