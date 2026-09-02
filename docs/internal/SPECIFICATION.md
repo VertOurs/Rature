@@ -870,19 +870,20 @@ ancien, exactement l'ordre d'`App.archives()`. Cinq colonnes, en-têtes en
 §3.8 :
 
 ```
-┌────────────────┬───────┬────────┬─────────┬────────────┐
-│ Day            │ Added │ Struck │ Deleted │ To reserve │
-├────────────────┼───────┼────────┼─────────┼────────────┤
-│ 30 August 2026 │   7   │   5    │    1    │     2      │
-│ 29 August 2026 │   4   │   4    │    0    │     0      │
-│ 28 August 2026 │   9   │   6    │    2    │     1      │
-├────────────────┼───────┼────────┼─────────┼────────────┤
-│ Total          │  20   │   15   │    3    │     3      │
-└────────────────┴───────┴────────┴─────────┴────────────┘
+┌────────────────────┬───────┬────────┬─────────┬────────────┐
+│ Day                │ Added │ Struck │ Deleted │ To reserve │
+├────────────────────┼───────┼────────┼─────────┼────────────┤
+│ Sunday 30 August   │   7   │   5    │    1    │     2      │
+│ Saturday 29 August │   4   │   4    │    0    │     0      │
+│ Friday 28 August   │   9   │   6    │    2    │     1      │
+├────────────────────┼───────┼────────┼─────────┼────────────┤
+│ Total              │  20   │   15   │    3    │     3      │
+└────────────────────┴───────┴────────┴─────────┴────────────┘
 ```
 
-- **Day** : la date de la journée, format long local, comme le titre de la
-  vue Jour et de la fenêtre d'archives.
+- **Day** : la date de la journée en format long local avec le jour de la
+  semaine (`%A %d %B`), comme les titres d'en-tête de la vue Jour et de la
+  fenêtre d'archives.
 - **Added** : `len(day.tasks) + len(day.deletions)`, c'est à dire toute
   tâche ayant reçu un numéro ce jour-là, égal à `day.counter - 1`. Le
   journal `deletions` n'est utilisé que pour son **nombre d'entrées**,

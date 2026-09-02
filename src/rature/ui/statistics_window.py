@@ -49,7 +49,7 @@ class StatisticsWindow(Adw.Window):
         for day_date, counts in stats:
             self.rows.append(
                 StatisticsRow(
-                    date_text=day_date.strftime("%d %B %Y"),
+                    date_text=day_date.strftime("%A %d %B"),
                     added=counts.added,
                     struck=counts.struck,
                     deleted=counts.deleted,
