@@ -164,6 +164,12 @@ class RatureWindow(Adw.ApplicationWindow):
         # skipping it would leave the screen contradicting the session
         # until the next timer tick. For a business error nothing changed,
         # and the redraw is a no-op.
+        #
+        # _refresh_all rebuilds the list rows, and this often runs from
+        # inside a row's own "clicked" or "drop" handler (strike, delete,
+        # reorder). Removing that row mid-emission is safe: GTK holds a
+        # reference for the length of the signal, and the bound handler
+        # keeps its own until it returns.
         success = self._perform(action)
         self._refresh_all()
         return success
