@@ -10,6 +10,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Étape suivante** : à choisir avec l'auteur parmi la liste du
   chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé entre
   ses points.
+- **Revue de code du 2 septembre 2026** : traitée. Deux refactors sans
+  effet fonctionnel, fusionnés (PR #38, liaison ligne de la sidebar vers
+  sa page ; PR #39, annotations de retour dans `RatureApplication`).
+  Rien d'ouvert côté revue.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
