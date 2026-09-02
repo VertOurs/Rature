@@ -122,7 +122,12 @@ Reconstruction en `.ui`, branchée sur un coeur déjà testé.
       `deletions`, puis retrait de l'entrée
 - [ ] Recherche dans les archives
 - [ ] Export d'une journée en texte
-- [ ] Traduction française complète
+- [ ] Traduction française complète. Cohérence de langue de bout en bout :
+      les chaînes de l'interface, la date de l'en-tête et les noms de
+      jours (`SPECIFICATION.md` §3.4) sont dans la même langue, jamais une
+      traduction partielle. Cas à traiter : une machine dont `LC_MESSAGES`
+      et `LC_TIME` divergent, où la date pourrait rester dans une autre
+      langue que l'interface
 - [ ] Fenêtre Statistiques, périmètre défini en `SPECIFICATION.md` §2.6
 
 **Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
