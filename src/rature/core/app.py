@@ -14,7 +14,8 @@ from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
 
-from rature.core import export, storage
+from rature.core import export, search, storage
+from rature.core.migrations import FutureVersionError
 from rature.core.models import RecurringItem, ReserveItem, Task
 
 # LockedError re-exported: ui/ may only import rature.core.app, and its
@@ -145,6 +146,27 @@ class App:
     def archives(self) -> list[date]:
         """Dates with an archived day, most recent first."""
         return storage.list_archives(data_dir=self.data_dir)
+
+    def search_archives(self, query: str) -> list[date]:
+        """SPECIFICATION.md §3.13: archived dates holding a task that matches query.
+
+        Same order as archives(), most recent first. A query that is empty
+        or only whitespace returns archives() unchanged. An archive that
+        fails to read is skipped, never raised: one unreadable file does
+        not sink the whole search (§3.5, §3.13). Matching is the case- and
+        accent-insensitive substring test of search.day_matches.
+        """
+        if not query.strip():
+            return self.archives()
+        matches: list[date] = []
+        for day_date in self.archives():
+            try:
+                day = self.read_archive(day_date)
+            except (OSError, ValueError, KeyError, TypeError, FutureVersionError):
+                continue
+            if search.day_matches(day, query):
+                matches.append(day_date)
+        return matches
 
     def read_archive(self, day_date: date) -> Day:
         """Load one archived day. See storage.load_archive for what can raise."""
