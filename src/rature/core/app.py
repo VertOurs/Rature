@@ -14,7 +14,7 @@ from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
 
-from rature.core import storage
+from rature.core import export, storage
 from rature.core.models import RecurringItem, ReserveItem, Task
 
 # LockedError re-exported: ui/ may only import rature.core.app, and its
@@ -159,6 +159,18 @@ class App:
         reads from the live session. Raises whatever read_archive raises.
         """
         return Session(self.read_archive(day_date))
+
+    def day_text(self) -> str:
+        """SPECIFICATION.md §3.12: the current day as plain text."""
+        return export.day_text(self.session)
+
+    def archived_day_text(self, day_date: date) -> str:
+        """SPECIFICATION.md §3.12: an archived day as plain text.
+
+        Raises whatever archived_session raises for a missing or unreadable
+        archive.
+        """
+        return export.day_text(self.archived_session(day_date))
 
     def _save(self) -> None:
         storage.save(Store.from_session(self.session), data_dir=self.data_dir)
