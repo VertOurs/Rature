@@ -40,6 +40,12 @@ def migrate(
 ) -> dict:
     """Bring a raw data dict up to ``target``, or raise if it cannot."""
     steps = _MIGRATIONS if registry is None else registry
+    if not isinstance(data, dict):
+        # A valid JSON file whose top level is a list, string or number:
+        # data.get below would raise AttributeError, which neither App.open
+        # nor the Archives window catches. Fold it into the corrupted-file
+        # path they already handle.
+        raise ValueError(f"data must be a JSON object, got {type(data).__name__}")
     version = data.get("version")
     if not isinstance(version, int) or isinstance(version, bool) or version < 1:
         raise ValueError(f"missing or invalid data version: {version!r}")

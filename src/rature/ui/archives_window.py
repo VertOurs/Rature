@@ -55,6 +55,10 @@ class ArchivesWindow(Adw.Window):
         self.sidebar_stack.set_visible_child_name("dates" if self._dates else "empty")
         self.date_list.connect("row-selected", self._on_row_selected)
         if self._dates:
+            # Fires _on_row_selected synchronously, so the first archived
+            # day is read from disk before __init__ returns. Archives are
+            # small single-day files and the window is not shown yet, so
+            # the blocking read is not worth deferring to an idle callback.
             self.date_list.select_row(self.date_list.get_row_at_index(0))
         else:
             self.content_stack.set_visible_child_name("no-archives")
