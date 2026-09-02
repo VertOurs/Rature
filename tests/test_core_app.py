@@ -181,6 +181,32 @@ def test_archived_session_raises_for_an_unknown_date(tmp_path: Path) -> None:
         app.archived_session(date(2026, 8, 1))
 
 
+def test_day_text_renders_the_current_day(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    task = app.add("buy bread")
+    app.strike(task.id)
+    assert app.day_text() == "Monday 24 August\n\n[x] 1  buy bread"
+
+
+def test_archived_day_text_renders_an_archived_day(tmp_path: Path) -> None:
+    save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(save_now))
+    app.add("finish the meson file")
+    app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
+    app.ensure_day()
+    assert app.archived_day_text(date(2026, 8, 23)) == (
+        "Sunday 23 August\n\n[ ] 1  finish the meson file"
+    )
+
+
+def test_archived_day_text_raises_for_an_unknown_date(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    with pytest.raises(FileNotFoundError):
+        app.archived_day_text(date(2026, 8, 1))
+
+
 def test_add_saves_immediately(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))
