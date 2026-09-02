@@ -13,6 +13,8 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gdk, Gtk  # noqa: E402
 
+from rature.ui.inline_rename import InlineRename  # noqa: E402
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -64,16 +66,14 @@ class ReserveRow(Gtk.ListBoxRow):
         self.rename_button.connect("clicked", self._on_rename_clicked)
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
-        self._editing = False
-        self.rename_entry.connect(
-            "activate", lambda _entry: self.commit_pending_rename()
+        self._rename = InlineRename(
+            entry=self.rename_entry,
+            label=self.text_label,
+            current_text=lambda: self.item.text,
+            commit=lambda text: self.perform(
+                lambda: self.app.rename_reserve(self.item.id, text)
+            ),
         )
-        key_controller = Gtk.EventControllerKey()
-        key_controller.connect("key-pressed", self._on_rename_key_pressed)
-        self.rename_entry.add_controller(key_controller)
-        focus_controller = Gtk.EventControllerFocus()
-        focus_controller.connect("leave", lambda _c: self.commit_pending_rename())
-        self.rename_entry.add_controller(focus_controller)
 
         # SPECIFICATION.md §3.3: the row is a drag source carrying the
         # item id; the Day sidebar entry is the target. COPY, not MOVE:
@@ -105,43 +105,8 @@ class ReserveRow(Gtk.ListBoxRow):
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
-        self._editing = True
-        self.rename_entry.set_text(self.item.text)
-        self.text_label.set_visible(False)
-        self.rename_entry.set_visible(True)
-        self.rename_entry.grab_focus()
-        self.rename_entry.select_region(0, -1)
-
-    def _on_rename_key_pressed(
-        self, _controller: Gtk.EventControllerKey, keyval: int, _keycode: int, _state
-    ) -> bool:
-        if keyval == Gdk.KEY_Escape:
-            self._cancel_rename()
-            return True
-        return False
-
-    def _cancel_rename(self) -> None:
-        # SPECIFICATION.md §3.2: Escape discards the typed text outright,
-        # unlike Enter or losing focus, which both commit.
-        if not self._editing:
-            return
-        self._editing = False
-        self.rename_entry.set_visible(False)
-        self.text_label.set_visible(True)
+        self._rename.begin()
 
     def commit_pending_rename(self) -> None:
-        """Validate an in-progress rename. A no-op if not editing.
-
-        Never triggers a view refresh: called both on Enter/focus-out and,
-        by ReserveView, to flush a pending edit before it rebuilds rows.
-        The label is updated locally instead, which is enough either way.
-        """
-        if not self._editing:
-            return
-        text = self.rename_entry.get_text().strip()
-        self._editing = False
-        self.rename_entry.set_visible(False)
-        self.text_label.set_visible(True)
-        if text and text != self.item.text:
-            self.text_label.set_label(text)
-            self.perform(lambda: self.app.rename_reserve(self.item.id, text))
+        """Flush a pending edit, e.g. before ReserveView rebuilds its rows."""
+        self._rename.commit()

@@ -13,8 +13,9 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.ui import list_helpers  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
 
 if TYPE_CHECKING:
@@ -98,24 +99,7 @@ class DayView(Adw.Bin):
         if self.run_action(lambda: self.app.add(text)):
             entry.set_text("")
             entry.grab_focus()
-            self._scroll_to_bottom()
-
-    def _scroll_to_bottom(self) -> None:
-        # A fresh add is always appended last in the active block, so
-        # scrolling to the bottom is scrolling to it. GLib.idle_add defers
-        # this past the new row's own allocation, so the adjustment's
-        # upper bound already accounts for it by the time this runs.
-        #
-        # Replaces an earlier grab_focus()-based approach (focusing the
-        # row, then the entry again) that never actually scrolled anything
-        # when checked against a real window: confirmed by hand, not by
-        # reasoning about the API.
-        def scroll_once() -> bool:
-            adjustment = self.scrolled_window.get_vadjustment()
-            adjustment.set_value(adjustment.get_upper() - adjustment.get_page_size())
-            return GLib.SOURCE_REMOVE
-
-        GLib.idle_add(scroll_once)
+            list_helpers.scroll_to_bottom(self.scrolled_window)
 
     def _on_lock_clicked(self, _button: Gtk.Button) -> None:
         if self.app.session.day.locked:
@@ -125,14 +109,11 @@ class DayView(Adw.Bin):
 
     def _commit_pending_renames(self) -> None:
         for list_box in (self.struck_list, self.active_list):
-            row = list_box.get_row_at_index(0)
-            while row is not None:
+            for row in list_helpers.rows(list_box):
                 row.commit_pending_rename()
-                row = row.get_next_sibling()
 
     def _fill(self, list_box: Gtk.ListBox, tasks: Iterable[Task]) -> None:
-        while (row := list_box.get_row_at_index(0)) is not None:
-            list_box.remove(row)
+        list_helpers.clear(list_box)
         for task in tasks:
             list_box.append(
                 TaskRow(

@@ -12,8 +12,9 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.ui import list_helpers  # noqa: E402
 from rature.ui.reserve_row import ReserveRow  # noqa: E402
 
 if TYPE_CHECKING:
@@ -62,8 +63,7 @@ class ReserveView(Adw.Bin):
         # user was mid-typing.
         self._commit_pending_renames()
         reserve = self.app.session.reserve
-        while (row := self.item_list.get_row_at_index(0)) is not None:
-            self.item_list.remove(row)
+        list_helpers.clear(self.item_list)
         for item in reserve:
             self.item_list.append(
                 ReserveRow(
@@ -85,22 +85,8 @@ class ReserveView(Adw.Bin):
         if self.run_action(lambda: self.app.add_to_reserve(text)):
             entry.set_text("")
             entry.grab_focus()
-            self._scroll_to_bottom()
-
-    def _scroll_to_bottom(self) -> None:
-        # A fresh add is appended last, so scrolling to the bottom is
-        # scrolling to it. GLib.idle_add defers this past the new row's own
-        # allocation, so the adjustment's upper bound already accounts for
-        # it by the time this runs. Same approach as the Day view.
-        def scroll_once() -> bool:
-            adjustment = self.scrolled_window.get_vadjustment()
-            adjustment.set_value(adjustment.get_upper() - adjustment.get_page_size())
-            return GLib.SOURCE_REMOVE
-
-        GLib.idle_add(scroll_once)
+            list_helpers.scroll_to_bottom(self.scrolled_window)
 
     def _commit_pending_renames(self) -> None:
-        row = self.item_list.get_row_at_index(0)
-        while row is not None:
+        for row in list_helpers.rows(self.item_list):
             row.commit_pending_rename()
-            row = row.get_next_sibling()

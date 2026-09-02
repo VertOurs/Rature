@@ -15,6 +15,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gtk  # noqa: E402
 
 from rature.core.migrations import FutureVersionError  # noqa: E402
+from rature.ui import list_helpers  # noqa: E402
 from rature.ui.archive_date_row import ArchiveDateRow  # noqa: E402
 from rature.ui.archive_task_row import ArchiveTaskRow  # noqa: E402
 
@@ -73,8 +74,8 @@ class ArchivesWindow(Adw.Window):
         # weekday-day-month long form as the Day view's title. The label
         # lives in the .ui; only its text changes as the selection moves.
         self.title.set_label(day_date.strftime("%A %d %B"))
-        self._clear(self.struck_list)
-        self._clear(self.active_list)
+        list_helpers.clear(self.struck_list)
+        list_helpers.clear(self.active_list)
         try:
             # SPECIFICATION.md §3.2: block order is Session.view()'s, never
             # recomputed here. archived_session hands back the same
@@ -92,8 +93,3 @@ class ArchivesWindow(Adw.Window):
         self.content_stack.set_visible_child_name(
             "tasks" if session.day.tasks else "empty"
         )
-
-    @staticmethod
-    def _clear(list_box: Gtk.ListBox) -> None:
-        while (row := list_box.get_row_at_index(0)) is not None:
-            list_box.remove(row)
