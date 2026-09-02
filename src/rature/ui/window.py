@@ -33,6 +33,8 @@ class RatureWindow(Adw.ApplicationWindow):
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()
     sidebar_list: Gtk.ListBox = Gtk.Template.Child()
     day_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
+    reserve_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
+    recurring_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     day_page: Adw.NavigationPage = Gtk.Template.Child()
     reserve_page: Adw.NavigationPage = Gtk.Template.Child()
     recurring_page: Adw.NavigationPage = Gtk.Template.Child()
@@ -53,6 +55,12 @@ class RatureWindow(Adw.ApplicationWindow):
         self.reserve_page.set_child(self.reserve_view)
         self.recurring_view = RecurringView(app=app, run_action=self._run_app_action)
         self.recurring_page.set_child(self.recurring_view)
+
+        # Each sidebar row carries the content page it selects, so
+        # _on_row_selected never depends on the row order in window.ui.
+        self.day_sidebar_row.page = self.day_page
+        self.reserve_sidebar_row.page = self.reserve_page
+        self.recurring_sidebar_row.page = self.recurring_page
 
         # SPECIFICATION.md §3.7: collapsed AdwNavigationSplitView shows the
         # sidebar page unless show-content is set, so a narrow window would
@@ -203,10 +211,7 @@ class RatureWindow(Adw.ApplicationWindow):
     ) -> None:
         if row is None:
             return
-        # Fixed order, matching the sidebar rows in window.ui:
-        # Day, Reserve, Recurring (SPECIFICATION.md §3.1).
-        pages = (self.day_page, self.reserve_page, self.recurring_page)
-        self.split_view.set_content(pages[row.get_index()])
+        self.split_view.set_content(row.page)
 
     def _on_row_activated(self, _list_box: Gtk.ListBox, _row: Gtk.ListBoxRow) -> None:
         # SPECIFICATION.md §3.7: a click always navigates to the content

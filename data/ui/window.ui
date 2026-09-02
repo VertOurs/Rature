@@ -57,7 +57,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBoxRow">
+                      <object class="GtkListBoxRow" id="reserve_sidebar_row">
                         <property name="child">
                           <object class="GtkLabel">
                             <property name="label" translatable="yes">Reserve</property>
@@ -71,7 +71,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBoxRow">
+                      <object class="GtkListBoxRow" id="recurring_sidebar_row">
                         <property name="child">
                           <object class="GtkLabel">
                             <property name="label" translatable="yes">Recurring</property>
