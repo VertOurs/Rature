@@ -207,6 +207,76 @@ def test_archived_day_text_raises_for_an_unknown_date(tmp_path: Path) -> None:
         app.archived_day_text(date(2026, 8, 1))
 
 
+def _two_archives(tmp_path: Path) -> App:
+    """archive/2026-08-20 = ["call the dentist"], 2026-08-21 = ["answer the email"]."""
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    app.add("call the dentist")
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    app.add("answer the email")
+    app.clock = clock_at(datetime(2026, 8, 22, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    return app
+
+
+def test_search_archives_returns_only_days_with_a_match(tmp_path: Path) -> None:
+    app = _two_archives(tmp_path)
+    assert app.search_archives("dentist") == [date(2026, 8, 20)]
+    assert app.search_archives("email") == [date(2026, 8, 21)]
+
+
+def test_search_archives_with_no_match_returns_an_empty_list(tmp_path: Path) -> None:
+    assert _two_archives(tmp_path).search_archives("helicopter") == []
+
+
+def test_search_archives_blank_query_returns_every_archive(tmp_path: Path) -> None:
+    app = _two_archives(tmp_path)
+    assert app.search_archives("") == app.archives()
+    assert app.search_archives("   ") == app.archives()
+
+
+def test_search_archives_keeps_the_most_recent_first_order(tmp_path: Path) -> None:
+    app = _two_archives(tmp_path)
+    assert app.search_archives("the") == [date(2026, 8, 21), date(2026, 8, 20)]
+
+
+def test_search_archives_is_accent_and_case_insensitive(tmp_path: Path) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    app.add("Réparer le vélo")
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    assert app.search_archives("REPARER LE VELO") == [date(2026, 8, 20)]
+
+
+def test_search_archives_matches_a_struck_task(tmp_path: Path) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
+    task = app.add("finish the report")
+    app.strike(task.id)
+    app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
+    app.ensure_day()
+    assert app.search_archives("report") == [date(2026, 8, 20)]
+
+
+def test_search_archives_skips_an_unreadable_archive(tmp_path: Path) -> None:
+    app = _two_archives(tmp_path)
+    (tmp_path / "archive" / "2026-08-19.json").write_text("not json", encoding="utf-8")
+    assert app.search_archives("dentist") == [date(2026, 8, 20)]
+
+
+def test_search_archives_skips_a_future_version_archive(tmp_path: Path) -> None:
+    app = _two_archives(tmp_path)
+    (tmp_path / "archive" / "2026-08-19.json").write_text(
+        '{"version": 99}', encoding="utf-8"
+    )
+    assert app.search_archives("dentist") == [date(2026, 8, 20)]
+
+
+def test_search_archives_on_a_fresh_app_is_empty(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+    assert app.search_archives("anything") == []
+
+
 def test_add_saves_immediately(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))
