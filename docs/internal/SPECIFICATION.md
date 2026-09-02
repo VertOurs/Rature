@@ -662,6 +662,14 @@ bascules du formulaire, ne figurent pas dans cette liste : ils sont dérivés
 de la locale par `strftime` (§3.4), n'entrent jamais au catalogue et sont
 donc corrects dans toutes les langues sans traduction à écrire.
 
+**Cohérence de langue.** Les noms de jours et les dates longues (titre de la
+vue Jour, de la fenêtre d'archives, colonne Day des Statistiques) suivent la
+même langue que l'interface, y compris sur une machine où `LANGUAGE` et
+`LC_TIME` divergent : le lanceur réaligne `LC_TIME` sur la langue des
+messages au démarrage. Si la locale correspondante n'est pas installée sur
+la machine, la date peut rester dans une autre langue ; c'est une limite du
+système, pas un choix de l'application.
+
 ---
 
 ### 3.9 Icônes
