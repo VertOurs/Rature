@@ -172,6 +172,16 @@ class App:
         """Load one archived day. See storage.load_archive for what can raise."""
         return storage.load_archive(day_date, data_dir=self.data_dir)
 
+    def archive_matches(self, day: Day, query: str) -> bool:
+        """SPECIFICATION.md §3.13's match test against an already-loaded day.
+
+        The Archives window reads each archive once (read_archive) and
+        keeps the Day for its lifetime, then filters with this instead of
+        search_archives, which would reread every file per keystroke.
+        ui/ goes through App and never imports rature.core.search.
+        """
+        return search.day_matches(day, query)
+
     def archived_session(self, day_date: date) -> Session:
         """A read-only Session wrapping one archived day.
 
