@@ -193,6 +193,11 @@ class App:
         self.session.move_before(task_id, target_id)
         self._save()
 
+    def undo_last_deletion(self) -> Task:
+        task = self.session.undo_last_deletion()
+        self._save()
+        return task
+
     def lock(self) -> None:
         self.session.lock()
         self._save()

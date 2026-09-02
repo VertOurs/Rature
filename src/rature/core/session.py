@@ -139,6 +139,33 @@ class Session:
         )
         self.day.tasks.remove(task)
 
+    def undo_last_deletion(self) -> Task:
+        """Restore the most recently deleted task and drop its journal entry.
+
+        SPECIFICATION.md §3.2: the task reappears at its recorded index
+        with its original number, struck iff it was struck. The entry
+        leaves the journal so the §2.6 count stays exact (ADR 0005). The
+        index is clamped: adds, other deletes or a reorder since may have
+        left no slot at the original position. The counter is untouched,
+        so the freed number is still never reused (§2.4).
+        """
+        if not self.day.deletions:
+            raise ValueError("no deletion to undo")
+        entry = self.day.deletions.pop()
+        task = Task(
+            id=entry.id,
+            num=entry.num,
+            text=entry.text,
+            origin=entry.origin,
+            done=entry.done,
+            done_at=entry.done_at,
+            source_id=entry.source_id,
+            source_created=entry.source_created,
+            template_id=entry.template_id,
+        )
+        self.day.tasks.insert(min(entry.index, len(self.day.tasks)), task)
+        return task
+
     def reorder(self, ordered_ids: list[str]) -> None:
         by_id = {task.id: task for task in self.day.tasks}
         if len(ordered_ids) != len(by_id) or set(ordered_ids) != set(by_id):
