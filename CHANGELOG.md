@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add a task already struck (SPECIFICATION.md §3.2): Shift+Enter in the
+  Day view entry logs the task straight into the struck block in one
+  gesture instead of add-then-strike, for retroactive logging. Same
+  numbering as a normal add, the list scrolls up to the new task, and it
+  is refused while the list is frozen like any add.
 - Undo the last deletion (SPECIFICATION.md §3.2): a header button in the
   Day view restores the most recently deleted task of the current day at
   its original position and number, struck if it was struck, then drops
