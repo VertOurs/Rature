@@ -59,6 +59,37 @@ def test_every_ui_file_is_in_potfiles() -> None:
     assert not missing, f".ui files missing from po/POTFILES.in: {missing}"
 
 
+def _calls_gettext(tree: ast.Module) -> bool:
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_"
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+            and isinstance(node.args[0].value, str)
+        ):
+            return True
+    return False
+
+
+def test_python_modules_that_call_gettext_are_in_potfiles() -> None:
+    entries = {
+        line.strip()
+        for line in (REPO / "po" / "POTFILES.in")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+    missing = []
+    for path in sorted((REPO / "src" / "rature").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        relative = path.relative_to(REPO).as_posix()
+        if _calls_gettext(tree) and relative not in entries:
+            missing.append(relative)
+    assert not missing, f"_() strings not extracted, add to po/POTFILES.in: {missing}"
+
+
 def test_visible_properties_are_marked_translatable() -> None:
     violations = []
     for ui_path in _ui_files():
