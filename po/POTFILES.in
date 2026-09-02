@@ -1,6 +1,6 @@
 # Every data/ui/*.ui file, whether or not it carries translatable strings
-# yet (tests/test_ui_wiring.py enforces this), plus the other sources that
-# do. The Python UI modules return here too once they gain _() calls.
+# yet, plus every src/rature Python module that calls _(). Both lists are
+# enforced by tests/test_ui_wiring.py.
 data/io.github.vertours.Rature.desktop.in
 data/io.github.vertours.Rature.metainfo.xml.in
 data/ui/window.ui
@@ -17,3 +17,7 @@ data/ui/archives_window.ui
 data/ui/statistics_row.ui
 data/ui/statistics_window.ui
 data/ui/shortcuts.ui
+src/rature/ui/application.py
+src/rature/ui/day_view.py
+src/rature/ui/task_row.py
+src/rature/ui/window.py
