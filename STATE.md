@@ -6,20 +6,12 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 4, confort et traductions
+- **Chantier en cours** : 4, confort et traductions. Démarré le
+  2 septembre 2026, dette d'avant-chantier soldée (voir « Chantiers
+  terminés »).
 - **Étape suivante** : à choisir avec l'auteur parmi la liste du
   chantier 4 dans `docs/internal/ROADMAP.md`, aucun ordre imposé entre
   ses points.
-- **Revue de code du 2 septembre 2026** : soldée. PR #38 à #44. La revue
-  externe (ordre positionnel des lignes de sidebar, annotations de
-  retour) puis l'autocritique du chantier 3 : couplage à l'ordre et à la
-  structure des `.ui` supprimé, widgets d'en-tête sortis du Python,
-  logique dupliquée des vues factorisée dans `inline_rename`,
-  `list_helpers` et `reorder` (ce dernier testé), et un vrai bug corrigé
-  (`migrate` plantait au démarrage sur un JSON dont la racine n'est pas
-  un objet). Deux points laissés tels quels, commentés : rebuild
-  ré-entrant des lignes, lecture d'archive synchrone. Le chantier 4
-  démarre sans dette connue.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -46,8 +38,9 @@ manifeste (`CLAUDE.md` §4 règle 8).
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
-Un correctif non publié attend dans `CHANGELOG.md` sous `[Unreleased]`
-(PR #44) : au prochain release, incrément **patch**, `0.9.1`.
+Deux correctifs non publiés attendent sous `[Unreleased]` dans
+`CHANGELOG.md` (PR #44, plantage au démarrage ; PR #46, titre d'en-tête) :
+au prochain release, incrément **patch**, `0.9.1`.
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
 `STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
@@ -100,6 +93,12 @@ Un correctif non publié attend dans `CHANGELOG.md` sous `[Unreleased]`
   l'adaptation aux fenêtres étroites (`AdwBreakpoint` sous 500 unités,
   panneau latéral replié avec bouton retour). Couvre `SPECIFICATION.md`
   §2 et §3 en entier.
+- **Purge de dette avant chantier 4**, PR #38 à #46 : revue externe puis
+  autocritique du chantier 3. Couplage à l'ordre et à la structure des
+  `.ui` supprimé, titres d'en-tête en `AdwWindowTitle`, logique des vues
+  factorisée (`inline_rename`, `list_helpers`, `reorder` testé), plantage
+  au démarrage sur un JSON non-objet corrigé. Deux points fragiles mais
+  corrects laissés commentés. Correctifs #44 et #46 en attente de release.
 
 ## Documents
 
