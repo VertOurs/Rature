@@ -14,7 +14,7 @@ from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
 
-from rature.core import export, search, storage
+from rature.core import export, search, stats, storage
 from rature.core.migrations import FutureVersionError
 from rature.core.models import RecurringItem, ReserveItem, Task
 
@@ -181,6 +181,22 @@ class App:
         ui/ goes through App and never imports rature.core.search.
         """
         return search.day_matches(day, query)
+
+    def statistics(self) -> list[tuple[date, stats.DayCounts]]:
+        """SPECIFICATION.md §3.14: (date, counts) per archived day.
+
+        Most recent first, exactly archives()' order. An archive that fails
+        to read is skipped, never raised, like search_archives (§3.13).
+        Per-period totals are summed in the interface, not here.
+        """
+        rows: list[tuple[date, stats.DayCounts]] = []
+        for day_date in self.archives():
+            try:
+                day = self.read_archive(day_date)
+            except (OSError, ValueError, KeyError, TypeError, FutureVersionError):
+                continue
+            rows.append((day_date, stats.day_counts(day)))
+        return rows
 
     def archived_session(self, day_date: date) -> Session:
         """A read-only Session wrapping one archived day.
