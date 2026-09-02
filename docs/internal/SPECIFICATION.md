@@ -323,8 +323,9 @@ C'est la vue par défaut à l'ouverture.
 
 **Structure.** `AdwToolbarView`. En tête, un `AdwHeaderBar` dont le titre est
 la date de la journée en cours, en format long local. À droite, le bouton
-d'annulation de la dernière suppression, puis le bouton bascule de
-verrouillage. En pied, la barre de saisie. Au centre, un `GtkScrolledWindow`
+Copy as text (§3.12), le bouton d'annulation de la dernière suppression, puis
+le bouton bascule de verrouillage. En pied, la barre de saisie. Au centre, un
+`GtkScrolledWindow`
 contenant deux listes empilées.
 
 **Les deux blocs.** Le bloc des rayées est toujours au-dessus, le bloc des
@@ -545,7 +546,9 @@ Fenêtre distincte, ouverte depuis le menu principal, en lecture seule.
   ancien. Aucun compte, aucun aperçu, aucun résumé à côté d'une date.
 - Le contenu d'une journée suit la disposition de §3.2 : rayées en haut, en
   cours en dessous, mêmes numéros.
-- Aucun bouton sur les lignes, aucun menu, aucun glisser-déposer.
+- Aucun bouton sur les lignes, aucun menu, aucun glisser-déposer. Seul
+  l'en-tête porte un bouton Copy as text (§3.12), qui copie la date
+  sélectionnée.
 - Le journal de suppressions n'est jamais affiché, §2.2. Les tâches
   supprimées n'apparaissent pas non plus dans la journée archivée.
 - Une archive illisible affiche un texte neutre à la place du contenu, sans
@@ -630,6 +633,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Menu de ligne | `Rename`, `Edit`, `Delete` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
 | Infobulle d'annulation de suppression | `Undo delete` |
+| Infobulle de copie | `Copy as text` |
 | Fenêtre des raccourcis, titres de groupe | `General`, `Navigation`, `Tasks` |
 | Fenêtre des raccourcis, descriptions | `Quit`, `Keyboard Shortcuts`, `Show the Day view`, `Show the Reserve view`, `Show the Recurring view`, `Add a task`, `Add a task already struck`, `Undo the last deletion`, `Cancel an edit` |
 | Infobulle d'envoi | `Send to the day` |
@@ -667,6 +671,7 @@ image cassée, et ça ne se voit qu'à l'exécution.
 | Rayer | `object-select-symbolic` |
 | Dérayer | `edit-undo-symbolic` |
 | Annuler la dernière suppression | `document-revert-symbolic` |
+| Copier la journée en texte | `edit-copy-symbolic` |
 | Menu de ligne | `view-more-symbolic` |
 | Menu principal | `open-menu-symbolic` |
 | Supprimer | `user-trash-symbolic` |
@@ -727,3 +732,45 @@ accélérateurs `Ctrl+?` et `F1` sont posés à la main. Trois sections :
 Le contenu est entièrement déclaratif, sans logique. L'entrée Keyboard
 Shortcuts du menu principal déclenche la même action `win.show-help-overlay`.
 Tous les libellés affichés sont en §3.8.
+
+---
+
+### 3.12 Export d'une journée en texte
+
+Ajouté au chantier 4. Un bouton Copy as text (`edit-copy-symbolic`, §3.9)
+dans l'en-tête de la vue Jour et dans l'en-tête de la fenêtre d'archives
+copie la journée affichée dans le presse-papier, en texte brut. Aucun
+fichier, aucun dialogue, aucun retour visible : le style du reste de
+l'interface, où l'annulation comme l'ajout ne confirment rien.
+
+- Vue Jour : la journée en cours. Le bouton reste actif même sur une journée
+  vide.
+- Fenêtre d'archives : la date sélectionnée. Inactif tant qu'aucune date
+  lisible n'est affichée.
+
+**Format.**
+
+```
+Monday 31 August
+
+[x] 1  finish the meson file
+[x] 3  answer Marie
+[ ] 2  call the dentist
+[ ] 5  take out the bin
+```
+
+- Première ligne : la date, format long local, comme le titre de l'en-tête
+  du Jour.
+- Une ligne vide, puis une ligne par tâche dans l'ordre de `Session.view()`
+  (les rayées d'abord, comme à l'écran).
+- `[x]` si la tâche est rayée, `[ ]` sinon ; puis le numéro ; puis le texte.
+  Deux espaces entre le numéro et le texte. Le numéro n'est ni aligné ni
+  recalculé (§2.4).
+- Une tâche supprimée n'apparaît jamais, §2.2. Le journal `deletions` non
+  plus.
+- Journée vide : la date seule, sans ligne vide ni corps.
+- Pas de saut de ligne final.
+
+Côté `core`, une fonction pure `day_text(session)` produit ce texte.
+`App.day_text` et `App.archived_day_text(date)` l'exposent à l'interface, qui
+ne fait que l'écrire dans le presse-papier.
