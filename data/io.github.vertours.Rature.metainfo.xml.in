@@ -32,6 +32,17 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.8.0" date="2026-09-02">
+      <description>
+        <p>
+          A read-only Archives window, opened from the main menu: a
+          sidebar of every archived date, most recent first, and the
+          matching day on the right, laid out like the Day view. An
+          archive that fails to load shows a neutral message instead of
+          blocking the others.
+        </p>
+      </description>
+    </release>
     <release version="0.7.0" date="2026-08-31">
       <description>
         <p>

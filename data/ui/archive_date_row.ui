@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="RatureArchiveDateRow" parent="AdwActionRow">
+    <!-- title is set from Python: a locale-formatted date, not a
+         catalogue string. -->
+  </template>
+</interface>

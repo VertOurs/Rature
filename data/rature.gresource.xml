@@ -11,6 +11,9 @@
     <file preprocess="xml-stripblanks">ui/recurring_row.ui</file>
     <file preprocess="xml-stripblanks">ui/recurring_form.ui</file>
     <file preprocess="xml-stripblanks">ui/recurring_view.ui</file>
+    <file preprocess="xml-stripblanks">ui/archive_date_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/archive_task_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/archives_window.ui</file>
     <file compressed="true">style.css</file>
   </gresource>
 </gresources>

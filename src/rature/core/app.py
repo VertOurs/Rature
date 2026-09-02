@@ -150,6 +150,16 @@ class App:
         """Load one archived day. See storage.load_archive for what can raise."""
         return storage.load_archive(day_date, data_dir=self.data_dir)
 
+    def archived_session(self, day_date: date) -> Session:
+        """A read-only Session wrapping one archived day.
+
+        SPECIFICATION.md §3.2: block order (struck above active) is
+        Session.view()'s, never recomputed in the interface. This gives the
+        Archives window (§3.5) the same struck/active split the Day view
+        reads from the live session. Raises whatever read_archive raises.
+        """
+        return Session(self.read_archive(day_date))
+
     def _save(self) -> None:
         storage.save(Store.from_session(self.session), data_dir=self.data_dir)
 

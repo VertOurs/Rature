@@ -11,3 +11,6 @@ data/ui/reserve_view.ui
 data/ui/recurring_row.ui
 data/ui/recurring_form.ui
 data/ui/recurring_view.ui
+data/ui/archive_date_row.ui
+data/ui/archive_task_row.ui
+data/ui/archives_window.ui
