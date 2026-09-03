@@ -1,0 +1,8 @@
+[Flatpak Repo]
+Title=Rature
+Url=https://vertours.github.io/Rature/repo/
+Homepage=https://github.com/VertOurs/Rature
+Comment=Self-hosted Flatpak repository for Rature
+Description=Rature — your day, one line at a time
+Icon=https://raw.githubusercontent.com/VertOurs/Rature/main/data/icons/hicolor/scalable/apps/io.github.vertours.Rature.svg
+GPGKey=mDMEapl3ABYJKwYBBAHaRw8BAQdAaoXUVI3A2781AXrhwCBn5sOQ9uRfUGAQ9ovpn007aOe0NFJhdHVyZSBGbGF0cGFrIHJlcG8gc2lnbmluZyA8dmVydG91cnMuZGV2QGdtYWlsLmNvbT6IkgQTFgoAOxYhBMLLslbZGwG5ILC+OJgoBldXX8naBQJqmXcAAhsDBQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEJgoBldXX8naZqMA+Md/fSxSQwg5GnGwHpcyIKHhi4qZJ3pSMk1YBRBI99gBANaSkXttNSU833zZ48vOsNpy2s7ZKg7XHeb9IKm/GB4O

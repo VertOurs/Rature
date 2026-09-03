@@ -48,7 +48,8 @@ The method it reproduces:
 Pre-release, built from a written specification. Milestones 0 to 4 are done:
 the business logic, the three views, the Archives and Statistics windows,
 keyboard shortcuts, plain-text export and the French translation. Milestone
-5, publication, is in progress; `0.10.0` is not cut yet.
+5, publication, is under way: `0.10.0` is released and installable from the
+self-hosted Flatpak repository below.
 
 Built with AI assistance (Claude Code); the author writes the
 specification, reviews every change, and merges it.
@@ -83,9 +84,20 @@ flatpak run io.github.vertours.Rature
 
 ## Installing
 
-Not published yet. Milestone 5 will provide a self-hosted Flatpak
-repository (with automatic updates), a standalone `.flatpak` bundle on each
-release, and AUR and COPR packages. Flathub is deliberately not a target.
+From the self-hosted Flatpak repository (with automatic updates):
+
+```
+flatpak remote-add --if-not-exists rature \
+  https://vertours.github.io/Rature/io.github.vertours.Rature.flatpakrepo
+flatpak install rature io.github.vertours.Rature
+```
+
+A standalone `.flatpak` bundle is attached to each
+[release](https://github.com/VertOurs/Rature/releases) for a one-off
+install without adding the repository.
+
+AUR and COPR packages are planned. Flathub is deliberately not a target
+([`docs/adr/0001-rejet-de-flathub.md`](docs/adr/0001-rejet-de-flathub.md)).
 
 ## Contributing
 

@@ -10,7 +10,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (2026-09-03, sur `//50`) : quatre sources de version, `CHANGELOG` et
   metainfo `<release>` à jour, tag `v0.10.0` annoté et signé sur le
   commit de merge de la PR #93, release GitHub « nue » (tarball source).
-  Reste le canal de distribution (§5.2).
+  Le canal de distribution (§5.2 dépôt auto-hébergé + §5.3 bundle) est
+  posé en CI, à valider par un `workflow_dispatch` sur `v0.10.0`.
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -28,15 +29,23 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `flatpak-builder-lint` manifeste **et** dépôt en CI (deux erreurs
   Flathub-only filtrées, `build-aux/flatpak/repo_lint.py`), `0.10.0`
   coupée, taguée et publiée.
+- **§5.2 + §5.3, dépôt Flatpak auto-hébergé** : clé GPG dédiée à la
+  signature du dépôt (FPR `C2CBB256D91B01B920B0BE3898280657575FC9DA`,
+  ≠ clé de commit), publique dans `build-aux/flatpak/repo-signing-key.gpg`
+  et dans le `.flatpakrepo`, privée dans le secret Actions
+  `FLATPAK_GPG_PRIVATE_KEY`. GitHub Pages activé en mode `workflow`.
+  `.github/workflows/release.yml` (sur tag `v*` ou `workflow_dispatch`) :
+  build + bundle `.flatpak` signés, `build-update-repo` avec deltas
+  statiques, publication de `repo/` + `.flatpakrepo` + clé + `index.html`
+  sur Pages (`https://vertours.github.io/Rature/`), bundle joint à la
+  release. À valider : un `workflow_dispatch` sur `v0.10.0`, puis un
+  `flatpak remote-add` + `install` depuis une machine propre (hors agent,
+  `CLAUDE.md` §6).
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. §5.2 dépôt Flatpak auto-hébergé. Prérequis auteur : clé GPG dédiée
-     à la signature du dépôt (≠ clé de commit), sauvegardée hors machine,
-     partie privée en secret GitHub Actions. Puis action `on: push tags
-     v*` → `flatpak build-export` signé → GitHub Pages + `.flatpakrepo`.
-  2. §5.3 bundle `.flatpak` autonome joint à chaque release.
-  3. §5.4 AUR (PKGBUILD) + COPR (.spec).
-  4. Bump `//51` → `0.10.1` dès l'image CI `gnome-51` disponible.
+  1. Valider le pipeline `release.yml` (voir ci-dessus).
+  2. §5.4 AUR (PKGBUILD) + COPR (.spec).
+  3. Bump `//51` → `0.10.1` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -50,6 +59,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - « Require status checks » actif dans le ruleset `main` : `lint`, `test`,
   `meson`, `flatpak`, mode strict, aucun contournement possible même par un
   admin. Vérifié le 31 août 2026 via `gh api repos/.../rulesets`.
+- Deuxième clé GPG, dédiée à la **signature du dépôt Flatpak** (jamais aux
+  commits) : ed25519 `C2CBB256D91B01B920B0BE3898280657575FC9DA`, uid
+  « Rature Flatpak repo signing », sans passphrase. Publique versionnée,
+  privée dans le secret Actions `FLATPAK_GPG_PRIVATE_KEY`. GitHub Pages
+  activé (`build_type=workflow`), sert `https://vertours.github.io/Rature/`.
 
 ## Versions retenues
 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rature — Flatpak repository</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { max-width: 40rem; margin: 4rem auto; padding: 0 1.2rem;
+         font: 16px/1.6 system-ui, sans-serif; }
+  code, pre { font-family: ui-monospace, monospace; }
+  pre { background: rgba(128,128,128,.12); padding: 1rem; border-radius: 6px;
+        overflow-x: auto; }
+  a { color: #c01c28; }
+  h1 { margin-bottom: .2rem; }
+  .sub { color: gray; margin-top: 0; }
+</style>
+</head>
+<body>
+<h1>Rature</h1>
+<p class="sub">Your day, one line at a time. A self-hosted Flatpak repository.</p>
+
+<p>Add the repository, then install:</p>
+<pre>flatpak remote-add --if-not-exists rature \
+  https://vertours.github.io/Rature/io.github.vertours.Rature.flatpakrepo
+flatpak install rature io.github.vertours.Rature</pre>
+
+<p>Updates then arrive like any other Flatpak app. A standalone
+<code>.flatpak</code> bundle is attached to each
+<a href="https://github.com/VertOurs/Rature/releases">GitHub release</a>.</p>
+
+<p>Source, issues and the changelog:
+<a href="https://github.com/VertOurs/Rature">github.com/VertOurs/Rature</a>.
+The repository is signed with the key in
+<a href="io.github.vertours.Rature.flatpakrepo">the <code>.flatpakrepo</code></a>.</p>
+</body>
+</html>
