@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
-"""The day rollover: the 04:00 boundary, the six steps, multi-day, midnight."""
+"""The day rollover: the 04:00 boundary, the six steps, multi-day, midnight, DST."""
 
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -12,6 +13,9 @@ from rature.core.session import Day, Session, reference_date
 from rature.core.storage import archive
 
 PARIS = timezone(timedelta(hours=2))
+# A real zone, unlike the fixed-offset PARIS above: its offset changes
+# across the DST transitions the tests at the bottom cross.
+PARIS_TZ = ZoneInfo("Europe/Paris")
 STAMP = datetime(2026, 8, 24, 14, 32, 7, tzinfo=PARIS)
 D24 = date(2026, 8, 24)
 D25 = date(2026, 8, 25)
@@ -248,3 +252,51 @@ def test_the_rollover_fires_after_four_am() -> None:
     assert session.rollover_due(datetime(2026, 8, 25, 5, 0)) is True
     session.roll_over(datetime(2026, 8, 25, 5, 0))
     assert session.day.date == D25
+
+
+# SPECIFICATION.md §2.5: the boundary follows local wall time "sans
+# compensation". reference_date subtracts four hours from the naive
+# components of an aware datetime, so a real DST zone must not shift the
+# day it lands on.
+
+
+def test_reference_date_across_the_autumn_fall_back() -> None:
+    # 2026-10-25: 03:00 CEST winds back to 02:00 CET, so 03:30 happens
+    # twice. Both foldings are before the 04:00 boundary; 04:30 is after.
+    assert reference_date(
+        datetime(2026, 10, 25, 3, 30, fold=0, tzinfo=PARIS_TZ)
+    ) == date(2026, 10, 24)
+    assert reference_date(
+        datetime(2026, 10, 25, 3, 30, fold=1, tzinfo=PARIS_TZ)
+    ) == date(2026, 10, 24)
+    assert reference_date(datetime(2026, 10, 25, 4, 30, tzinfo=PARIS_TZ)) == date(
+        2026, 10, 25
+    )
+
+
+def test_reference_date_across_the_spring_forward() -> None:
+    # 2027-03-28: 02:00 CET jumps to 03:00 CEST. 03:30 (CEST) is still
+    # before the 04:00 boundary; 04:30 is after.
+    assert reference_date(datetime(2027, 3, 28, 3, 30, tzinfo=PARIS_TZ)) == date(
+        2027, 3, 27
+    )
+    assert reference_date(datetime(2027, 3, 28, 4, 30, tzinfo=PARIS_TZ)) == date(
+        2027, 3, 28
+    )
+
+
+def test_rollover_across_a_dst_transition_archives_exactly_one_day(
+    tmp_path: Path,
+) -> None:
+    # Evening of 2026-10-24 (CEST) to the morning of 2026-10-25 (CET),
+    # across the autumn fall-back: one archive, under the old date.
+    session = session_on(date(2026, 10, 24))
+    session.add("carry over")
+    morning = datetime(2026, 10, 25, 10, 0, tzinfo=PARIS_TZ)
+    assert session.rollover_due(morning) is True
+    old = session.roll_over(morning)
+    assert old.date == date(2026, 10, 24)
+    assert session.day.date == date(2026, 10, 25)
+    path = archive(old, data_dir=tmp_path)
+    assert path.name == "2026-10-24.json"
+    assert list((tmp_path / "archive").iterdir()) == [path]
