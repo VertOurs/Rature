@@ -193,7 +193,7 @@ Trois travaux :
 - [ ] `CHANGELOG.md`, format Keep a Changelog
 - [ ] `CONTRIBUTING.md`, même si personne d'autre ne contribue, il fixe les
       règles pour soi-même
-- [ ] `docs/internal/ARCHITECTURE.md` copié dans le dépôt
+- [ ] `docs/ARCHITECTURE.md` copié dans le dépôt
 - [ ] `docs/internal/ROADMAP.md` copié dans le dépôt
 - [ ] `docs/internal/CHANTIER-0.md` copié dans le dépôt
 - [ ] `CLAUDE.md` et `STATE.md` copiés à la racine

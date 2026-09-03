@@ -2,7 +2,7 @@
 
 STATE.md décrit l'état courant, pas l'historique. Un chantier terminé se
 condense en trois lignes. Ce qui est durable part dans un ADR ou dans
-`docs/internal/ARCHITECTURE.md` ; ce qui est historique est déjà dans git.
+`docs/ARCHITECTURE.md` ; ce qui est historique est déjà dans git.
 
 ## Avancement
 
@@ -18,16 +18,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   et le runtime `//51` stable n'est pas encore sur `flathub` (51 est en
   RC, stable le 16/09). `//50` reste la stable courante, non EOL, d'ici
   là. Vérifié le 3 septembre 2026.
+- **`ARCHITECTURE.md` traduit et publié** dans `docs/ARCHITECTURE.md`,
+  rafraîchi sur l'arborescence courante ; l'ancienne version interne
+  française est retirée.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Traduire `ARCHITECTURE.md` en anglais → `docs/ARCHITECTURE.md`,
-     retirer `docs/internal/ARCHITECTURE.md`, corriger tous les renvois.
-  2. Qualité §5.1 : README anglais (ligne IA, install), metainfo complet
+  1. Qualité §5.1 : README anglais (ligne IA, install), metainfo complet
      (`<url>`, `<branding>`, `<releases>`, `<screenshots>`), captures,
      `flatpak-builder-lint` en CI.
-  3. Dès que l'image `gnome-51` existe : bump `//50` → `//51` (manifeste,
+  2. Dès que l'image `gnome-51` existe : bump `//50` → `//51` (manifeste,
      CI, table « Versions retenues »).
-  4. Couper `0.10.0` (version Meson, CHANGELOG, tag signé) — après le
+  3. Couper `0.10.0` (version Meson, CHANGELOG, tag signé) — après le
      bump —, puis §5.2 dépôt Flatpak auto-hébergé.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
