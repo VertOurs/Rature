@@ -9,16 +9,20 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Chantier en cours** : 5, publication. Le chantier 4 est terminé (voir
   « Chantiers terminés ») ; `[Unreleased]` dans `CHANGELOG.md` est prêt
   pour une release `0.10.0`, à couper par l'auteur.
-- **Étape suivante**, début du chantier 5 (`docs/internal/ROADMAP.md` §5) :
-  1. Trancher les deux décisions ouvertes de `CLAUDE.md` §3 : mention de
-     l'assistance IA dans le README public ; traduction d'`ARCHITECTURE.md`
-     en anglais et publication dans `docs/`.
-  2. Qualité de publication (§5.1) : captures d'écran, metainfo complet,
-     README anglais avec captures et instructions d'installation,
-     validations `appstreamcli` / `desktop-file-validate` /
-     `flatpak-builder-lint`.
-  3. Canal principal (§5.2) : dépôt Flatpak statique sur GitHub Pages,
-     signé GPG, publié par une action à chaque tag, plus un `.flatpakrepo`.
+- **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
+  = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
+  anglais, publié dans `docs/`, version interne française retirée ; bump
+  runtime GNOME 51 immédiat (RC, stable le 16 septembre 2026, la 50
+  passe alors EOL).
+- **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5) :
+  1. Bump `//50` → `//51` : manifeste, CI, table « Versions retenues ».
+  2. Traduire `ARCHITECTURE.md` en anglais → `docs/ARCHITECTURE.md`,
+     retirer `docs/internal/ARCHITECTURE.md`, corriger tous les renvois.
+  3. Qualité §5.1 : README anglais (ligne IA, install), metainfo complet
+     (`<url>`, `<branding>`, `<releases>`, `<screenshots>`), captures,
+     `flatpak-builder-lint` en CI.
+  4. Couper `0.10.0` (version Meson, CHANGELOG, tag signé), puis §5.2
+     dépôt Flatpak auto-hébergé.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
