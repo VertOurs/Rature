@@ -10,8 +10,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (2026-09-03, sur `//50`) : quatre sources de version, `CHANGELOG` et
   metainfo `<release>` à jour, tag `v0.10.0` annoté et signé sur le
   commit de merge de la PR #93, release GitHub « nue » (tarball source).
-  Le canal de distribution (§5.2 dépôt auto-hébergé + §5.3 bundle) est
-  posé en CI, à valider par un `workflow_dispatch` sur `v0.10.0`.
+  Le canal de distribution (§5.2 dépôt auto-hébergé + §5.3 bundle) est en
+  place et validé côté CI : `workflow_dispatch` sur `v0.10.0` vert,
+  `https://vertours.github.io/Rature/` sert le dépôt signé et le
+  `.flatpakrepo`, `rature.flatpak` joint à la release. Reste le test
+  `flatpak remote-add` + `install` depuis une machine propre (hors agent).
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -38,12 +41,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   build + bundle `.flatpak` signés, `build-update-repo` avec deltas
   statiques, publication de `repo/` + `.flatpakrepo` + clé + `index.html`
   sur Pages (`https://vertours.github.io/Rature/`), bundle joint à la
-  release. À valider : un `workflow_dispatch` sur `v0.10.0`, puis un
-  `flatpak remote-add` + `install` depuis une machine propre (hors agent,
-  `CLAUDE.md` §6).
+  release. Les assets statiques du dépôt viennent d'une seconde extraction
+  éparse de la branche du workflow (PR #96), et `gh` du job `deploy` reçoit
+  `GH_REPO` faute de checkout (PR #97). Validé par `workflow_dispatch` sur
+  `v0.10.0` (3 septembre 2026). Reste, hors agent (`CLAUDE.md` §6) :
+  `flatpak remote-add` + `install` depuis une machine propre ; sauvegarde
+  hors machine de la clé privée `~/rature-repo-signing.private.asc` puis
+  suppression.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Valider le pipeline `release.yml` (voir ci-dessus).
+  1. Test d'installation depuis une machine propre (hors agent).
   2. §5.4 AUR (PKGBUILD) + COPR (.spec).
   3. Bump `//51` → `0.10.1` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
