@@ -6,17 +6,18 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 5, publication. **`0.10.1` est coupée**
+- **Chantier en cours** : 5, publication. **`0.10.1` est publiée**
   (2026-09-03, sur `//50`) : quatre sources de version d'accord, `CHANGELOG`
-  et metainfo `<release>` à jour. Elle publie le canal auto-hébergé (§5.2 +
-  §5.3) et corrige un bug de traduction Flatpak (interface restée en
-  anglais : domaine texte C non lié + catalogue dans une extension `.Locale`
-  non tirée ; `separate-locales: false` + `locale.textdomain` dans
-  `src/rature.in`). `0.10.0` : tag `v0.10.0` signé, release GitHub « nue »,
-  pipeline `release.yml` validé (`workflow_dispatch` vert,
-  `https://vertours.github.io/Rature/` sert le dépôt signé, `rature.flatpak`
-  joint). Reste, pour `0.10.1` : merge de la PR, tag `v0.10.1`, puis test
-  `flatpak install` depuis une machine propre (hors agent).
+  et metainfo `<release>` à jour, tag `v0.10.1` annoté et signé sur le
+  commit de merge de la PR #100, `release.yml` vert (dépôt et bundle
+  reconstruits et signés, `https://vertours.github.io/Rature/` republié,
+  `rature.flatpak` joint à la release). Elle publie le canal auto-hébergé
+  (§5.2 + §5.3) et corrige un bug de traduction Flatpak (interface restée
+  en anglais : domaine texte C non lié + catalogue dans une extension
+  `.Locale` non tirée ; `separate-locales: false` + `locale.textdomain`
+  dans `src/rature.in`). `0.10.0` reste taguée, sur `//50`. Reste, hors
+  agent (`CLAUDE.md` §6) : `flatpak install` depuis une machine propre et
+  contrôle que l'interface est en français.
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -38,22 +39,25 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   signature du dépôt (FPR `C2CBB256D91B01B920B0BE3898280657575FC9DA`,
   ≠ clé de commit), publique dans `build-aux/flatpak/repo-signing-key.gpg`
   et dans le `.flatpakrepo`, privée dans le secret Actions
-  `FLATPAK_GPG_PRIVATE_KEY`. GitHub Pages activé en mode `workflow`.
+  `FLATPAK_GPG_PRIVATE_KEY`. GitHub Pages activé en mode `workflow` ;
+  l'environnement `github-pages` n'autorise le déploiement que depuis
+  `main`, il a fallu lui ajouter une règle pour les tags `v*` sinon le job
+  `deploy` déclenché par un tag est rejeté sans exécuter d'étape.
   `.github/workflows/release.yml` (sur tag `v*` ou `workflow_dispatch`) :
   build + bundle `.flatpak` signés, `build-update-repo` avec deltas
   statiques, publication de `repo/` + `.flatpakrepo` + clé + `index.html`
   sur Pages (`https://vertours.github.io/Rature/`), bundle joint à la
   release. Les assets statiques du dépôt viennent d'une seconde extraction
   éparse de la branche du workflow (PR #96), et `gh` du job `deploy` reçoit
-  `GH_REPO` faute de checkout (PR #97). Validé par `workflow_dispatch` sur
-  `v0.10.0` (3 septembre 2026). Reste, hors agent (`CLAUDE.md` §6) :
-  `flatpak remote-add` + `install` depuis une machine propre ; sauvegarde
-  hors machine de la clé privée `~/rature-repo-signing.private.asc` puis
-  suppression.
+  `GH_REPO` faute de checkout (PR #97). Rodé sur `v0.10.0`
+  (`workflow_dispatch`) puis `v0.10.1` (push de tag), 3 septembre 2026.
+  Reste, hors agent (`CLAUDE.md` §6) : `flatpak remote-add` + `install`
+  depuis une machine propre ; sauvegarde hors machine de la clé privée
+  `~/rature-repo-signing.private.asc` puis suppression.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Merge de la release `0.10.1`, tag `v0.10.1`, puis test d'installation
-     depuis une machine propre (hors agent).
+  1. Test d'installation de `0.10.1` depuis une machine propre, contrôle
+     que l'interface est en français (hors agent).
   2. §5.4 AUR (PKGBUILD) + COPR (.spec).
   3. Bump `//51` → `0.10.2` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
