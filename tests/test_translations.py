@@ -3,7 +3,7 @@
 """The launcher's gettext wiring actually backs a module-level `_()`.
 
 rature.in calls gettext.bindtextdomain and gettext.textdomain (not
-locale's, not gettext.install), the pair CLAUDE.md §4 rule 7 requires
+locale's, not gettext.install), the pair CLAUDE.md §4 rule 2 requires
 every module to rely on through `from gettext import gettext as _`.
 This exercises that exact mechanism with a throwaway domain and a
 compiled .mo, no GTK or Flatpak needed.

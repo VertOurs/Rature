@@ -139,16 +139,21 @@ def list_archives(*, data_dir: Path | None = None) -> list[date]:
     Reads file names only, never a file's content, so a corrupted
     archive cannot make this fail. Only names matching AAAA-MM-JJ.json
     count: _atomic_write_json's .<name>.<pid>.tmp sibling can survive
-    a crash mid-write, and archive/ is exactly where it would land.
+    a crash mid-write, and archive/ is exactly where it would land. A
+    name of that shape that is not a real date (2026-02-30.json) is
+    skipped, not raised on.
     """
     directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
     if not directory.is_dir():
         return []
-    dates = [
-        date.fromisoformat(path.name.removesuffix(".json"))
-        for path in directory.iterdir()
-        if _ARCHIVE_NAME.match(path.name)
-    ]
+    dates: list[date] = []
+    for path in directory.iterdir():
+        if not _ARCHIVE_NAME.match(path.name):
+            continue
+        try:
+            dates.append(date.fromisoformat(path.name.removesuffix(".json")))
+        except ValueError:
+            continue
     return sorted(dates, reverse=True)
 
 
