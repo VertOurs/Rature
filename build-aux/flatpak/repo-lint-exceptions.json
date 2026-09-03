@@ -1,0 +1,4 @@
+{
+  "appstream-external-screenshot-url": "Rature self-hosts; screenshots live in the GitHub repo and are referenced by raw.githubusercontent.com URL, not mirrored to dl.flathub.org. Not a Flathub submission (docs/adr/0001-rejet-de-flathub.md).",
+  "appstream-screenshots-not-mirrored-in-ostree": "No Flathub media pipeline mirrors screenshots into the ostree commit; the metainfo carries plain URLs. Not a Flathub submission (docs/adr/0001-rejet-de-flathub.md)."
+}

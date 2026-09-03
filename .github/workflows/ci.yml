@@ -79,3 +79,7 @@ jobs:
           bundle: rature.flatpak
           manifest-path: build-aux/flatpak/io.github.vertours.Rature.yml
           cache-key: flatpak-builder-${{ github.sha }}
+      # The action builds into repo/. Lint that too, minus the two
+      # Flathub-submission-only rules (build-aux/flatpak/repo_lint.py).
+      - name: Lint the built Flatpak repo
+        run: python3 build-aux/flatpak/repo_lint.py repo
