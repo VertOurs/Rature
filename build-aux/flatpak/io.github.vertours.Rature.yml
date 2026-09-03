@@ -7,6 +7,12 @@ runtime-version: '50'
 sdk: org.gnome.Sdk
 command: rature
 
+# Ship the compiled gettext catalogue inside the app, not in a split
+# io.github.vertours.Rature.Locale extension: a --user install and the
+# standalone bundle both fail to pull that extension, which left the
+# interface untranslated. Rature has one translation; the size is trivial.
+separate-locales: false
+
 finish-args:
   - --socket=wayland
   - --socket=fallback-x11

@@ -8,6 +8,7 @@ from pathlib import Path
 REPO = Path(__file__).parent.parent
 DATA = REPO / "data"
 APP_ID = "io.github.vertours.Rature"
+MANIFEST = REPO / "build-aux" / "flatpak" / f"{APP_ID}.yml"
 
 
 def _read_lines(path: Path) -> list[str]:
@@ -45,3 +46,11 @@ def test_desktop_entry_points_at_the_launcher_and_icon() -> None:
 def test_scalable_icon_is_installed_under_the_app_id() -> None:
     icon = DATA / "icons/hicolor/scalable/apps" / f"{APP_ID}.svg"
     assert icon.is_file()
+
+
+def test_manifest_keeps_the_locale_catalogue_in_the_app() -> None:
+    # A split .Locale extension is not pulled by a --user install nor
+    # bundled into the standalone .flatpak, which left the interface
+    # untranslated. Keep the catalogue inside the app.
+    lines = [line.strip() for line in _read_lines(MANIFEST)]
+    assert "separate-locales: false" in lines

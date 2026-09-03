@@ -290,3 +290,20 @@ def test_write_failure_banner_clears_only_behind_a_confirmed_write_guard() -> No
         f"window.py lines {unguarded}: _write_failure_active is cleared "
         f"outside a {_BANNER_CLEAR_GUARDS} guard (SPECIFICATION.md §3.6)"
     )
+
+
+def test_launcher_binds_the_c_gettext_domain() -> None:
+    # GTK translates the .ui templates through the C library, not Python's
+    # gettext, so src/rature.in must call locale.bindtextdomain and
+    # locale.textdomain. Binding only gettext.* leaves every .ui string in
+    # English on a translated system (it did, before 0.10.1).
+    tree = ast.parse((REPO / "src" / "rature.in").read_text(encoding="utf-8"))
+    called = {
+        f"{node.func.value.id}.{node.func.attr}"
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name)
+    }
+    missing = {"locale.bindtextdomain", "locale.textdomain"} - called
+    assert not missing, f"src/rature.in does not call {missing}"
