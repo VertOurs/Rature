@@ -65,6 +65,19 @@
   </screenshots>
 
   <releases>
+    <release version="0.10.0" date="2026-09-03">
+      <description>
+        <p>
+          The comfort features and the translation. You can undo the last
+          deletion, add a task already struck in one gesture, copy a day
+          to the clipboard as plain text, and reach every action with a
+          keyboard shortcut listed in a help window. The Archives window
+          gains a search over task text, a read-only Statistics window
+          shows plain counts per archived day, and the interface is fully
+          translated to French.
+        </p>
+      </description>
+    </release>
     <release version="0.9.0" date="2026-09-02">
       <description>
         <p>

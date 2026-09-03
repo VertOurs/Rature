@@ -6,9 +6,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 5, publication. Le chantier 4 est terminé (voir
-  « Chantiers terminés ») ; `[Unreleased]` dans `CHANGELOG.md` est prêt
-  pour une release `0.10.0`, à couper par l'auteur.
+- **Chantier en cours** : 5, publication. `0.10.0` est coupée
+  (2026-09-03, sur `//50`) : version dans les quatre sources, `CHANGELOG`
+  et metainfo `<release>` à jour. Reste à taguer `v0.10.0` et à monter le
+  canal de distribution (§5.2).
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -21,20 +22,18 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Fait au chantier 5** : décisions figées (`CLAUDE.md` §3),
   `ARCHITECTURE.md` traduit et publié dans `docs/ARCHITECTURE.md`
   (rafraîchi, version interne retirée), README réécrit avec la ligne IA,
-  metainfo complété (`<branding>`, `<url type="contribute">`, description),
-  `flatpak-builder-lint manifest` en CI.
+  metainfo complété (`<branding>`, `<url type="contribute">`, description,
+  `<screenshots>` + 4 captures dans `data/screenshots/`),
+  `flatpak-builder-lint` manifeste **et** dépôt en CI (deux erreurs
+  Flathub-only filtrées, `build-aux/flatpak/repo_lint.py`), version
+  `0.10.0` coupée.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Captures d'écran → bloc `![]()` du README + `<screenshots>` du
-     metainfo (4 PNG dans `data/screenshots/`, fournies par l'auteur).
-  2. `flatpak-builder-lint repo` en CI + `.flatpak-builder-lint-exceptions.json`
-     documenté pour les règles purement Flathub.
-  3. Couper `0.10.0` sur `//50` : version Meson, `CHANGELOG`
-     `[Unreleased]` → `[0.10.0]`, metainfo `<release>`, `STATE.md`, tag
-     signé `v0.10.0`.
-  4. §5.2 dépôt Flatpak auto-hébergé (clé GPG de signature = auteur),
+  1. Taguer `v0.10.0` (signé) + release GitHub « nue » (tarball source),
+     notes = section `0.10.0` du `CHANGELOG`.
+  2. §5.2 dépôt Flatpak auto-hébergé (clé GPG de signature = auteur),
      §5.3 bundle, §5.4 AUR/COPR.
-  5. Bump `//51` → `0.10.1` dès l'image CI disponible.
+  3. Bump `//51` → `0.10.1` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -58,16 +57,15 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `0.10.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `0.10.1` dès l'image CI `gnome-51` disponible |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
+| Version du projet | `0.10.0` | Chantier 4 (confort + traduction FR) publié, sur `//50`. Coupée le 3 septembre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
-`[Unreleased]` dans `CHANGELOG.md` accumule sept fonctionnalités
+`0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
 (annulation de la dernière suppression, ajout d'une tâche déjà rayée,
 raccourcis clavier et fenêtre d'aide, export d'une journée en texte,
 recherche dans les archives, fenêtre Statistiques, traduction française
-complète) et deux correctifs (PR #44, plantage au démarrage ; PR #46,
-titre d'en-tête). Le chantier 4 est complet ; une fonctionnalité impose
-un incrément **mineur** : la prochaine release sera `0.10.0`.
+complète) plus le correctif du fichier JSON non-objet. `[Unreleased]` est
+vide ; l'incrément suivant sera `0.10.1`, le bump `//51`.
 
 **Bump vers GNOME 51** : après la sortie stable (16 septembre 2026) et la
 publication de l'image CI `gnome-51`. Touche le manifeste, la CI et la
