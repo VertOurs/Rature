@@ -35,12 +35,22 @@ except locale.Error:
 # LC_TIME with the message language (SPECIFICATION.md §3.8).
 align_time_locale(environ=os.environ)
 
-# gettext's own bindtextdomain/textdomain, not locale's: they are what
-# backs gettext.gettext, and every module reaches it through
-# `from gettext import gettext as _` (CLAUDE.md §4 rule 2). Not
-# gettext.install(): that would put _ in builtins instead.
+# Two text domains to bind, not one. gettext's own bindtextdomain/
+# textdomain back gettext.gettext, which every module reaches through
+# `from gettext import gettext as _` (CLAUDE.md §4 rule 2); not
+# gettext.install(), which would put _ in builtins instead.
 gettext.bindtextdomain("rature", LOCALEDIR)
 gettext.textdomain("rature")
+
+# GTK translates the .ui templates itself, through the C library, so the
+# C text domain has to be bound too or every .ui string stays in English.
+try:
+    locale.bindtextdomain("rature", LOCALEDIR)
+    locale.textdomain("rature")
+except AttributeError:
+    # Python built without the C libintl bindings: the .ui strings stay
+    # untranslated, but the app still runs.
+    pass
 
 
 def _load_resources() -> None:

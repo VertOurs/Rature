@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `.flatpakrepo` and a landing page to GitHub Pages; the bundle is
   attached to the GitHub release.
 
+### Fixed
+
+- The interface stayed in English on a French system when run as a
+  Flatpak. The launcher bound only Python's gettext domain, not the C
+  domain GTK uses to translate the `.ui` templates, and the compiled
+  catalogue was split into a locale extension that a `--user` install and
+  the standalone bundle never pulled. The C text domain is now bound and
+  the catalogue ships inside the app (`separate-locales: false`).
+
 ## [0.10.0] - 2026-09-03
 
 ### Added
