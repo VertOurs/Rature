@@ -36,6 +36,13 @@ The method it reproduces:
 - **Undo the last deletion**, **copy a day as plain text**, keyboard
   shortcuts with a help window, and a full French translation.
 
+## Screenshots
+
+![The Day view](data/screenshots/day.png)
+![The Recurring view](data/screenshots/recurring.png)
+![The Archives window](data/screenshots/archives.png)
+![The Statistics window](data/screenshots/statistics.png)
+
 ## Status
 
 Pre-release, built from a written specification. Milestones 0 to 4 are done:

@@ -45,6 +45,25 @@
     <color type="primary" scheme_preference="dark">#ed333b</color>
   </branding>
 
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/VertOurs/Rature/main/data/screenshots/day.png</image>
+      <caption>The Day view: struck tasks on top, active tasks below, stable numbers</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/VertOurs/Rature/main/data/screenshots/recurring.png</image>
+      <caption>Recurring templates and the form to add one</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/VertOurs/Rature/main/data/screenshots/archives.png</image>
+      <caption>The Archives window: a past day, read-only, with search</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/VertOurs/Rature/main/data/screenshots/statistics.png</image>
+      <caption>The Statistics window: counts per archived day</caption>
+    </screenshot>
+  </screenshots>
+
   <releases>
     <release version="0.9.0" date="2026-09-02">
       <description>
