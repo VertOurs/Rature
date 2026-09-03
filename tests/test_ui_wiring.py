@@ -239,3 +239,48 @@ def test_ui_modules_only_import_core_session_storage_models_for_typing() -> None
         for module in _bad_core_imports(tree):
             violations.append(f"{py_path.name}: imports {module} outside TYPE_CHECKING")
     assert not violations, violations
+
+
+# SPECIFICATION.md §3.6: the write-failure banner clears only on a write
+# that reached disk. Every `self._write_failure_active = False` in
+# window.py must sit under a guard naming one of these.
+_BANNER_CLEAR_GUARDS = {"SAVED", "clear_banner_on_success"}
+
+
+def _is_banner_clear(node: ast.AST) -> bool:
+    return (
+        isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Attribute)
+        and node.targets[0].attr == "_write_failure_active"
+        and isinstance(node.value, ast.Constant)
+        and node.value.value is False
+    )
+
+
+def test_write_failure_banner_clears_only_behind_a_confirmed_write_guard() -> None:
+    tree = ast.parse((UI_SRC / "window.py").read_text(encoding="utf-8"))
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            child._parent = parent
+
+    unguarded = []
+    for node in ast.walk(tree):
+        if not _is_banner_clear(node):
+            continue
+        walker = node
+        while (walker := getattr(walker, "_parent", None)) is not None:
+            if isinstance(walker, ast.If):
+                referenced = {
+                    child.attr if isinstance(child, ast.Attribute) else child.id
+                    for child in ast.walk(walker.test)
+                    if isinstance(child, (ast.Name, ast.Attribute))
+                }
+                if _BANNER_CLEAR_GUARDS & referenced:
+                    break
+        else:
+            unguarded.append(node.lineno)
+    assert not unguarded, (
+        f"window.py lines {unguarded}: _write_failure_active is cleared "
+        f"outside a {_BANNER_CLEAR_GUARDS} guard (SPECIFICATION.md §3.6)"
+    )
