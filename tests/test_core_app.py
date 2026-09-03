@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from rature.core.app import App, StartupOutcome
+from rature.core import storage
+from rature.core.app import App, EnsureOutcome, EnsureResult, StartupOutcome
 from rature.core.migrations import FutureVersionError
 from rature.core.session import LockedError
 from rature.core.stats import DayCounts
@@ -121,7 +122,7 @@ def test_ensure_day_is_a_no_op_when_nothing_is_due(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))
     day_before = app.session.day
-    assert app.ensure_day() is None
+    assert app.ensure_day() == EnsureResult(EnsureOutcome.IDLE, None)
     assert app.session.day is day_before
     assert not (tmp_path / "archive").exists()
 
@@ -130,10 +131,51 @@ def test_ensure_day_returns_the_archived_day_when_due(tmp_path: Path) -> None:
     save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(save_now))
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    archived = app.ensure_day()
-    assert archived is not None
-    assert archived.date == date(2026, 8, 23)
+    result = app.ensure_day()
+    assert result.outcome is EnsureOutcome.SAVED
+    assert result.archived is not None
+    assert result.archived.date == date(2026, 8, 23)
     assert app.session.day.date == date(2026, 8, 24)
+    assert app.save_pending is False
+
+
+def _raise_oserror(*_args, **_kwargs):
+    raise OSError("disk full")
+
+
+def test_rollover_save_failure_is_retried_without_re_rolling(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 23, 10, 0, tzinfo=PARIS)))
+    app.add("carry me over")
+    app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
+
+    archive_calls = 0
+    real_archive = storage.archive
+
+    def counting_archive(day, **kwargs):
+        nonlocal archive_calls
+        archive_calls += 1
+        return real_archive(day, **kwargs)
+
+    monkeypatch.setattr(storage, "archive", counting_archive)
+    monkeypatch.setattr(storage, "save", _raise_oserror)
+
+    failed = app.ensure_day()
+    assert failed.outcome is EnsureOutcome.SAVE_FAILED
+    assert failed.archived is not None and failed.archived.date == date(2026, 8, 23)
+    assert app.session.day.date == date(2026, 8, 24)  # rolled over in memory
+    assert app.save_pending is True  # not treated as persisted
+    assert archive_calls == 1
+    assert load(data_dir=tmp_path).into_session().day.date == date(2026, 8, 23)
+
+    monkeypatch.setattr(storage, "save", save)  # a working write again
+    retried = app.ensure_day()
+    assert retried.outcome is EnsureOutcome.SAVED
+    assert retried.archived is None  # no second rollover
+    assert archive_calls == 1  # not re-archived
+    assert app.save_pending is False
+    assert load(data_dir=tmp_path).into_session().day.date == date(2026, 8, 24)
 
 
 def test_archives_is_empty_before_any_rollover(tmp_path: Path) -> None:

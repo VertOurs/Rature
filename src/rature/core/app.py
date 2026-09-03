@@ -13,6 +13,7 @@ import enum
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
+from typing import NamedTuple
 
 from rature.core import export, search, stats, storage
 from rature.core.migrations import FutureVersionError
@@ -35,6 +36,28 @@ class StartupOutcome(enum.Enum):
     LOADED = enum.auto()
     FIRST_LAUNCH = enum.auto()
     RECOVERED_FROM_CORRUPTION = enum.auto()
+
+
+class EnsureOutcome(enum.Enum):
+    """What one App.ensure_day call did about persistence.
+
+    IDLE: no rollover was due and no earlier save was still pending.
+    SAVED: a write reached disk (a due rollover, or a retry of a pending
+    one). SAVE_FAILED: a write was attempted and raised OSError; the
+    rolled-over state is still only in memory and stays pending.
+    """
+
+    IDLE = enum.auto()
+    SAVED = enum.auto()
+    SAVE_FAILED = enum.auto()
+
+
+class EnsureResult(NamedTuple):
+    """What App.ensure_day returns: the persistence outcome and, when a
+    rollover ran, the day it archived (None otherwise)."""
+
+    outcome: EnsureOutcome
+    archived: Day | None
 
 
 def _default_clock() -> datetime:
@@ -68,6 +91,14 @@ class App:
         # Set only when startup is RECOVERED_FROM_CORRUPTION: the file
         # storage.quarantine() moved the unreadable data file to.
         self.quarantined_path = quarantined_path
+        # True between a rollover that archived a day and the write that
+        # persists it: a failed write leaves it set so ensure_day retries.
+        self._save_pending = False
+
+    @property
+    def save_pending(self) -> bool:
+        """A rolled-over day is archived but not yet written to disk."""
+        return self._save_pending
 
     @classmethod
     def open(
@@ -127,21 +158,29 @@ class App:
             quarantined_path=quarantined_path,
         )
 
-    def ensure_day(self) -> Day | None:
-        """Run the SPECIFICATION.md §2.5 rollover if due, as a single step.
+    def ensure_day(self) -> EnsureResult:
+        """Run the SPECIFICATION.md §2.5 rollover if due, and persist it.
 
-        roll_over, archive, then save, in that order, so this sequence is
-        never again something a caller has to remember. Returns the day
-        that was archived, or None if none was due, so the caller knows
-        whether it needs to refresh.
+        roll_over, archive, then save, in that order. A save that raises
+        OSError is reported as EnsureResult(SAVE_FAILED, old_day), not
+        propagated: the rollover already happened in memory and was
+        archived, so a later call retries the write while _save_pending is
+        set, without a second roll_over or a second archive. Returns
+        IDLE when nothing was due and nothing was pending.
         """
         now = self.clock()
-        if not self.session.rollover_due(now):
-            return None
-        old_day = self.session.roll_over(now)
-        storage.archive(old_day, data_dir=self.data_dir)
-        self._save()
-        return old_day
+        archived: Day | None = None
+        if self.session.rollover_due(now):
+            archived = self.session.roll_over(now)
+            storage.archive(archived, data_dir=self.data_dir)
+            self._save_pending = True
+        if not self._save_pending:
+            return EnsureResult(EnsureOutcome.IDLE, archived)
+        try:
+            self._save()
+        except OSError:
+            return EnsureResult(EnsureOutcome.SAVE_FAILED, archived)
+        return EnsureResult(EnsureOutcome.SAVED, archived)
 
     def archives(self) -> list[date]:
         """Dates with an archived day, most recent first."""
@@ -232,6 +271,10 @@ class App:
 
     def _save(self) -> None:
         storage.save(Store.from_session(self.session), data_dir=self.data_dir)
+        # A write that returned means whatever was pending is now on disk.
+        # Only ensure_day sets the flag, so a mutation's save clearing it
+        # is a harmless no-op in the common case.
+        self._save_pending = False
 
     # Mutations below wrap the matching Session method: supply now/today
     # from self.clock() where the operation needs one, then save. Business

@@ -14,7 +14,12 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 
-from rature.core.app import App, LockedError, StartupOutcome  # noqa: E402
+from rature.core.app import (  # noqa: E402
+    App,
+    EnsureOutcome,
+    LockedError,
+    StartupOutcome,
+)
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
@@ -84,7 +89,10 @@ class RatureWindow(Adw.ApplicationWindow):
         self.sidebar_list.connect("row-activated", self._on_row_activated)
         self._install_shortcuts()
 
-        self._write_failure_active = False
+        # A startup rollover whose save failed leaves App.save_pending set;
+        # show the write-failure banner now rather than after the first
+        # 60 s tick (before this, that path crashed do_activate outright).
+        self._write_failure_active = self.app.save_pending
         self._quarantine_dismissed = False
         self._new_day_pending = False
         self._new_day_dismissed = False
@@ -147,12 +155,21 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _on_ensure_day_tick(self) -> bool:
         def tick() -> None:
-            archived = self.app.ensure_day()
+            outcome, archived = self.app.ensure_day()
             if archived is not None:
                 self._new_day_pending = True
                 self._new_day_dismissed = False
+            # SPECIFICATION.md §3.6: the write-failure banner clears only
+            # on a write that reached disk. The 60 s tick usually writes
+            # nothing, so map ensure_day's outcome here and tell _perform
+            # not to clear the banner on the no-exception path.
+            if outcome is EnsureOutcome.SAVED:
+                self._write_failure_active = False
+            elif outcome is EnsureOutcome.SAVE_FAILED:
+                self._write_failure_active = True
 
-        self._run_app_action(tick)
+        self._perform(tick, clear_banner_on_success=False)
+        self._refresh_all()
         return GLib.SOURCE_CONTINUE
 
     def _refresh_all(self) -> None:
@@ -187,12 +204,17 @@ class RatureWindow(Adw.ApplicationWindow):
         self.send_to_day(value)
         return True
 
-    def _perform(self, action) -> bool:
+    def _perform(self, action, *, clear_banner_on_success: bool = True) -> bool:
         # SPECIFICATION.md §3.6 point 3: the one place that catches OSError,
         # for every action. LockedError/KeyError/ValueError are refused
         # business commands the interface should have made impossible by
         # disabling the control; per §3.6's "Refus métier" they are a bug,
         # logged and swallowed, never shown.
+        #
+        # clear_banner_on_success=False is for the timer tick: a tick that
+        # raised nothing has usually written nothing, and §3.6 only lifts
+        # the banner on a write that reached disk (the tick sets the flag
+        # itself from ensure_day's outcome).
         try:
             action()
         except OSError:
@@ -202,7 +224,8 @@ class RatureWindow(Adw.ApplicationWindow):
             traceback.print_exc(file=sys.stderr)
             success = False
         else:
-            self._write_failure_active = False
+            if clear_banner_on_success:
+                self._write_failure_active = False
             success = True
         self._update_banner()
         return success

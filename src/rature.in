@@ -37,7 +37,7 @@ align_time_locale(environ=os.environ)
 
 # gettext's own bindtextdomain/textdomain, not locale's: they are what
 # backs gettext.gettext, and every module reaches it through
-# `from gettext import gettext as _` (CLAUDE.md §4 rule 7). Not
+# `from gettext import gettext as _` (CLAUDE.md §4 rule 2). Not
 # gettext.install(): that would put _ in builtins instead.
 gettext.bindtextdomain("rature", LOCALEDIR)
 gettext.textdomain("rature")
