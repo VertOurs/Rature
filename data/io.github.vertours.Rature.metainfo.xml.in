@@ -16,6 +16,13 @@
       tasks stay visible in a block at the top: there is no planning, no
       categories, no scoring, no encouragement.
     </p>
+    <p>
+      Striking is not deleting: a struck task stays visible as a trace of
+      what got done, a deleted one leaves without a shown trace. Beside the
+      day list, an undated reserve holds what is not scheduled, and
+      recurring templates come back on their weekdays. Past days are kept,
+      searchable and read-only.
+    </p>
   </description>
 
   <launchable type="desktop-id">io.github.vertours.Rature.desktop</launchable>
@@ -24,12 +31,19 @@
   <url type="homepage">https://github.com/VertOurs/Rature</url>
   <url type="bugtracker">https://github.com/VertOurs/Rature/issues</url>
   <url type="vcs-browser">https://github.com/VertOurs/Rature</url>
+  <url type="contribute">https://github.com/VertOurs/Rature/blob/main/CONTRIBUTING.md</url>
 
   <developer id="io.github.vertours">
     <name>VertOurs</name>
   </developer>
 
   <content_rating type="oars-1.1"/>
+
+  <branding>
+    <!-- The red strike of the icon (data/icons/.../Rature.svg). -->
+    <color type="primary" scheme_preference="light">#e01b24</color>
+    <color type="primary" scheme_preference="dark">#ed333b</color>
+  </branding>
 
   <releases>
     <release version="0.9.0" date="2026-09-02">

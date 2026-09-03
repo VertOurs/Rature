@@ -1,6 +1,6 @@
 # Rature
 
-A daily list desktop application for GNOME. Your day, one line at a time.
+A daily-list desktop application for GNOME. Your day, one line at a time.
 
 ## What it is
 
@@ -21,17 +21,38 @@ The method it reproduces:
 - The list can be frozen to end the composition of the day while striking,
   renaming and reordering stay possible.
 
+## Features
+
+- **Day view** — add, strike, unstrike, rename in place, delete, reorder by
+  drag-and-drop, freeze the list. `Shift+Enter` logs a task already struck.
+- **Reserve** — an undated list you draw from in the morning; unfinished
+  day tasks return to it at the day rollover.
+- **Recurring** — task templates tied to weekdays, injected automatically
+  each new day.
+- **Archives window** — every past day, read-only, with a search over task
+  text.
+- **Statistics window** — a plain table of counts per archived day, no
+  chart and no judgement.
+- **Undo the last deletion**, **copy a day as plain text**, keyboard
+  shortcuts with a help window, and a full French translation.
+
 ## Status
 
-Pre-release, built from a written specification. The foundations
-(milestone 0) are done; milestone 1, the business logic, is in progress.
-Nothing is functional yet and nothing is published. Design decisions and the
-roadmap live under `docs/internal/` (in French).
+Pre-release, built from a written specification. Milestones 0 to 4 are done:
+the business logic, the three views, the Archives and Statistics windows,
+keyboard shortcuts, plain-text export and the French translation. Milestone
+5, publication, is in progress; `0.10.0` is not cut yet.
+
+Built with AI assistance (Claude Code); the author writes the
+specification, reviews every change, and merges it.
+
+Design decisions and the roadmap live under `docs/internal/` (in French).
+The architecture is [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Building from source
 
-Requires Meson, GTK 4, libadwaita, GLib and gettext development tools, and
-Python 3.13 or newer.
+Requires Meson, GTK 4, libadwaita, GLib and the gettext tools, and Python
+3.13 or newer.
 
 ```
 meson setup build
@@ -56,8 +77,8 @@ flatpak run io.github.vertours.Rature
 ## Installing
 
 Not published yet. Milestone 5 will provide a self-hosted Flatpak
-repository, an AUR package and a COPR package. Flathub is deliberately not a
-target.
+repository (with automatic updates), a standalone `.flatpak` bundle on each
+release, and AUR and COPR packages. Flathub is deliberately not a target.
 
 ## Contributing
 
