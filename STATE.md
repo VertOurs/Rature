@@ -6,31 +6,19 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 4, confort et traductions. Démarré le
-  2 septembre 2026, dette d'avant-chantier soldée (voir « Chantiers
-  terminés »).
-- **Fait au chantier 4** :
-  - Annulation de la dernière suppression. PR #49, #51, #52.
-  - Ajout d'une tâche déjà rayée par Maj+Entrée. PR #55, #56, #57.
-  - Raccourcis clavier et fenêtre d'aide (`AdwShortcutsDialog`,
-    `GtkShortcutsWindow` déprécié). `Ctrl+1/2/3`, `Ctrl+Z`, `Ctrl+?`/`F1`,
-    item de menu ; Maj+Entrée y est listé. PR #59, #60.
-  - Export d'une journée en texte : bouton Copy as text dans l'en-tête de
-    la vue Jour et de la fenêtre d'archives, vers le presse-papier.
-    `core.export.day_text`. PR #62, #63, #64.
-  - Recherche dans les archives : `GtkSearchEntry` en tête de la barre
-    latérale de la fenêtre d'archives, filtre les dates au fil de la
-    frappe, insensible à la casse et aux accents. `core.search.day_matches`,
-    `App.search_archives` et `App.archive_matches`. PR #66, #67, #68.
-  - Fenêtre Statistiques : `AdwWindow` distincte ouverte par l'entrée
-    Statistics du menu, tableau en lecture seule (une ligne par journée
-    archivée, colonnes Added/Struck/Deleted/To reserve, ligne Total),
-    aucun graphique ni appréciation. `core.stats.day_counts` et
-    `App.statistics`. PR #70, #71, #72.
-- **Étape suivante** : dernier point du chantier 4, la traduction
-  française complète (`docs/internal/ROADMAP.md`), qui en est le critère
-  de fin : toutes les chaînes traduites et cohérence de langue de bout en
-  bout (interface, date d'en-tête, noms de jours).
+- **Chantier en cours** : 5, publication. Le chantier 4 est terminé (voir
+  « Chantiers terminés ») ; `[Unreleased]` dans `CHANGELOG.md` est prêt
+  pour une release `0.10.0`, à couper par l'auteur.
+- **Étape suivante**, début du chantier 5 (`docs/internal/ROADMAP.md` §5) :
+  1. Trancher les deux décisions ouvertes de `CLAUDE.md` §3 : mention de
+     l'assistance IA dans le README public ; traduction d'`ARCHITECTURE.md`
+     en anglais et publication dans `docs/`.
+  2. Qualité de publication (§5.1) : captures d'écran, metainfo complet,
+     README anglais avec captures et instructions d'installation,
+     validations `appstreamcli` / `desktop-file-validate` /
+     `flatpak-builder-lint`.
+  3. Canal principal (§5.2) : dépôt Flatpak statique sur GitHub Pages,
+     signé GPG, publié par une action à chaque tag, plus un `.flatpakrepo`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -57,13 +45,13 @@ manifeste (`CLAUDE.md` §4 règle 8).
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
-`[Unreleased]` dans `CHANGELOG.md` accumule six fonctionnalités
+`[Unreleased]` dans `CHANGELOG.md` accumule sept fonctionnalités
 (annulation de la dernière suppression, ajout d'une tâche déjà rayée,
 raccourcis clavier et fenêtre d'aide, export d'une journée en texte,
-recherche dans les archives, fenêtre Statistiques) et deux correctifs
-(PR #44, plantage au démarrage ; PR #46, titre d'en-tête). Une
-fonctionnalité impose un incrément **mineur** : la prochaine release sera
-`0.10.0`.
+recherche dans les archives, fenêtre Statistiques, traduction française
+complète) et deux correctifs (PR #44, plantage au démarrage ; PR #46,
+titre d'en-tête). Le chantier 4 est complet ; une fonctionnalité impose
+un incrément **mineur** : la prochaine release sera `0.10.0`.
 
 **Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
 `STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
@@ -122,6 +110,15 @@ fonctionnalité impose un incrément **mineur** : la prochaine release sera
   factorisée (`inline_rename`, `list_helpers`, `reorder` testé), plantage
   au démarrage sur un JSON non-objet corrigé. Deux points fragiles mais
   corrects laissés commentés. Correctifs #44 et #46 en attente de release.
+- **Chantier 4**, PR #49 à #76 : confort et traductions. Annulation de la
+  dernière suppression, ajout d'une tâche déjà rayée (Maj+Entrée),
+  raccourcis clavier + fenêtre d'aide, export d'une journée en texte,
+  recherche dans les archives, fenêtre Statistiques (`core.search`,
+  `core.stats`, `App.search_archives` / `archive_matches` / `statistics`).
+  Traduction française : `fr.po` à 100 %, tout `_()` extrait
+  (`POTFILES.in`), `LC_TIME` réaligné sur la langue des messages au
+  démarrage (`rature.i18n`). Couvre `SPECIFICATION.md` §3.11 à §3.14 et le
+  critère de langue du `ROADMAP`.
 
 ## Documents
 
@@ -132,3 +129,7 @@ Cadrage relu, contradictions résolues, six cas limites tranchés en
 fenêtre principale, les trois vues, fenêtre d'archives, démarrage et refus,
 fenêtres étroites, textes et icônes. Entièrement couverte par le
 chantier 3, terminé.
+
+`SPECIFICATION.md` §3.11 à §3.14 (raccourcis et fenêtre d'aide, export
+texte, recherche dans les archives, fenêtre Statistiques) et la note de
+cohérence de langue en §3.8 ajoutées au chantier 4, terminé.
