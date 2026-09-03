@@ -118,15 +118,15 @@
         <setter object="split_view" property="collapsed">True</setter>
       </object>
     </child>
+    <!-- Not in the widget tree: mounted on the split view from
+         RatureWindow.__init__ once the views have their App. Kept inside
+         the template so Gtk.Template.Child resolves them by contract, not
+         by the builder happening to parse the whole file. -->
+    <object class="AdwNavigationPage" id="reserve_page">
+      <property name="title" translatable="yes">Reserve</property>
+    </object>
+    <object class="AdwNavigationPage" id="recurring_page">
+      <property name="title" translatable="yes">Recurring</property>
+    </object>
   </template>
-  <object class="AdwNavigationPage" id="reserve_page">
-    <property name="title" translatable="yes">Reserve</property>
-    <!-- Content is ReserveView, attached in RatureWindow.__init__: it
-         needs App, which template XML has no way to pass in. -->
-  </object>
-  <object class="AdwNavigationPage" id="recurring_page">
-    <property name="title" translatable="yes">Recurring</property>
-    <!-- Content is RecurringView, attached in RatureWindow.__init__: it
-         needs App, which template XML has no way to pass in. -->
-  </object>
 </interface>
