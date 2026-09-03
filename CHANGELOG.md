@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A self-hosted Flatpak repository and a standalone `.flatpak` bundle as
+  install channels (ROADMAP §5.2, §5.3). A Release workflow builds the
+  Flatpak on a `v*` tag or a manual dispatch, signs the repository and the
+  bundle with a dedicated GPG key, and deploys the repository, its
+  `.flatpakrepo` and a landing page to GitHub Pages; the bundle is
+  attached to the GitHub release.
+
 ## [0.10.0] - 2026-09-03
 
 ### Added

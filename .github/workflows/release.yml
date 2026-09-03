@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to (re)publish
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  GPG_FPR: C2CBB256D91B01B920B0BE3898280657575FC9DA
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Import the repo signing key
+        run: printf '%s' "$KEY" | gpg --batch --import
+        env:
+          KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: rature.flatpak
+          manifest-path: build-aux/flatpak/io.github.vertours.Rature.yml
+          gpg-sign: ${{ env.GPG_FPR }}
+          cache-key: flatpak-release-${{ github.sha }}
+
+      - name: Generate static deltas and re-sign the summary
+        run: >
+          flatpak build-update-repo --generate-static-deltas
+          --gpg-sign=${{ env.GPG_FPR }} repo
+
+      - name: Assemble the Pages site
+        run: |
+          mkdir -p site
+          mv repo site/repo
+          cp io.github.vertours.Rature.flatpakrepo site/
+          cp build-aux/flatpak/repo-signing-key.gpg site/
+          cp build-aux/flatpak/index.html site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: rature.flatpak
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+
+      - name: Attach the bundle to the release
+        run: |
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 \
+            || gh release create "$RELEASE_TAG" --verify-tag \
+                 --title "$RELEASE_TAG" --notes "See CHANGELOG.md."
+          gh release upload "$RELEASE_TAG" rature.flatpak --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
