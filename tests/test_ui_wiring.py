@@ -196,12 +196,18 @@ def test_template_classes_point_to_existing_ui_with_matching_children() -> None:
                     f"<template class={gtype_name!r}>"
                 )
                 continue
-            ids_in_ui = {node.get("id") for node in ui_tree.iter() if node.get("id")}
-            missing = set(child_ids) - ids_in_ui
+            # Ids must sit inside <template>, not merely somewhere in the
+            # file: Gtk.Template.Child binds children of the template, and
+            # resolving a detached top-level <object> only works by
+            # accident of the builder parsing the whole interface.
+            ids_in_template = {
+                node.get("id") for node in template.iter() if node.get("id")
+            }
+            missing = set(child_ids) - ids_in_template
             if missing:
                 violations.append(
-                    f"{py_path.name}: Template.Child ids missing from "
-                    f"{ui_path.name}: {sorted(missing)}"
+                    f"{py_path.name}: Template.Child ids not inside "
+                    f"<template> in {ui_path.name}: {sorted(missing)}"
                 )
     assert not violations, violations
 
