@@ -192,6 +192,14 @@ def test_list_archives_ignores_a_non_dated_name(tmp_path: Path) -> None:
     assert list_archives(data_dir=tmp_path) == []
 
 
+def test_list_archives_ignores_an_impossible_date(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / "2026-02-30.json").write_text("{}", encoding="utf-8")
+    (archive_dir / "2026-08-24.json").write_text("{}", encoding="utf-8")
+    assert list_archives(data_dir=tmp_path) == [date(2026, 8, 24)]
+
+
 def test_list_archives_ignores_an_orphaned_tmp_file(tmp_path: Path) -> None:
     archive_dir = tmp_path / "archive"
     archive_dir.mkdir()
