@@ -65,6 +65,16 @@
   </screenshots>
 
   <releases>
+    <release version="0.10.1" date="2026-09-03">
+      <description>
+        <p>
+          Rature is now installable from a self-hosted Flatpak repository,
+          with automatic updates, and as a standalone bundle attached to
+          each release. This release also fixes the interface staying in
+          English on a translated system when run as a Flatpak.
+        </p>
+      </description>
+    </release>
     <release version="0.10.0" date="2026-09-03">
       <description>
         <p>
