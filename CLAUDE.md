@@ -75,18 +75,13 @@ Discutées et tranchées. **Ne pas les rouvrir** sans demande explicite.
 | Qualité | ruff, pytest, CI GitHub Actions |
 | Sort du POC | Abandonné. Ni utilisé, ni migré, ni consulté, ni recopié |
 | Jalons | Sens de `0.9.x` et `1.0.0` : `docs/internal/ROADMAP.md` |
+| Mention de l'assistance IA | Une ligne factuelle dans le README public. Tranché au chantier 5 |
+| Document d'architecture | Traduit en anglais, publié dans `docs/ARCHITECTURE.md`, version interne française retirée. Tranché au chantier 5 |
 
 Les décisions qui ont une histoire sont documentées dans `docs/adr/` :
 rejet de Flathub (0001), séparation `core` et `ui` (0002), fichier JSON
 unique (0003), abandon du prototype (0004), journal de suppressions (0005),
 installation du paquet sous `datadir` (0006).
-
-### Décisions encore ouvertes
-
-- **Mention de l'assistance IA dans le README public.** À trancher avant le
-  chantier 5, pas avant. Ne pas relancer le sujet d'ici là.
-- **Traduction de `ARCHITECTURE.md` en anglais et publication dans `docs/`.**
-  À trancher au chantier 5, pas avant.
 
 ---
 
