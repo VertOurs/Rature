@@ -208,6 +208,16 @@ class App:
         """
         return Session(self.read_archive(day_date))
 
+    def archive_session_from(self, day: Day) -> Session:
+        """A read-only Session around an already-loaded archived Day.
+
+        Same result as archived_session(day_date), for a caller that holds
+        the Day itself: the Archives window caches parsed archives and
+        should not reread the file to render one. Keeps Session out of ui/
+        (ARCHITECTURE.md: only App bridges ui/ to core/).
+        """
+        return Session(day)
+
     def day_text(self) -> str:
         """SPECIFICATION.md §3.12: the current day as plain text."""
         return export.day_text(self.session)
