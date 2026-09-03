@@ -6,10 +6,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 5, publication. `0.10.0` est coupée
-  (2026-09-03, sur `//50`) : version dans les quatre sources, `CHANGELOG`
-  et metainfo `<release>` à jour. Reste à taguer `v0.10.0` et à monter le
-  canal de distribution (§5.2).
+- **Chantier en cours** : 5, publication. **`0.10.0` est publiée**
+  (2026-09-03, sur `//50`) : quatre sources de version, `CHANGELOG` et
+  metainfo `<release>` à jour, tag `v0.10.0` annoté et signé sur le
+  commit de merge de la PR #93, release GitHub « nue » (tarball source).
+  Reste le canal de distribution (§5.2).
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -25,15 +26,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   metainfo complété (`<branding>`, `<url type="contribute">`, description,
   `<screenshots>` + 4 captures dans `data/screenshots/`),
   `flatpak-builder-lint` manifeste **et** dépôt en CI (deux erreurs
-  Flathub-only filtrées, `build-aux/flatpak/repo_lint.py`), version
-  `0.10.0` coupée.
+  Flathub-only filtrées, `build-aux/flatpak/repo_lint.py`), `0.10.0`
+  coupée, taguée et publiée.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Taguer `v0.10.0` (signé) + release GitHub « nue » (tarball source),
-     notes = section `0.10.0` du `CHANGELOG`.
-  2. §5.2 dépôt Flatpak auto-hébergé (clé GPG de signature = auteur),
-     §5.3 bundle, §5.4 AUR/COPR.
-  3. Bump `//51` → `0.10.1` dès l'image CI `gnome-51` disponible.
+  1. §5.2 dépôt Flatpak auto-hébergé. Prérequis auteur : clé GPG dédiée
+     à la signature du dépôt (≠ clé de commit), sauvegardée hors machine,
+     partie privée en secret GitHub Actions. Puis action `on: push tags
+     v*` → `flatpak build-export` signé → GitHub Pages + `.flatpakrepo`.
+  2. §5.3 bundle `.flatpak` autonome joint à chaque release.
+  3. §5.4 AUR (PKGBUILD) + COPR (.spec).
+  4. Bump `//51` → `0.10.1` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
