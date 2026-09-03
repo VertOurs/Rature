@@ -34,6 +34,19 @@ jobs:
         with:
           ref: ${{ env.RELEASE_TAG }}
 
+      # The repo descriptor, signing key and landing page are distribution
+      # metadata, not versioned with the app. Take them from the branch the
+      # workflow runs on, so re-publishing a tag cut before this workflow
+      # existed still finds them.
+      - uses: actions/checkout@v7
+        with:
+          path: _dist
+          sparse-checkout: |
+            io.github.vertours.Rature.flatpakrepo
+            build-aux/flatpak/repo-signing-key.gpg
+            build-aux/flatpak/index.html
+          sparse-checkout-cone-mode: false
+
       - name: Import the repo signing key
         run: printf '%s' "$KEY" | gpg --batch --import
         env:
@@ -55,9 +68,9 @@ jobs:
         run: |
           mkdir -p site
           mv repo site/repo
-          cp io.github.vertours.Rature.flatpakrepo site/
-          cp build-aux/flatpak/repo-signing-key.gpg site/
-          cp build-aux/flatpak/index.html site/index.html
+          cp _dist/io.github.vertours.Rature.flatpakrepo site/
+          cp _dist/build-aux/flatpak/repo-signing-key.gpg site/
+          cp _dist/build-aux/flatpak/index.html site/index.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
