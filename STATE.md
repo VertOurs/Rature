@@ -13,23 +13,28 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
   runtime vers GNOME 51.
-- **Bump `//51` bloqué par l'amont** jusqu'au ~16 septembre 2026 : l'image
-  CI `ghcr.io/flathub-infra/flatpak-github-actions:gnome-51` renvoie 404
-  et le runtime `//51` stable n'est pas encore sur `flathub` (51 est en
-  RC, stable le 16/09). `//50` reste la stable courante, non EOL, d'ici
-  là. Vérifié le 3 septembre 2026.
-- **`ARCHITECTURE.md` traduit et publié** dans `docs/ARCHITECTURE.md`,
-  rafraîchi sur l'arborescence courante ; l'ancienne version interne
-  française est retirée.
+- **`0.10.0` sort sur `//50`.** Décision du 3 septembre 2026 : ne pas
+  bloquer la release sur GNOME 51. `//50` passe EOL vers le 16/09 ; le
+  bump `//51` est fait ensuite, dès que l'image CI
+  `ghcr.io/flathub-infra/flatpak-github-actions:gnome-51` existe (elle
+  renvoie 404 au 3/09), et livré en `0.10.1`.
+- **Fait au chantier 5** : décisions figées (`CLAUDE.md` §3),
+  `ARCHITECTURE.md` traduit et publié dans `docs/ARCHITECTURE.md`
+  (rafraîchi, version interne retirée), README réécrit avec la ligne IA,
+  metainfo complété (`<branding>`, `<url type="contribute">`, description),
+  `flatpak-builder-lint manifest` en CI.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Qualité §5.1 : README anglais (ligne IA, install), metainfo complet
-     (`<url>`, `<branding>`, `<releases>`, `<screenshots>`), captures,
-     `flatpak-builder-lint` en CI.
-  2. Dès que l'image `gnome-51` existe : bump `//50` → `//51` (manifeste,
-     CI, table « Versions retenues »).
-  3. Couper `0.10.0` (version Meson, CHANGELOG, tag signé) — après le
-     bump —, puis §5.2 dépôt Flatpak auto-hébergé.
+  1. Captures d'écran → bloc `![]()` du README + `<screenshots>` du
+     metainfo (4 PNG dans `data/screenshots/`, fournies par l'auteur).
+  2. `flatpak-builder-lint repo` en CI + `.flatpak-builder-lint-exceptions.json`
+     documenté pour les règles purement Flathub.
+  3. Couper `0.10.0` sur `//50` : version Meson, `CHANGELOG`
+     `[Unreleased]` → `[0.10.0]`, metainfo `<release>`, `STATE.md`, tag
+     signé `v0.10.0`.
+  4. §5.2 dépôt Flatpak auto-hébergé (clé GPG de signature = auteur),
+     §5.3 bundle, §5.4 AUR/COPR.
+  5. Bump `//51` → `0.10.1` dès l'image CI disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -51,7 +56,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 
 | Élément | Version | Motif |
 |---|---|---|
-| Runtime | `org.gnome.Platform//50` | Stable courante. GNOME 51 sort le 16 septembre 2026, la 50 passe alors en fin de vie |
+| Runtime | `org.gnome.Platform//50` | Jusqu'à `0.10.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `0.10.1` dès l'image CI `gnome-51` disponible |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
 | Version du projet | `0.9.0` | Adaptation aux fenêtres étroites ; complète le chantier 3 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
@@ -64,8 +69,9 @@ complète) et deux correctifs (PR #44, plantage au démarrage ; PR #46,
 titre d'en-tête). Le chantier 4 est complet ; une fonctionnalité impose
 un incrément **mineur** : la prochaine release sera `0.10.0`.
 
-**Bump vers GNOME 51 à partir du 16 septembre 2026** : manifeste, CI,
-`STATE.md`. Rien de publié d'ici là, donc pas d'urgence.
+**Bump vers GNOME 51** : après la sortie stable (16 septembre 2026) et la
+publication de l'image CI `gnome-51`. Touche le manifeste, la CI et la
+table ci-dessus. Livré en `0.10.1`, `0.10.0` restant sur `//50`.
 
 ## Environnement de la machine
 
