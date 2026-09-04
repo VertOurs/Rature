@@ -183,3 +183,9 @@ chantier 3, terminé.
 `SPECIFICATION.md` §3.11 à §3.14 (raccourcis et fenêtre d'aide, export
 texte, recherche dans les archives, fenêtre Statistiques) et la note de
 cohérence de langue en §3.8 ajoutées au chantier 4, terminé.
+
+`ROADMAP.md` étendue à la v2 le 4 septembre 2026 (PR #102) : chantiers 6
+(observabilité et finition), 7 (capture et réserve) et 8 (confort et
+langues), qui closent sur `2.0.0`. `CONTRIBUTING.md` mis à jour en
+conséquence : les versions majeures sont désormais pilotées par les
+jalons de `ROADMAP.md`, qui prévaut sur les règles d'incrément générales.
