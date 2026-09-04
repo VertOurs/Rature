@@ -160,8 +160,9 @@ merge time.
 - `BREAKING CHANGE`: major.
 - Before 1.0, a break takes a minor bump only.
 
-What `0.9.x` and `1.0.0` mean for this project: see
-`docs/internal/ROADMAP.md`.
+Majors are milestone-driven here: what `0.9.x`, `1.0.0` and `2.0.0` mean
+for this project, and which milestones they close, is defined in
+`docs/internal/ROADMAP.md`, which prevails over the increment rules above.
 
 ## Releases
 
