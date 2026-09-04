@@ -13,6 +13,8 @@ n'est pas atteint.
 
 ## Vue d'ensemble
 
+### Version 1
+
 | Chantier | Objet | Visible pour l'utilisateur |
 |---|---|---|
 | 0 | Fondations : dépôt, Meson, CI, licence | Non |
@@ -22,10 +24,22 @@ n'est pas atteint.
 | 4 | Confort et traductions | Oui |
 | 5 | Publication : dépôt auto-hébergé, AUR, COPR | Oui |
 
+### Version 2
+
+| Chantier | Objet | Visible pour l'utilisateur |
+|---|---|---|
+| 6 | Observabilité et finition | Peu |
+| 7 | Capture et réserve | Oui, beaucoup |
+| 8 | Confort et langues | Oui |
+
 `0.9.x` correspond aux chantiers 0 à 4 terminés : fonctionnellement
-complet, non publié. `1.0.0` correspond au chantier 5 terminé :
-l'application est installable et se met à jour depuis le dépôt
-auto-hébergé.
+complet, non publié. `1.0.0` correspond aux chantiers 0 à 5 tous
+terminés : l'application est installable et se met à jour depuis le
+dépôt auto-hébergé. C'est la clôture de la v1.
+
+`2.0.0` correspond aux chantiers 6, 7 et 8 tous terminés, chacun avec
+son critère de fin atteint. C'est la v2. Les versions `1.x`
+intermédiaires suivent les règles d'incrément de `CONTRIBUTING.md`.
 
 ---
 
@@ -192,6 +206,96 @@ dépôt auto-hébergé, et la publication d'une version reste automatisée.
 
 ---
 
+## Chantier 6 : observabilité et finition
+
+Rendre l'application diagnosticable avant d'y ajouter de la complexité.
+Aucune fonctionnalité nouvelle pour l'utilisateur, en dehors d'une
+correction.
+
+- [ ] `logging` de la bibliothèque standard, un logger par module, aucune
+      dépendance nouvelle
+- [ ] Sortie vers stderr, donc lisible par `journalctl` sous Flatpak
+- [ ] Niveau réglable par variable d'environnement, `INFO` par défaut
+- [ ] Aucun texte de tâche ni de réserve dans les journaux au niveau par
+      défaut. Ces textes sont des données personnelles. Les identifiants et
+      les compteurs suffisent au diagnostic
+- [ ] Points instrumentés au minimum : démarrage, chemin des données,
+      passage du jour, archivage, échec d'écriture, migration appliquée
+- [ ] Correction : le focus remonte et ne reste pas en place après un ajout
+      en réserve
+- [ ] README affiné, captures à jour
+
+**Critère de fin** : `journalctl` montre le démarrage, le passage du jour
+et un échec d'écriture provoqué ; aucun texte de tâche n'apparaît dans les
+journaux au niveau par défaut ; le focus reste en place après un ajout en
+réserve.
+
+---
+
+## Chantier 7 : capture et réserve
+
+La capture depuis le téléphone revient, sans application dédiée, sans
+réseau et sans compte tiers : un fichier texte déposé dans un dossier
+synchronisé.
+
+La vue Jour n'est pas concernée. Les numéros, les rayées, le passage à
+04:00, l'annulation de suppression et les archives restent locaux et
+inchangés.
+
+### 7.1 Boîte de dépôt
+
+- [ ] ADR 0007 : boîte de dépôt texte, écrite avant le code
+- [ ] Dossier surveillé choisi par l'utilisateur via le portail de fichiers,
+      mémorisé dans GSettings. Aucune permission large ajoutée au manifeste
+- [ ] Lecture au démarrage, puis à chaque retour de focus de la fenêtre.
+      Pas de surveillance continue
+- [ ] Format : une tâche par ligne, lignes vides ignorées, aucune syntaxe
+- [ ] Un fichier importé est déplacé dans un sous-dossier `traité/`, jamais
+      supprimé
+- [ ] Aucun dédoublonnage à l'import, conformément à `SPECIFICATION.md`
+      §2.7.4 qui ne dédoublonne qu'au passage du jour
+- [ ] Fichier illisible ou mal encodé : rien n'est importé, le fichier reste
+      en place, une bannière prévient. Réutilise le motif de quarantaine déjà
+      en place pour `data.json`
+- [ ] Chaque source de capture écrit son propre fichier
+      (`inbox-<machine>-<horodatage>.txt`), donc jamais deux écrivains sur un
+      même fichier
+
+### 7.2 Réserve et priorité
+
+- [ ] Renvoi manuel d'une tâche du jour vers la réserve : méthode dans
+      `core`, bouton, glisser-déposer
+- [ ] Priorité : marqueur visuel seul, aucun effet sur l'ordre d'affichage
+      ni sur les numéros. S'applique aux tâches du jour et aux items de
+      réserve
+- [ ] Migration de format pour le champ de priorité. Première utilisation
+      réelle du socle `migrations.py` posé au chantier 1
+
+**Critère de fin** : un fichier texte déposé depuis un téléphone via un
+dossier synchronisé apparaît en réserve au retour de focus, et se retrouve
+dans `traité/` ; un fichier illisible ne fait perdre aucune tâche et
+déclenche la bannière ; la priorité n'a aucun effet sur l'ordre ; la
+migration s'applique sans perte sur un fichier de version antérieure.
+
+---
+
+## Chantier 8 : confort et langues
+
+- [ ] Fenêtre Statistiques rafraîchie pendant qu'elle est ouverte, sans
+      avoir à la refermer
+- [ ] Catalogues `es`, `de`, `pt_BR`, `ru`, `eo`
+- [ ] Job CI de traduction :
+      `msgfmt --check --check-format --check-header`
+- [ ] Les traductions produites par machine sont signalées comme telles dans
+      l'en-tête du `.po` concerné. Transparence sur l'origine, pas de
+      traducteur humain attribué à tort
+
+**Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
+traduite pour chaque catalogue livré, le job CI de traduction est vert, et
+la fenêtre Statistiques se met à jour sans être refermée.
+
+---
+
 ## Après publication
 
 - Suivre les fins de vie de runtime, une migration par an environ
@@ -204,13 +308,26 @@ dépôt auto-hébergé, et la publication d'une version reste automatisée.
 
 Noté ici pour ne pas y penser pendant les chantiers.
 
-- **Dictée vocale.** Demanderait un moteur local, whisper.cpp ou vosk.
-  Alourdit fortement le paquet. À réévaluer seulement si le manque se fait
-  sentir à l'usage.
-- **Synchronisation entre machines.** Écartée.
-- **Version mobile et capture depuis le téléphone.** Écartées le 24 août
-  2026. Le projet reste une application de bureau sur un seul poste.
-- **Traduction espéranto.** Hors MVP v1. Le pipeline gettext la rendrait
-  possible sans travail d'infrastructure, un simple catalogue `eo/` ; à
-  réévaluer après la 1.0 si le besoin se confirme. « Français en priorité »
-  reste la seule langue engagée (décisions figées, `CLAUDE.md` §3).
+- **Dictée vocale.** Écartée. Demanderait un moteur local, whisper.cpp ou
+  vosk, et alourdirait fortement le paquet. Non utilisée en pratique par
+  l'auteur. À réévaluer seulement si le manque se fait sentir à l'usage.
+- **Synchronisation de la journée en cours entre machines.** Écartée. Elle
+  imposerait un moteur de fusion dans `core/`, avec des conflits sur le
+  compteur de numéros, le verrouillage et le passage du jour. La réserve,
+  qui est la partie durable des données, est traitée au chantier 7.
+- **Synchronisation avec Todoist ou un autre service tiers.** Écartée au
+  profit de la boîte de dépôt texte du chantier 7, qui couvre le même besoin
+  sans réseau, sans jeton et sans compte. À réévaluer seulement si la boîte
+  de dépôt se révèle insuffisante à l'usage.
+- **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
+  mais dans la maintenance de deux bases à vie, pour une personne seule.
+  La capture depuis le téléphone est traitée au chantier 7 par n'importe
+  quelle application de notes capable d'écrire dans un dossier synchronisé.
+- **Version mobile de l'application.** Écartée le 24 août 2026. Le projet
+  reste une application de bureau.
+
+Note : l'entrée « Traduction espéranto », auparavant repoussée, entre au
+chantier 8 et sort donc de cette section. L'entrée « capture depuis le
+téléphone », auparavant regroupée avec « version mobile » et repoussée le
+24 août 2026, entre au chantier 7 sous la forme d'une boîte de dépôt texte
+et sort donc, elle aussi, de cette section.
