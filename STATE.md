@@ -15,9 +15,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (§5.2 + §5.3) et corrige un bug de traduction Flatpak (interface restée
   en anglais : domaine texte C non lié + catalogue dans une extension
   `.Locale` non tirée ; `separate-locales: false` + `locale.textdomain`
-  dans `src/rature.in`). `0.10.0` reste taguée, sur `//50`. Reste, hors
-  agent (`CLAUDE.md` §6) : `flatpak install` depuis une machine propre et
-  contrôle que l'interface est en français.
+  dans `src/rature.in`). `0.10.0` reste taguée, sur `//50`. Installation
+  testée depuis une machine propre (hors agent, `CLAUDE.md` §6), le
+  8 septembre 2026 : mise à jour automatique via le dépôt sans souci,
+  interface bien en français.
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -51,15 +52,14 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   éparse de la branche du workflow (PR #96), et `gh` du job `deploy` reçoit
   `GH_REPO` faute de checkout (PR #97). Rodé sur `v0.10.0`
   (`workflow_dispatch`) puis `v0.10.1` (push de tag), 3 septembre 2026.
-  Reste, hors agent (`CLAUDE.md` §6) : `flatpak remote-add` + `install`
-  depuis une machine propre ; sauvegarde hors machine de la clé privée
-  `~/rature-repo-signing.private.asc` puis suppression.
+  Testé hors agent (`CLAUDE.md` §6), le 8 septembre 2026 :
+  `flatpak remote-add` + `install` depuis une machine propre, mise à jour
+  automatique confirmée ; clé privée `~/rature-repo-signing.private.asc`
+  sauvegardée hors machine puis supprimée du disque.
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
   `//50` :
-  1. Test d'installation de `0.10.1` depuis une machine propre, contrôle
-     que l'interface est en français (hors agent).
-  2. §5.4 AUR (PKGBUILD) + COPR (.spec).
-  3. Bump `//51` → `0.10.2` dès l'image CI `gnome-51` disponible.
+  1. §5.4 AUR (PKGBUILD) + COPR (.spec).
+  2. Bump `//51` → `0.10.2` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
