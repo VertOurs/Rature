@@ -15,6 +15,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   le dépôt auto-hébergé.
 - **Suivi ouvert** : bump runtime `//50` → `//51` en `1.0.1` dès que
   l'image CI `gnome-51` existe (voir « Versions retenues »).
+- **À l'ouverture du chantier 6** : activer les alertes de sécurité
+  Dependabot (Settings → Code security), désactivées aujourd'hui ;
+  rappel demandé par VertOurs le 8 septembre 2026. Distinct des mises à
+  jour de version Dependabot, déjà actives (`.github/dependabot.yml`).
+- **Audit pré-chantier 6** (8 septembre 2026) : aucun `TODO`, aucun
+  `print`, aucun `except` trop large, séparation `core`/`ui` et i18n
+  intactes. Issue #85 (trou de couverture `storage`, ouverte le
+  3 septembre) toujours ouverte, bon premier ticket pour le chantier 6.
+  Quatre actions GitHub obsolètes dans `release.yml` corrigées
+  (`upload-artifact`, `download-artifact`, `upload-pages-artifact`,
+  `deploy-pages`).
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
