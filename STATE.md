@@ -56,10 +56,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `flatpak remote-add` + `install` depuis une machine propre, mise à jour
   automatique confirmée ; clé privée `~/rature-repo-signing.private.asc`
   sauvegardée hors machine puis supprimée du disque.
+- **AUR et COPR repoussés au chantier 6** (décision du 8 septembre 2026,
+  `docs/internal/ROADMAP.md` §6) : ils ne conditionnent plus la 1.0. Le
+  `PKGBUILD` écrit au chantier 5 reste dans `build-aux/aur/PKGBUILD`, prêt
+  à être soumis quand le chantier 6 s'ouvrira ; la soumission elle-même,
+  compte AUR et clé SSH, reste hors agent (`CLAUDE.md` §6).
 - **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
-  `//50` :
-  1. §5.4 AUR (PKGBUILD) + COPR (.spec).
-  2. Bump `//51` → `0.10.2` dès l'image CI `gnome-51` disponible.
+  `//50` : bump `//51` → `0.10.2` dès l'image CI `gnome-51` disponible.
+  Avec les deux points hors agent validés plus haut, le critère de fin du
+  chantier 5 semble atteint indépendamment de ce bump ; la clôture du
+  chantier et le tag `1.0.0` restent une décision de VertOurs.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt

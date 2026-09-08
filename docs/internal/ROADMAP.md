@@ -22,13 +22,13 @@ n'est pas atteint.
 | 2 | Réserve et récurrentes, côté logique | Non |
 | 3 | Interface reconstruite | Oui, beaucoup |
 | 4 | Confort et traductions | Oui |
-| 5 | Publication : dépôt auto-hébergé, AUR, COPR | Oui |
+| 5 | Publication : dépôt auto-hébergé | Oui |
 
 ### Version 2
 
 | Chantier | Objet | Visible pour l'utilisateur |
 |---|---|---|
-| 6 | Observabilité et finition | Peu |
+| 6 | Observabilité, finition et paquetage natif | Peu |
 | 7 | Capture et réserve | Oui, beaucoup |
 | 8 | Confort et langues | Oui |
 
@@ -191,15 +191,9 @@ n'importe quelle application Flatpak.
 Installation en une commande, sans mises à jour automatiques. Utile pour
 essayer sans ajouter de dépôt.
 
-### 5.4 Paquets natifs
-
-- [ ] **AUR** (Arch) : un PKGBUILD, publication immédiate, sans revue
-- [ ] **COPR** (Fedora) : un fichier .spec, reconstruction automatique depuis
-      le dépôt git
-
-Écartés volontairement : PPA Ubuntu, OBS, et les dépôts officiels Fedora ou
-Debian, qui demandent parrainage, revue et un engagement de maintenance hors
-de proportion pour une personne seule.
+AUR et COPR (paquets natifs, anciennement §5.4) ne conditionnent plus la
+1.0 : décision du 8 septembre 2026, repoussés au chantier 6. Le `PKGBUILD`
+écrit à ce stade vit dans `build-aux/aur/PKGBUILD`.
 
 **Critère de fin** : l'application s'installe et se met à jour depuis le
 dépôt auto-hébergé, et la publication d'une version reste automatisée.
@@ -225,10 +219,25 @@ correction.
       en réserve
 - [ ] README affiné, captures à jour
 
+### Paquetage natif
+
+Repoussé du chantier 5 (décision du 8 septembre 2026) : la 1.0 ne dépend
+que du dépôt auto-hébergé et du bundle, pas des paquets natifs. Le
+`PKGBUILD` écrit au chantier 5 vit déjà dans `build-aux/aur/PKGBUILD`.
+
+- [ ] **AUR** (Arch) : soumettre `build-aux/aur/PKGBUILD`, publication
+      immédiate, sans revue
+- [ ] **COPR** (Fedora) : un fichier .spec, reconstruction automatique
+      depuis le dépôt git
+
+Écartés volontairement : PPA Ubuntu, OBS, et les dépôts officiels Fedora ou
+Debian, qui demandent parrainage, revue et un engagement de maintenance hors
+de proportion pour une personne seule.
+
 **Critère de fin** : `journalctl` montre le démarrage, le passage du jour
 et un échec d'écriture provoqué ; aucun texte de tâche n'apparaît dans les
 journaux au niveau par défaut ; le focus reste en place après un ajout en
-réserve.
+réserve ; le paquet est publié sur AUR et sur COPR.
 
 ---
 
