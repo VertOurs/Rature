@@ -6,19 +6,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 5, publication. **`0.10.1` est publiée**
-  (2026-09-03, sur `//50`) : quatre sources de version d'accord, `CHANGELOG`
-  et metainfo `<release>` à jour, tag `v0.10.1` annoté et signé sur le
-  commit de merge de la PR #100, `release.yml` vert (dépôt et bundle
-  reconstruits et signés, `https://vertours.github.io/Rature/` republié,
-  `rature.flatpak` joint à la release). Elle publie le canal auto-hébergé
-  (§5.2 + §5.3) et corrige un bug de traduction Flatpak (interface restée
-  en anglais : domaine texte C non lié + catalogue dans une extension
-  `.Locale` non tirée ; `separate-locales: false` + `locale.textdomain`
-  dans `src/rature.in`). `0.10.0` reste taguée, sur `//50`. Installation
-  testée depuis une machine propre (hors agent, `CLAUDE.md` §6), le
-  8 septembre 2026 : mise à jour automatique via le dépôt sans souci,
-  interface bien en français.
+- **Chantier en cours** : 5, publication. **`1.0.0` est coupée**
+  (2026-09-08, sur `//50`) : quatre sources de version d'accord,
+  `CHANGELOG` et metainfo `<release>` à jour. Aucun changement fonctionnel
+  depuis `0.10.1` : le critère de fin du chantier 5 est atteint, dépôt
+  auto-hébergé installable et auto-mis-à-jour, testé sur une machine
+  propre le 8 septembre 2026 (interface en français). `0.10.0` et
+  `0.10.1` restent taguées, sur `//50`. Reste : merge de la PR, tag
+  `v1.0.0` annoté et signé, push du tag, puis contrôle que `release.yml`
+  est vert.
 - **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
   = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
   anglais, publié dans `docs/`, version interne française retirée ; bump
@@ -27,7 +23,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   2026 : ne pas bloquer la release sur GNOME 51. `//50` passe EOL vers le
   16/09 ; le bump `//51` est fait ensuite, dès que l'image CI
   `ghcr.io/flathub-infra/flatpak-github-actions:gnome-51` existe (elle
-  renvoie 404 au 3/09), et livré en `0.10.2`.
+  renvoie 404 au 3/09), et livré en `1.0.1` (patch, `1.0.0` étant sortie
+  avant ce bump).
 - **Fait au chantier 5** : décisions figées (`CLAUDE.md` §3),
   `ARCHITECTURE.md` traduit et publié dans `docs/ARCHITECTURE.md`
   (rafraîchi, version interne retirée), README réécrit avec la ligne IA,
@@ -61,11 +58,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `PKGBUILD` écrit au chantier 5 reste dans `build-aux/aur/PKGBUILD`, prêt
   à être soumis quand le chantier 6 s'ouvrira ; la soumission elle-même,
   compte AUR et clé SSH, reste hors agent (`CLAUDE.md` §6).
-- **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5), sur
-  `//50` : bump `//51` → `0.10.2` dès l'image CI `gnome-51` disponible.
-  Avec les deux points hors agent validés plus haut, le critère de fin du
-  chantier 5 semble atteint indépendamment de ce bump ; la clôture du
-  chantier et le tag `1.0.0` restent une décision de VertOurs.
+- **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5) :
+  1. Merge de la release `1.0.0`, tag `v1.0.0` annoté et signé, push du
+     tag.
+  2. Contrôle que `release.yml` est vert (dépôt et bundle republiés).
+  3. Bump `//51` → `1.0.1` dès l'image CI `gnome-51` disponible.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -92,9 +89,9 @@ manifeste (`CLAUDE.md` §4 règle 8).
 
 | Élément | Version | Motif |
 |---|---|---|
-| Runtime | `org.gnome.Platform//50` | Jusqu'à `0.10.1` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `0.10.2` dès l'image CI `gnome-51` disponible |
+| Runtime | `org.gnome.Platform//50` | Jusqu'à `1.0.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.0.1` dès l'image CI `gnome-51` disponible |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `0.10.1` | Canal auto-hébergé (§5.2 + §5.3) et correctif de traduction Flatpak, sur `//50`. Coupée le 3 septembre 2026 |
+| Version du projet | `1.0.0` | Ferme la v1 (chantiers 0 à 5). Aucun changement fonctionnel depuis `0.10.1`. Coupée le 8 septembre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -105,12 +102,17 @@ complète) plus le correctif du fichier JSON non-objet.
 
 `0.10.1` (3 septembre 2026) publie le dépôt Flatpak auto-hébergé et le
 bundle autonome (§5.2, §5.3) et corrige l'interface restée en anglais sous
-Flatpak. `[Unreleased]` est vide ; l'incrément suivant est `0.10.2`, le
-bump `//51`.
+Flatpak.
+
+`1.0.0` (8 septembre 2026) ferme la v1 : chantiers 0 à 5 tous terminés, le
+critère de fin du chantier 5 est atteint (installation et mise à jour
+automatique confirmées sur une machine propre). Aucun changement
+fonctionnel depuis `0.10.1`. AUR et COPR repoussés au chantier 6.
+`[Unreleased]` est vide ; l'incrément suivant est `1.0.1`, le bump `//51`.
 
 **Bump vers GNOME 51** : après la sortie stable (16 septembre 2026) et la
 publication de l'image CI `gnome-51`. Touche le manifeste, la CI et la
-table ci-dessus. Livré en `0.10.2`, `0.10.0` et `0.10.1` restant sur `//50`.
+table ci-dessus. Livré en `1.0.1`, `1.0.0` restant sur `//50`.
 
 ## Environnement de la machine
 

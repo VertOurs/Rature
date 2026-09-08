@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-08
+
+Milestone 5 (publication) is complete: Rature installs and updates itself
+from the self-hosted Flatpak repository, verified on a clean machine. This
+closes version 1 (ROADMAP.md).
+
+### Changed
+
+- AUR and COPR packages move to milestone 6, in version 2; they no longer
+  gate this release. The `PKGBUILD` written for milestone 5 stays in
+  `build-aux/aur/PKGBUILD`.
+
 ## [0.10.1] - 2026-09-03
 
 ### Added
