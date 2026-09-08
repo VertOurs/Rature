@@ -6,63 +6,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 5, publication. **`1.0.0` est coupée**
-  (2026-09-08, sur `//50`) : quatre sources de version d'accord,
-  `CHANGELOG` et metainfo `<release>` à jour. Aucun changement fonctionnel
-  depuis `0.10.1` : le critère de fin du chantier 5 est atteint, dépôt
-  auto-hébergé installable et auto-mis-à-jour, testé sur une machine
-  propre le 8 septembre 2026 (interface en français). `0.10.0` et
-  `0.10.1` restent taguées, sur `//50`. Reste : merge de la PR, tag
-  `v1.0.0` annoté et signé, push du tag, puis contrôle que `release.yml`
-  est vert.
-- **Décisions du chantier 5** (`CLAUDE.md` §3) : mention de l'assistance IA
-  = une ligne factuelle dans le README ; `ARCHITECTURE.md` traduit en
-  anglais, publié dans `docs/`, version interne française retirée ; bump
-  runtime vers GNOME 51.
-- **`0.10.0` et `0.10.1` sortent sur `//50`.** Décision du 3 septembre
-  2026 : ne pas bloquer la release sur GNOME 51. `//50` passe EOL vers le
-  16/09 ; le bump `//51` est fait ensuite, dès que l'image CI
-  `ghcr.io/flathub-infra/flatpak-github-actions:gnome-51` existe (elle
-  renvoie 404 au 3/09), et livré en `1.0.1` (patch, `1.0.0` étant sortie
-  avant ce bump).
-- **Fait au chantier 5** : décisions figées (`CLAUDE.md` §3),
-  `ARCHITECTURE.md` traduit et publié dans `docs/ARCHITECTURE.md`
-  (rafraîchi, version interne retirée), README réécrit avec la ligne IA,
-  metainfo complété (`<branding>`, `<url type="contribute">`, description,
-  `<screenshots>` + 4 captures dans `data/screenshots/`),
-  `flatpak-builder-lint` manifeste **et** dépôt en CI (deux erreurs
-  Flathub-only filtrées, `build-aux/flatpak/repo_lint.py`), `0.10.0`
-  coupée, taguée et publiée.
-- **§5.2 + §5.3, dépôt Flatpak auto-hébergé** : clé GPG dédiée à la
-  signature du dépôt (FPR `C2CBB256D91B01B920B0BE3898280657575FC9DA`,
-  ≠ clé de commit), publique dans `build-aux/flatpak/repo-signing-key.gpg`
-  et dans le `.flatpakrepo`, privée dans le secret Actions
-  `FLATPAK_GPG_PRIVATE_KEY`. GitHub Pages activé en mode `workflow` ;
-  l'environnement `github-pages` n'autorise le déploiement que depuis
-  `main`, il a fallu lui ajouter une règle pour les tags `v*` sinon le job
-  `deploy` déclenché par un tag est rejeté sans exécuter d'étape.
-  `.github/workflows/release.yml` (sur tag `v*` ou `workflow_dispatch`) :
-  build + bundle `.flatpak` signés, `build-update-repo` avec deltas
-  statiques, publication de `repo/` + `.flatpakrepo` + clé + `index.html`
-  sur Pages (`https://vertours.github.io/Rature/`), bundle joint à la
-  release. Les assets statiques du dépôt viennent d'une seconde extraction
-  éparse de la branche du workflow (PR #96), et `gh` du job `deploy` reçoit
-  `GH_REPO` faute de checkout (PR #97). Rodé sur `v0.10.0`
-  (`workflow_dispatch`) puis `v0.10.1` (push de tag), 3 septembre 2026.
-  Testé hors agent (`CLAUDE.md` §6), le 8 septembre 2026 :
-  `flatpak remote-add` + `install` depuis une machine propre, mise à jour
-  automatique confirmée ; clé privée `~/rature-repo-signing.private.asc`
-  sauvegardée hors machine puis supprimée du disque.
-- **AUR et COPR repoussés au chantier 6** (décision du 8 septembre 2026,
-  `docs/internal/ROADMAP.md` §6) : ils ne conditionnent plus la 1.0. Le
-  `PKGBUILD` écrit au chantier 5 reste dans `build-aux/aur/PKGBUILD`, prêt
-  à être soumis quand le chantier 6 s'ouvrira ; la soumission elle-même,
-  compte AUR et clé SSH, reste hors agent (`CLAUDE.md` §6).
-- **Étape suivante**, chantier 5 (`docs/internal/ROADMAP.md` §5) :
-  1. Merge de la release `1.0.0`, tag `v1.0.0` annoté et signé, push du
-     tag.
-  2. Contrôle que `release.yml` est vert (dépôt et bundle republiés).
-  3. Bump `//51` → `1.0.1` dès l'image CI `gnome-51` disponible.
+- **Chantier en cours** : aucun. Chantiers 0 à 5 terminés, `1.0.0`
+  publiée le 8 septembre 2026 (`docs/internal/ROADMAP.md`) : la v1 est
+  close. Le chantier 6 (v2 : observabilité, finition, paquetage natif)
+  n'a pas commencé.
+- **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
+  testé hors agent (`CLAUDE.md` §6) le 8 septembre 2026, sans souci, via
+  le dépôt auto-hébergé.
+- **Suivi ouvert** : bump runtime `//50` → `//51` en `1.0.1` dès que
+  l'image CI `gnome-51` existe (voir « Versions retenues »).
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -177,6 +129,15 @@ table ci-dessus. Livré en `1.0.1`, `1.0.0` restant sur `//50`.
   (`POTFILES.in`), `LC_TIME` réaligné sur la langue des messages au
   démarrage (`rature.i18n`). Couvre `SPECIFICATION.md` §3.11 à §3.14 et le
   critère de langue du `ROADMAP`.
+- **Chantier 5**, versions `0.10.0`, `0.10.1` et `1.0.0` (détail dans
+  `CHANGELOG.md`) : publication. Qualité façon Flathub sans Flathub
+  (`flatpak-builder-lint` manifeste et dépôt en CI, metainfo et README
+  complétés, `ARCHITECTURE.md` publié en anglais). Dépôt Flatpak
+  auto-hébergé signé sur GitHub Pages (clé et workflow détaillés dans
+  « Dépôt » ci-dessous) et bundle `.flatpak` joint à chaque release ;
+  installation et mise à jour automatique confirmées sur une machine
+  propre. AUR et COPR repoussés au chantier 6, `PKGBUILD` déjà écrit dans
+  `build-aux/aur/PKGBUILD`. Clôturé par `1.0.0`, qui ferme la v1.
 
 ## Documents
 

@@ -217,7 +217,11 @@ correction.
       passage du jour, archivage, échec d'écriture, migration appliquée
 - [ ] Correction : le focus remonte et ne reste pas en place après un ajout
       en réserve
-- [ ] README affiné, captures à jour
+- [ ] README affiné, captures à jour, rendu plus attractif
+- [ ] Logo revu
+- [ ] Page statique de présentation du projet sur GitHub Pages, en plus du
+      dépôt Flatpak déjà servi là
+- [ ] Sponsoring : `FUNDING.yml` et mention dans le README
 
 ### Paquetage natif
 
@@ -229,6 +233,7 @@ que du dépôt auto-hébergé et du bundle, pas des paquets natifs. Le
       immédiate, sans revue
 - [ ] **COPR** (Fedora) : un fichier .spec, reconstruction automatique
       depuis le dépôt git
+- [ ] **Mageia** : paquet source pour le dépôt communautaire
 
 Écartés volontairement : PPA Ubuntu, OBS, et les dépôts officiels Fedora ou
 Debian, qui demandent parrainage, revue et un engagement de maintenance hors
@@ -237,7 +242,7 @@ de proportion pour une personne seule.
 **Critère de fin** : `journalctl` montre le démarrage, le passage du jour
 et un échec d'écriture provoqué ; aucun texte de tâche n'apparaît dans les
 journaux au niveau par défaut ; le focus reste en place après un ajout en
-réserve ; le paquet est publié sur AUR et sur COPR.
+réserve ; le paquet est publié sur AUR, COPR et Mageia.
 
 ---
 
@@ -274,6 +279,8 @@ inchangés.
 
 - [ ] Renvoi manuel d'une tâche du jour vers la réserve : méthode dans
       `core`, bouton, glisser-déposer
+- [ ] Réordonnancement manuel (monter/descendre) des items de la réserve,
+      à côté du glisser-déposer déjà en place pour la vue Jour
 - [ ] Priorité : marqueur visuel seul, aucun effet sur l'ordre d'affichage
       ni sur les numéros. S'applique aux tâches du jour et aux items de
       réserve
@@ -285,6 +292,28 @@ dossier synchronisé apparaît en réserve au retour de focus, et se retrouve
 dans `traité/` ; un fichier illisible ne fait perdre aucune tâche et
 déclenche la bannière ; la priorité n'a aucun effet sur l'ordre ; la
 migration s'applique sans perte sur un fichier de version antérieure.
+
+### 7.3 Préparer le lendemain
+
+Besoin confirmé à l'usage (retour du 8 septembre 2026, après une semaine
+sur `0.10.1`) : pouvoir préparer la liste du jour suivant avant le
+passage de 04:00. Ce n'est pas un simple ajout : `SPECIFICATION.md` §2.5
+ne connaît aujourd'hui qu'une seule journée active, et `CLAUDE.md` pose
+« sans planification » comme principe fondateur du projet (§1).
+
+- [ ] Session de cadrage dédiée avant tout code : qu'est-ce qu'on prépare
+      exactement (une liste séparée ? des tâches ajoutées au jour suivant
+      qui basculent au rollover ?), et en quoi ça reste distinct de la
+      réserve. Tranche aussi ces deux points, qui en dépendent :
+      - décaler un item du jour directement au lendemain
+      - paramètre : un item non rayé en fin de journée retourne en
+        réserve ou bascule au lendemain, au choix
+- [ ] ADR documentant la décision et son articulation avec §2.5
+- [ ] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après
+
+**Ne commence pas avant que le cadrage ci-dessus soit fait.** L'abandon du
+POC (ADR 0004) vient exactement du scénario inverse : une fonctionnalité
+codée avant que la spec ne la décrive.
 
 ---
 
@@ -320,14 +349,27 @@ Noté ici pour ne pas y penser pendant les chantiers.
 - **Dictée vocale.** Écartée. Demanderait un moteur local, whisper.cpp ou
   vosk, et alourdirait fortement le paquet. Non utilisée en pratique par
   l'auteur. À réévaluer seulement si le manque se fait sentir à l'usage.
-- **Synchronisation de la journée en cours entre machines.** Écartée. Elle
-  imposerait un moteur de fusion dans `core/`, avec des conflits sur le
-  compteur de numéros, le verrouillage et le passage du jour. La réserve,
-  qui est la partie durable des données, est traitée au chantier 7.
-- **Synchronisation avec Todoist ou un autre service tiers.** Écartée au
-  profit de la boîte de dépôt texte du chantier 7, qui couvre le même besoin
-  sans réseau, sans jeton et sans compte. À réévaluer seulement si la boîte
-  de dépôt se révèle insuffisante à l'usage.
+- **Synchronisation de la journée en cours entre machines.** Repoussée
+  hors v2 : besoin réel reconfirmé le 8 septembre 2026, candidate pour la
+  v3. Elle imposerait un moteur de fusion dans `core/`, avec des conflits
+  sur le compteur de numéros, le verrouillage et le passage du jour. La
+  réserve, qui est la partie durable des données, est traitée au
+  chantier 7.
+- **Synchronisation avec Todoist ou un autre service tiers.** Repoussée
+  hors v2 : besoin réel reconfirmé le 8 septembre 2026, candidate pour la
+  v3, au profit pour l'instant de la boîte de dépôt texte du chantier 7,
+  qui couvre une partie du même besoin sans réseau, sans jeton et sans
+  compte.
+- **Étiquettes temporelles ou catégories** (« cet après-midi », « à faire
+  après »). Abandonnée le 8 septembre 2026 : ce sont des catégories, que
+  la méthode exclut par construction (`CLAUDE.md` §1) et que
+  `SPECIFICATION.md` §2.3 interdit (« pas de tri automatique, pas de
+  priorisation implicite »). À revoir seulement si le besoin ressurgit.
+- **Statistiques de suivi sur les récurrentes.** Abandonnée le
+  8 septembre 2026, le temps de voir si le besoin persiste ; candidate
+  pour la v3 sinon. Si le besoin ressurgit, attention : un suivi de
+  régularité frôle la série de jours consécutifs que `SPECIFICATION.md`
+  §2.3 interdit explicitement.
 - **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
   mais dans la maintenance de deux bases à vie, pour une personne seule.
   La capture depuis le téléphone est traitée au chantier 7 par n'importe
