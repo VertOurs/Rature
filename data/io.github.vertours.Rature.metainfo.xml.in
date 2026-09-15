@@ -65,6 +65,16 @@
   </screenshots>
 
   <releases>
+    <release version="1.1.0" date="2026-09-15">
+      <description>
+        <p>
+          Structured logging: startup, the data directory, a day rolling
+          over, an archive being written and a write failure now show up
+          in the system journal, with no task or reserve text logged at
+          the default level.
+        </p>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-09-08">
       <description>
         <p>
