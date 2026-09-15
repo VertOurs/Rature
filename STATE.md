@@ -38,10 +38,19 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   points instrumentés : démarrage + chemin des données et quarantaine
   (`App.open`), passage du jour (`App.ensure_day`), archivage et échec
   d'écriture (`storage`), migration appliquée (`migrations`). Aucun texte
-  de tâche ou de réserve loggé. `core/` toujours à 100 %. En attente de
-  validation du message de commit et d'ouverture de PR. Reste du
-  chantier 6 (README, logo, page GitHub Pages, `FUNDING.yml`, correctif
-  du focus, paquetage natif) non commencé.
+  de tâche ou de réserve loggé. `core/` toujours à 100 %.
+- **Focus après ajout** (ROADMAP chantier 6, 15 septembre 2026) : traité
+  sans reproduction possible. Ni VertOurs ni l'agent n'ont pu reproduire
+  le bug (« le focus remonte après un ajout en réserve ») au moment de le
+  traiter ; relecture de `day_view.py` et `reserve_view.py` sans anomalie
+  trouvée, `entry.grab_focus()` déjà appelé après `run_action` dans les
+  deux vues, conforme à `SPECIFICATION.md`. Garde-fou de non-régression
+  ajouté à la place (`tests/test_focus_kept_on_add.py`, analyse statique
+  AST : `grab_focus()` doit rester dans le corps du `if self.run_action`,
+  jamais avant). À rouvrir si le bug ressurgit, avec des étapes de
+  reproduction cette fois.
+- Reste du chantier 6 non commencé : README, logo, page GitHub Pages,
+  `FUNDING.yml`, paquetage natif.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
