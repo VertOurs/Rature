@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-15
+
+Milestone 6 (observability and finishing) is complete: logging is in
+place and confirmed live via `journalctl`, native packaging (AUR, COPR,
+Mageia) is prepared and verified but not yet submitted, and the README
+and project page are refreshed (`docs/internal/ROADMAP.md`).
+
 ### Added
 
 - Structured logging (ROADMAP milestone 6): stdlib `logging`, one logger
@@ -16,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   data file being quarantined, a day rolling over, an archive being
   written, a write failure, and an applied migration. No task or reserve
   text is logged at the default level, since that text is personal data.
+- A GitHub Sponsors link (`.github/FUNDING.yml`), entirely optional: the
+  app, its updates and its packages stay free regardless.
 
 ## [1.0.0] - 2026-09-08
 
@@ -271,7 +280,11 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/VertOurs/Rature/releases/tag/v1.1.0
+[1.0.0]: https://github.com/VertOurs/Rature/releases/tag/v1.0.0
+[0.10.1]: https://github.com/VertOurs/Rature/releases/tag/v0.10.1
+[0.10.0]: https://github.com/VertOurs/Rature/releases/tag/v0.10.0
 [0.9.0]: https://github.com/VertOurs/Rature/releases/tag/v0.9.0
 [0.8.0]: https://github.com/VertOurs/Rature/releases/tag/v0.8.0
 [0.7.0]: https://github.com/VertOurs/Rature/releases/tag/v0.7.0

@@ -9,11 +9,20 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Chantier en cours** : aucun. Chantiers 0 à 6 terminés
   (`docs/internal/ROADMAP.md`), critère de fin du chantier 6 atteint le
   15 septembre 2026 (détail dans « Chantiers terminés »). Chantier 7
-  (capture et réserve) pas commencé.
+  (capture et réserve) **pas commencé, ne pas démarrer sans accord
+  explicite de VertOurs** (demande du 15 septembre 2026, y compris son
+  ADR 0007 préalable).
+- **Release `1.1.0` en cours de coupe** (15 septembre 2026) : ferme le
+  chantier 6. Quatre sources de version à jour, `CHANGELOG` et metainfo
+  `<release>` à jour. Reste : merge de la PR, tag `v1.1.0` annoté et
+  signé, push du tag, contrôle que `release.yml` est vert, puis correctif
+  des sommes sha256 `PKGBUILD`/`.spec` sur le tarball réel du tag (elles
+  référencent encore celui de `1.0.0`, un commit de suivi immédiat les
+  corrige).
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé hors agent (`CLAUDE.md` §6) le 8 septembre 2026, sans souci, via
   le dépôt auto-hébergé.
-- **Suivi ouvert** : bump runtime `//50` → `//51` en `1.0.1`, pas avant
+- **Suivi ouvert** : bump runtime `//50` → `//51` en `1.1.1`, pas avant
   le 16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
   réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
@@ -52,9 +61,9 @@ manifeste (`CLAUDE.md` §4 règle 8).
 
 | Élément | Version | Motif |
 |---|---|---|
-| Runtime | `org.gnome.Platform//50` | Jusqu'à `1.0.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.0.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
+| Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.0.0` | Ferme la v1 (chantiers 0 à 5). Aucun changement fonctionnel depuis `0.10.1`. Coupée le 8 septembre 2026 |
+| Version du projet | `1.1.0` | Ferme le chantier 6 (v2). Coupée le 15 septembre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -71,13 +80,19 @@ Flatpak.
 critère de fin du chantier 5 est atteint (installation et mise à jour
 automatique confirmées sur une machine propre). Aucun changement
 fonctionnel depuis `0.10.1`. AUR et COPR repoussés au chantier 6.
-`[Unreleased]` est vide ; l'incrément suivant est `1.0.1`, le bump `//51`.
+
+`1.1.0` (15 septembre 2026) ferme le chantier 6 : logging structuré
+confirmé par `journalctl` en usage réel, paquetage natif (AUR, COPR,
+Mageia) préparé et vérifié en conteneur mais pas encore soumis (repoussé
+en v3/v4), README et page de présentation refaits, `FUNDING.yml`. Aucune
+migration de format (`migrations.py` toujours à vide, rien à couvrir).
+`[Unreleased]` est vide ; l'incrément suivant est `1.1.1`, le bump `//51`.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
 runtime), et sous réserve que l'image CI `gnome-51` soit disponible à
 cette date. Touche le manifeste, la CI et la table ci-dessus. Livré en
-`1.0.1`, `1.0.0` restant sur `//50`.
+`1.1.1`, `1.1.0` restant sur `//50`.
 
 ## Environnement de la machine
 
@@ -175,9 +190,8 @@ cette date. Touche le manifeste, la CI et la table ci-dessus. Livré en
   page de présentation GitHub Pages étoffée
   (`build-aux/flatpak/index.html`, prend effet au prochain tag `v*`),
   logo abandonné, `FUNDING.yml` ajouté. Alertes de sécurité Dependabot
-  activées. Critère de fin atteint le 15 septembre 2026 ; aucune version
-  publiée pour ce chantier à ce jour, `[Unreleased]` les couvre tous en
-  `feat` (minor) et `docs`/`build`/`test` (aucun incrément).
+  activées. Critère de fin atteint le 15 septembre 2026. Clôturé par
+  `1.1.0`, coupée le même jour.
 
 ## Documents
 
