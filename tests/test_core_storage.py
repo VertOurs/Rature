@@ -3,6 +3,7 @@
 """XDG resolution, atomic round-trips and the never-overwrite archive rule."""
 
 import json
+import os
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -79,6 +80,17 @@ def test_a_failed_write_leaves_no_temporary_file(tmp_path: Path) -> None:
     assert list(tmp_path.iterdir()) == []
 
 
+@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores permissions")
+def test_save_into_a_read_only_directory_raises(tmp_path: Path) -> None:
+    tmp_path.chmod(0o500)
+    try:
+        with pytest.raises(OSError):
+            save(make_store(), data_dir=tmp_path)
+        assert list(tmp_path.iterdir()) == []
+    finally:
+        tmp_path.chmod(0o700)
+
+
 def test_main_file_path_is_data_json_under_the_data_dir(tmp_path: Path) -> None:
     assert main_file_path(data_dir=tmp_path) == tmp_path / "data.json"
 
@@ -91,6 +103,21 @@ def test_load_missing_file_raises(tmp_path: Path) -> None:
 def test_load_rejects_an_unknown_version(tmp_path: Path) -> None:
     (tmp_path / "data.json").write_text('{"version": 99}', encoding="utf-8")
     with pytest.raises(FutureVersionError):
+        load(data_dir=tmp_path)
+
+
+def test_load_invalid_json_raises(tmp_path: Path) -> None:
+    (tmp_path / "data.json").write_text("not json", encoding="utf-8")
+    with pytest.raises(ValueError):
+        load(data_dir=tmp_path)
+
+
+def test_load_truncated_json_raises(tmp_path: Path) -> None:
+    save(make_store(), data_dir=tmp_path)
+    path = tmp_path / "data.json"
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text[: len(text) // 2], encoding="utf-8")
+    with pytest.raises(ValueError):
         load(data_dir=tmp_path)
 
 

@@ -6,26 +6,33 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : aucun. Chantiers 0 à 5 terminés, `1.0.0`
-  publiée le 8 septembre 2026 (`docs/internal/ROADMAP.md`) : la v1 est
-  close. Le chantier 6 (v2 : observabilité, finition, paquetage natif)
-  n'a pas commencé.
+- **Chantier en cours** : chantier 6 (v2 : observabilité, finition,
+  paquetage natif), démarré le 15 septembre 2026. Chantiers 0 à 5
+  terminés, `1.0.0` publiée le 8 septembre 2026
+  (`docs/internal/ROADMAP.md`) : la v1 est close.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé hors agent (`CLAUDE.md` §6) le 8 septembre 2026, sans souci, via
   le dépôt auto-hébergé.
-- **Suivi ouvert** : bump runtime `//50` → `//51` en `1.0.1` dès que
-  l'image CI `gnome-51` existe (voir « Versions retenues »).
+- **Suivi ouvert** : bump runtime `//50` → `//51` en `1.0.1`, pas avant
+  le 16 octobre 2026 (un mois après la sortie stable du 16 septembre,
+  choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
+  réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
+  retenues »). Indépendant du chantier 6, déjà en cours.
 - **À l'ouverture du chantier 6** : activer les alertes de sécurité
   Dependabot (Settings → Code security), désactivées aujourd'hui ;
   rappel demandé par VertOurs le 8 septembre 2026. Distinct des mises à
   jour de version Dependabot, déjà actives (`.github/dependabot.yml`).
 - **Audit pré-chantier 6** (8 septembre 2026) : aucun `TODO`, aucun
   `print`, aucun `except` trop large, séparation `core`/`ui` et i18n
-  intactes. Issue #85 (trou de couverture `storage`, ouverte le
-  3 septembre) toujours ouverte, bon premier ticket pour le chantier 6.
-  Quatre actions GitHub obsolètes dans `release.yml` corrigées
+  intactes. Quatre actions GitHub obsolètes dans `release.yml` corrigées
   (`upload-artifact`, `download-artifact`, `upload-pages-artifact`,
   `deploy-pages`).
+- **Premier ticket du chantier 6** : issue #85 (trou de couverture
+  `storage`, ouverte le 3 septembre) traitée le 15 septembre 2026 sur la
+  branche `test/storage-coverage-gap-85` : `load` sur `data.json` invalide
+  ou tronqué, `save` dans un répertoire en lecture seule. `core/`
+  toujours à 100 % de couverture branches. En attente de validation du
+  message de commit et d'ouverture de PR.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -52,7 +59,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 
 | Élément | Version | Motif |
 |---|---|---|
-| Runtime | `org.gnome.Platform//50` | Jusqu'à `1.0.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.0.1` dès l'image CI `gnome-51` disponible |
+| Runtime | `org.gnome.Platform//50` | Jusqu'à `1.0.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.0.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
 | Version du projet | `1.0.0` | Ferme la v1 (chantiers 0 à 5). Aucun changement fonctionnel depuis `0.10.1`. Coupée le 8 septembre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
@@ -73,9 +80,11 @@ automatique confirmées sur une machine propre). Aucun changement
 fonctionnel depuis `0.10.1`. AUR et COPR repoussés au chantier 6.
 `[Unreleased]` est vide ; l'incrément suivant est `1.0.1`, le bump `//51`.
 
-**Bump vers GNOME 51** : après la sortie stable (16 septembre 2026) et la
-publication de l'image CI `gnome-51`. Touche le manifeste, la CI et la
-table ci-dessus. Livré en `1.0.1`, `1.0.0` restant sur `//50`.
+**Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
+sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
+runtime), et sous réserve que l'image CI `gnome-51` soit disponible à
+cette date. Touche le manifeste, la CI et la table ci-dessus. Livré en
+`1.0.1`, `1.0.0` restant sur `//50`.
 
 ## Environnement de la machine
 
