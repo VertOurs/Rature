@@ -40,6 +40,13 @@ def _pkgbuild_version() -> str:
     return match.group(1)
 
 
+def _spec_version(relative_path: str) -> str:
+    text = (REPO / relative_path).read_text(encoding="utf-8")
+    match = re.search(r"(?m)^Version:\s*(\S+)$", text)
+    assert match, f"no Version field in {relative_path}"
+    return match.group(1)
+
+
 def test_version_sources_agree() -> None:
     sources = {
         "rature.__version__": rature.__version__,
@@ -47,6 +54,8 @@ def test_version_sources_agree() -> None:
         "meson.build": _meson_version(),
         "metainfo latest release": _metainfo_latest_release(),
         "build-aux/aur/PKGBUILD": _pkgbuild_version(),
+        "build-aux/copr/rature.spec": _spec_version("build-aux/copr/rature.spec"),
+        "build-aux/mageia/rature.spec": _spec_version("build-aux/mageia/rature.spec"),
     }
     assert len(set(sources.values())) == 1, sources
 
