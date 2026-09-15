@@ -237,10 +237,13 @@ pas et ne doit pas créer à sa place.
 
 - [ ] **AUR** (Arch) : `PKGBUILD` prêt dans `build-aux/aur/`, avec son
       `.SRCINFO`. Soumission repoussée en v3/v4
-- [ ] **COPR** (Fedora) : un fichier .spec, reconstruction automatique
-      depuis le dépôt git. Soumission repoussée en v3/v4
-- [ ] **Mageia** : paquet source pour le dépôt communautaire. Soumission
-      repoussée en v3/v4
+- [ ] **COPR** (Fedora) : `rature.spec` prêt dans `build-aux/copr/`,
+      construction et `meson test` vérifiés en conteneur Fedora 44.
+      Reconstruction automatique depuis le dépôt git à activer côté COPR
+      au moment de la soumission. Soumission repoussée en v3/v4
+- [ ] **Mageia** : `rature.spec` prêt dans `build-aux/mageia/`,
+      construction et `meson test` vérifiés en conteneur Mageia 10.
+      Soumission repoussée en v3/v4
 
 Écartés volontairement : PPA Ubuntu, OBS, et les dépôts officiels Fedora ou
 Debian, qui demandent parrainage, revue et un engagement de maintenance hors

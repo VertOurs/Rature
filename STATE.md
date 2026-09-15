@@ -65,8 +65,25 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `build-aux/aur/` : `git clone ssh://aur@aur.archlinux.org/rature.git`
   (dépôt vide au premier essai), copier `PKGBUILD` et `.SRCINFO` dedans,
   commit, push. Publication immédiate, sans revue.
+- **Paquetage COPR et Mageia** (ROADMAP chantier 6, 15 septembre 2026) :
+  même traitement que l'AUR. `build-aux/copr/rature.spec` et
+  `build-aux/mageia/rature.spec` écrits, construction, `meson test`
+  (4/4) et installation réelle validés chacun dans son conteneur
+  (`podman run fedora:44`, `podman run mageia:latest`). Noms de paquets
+  vérifiés dans chaque dépôt, pas recopiés d'un autre système : Mageia
+  diffère de Fedora (`lib64gtk4.0-devel`, `lib64adwaita-devel`, etc.) et
+  détecte tout seul les dépendances `typelib()` au moment de la
+  construction. Sur les deux, `gobject-introspection` déclaré
+  explicitement en dépendance runtime : son absence fait planter
+  `gi.require_version` au lancement (repéré en testant l'installation du
+  paquet Fedora avec les dépendances faibles désactivées).
+  **Reste à faire, à la charge de VertOurs** : soumission COPR
+  (`https://copr.fedorainfracloud.org`, compte Fedora, nouveau projet,
+  webhook de reconstruction sur push) et Mageia (dépôt communautaire,
+  processus propre à leur infrastructure). Ni l'un ni l'autre ne demande
+  de compte à créer par l'agent.
 - Reste du chantier 6 non commencé : README, logo, page GitHub Pages,
-  `FUNDING.yml`, COPR, Mageia.
+  `FUNDING.yml`.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
