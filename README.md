@@ -1,11 +1,35 @@
+<div align="center">
+
 # Rature
 
-**Your day, one line at a time.** A daily-list desktop application for
-GNOME.
+<img src="data/icons/hicolor/scalable/apps/io.github.vertours.Rature.svg" width="96" height="96" alt="Rature icon">
+
+**A support, not a coach.**
 
 [![CI](https://github.com/VertOurs/Rature/actions/workflows/ci.yml/badge.svg)](https://github.com/VertOurs/Rature/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/VertOurs/Rature)](https://github.com/VertOurs/Rature/releases)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
+
+</div>
+
+## Why another todo app
+
+Dozens of task managers already exist; I tried a fair number of them
+before writing this one. Most assume a working memory and a motivation
+system that ADHD and depression do not reliably provide: a plan to hold
+in mind, priorities to keep straight, a backlog to catch up on, a streak
+to protect. Those are exactly the mechanisms that make a list stop
+working when executive function or motivation is the part that is
+missing, turning a task manager into one more source of guilt. Rature
+removes them instead of managing around them: nothing to plan, nothing
+to prioritize, nothing to fall behind on, nothing scored.
+
+A struck task stays visible in its block instead of disappearing: a
+small, precious hit of "I did that" in a context where it does not come
+easily otherwise. Unfinished work does not carry over as a growing
+backlog on the next day's list either; it returns to the reserve
+instead, and it is up to me, the next day, to decide what goes on the
+list according to whatever energy I actually have.
 
 ## What it is
 
@@ -77,8 +101,8 @@ publication.
 Version 2 is under way: structured logging, native packaging, a refreshed
 README and project page, and further comfort features.
 
-Built with AI assistance (Claude Code); the author writes the
-specification, reviews every change, and merges it.
+Built with AI assistance (Claude Code); I write the specification,
+review every change, and merge it.
 
 Design decisions and the roadmap live under `docs/internal/` (in French).
 The architecture is [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
