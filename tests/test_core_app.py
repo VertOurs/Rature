@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """App.open: first launch, loading, corruption recovery, the rollover catch-up."""
 
+import logging
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -43,6 +44,14 @@ def test_first_launch_uses_the_reference_date_not_the_calendar_date(
     assert app.session.day.date == date(2026, 8, 24)
 
 
+def test_open_logs_the_data_directory(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    with caplog.at_level(logging.INFO, logger="rature.core.app"):
+        App.open(tmp_path)
+    assert str(tmp_path) in caplog.text
+
+
 def test_open_loads_an_existing_file(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     session = App.open(tmp_path, clock=clock_at(now)).session
@@ -75,6 +84,16 @@ def test_open_quarantines_invalid_json_and_starts_fresh(tmp_path: Path) -> None:
     assert (tmp_path / "data.json").exists()
 
 
+def test_open_logs_a_quarantine_at_warning(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    (tmp_path / "data.json").write_text("not json", encoding="utf-8")
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        App.open(tmp_path)
+    assert caplog.records[0].levelno == logging.WARNING
+    assert "quarantin" in caplog.text.lower()
+
+
 def test_quarantined_path_is_none_without_a_corruption(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     first_launch = App.open(tmp_path, clock=clock_at(now))
@@ -104,6 +123,16 @@ def test_open_runs_a_due_rollover_before_returning(tmp_path: Path) -> None:
     assert app.startup is StartupOutcome.LOADED
     assert app.session.day.date == date(2026, 8, 24)
     assert (tmp_path / "archive" / "2026-08-23.json").exists()
+
+
+def test_a_rollover_is_logged(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
+    App.open(tmp_path, clock=clock_at(save_now))
+
+    tomorrow_now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    with caplog.at_level(logging.INFO, logger="rature.core.app"):
+        App.open(tmp_path, clock=clock_at(tomorrow_now))
+    assert "2026-08-24" in caplog.text
 
 
 def test_open_multi_day_catch_up_runs_once(tmp_path: Path) -> None:

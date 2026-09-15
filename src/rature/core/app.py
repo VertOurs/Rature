@@ -10,6 +10,7 @@ other way around.
 from __future__ import annotations
 
 import enum
+import logging
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
@@ -23,6 +24,8 @@ from rature.core.models import RecurringItem, ReserveItem, Task
 # mutation wrappers below raise it straight from Session.
 from rature.core.session import Day, LockedError, Session, reference_date  # noqa: F401
 from rature.core.storage import Store
+
+_logger = logging.getLogger(__name__)
 
 
 class StartupOutcome(enum.Enum):
@@ -114,6 +117,7 @@ class App:
         rollover happened, let alone run it itself.
         """
         resolved_dir = data_dir if data_dir is not None else storage.xdg_data_dir()
+        _logger.info("starting, data directory: %s", resolved_dir)
         now = clock()
         try:
             store = storage.load(data_dir=resolved_dir)
@@ -121,6 +125,7 @@ class App:
             app = cls._bootstrap(resolved_dir, clock, now, StartupOutcome.FIRST_LAUNCH)
         except (ValueError, KeyError, TypeError):
             quarantined_path = storage.quarantine(now, data_dir=resolved_dir)
+            _logger.warning("quarantined an unreadable data file: %s", quarantined_path)
             app = cls._bootstrap(
                 resolved_dir,
                 clock,
@@ -172,6 +177,9 @@ class App:
         archived: Day | None = None
         if self.session.rollover_due(now):
             archived = self.session.roll_over(now)
+            _logger.info(
+                "day rolled over from %s to %s", archived.date, self.session.day.date
+            )
             storage.archive(archived, data_dir=self.data_dir)
             self._save_pending = True
         if not self._save_pending:

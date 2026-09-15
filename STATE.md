@@ -32,6 +32,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `load` sur `data.json` invalide ou tronqué, `save` dans un répertoire en
   lecture seule. `core/` toujours à 100 % de couverture branches. Aucun
   bump de version (tests uniquement, rien de fonctionnel).
+- **Logging** (ROADMAP chantier 6, 15 septembre 2026) : `rature.logging_setup`
+  (stdlib, un handler stderr, niveau `RATURE_LOG_LEVEL`, `INFO` par
+  défaut) branché dans `src/rature.in`, seul point d'entrée réel. Six
+  points instrumentés : démarrage + chemin des données et quarantaine
+  (`App.open`), passage du jour (`App.ensure_day`), archivage et échec
+  d'écriture (`storage`), migration appliquée (`migrations`). Aucun texte
+  de tâche ou de réserve loggé. `core/` toujours à 100 %. En attente de
+  validation du message de commit et d'ouverture de PR. Reste du
+  chantier 6 (README, logo, page GitHub Pages, `FUNDING.yml`, correctif
+  du focus, paquetage natif) non commencé.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt

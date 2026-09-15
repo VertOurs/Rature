@@ -307,3 +307,19 @@ def test_launcher_binds_the_c_gettext_domain() -> None:
     }
     missing = {"locale.bindtextdomain", "locale.textdomain"} - called
     assert not missing, f"src/rature.in does not call {missing}"
+
+
+def test_launcher_configures_logging() -> None:
+    # ROADMAP chantier 6: RATURE_LOG_LEVEL only takes effect if
+    # src/rature.in calls logging_setup.configure before anything else runs.
+    tree = ast.parse((REPO / "src" / "rature.in").read_text(encoding="utf-8"))
+    imported = {
+        node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)
+    }
+    assert "rature.logging_setup" in imported
+    called = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "configure_logging" in called

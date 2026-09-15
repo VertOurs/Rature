@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Structured logging (ROADMAP milestone 6): stdlib `logging`, one logger
+  per module, a single stderr handler set up by `src/rature.in` before
+  anything else runs, level controlled by `RATURE_LOG_LEVEL` (`INFO` by
+  default). Instrumented: startup and the data directory, an unreadable
+  data file being quarantined, a day rolling over, an archive being
+  written, a write failure, and an applied migration. No task or reserve
+  text is logged at the default level, since that text is personal data.
+
 ## [1.0.0] - 2026-09-08
 
 Milestone 5 (publication) is complete: Rature installs and updates itself

@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The migration base: version checks, the step loop, and the wiring in load."""
 
+import logging
 from datetime import date
 from pathlib import Path
 
@@ -55,6 +56,16 @@ def test_a_registered_step_is_applied() -> None:
 
     result = migrate({"version": 1}, target=2, registry={1: one_to_two})
     assert result == {"version": 2, "added": True}
+
+
+def test_an_applied_step_is_logged(caplog: pytest.LogCaptureFixture) -> None:
+    def one_to_two(data: dict) -> dict:
+        return {**data, "version": 2}
+
+    with caplog.at_level(logging.INFO, logger="rature.core.migrations"):
+        migrate({"version": 1}, target=2, registry={1: one_to_two})
+    assert "1" in caplog.text
+    assert "2" in caplog.text
 
 
 def test_steps_run_in_order_up_to_the_target() -> None:
