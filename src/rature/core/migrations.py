@@ -5,9 +5,11 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 
 CURRENT_VERSION = 1
+_logger = logging.getLogger(__name__)
 
 
 class FutureVersionError(Exception):
@@ -61,5 +63,6 @@ def migrate(
         new_version = data.get("version")
         if not isinstance(new_version, int) or new_version <= version:
             raise RuntimeError(f"migration from version {version} did not advance it")
+        _logger.info("migrated data from version %d to %d", version, new_version)
         version = new_version
     return data

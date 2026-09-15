@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -20,6 +21,7 @@ FILE_VERSION = CURRENT_VERSION
 _MAIN_FILE = "data.json"
 _ARCHIVE_DIR = "archive"
 _ARCHIVE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
+_logger = logging.getLogger(__name__)
 
 
 def xdg_data_dir() -> Path:
@@ -77,6 +79,10 @@ def _atomic_write_json(path: Path, obj: dict) -> None:
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(tmp, path)
+    except OSError:
+        # Path only, never the content: obj carries task and reserve text.
+        _logger.error("failed to write %s", path)
+        raise
     finally:
         # A no-op after a successful replace; removes the orphan on failure.
         tmp.unlink(missing_ok=True)
@@ -130,6 +136,7 @@ def archive(day: Day, *, data_dir: Path | None = None) -> Path:
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / f"{day.date.isoformat()}.json"
     _atomic_write_json(path, {"version": FILE_VERSION, **day.to_dict()})
+    _logger.info("archived %s", path)
     return path
 
 

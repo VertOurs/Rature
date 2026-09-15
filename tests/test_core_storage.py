@@ -3,6 +3,7 @@
 """XDG resolution, atomic round-trips and the never-overwrite archive rule."""
 
 import json
+import logging
 import os
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -89,6 +90,23 @@ def test_save_into_a_read_only_directory_raises(tmp_path: Path) -> None:
         assert list(tmp_path.iterdir()) == []
     finally:
         tmp_path.chmod(0o700)
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores permissions")
+def test_a_write_failure_is_logged_at_error(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    tmp_path.chmod(0o500)
+    try:
+        with (
+            caplog.at_level(logging.ERROR, logger="rature.core.storage"),
+            pytest.raises(OSError),
+        ):
+            save(make_store(), data_dir=tmp_path)
+    finally:
+        tmp_path.chmod(0o700)
+    assert caplog.records[0].levelno == logging.ERROR
+    assert str(tmp_path / "data.json") in caplog.text
 
 
 def test_main_file_path_is_data_json_under_the_data_dir(tmp_path: Path) -> None:
@@ -179,6 +197,14 @@ def test_archive_overwrites_the_same_date(tmp_path: Path) -> None:
 def test_archive_carries_a_version(tmp_path: Path) -> None:
     path = archive(Day(date=date(2026, 8, 24)), data_dir=tmp_path)
     assert json.loads(path.read_text(encoding="utf-8"))["version"] == FILE_VERSION
+
+
+def test_archive_logs_the_written_path(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    with caplog.at_level(logging.INFO, logger="rature.core.storage"):
+        path = archive(Day(date=date(2026, 8, 24)), data_dir=tmp_path)
+    assert str(path) in caplog.text
 
 
 def test_archive_keeps_the_deletion_journal(tmp_path: Path) -> None:

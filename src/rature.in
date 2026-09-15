@@ -16,6 +16,9 @@ sys.path.insert(1, PKGDATADIR)
 
 from rature.config import LOCALEDIR  # noqa: E402
 from rature.i18n import align_time_locale  # noqa: E402
+from rature.logging_setup import configure as configure_logging  # noqa: E402
+
+configure_logging(environ=os.environ)
 
 # Ctrl+C in a terminal must kill the app, not surface as a KeyboardInterrupt
 # inside the GTK main loop.
