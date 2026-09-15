@@ -6,10 +6,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : chantier 6 (v2 : observabilité, finition,
-  paquetage natif), démarré le 15 septembre 2026. Chantiers 0 à 5
-  terminés, `1.0.0` publiée le 8 septembre 2026
-  (`docs/internal/ROADMAP.md`) : la v1 est close.
+- **Chantier en cours** : aucun. Chantiers 0 à 6 terminés
+  (`docs/internal/ROADMAP.md`), critère de fin du chantier 6 atteint le
+  15 septembre 2026 (détail dans « Chantiers terminés »). Chantier 7
+  (capture et réserve) pas commencé.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé hors agent (`CLAUDE.md` §6) le 8 septembre 2026, sans souci, via
   le dépôt auto-hébergé.
@@ -17,92 +17,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   le 16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
   réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
-  retenues »). Indépendant du chantier 6, déjà en cours.
-- **Alertes de sécurité Dependabot** : activées le 15 septembre 2026
-  (Settings → Code security), rappel du 8 septembre honoré. Distinct des
-  mises à jour de version Dependabot, déjà actives depuis plus tôt
-  (`.github/dependabot.yml`).
-- **Audit pré-chantier 6** (8 septembre 2026) : aucun `TODO`, aucun
-  `print`, aucun `except` trop large, séparation `core`/`ui` et i18n
-  intactes. Quatre actions GitHub obsolètes dans `release.yml` corrigées
-  (`upload-artifact`, `download-artifact`, `upload-pages-artifact`,
-  `deploy-pages`).
-- **Premier ticket du chantier 6** : issue #85 (trou de couverture
-  `storage`, ouverte le 3 septembre) close le 15 septembre 2026, PR #107 :
-  `load` sur `data.json` invalide ou tronqué, `save` dans un répertoire en
-  lecture seule. `core/` toujours à 100 % de couverture branches. Aucun
-  bump de version (tests uniquement, rien de fonctionnel).
-- **Logging** (ROADMAP chantier 6, 15 septembre 2026) : `rature.logging_setup`
-  (stdlib, un handler stderr, niveau `RATURE_LOG_LEVEL`, `INFO` par
-  défaut) branché dans `src/rature.in`, seul point d'entrée réel. Six
-  points instrumentés : démarrage + chemin des données et quarantaine
-  (`App.open`), passage du jour (`App.ensure_day`), archivage et échec
-  d'écriture (`storage`), migration appliquée (`migrations`). Aucun texte
-  de tâche ou de réserve loggé. `core/` toujours à 100 %.
-- **Focus après ajout** (ROADMAP chantier 6, 15 septembre 2026) : traité
-  sans reproduction possible. Ni VertOurs ni l'agent n'ont pu reproduire
-  le bug (« le focus remonte après un ajout en réserve ») au moment de le
-  traiter ; relecture de `day_view.py` et `reserve_view.py` sans anomalie
-  trouvée, `entry.grab_focus()` déjà appelé après `run_action` dans les
-  deux vues, conforme à `SPECIFICATION.md`. Garde-fou de non-régression
-  ajouté à la place (`tests/test_focus_kept_on_add.py`, analyse statique
-  AST : `grab_focus()` doit rester dans le corps du `if self.run_action`,
-  jamais avant). À rouvrir si le bug ressurgit, avec des étapes de
-  reproduction cette fois.
-- **Paquetage AUR** (ROADMAP chantier 6, 15 septembre 2026) :
-  `build-aux/aur/PKGBUILD` mis à jour vers `1.0.0` (il était resté bloqué
-  sur `0.10.1`), somme sha256 recalculée sur l'archive réelle du tag
-  `v1.0.0`. Construction, `meson test` (4/4) et empaquetage validés dans
-  un conteneur Arch (`podman run archlinux:latest`), pas seulement relus.
-  `.SRCINFO` généré par `makepkg --printsrcinfo` et versionné à côté du
-  `PKGBUILD`. `tests/test_versions.py::test_version_sources_agree` couvre
-  maintenant `PKGBUILD` en plus des quatre autres sources, pour que ce
-  genre de dérive de version ne se reproduise pas silencieusement.
-  **Reste à faire, à la charge de VertOurs** : la soumission proprement
-  dite demande son propre compte AUR et sa clé SSH, que l'agent n'a pas
-  et ne doit pas créer à sa place. Étapes : compte sur
-  `https://aur.archlinux.org`, clé SSH ajoutée au profil, puis depuis
-  `build-aux/aur/` : `git clone ssh://aur@aur.archlinux.org/rature.git`
-  (dépôt vide au premier essai), copier `PKGBUILD` et `.SRCINFO` dedans,
-  commit, push. Publication immédiate, sans revue.
-- **Paquetage COPR et Mageia** (ROADMAP chantier 6, 15 septembre 2026) :
-  même traitement que l'AUR. `build-aux/copr/rature.spec` et
-  `build-aux/mageia/rature.spec` écrits, construction, `meson test`
-  (4/4) et installation réelle validés chacun dans son conteneur
-  (`podman run fedora:44`, `podman run mageia:latest`). Noms de paquets
-  vérifiés dans chaque dépôt, pas recopiés d'un autre système : Mageia
-  diffère de Fedora (`lib64gtk4.0-devel`, `lib64adwaita-devel`, etc.) et
-  détecte tout seul les dépendances `typelib()` au moment de la
-  construction. Sur les deux, `gobject-introspection` déclaré
-  explicitement en dépendance runtime : son absence fait planter
-  `gi.require_version` au lancement (repéré en testant l'installation du
-  paquet Fedora avec les dépendances faibles désactivées).
-  **Reste à faire, à la charge de VertOurs** : soumission COPR
-  (`https://copr.fedorainfracloud.org`, compte Fedora, nouveau projet,
-  webhook de reconstruction sur push) et Mageia (dépôt communautaire,
-  processus propre à leur infrastructure). Ni l'un ni l'autre ne demande
-  de compte à créer par l'agent.
-- **README et page de présentation** (ROADMAP chantier 6, 15 septembre
-  2026) : statut du README corrigé (n'annonçait plus `1.0.0`), trois
-  badges ajoutés, en-tête recentré avec l'icône existante, nouvelle
-  section « Why another todo app » en première personne. Page
-  `build-aux/flatpak/index.html` étoffée en vraie présentation du projet
-  (captures, fonctionnalités), en plus des instructions d'installation
-  du dépôt Flatpak déjà servies là ; prend effet au prochain tag `v*` ou
-  déclenchement manuel du workflow Release. Logo abandonné, décision de
-  VertOurs le 15 septembre 2026 : l'icône actuelle est gardée, son
-  commentaire « placeholder » corrigé en conséquence.
-- **Sponsoring** (ROADMAP chantier 6, 15 septembre 2026) :
-  `.github/FUNDING.yml` créé (`github: [VertOurs]`), mention ajoutée au
-  README. **Reste à faire, à la charge de VertOurs** : aucun compte
-  GitHub Sponsors existant. Inscription sur `github.com/sponsors`,
-  2FA obligatoire, coordonnées bancaires via Stripe Connect, formulaire
-  fiscal, revue GitHub de quelques jours. Le bouton « Sponsor » et le
-  lien `github.com/sponsors/VertOurs` du README restent inactifs tant
-  que ce n'est pas fait.
-- Chantier 6 éditorial terminé (README, page de présentation, logo,
-  sponsoring). Reste : instrumentation confirmée en usage réel
-  (`journalctl`), puis le critère de fin du chantier.
+  retenues »).
+- **Reste à la charge de VertOurs, non bloquant** (chantier 6) :
+  soumission AUR (compte + clé SSH sur `aur.archlinux.org`), soumission
+  COPR (compte Fedora sur `copr.fedorainfracloud.org`), soumission
+  Mageia (dépôt communautaire), compte GitHub Sponsors
+  (`github.com/sponsors`, 2FA, Stripe Connect, formulaire fiscal, revue
+  de quelques jours). AUR/COPR/Mageia repoussés en v3/v4 par décision du
+  15 septembre 2026 ; Sponsors est optionnel. Aucun des quatre ne demande
+  de compte créé par l'agent. Détail dans « Chantiers terminés ».
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
@@ -228,6 +151,33 @@ cette date. Touche le manifeste, la CI et la table ci-dessus. Livré en
   installation et mise à jour automatique confirmées sur une machine
   propre. AUR et COPR repoussés au chantier 6, `PKGBUILD` déjà écrit dans
   `build-aux/aur/PKGBUILD`. Clôturé par `1.0.0`, qui ferme la v1.
+- **Chantier 6**, PR #107 à #117, 15 septembre 2026 : observabilité et
+  finition, aucun changement fonctionnel visible pour l'utilisateur en
+  dehors du correctif de focus (non reproduit, voir plus bas). Issue #85
+  (trou de couverture `storage`) close en ouverture de chantier.
+  Logging stdlib (`rature.logging_setup`, un handler stderr, niveau
+  `RATURE_LOG_LEVEL`) branché dans `src/rature.in` ; six points visés,
+  cinq instrumentés (démarrage, chemin des données, quarantaine, passage
+  du jour, archivage, échec d'écriture ; migration appliquée en attente,
+  aucune migration n'existe encore) et confirmés par un lancement réel
+  avec `journalctl` le 15 septembre 2026, sur le binaire installé hors
+  Flatpak et un dossier de données jetable ; aucun texte de tâche dans
+  les quatre captures. Focus après ajout en réserve : bug non
+  reproductible par VertOurs ni par l'agent, garde-fou de non-régression
+  ajouté (`tests/test_focus_kept_on_add.py`) plutôt qu'un correctif à
+  l'aveugle. Paquetage natif préparé et vérifié par une construction
+  réelle en conteneur (Arch, Fedora 44, Mageia 10) pour AUR, COPR et
+  Mageia, `tests/test_versions.py` étendu pour garder les trois `.spec`/
+  `PKGBUILD` synchronisés avec la version du projet ; soumission
+  effective repoussée en v3/v4 (comptes personnels requis). README
+  refait (statut à jour, trois badges, en-tête recentré sur l'icône
+  existante, section « Why another todo app » en première personne),
+  page de présentation GitHub Pages étoffée
+  (`build-aux/flatpak/index.html`, prend effet au prochain tag `v*`),
+  logo abandonné, `FUNDING.yml` ajouté. Alertes de sécurité Dependabot
+  activées. Critère de fin atteint le 15 septembre 2026 ; aucune version
+  publiée pour ce chantier à ce jour, `[Unreleased]` les couvre tous en
+  `feat` (minor) et `docs`/`build`/`test` (aucun incrément).
 
 ## Documents
 
