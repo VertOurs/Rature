@@ -136,6 +136,13 @@ flatpak run io.github.vertours.Rature
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Sponsoring
+
+If Rature is useful to you, sponsoring is welcome through the "Sponsor"
+button at the top of this repository, or directly on
+[GitHub Sponsors](https://github.com/sponsors/VertOurs). Entirely
+optional: the app, its updates and its packages stay free regardless.
+
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
