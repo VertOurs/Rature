@@ -28,11 +28,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (`upload-artifact`, `download-artifact`, `upload-pages-artifact`,
   `deploy-pages`).
 - **Premier ticket du chantier 6** : issue #85 (trou de couverture
-  `storage`, ouverte le 3 septembre) traitée le 15 septembre 2026 sur la
-  branche `test/storage-coverage-gap-85` : `load` sur `data.json` invalide
-  ou tronqué, `save` dans un répertoire en lecture seule. `core/`
-  toujours à 100 % de couverture branches. En attente de validation du
-  message de commit et d'ouverture de PR.
+  `storage`, ouverte le 3 septembre) close le 15 septembre 2026, PR #107 :
+  `load` sur `data.json` invalide ou tronqué, `save` dans un répertoire en
+  lecture seule. `core/` toujours à 100 % de couverture branches. Aucun
+  bump de version (tests uniquement, rien de fonctionnel).
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
