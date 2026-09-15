@@ -31,14 +31,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
   réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
   retenues »).
+- **GitHub Sponsors actif** : compte de VertOurs en place et public,
+  vérifié le 15 septembre 2026 (`sponsorsListing.isPublic: true` côté
+  API, `github.com/sponsors/VertOurs` répond 200). Le lien du README et
+  le bouton « Sponsor » du dépôt sont désormais fonctionnels.
 - **Reste à la charge de VertOurs, non bloquant** (chantier 6) :
   soumission AUR (compte + clé SSH sur `aur.archlinux.org`), soumission
   COPR (compte Fedora sur `copr.fedorainfracloud.org`), soumission
-  Mageia (dépôt communautaire), compte GitHub Sponsors
-  (`github.com/sponsors`, 2FA, Stripe Connect, formulaire fiscal, revue
-  de quelques jours). AUR/COPR/Mageia repoussés en v3/v4 par décision du
-  15 septembre 2026 ; Sponsors est optionnel. Aucun des quatre ne demande
-  de compte créé par l'agent. Détail dans « Chantiers terminés ».
+  Mageia (dépôt communautaire). Repoussées en v3/v4 par décision du
+  15 septembre 2026, aucun des trois ne demande de compte créé par
+  l'agent. Détail dans « Chantiers terminés ».
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
