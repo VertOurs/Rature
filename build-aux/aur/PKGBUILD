@@ -1,6 +1,6 @@
 # Maintainer: VertOurs <vertours.dev@gmail.com>
 pkgname=rature
-pkgver=0.10.1
+pkgver=1.0.0
 pkgrel=1
 pkgdesc="Your day, one line at a time: a daily-list desktop app for GNOME"
 arch=('any')
@@ -11,7 +11,7 @@ makedepends=('meson' 'ninja' 'gettext')
 checkdepends=('python-pytest')
 _pkgname=Rature
 source=("$pkgname-$pkgver.tar.gz::https://github.com/VertOurs/$_pkgname/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('bd3e18ff1bcdb6bbb8caeafbc60fe205324bf71354dc899e3d67dea6481a1e43')
+sha256sums=('18700f6631fee1339c35bd8e9a71ae1a1adb64b4f1904463fa8efca91c5bb478')
 
 build() {
   arch-meson "$_pkgname-$pkgver" build

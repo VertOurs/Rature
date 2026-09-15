@@ -1,0 +1,20 @@
+pkgbase = rature
+	pkgdesc = Your day, one line at a time: a daily-list desktop app for GNOME
+	pkgver = 1.0.0
+	pkgrel = 1
+	url = https://github.com/VertOurs/Rature
+	arch = any
+	license = GPL-3.0-or-later
+	checkdepends = python-pytest
+	makedepends = meson
+	makedepends = ninja
+	makedepends = gettext
+	depends = python
+	depends = python-gobject
+	depends = gtk4
+	depends = libadwaita
+	depends = glib2
+	source = rature-1.0.0.tar.gz::https://github.com/VertOurs/Rature/archive/refs/tags/v1.0.0.tar.gz
+	sha256sums = 18700f6631fee1339c35bd8e9a71ae1a1adb64b4f1904463fa8efca91c5bb478
+
+pkgname = rature

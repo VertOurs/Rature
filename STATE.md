@@ -49,8 +49,24 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   AST : `grab_focus()` doit rester dans le corps du `if self.run_action`,
   jamais avant). À rouvrir si le bug ressurgit, avec des étapes de
   reproduction cette fois.
+- **Paquetage AUR** (ROADMAP chantier 6, 15 septembre 2026) :
+  `build-aux/aur/PKGBUILD` mis à jour vers `1.0.0` (il était resté bloqué
+  sur `0.10.1`), somme sha256 recalculée sur l'archive réelle du tag
+  `v1.0.0`. Construction, `meson test` (4/4) et empaquetage validés dans
+  un conteneur Arch (`podman run archlinux:latest`), pas seulement relus.
+  `.SRCINFO` généré par `makepkg --printsrcinfo` et versionné à côté du
+  `PKGBUILD`. `tests/test_versions.py::test_version_sources_agree` couvre
+  maintenant `PKGBUILD` en plus des quatre autres sources, pour que ce
+  genre de dérive de version ne se reproduise pas silencieusement.
+  **Reste à faire, à la charge de VertOurs** : la soumission proprement
+  dite demande son propre compte AUR et sa clé SSH, que l'agent n'a pas
+  et ne doit pas créer à sa place. Étapes : compte sur
+  `https://aur.archlinux.org`, clé SSH ajoutée au profil, puis depuis
+  `build-aux/aur/` : `git clone ssh://aur@aur.archlinux.org/rature.git`
+  (dépôt vide au premier essai), copier `PKGBUILD` et `.SRCINFO` dedans,
+  commit, push. Publication immédiate, sans revue.
 - Reste du chantier 6 non commencé : README, logo, page GitHub Pages,
-  `FUNDING.yml`, paquetage natif.
+  `FUNDING.yml`, COPR, Mageia.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt

@@ -33,12 +33,20 @@ def _metainfo_latest_release() -> str:
     return version
 
 
+def _pkgbuild_version() -> str:
+    text = (REPO / "build-aux" / "aur" / "PKGBUILD").read_text(encoding="utf-8")
+    match = re.search(r"(?m)^pkgver=(\S+)$", text)
+    assert match, "no pkgver field in build-aux/aur/PKGBUILD"
+    return match.group(1)
+
+
 def test_version_sources_agree() -> None:
     sources = {
         "rature.__version__": rature.__version__,
         "pyproject.toml": _pyproject_version(),
         "meson.build": _meson_version(),
         "metainfo latest release": _metainfo_latest_release(),
+        "build-aux/aur/PKGBUILD": _pkgbuild_version(),
     }
     assert len(set(sources.values())) == 1, sources
 

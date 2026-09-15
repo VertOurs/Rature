@@ -229,11 +229,18 @@ Repoussé du chantier 5 (décision du 8 septembre 2026) : la 1.0 ne dépend
 que du dépôt auto-hébergé et du bundle, pas des paquets natifs. Le
 `PKGBUILD` écrit au chantier 5 vit déjà dans `build-aux/aur/PKGBUILD`.
 
-- [ ] **AUR** (Arch) : soumettre `build-aux/aur/PKGBUILD`, publication
-      immédiate, sans revue
+Le chantier 6 prépare et vérifie les fichiers de paquetage ; la
+soumission effective sur chaque plateforme est repoussée en v3/v4
+(décision du 15 septembre 2026, voir « Repoussé volontairement ») : elle
+demande un compte personnel de VertOurs par plateforme, que l'agent n'a
+pas et ne doit pas créer à sa place.
+
+- [ ] **AUR** (Arch) : `PKGBUILD` prêt dans `build-aux/aur/`, avec son
+      `.SRCINFO`. Soumission repoussée en v3/v4
 - [ ] **COPR** (Fedora) : un fichier .spec, reconstruction automatique
-      depuis le dépôt git
-- [ ] **Mageia** : paquet source pour le dépôt communautaire
+      depuis le dépôt git. Soumission repoussée en v3/v4
+- [ ] **Mageia** : paquet source pour le dépôt communautaire. Soumission
+      repoussée en v3/v4
 
 Écartés volontairement : PPA Ubuntu, OBS, et les dépôts officiels Fedora ou
 Debian, qui demandent parrainage, revue et un engagement de maintenance hors
@@ -242,7 +249,8 @@ de proportion pour une personne seule.
 **Critère de fin** : `journalctl` montre le démarrage, le passage du jour
 et un échec d'écriture provoqué ; aucun texte de tâche n'apparaît dans les
 journaux au niveau par défaut ; le focus reste en place après un ajout en
-réserve ; le paquet est publié sur AUR, COPR et Mageia.
+réserve ; les fichiers de paquetage natif sont prêts et vérifiés, la
+soumission effective repoussée en v3/v4.
 
 ---
 
@@ -376,6 +384,14 @@ Noté ici pour ne pas y penser pendant les chantiers.
   quelle application de notes capable d'écrire dans un dossier synchronisé.
 - **Version mobile de l'application.** Écartée le 24 août 2026. Le projet
   reste une application de bureau.
+- **Soumission effective des paquets AUR, COPR et Mageia.** Repoussée en
+  v3/v4 le 15 septembre 2026 : chaque plateforme demande un compte
+  personnel de VertOurs (AUR : compte et clé SSH ; COPR : compte Fedora ;
+  Mageia : processus propre au dépôt communautaire), que l'agent n'a pas et
+  ne doit pas créer à sa place. Le chantier 6 prépare et vérifie les
+  fichiers : `PKGBUILD` mis à jour vers `1.0.0` et construction validée en
+  conteneur Arch le 15 septembre 2026 (`build-aux/aur/PKGBUILD`,
+  `.SRCINFO`).
 
 Note : l'entrée « Traduction espéranto », auparavant repoussée, entre au
 chantier 8 et sort donc de cette section. L'entrée « capture depuis le
