@@ -18,10 +18,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
   réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
   retenues »). Indépendant du chantier 6, déjà en cours.
-- **À l'ouverture du chantier 6** : activer les alertes de sécurité
-  Dependabot (Settings → Code security), désactivées aujourd'hui ;
-  rappel demandé par VertOurs le 8 septembre 2026. Distinct des mises à
-  jour de version Dependabot, déjà actives (`.github/dependabot.yml`).
+- **Alertes de sécurité Dependabot** : activées le 15 septembre 2026
+  (Settings → Code security), rappel du 8 septembre honoré. Distinct des
+  mises à jour de version Dependabot, déjà actives depuis plus tôt
+  (`.github/dependabot.yml`).
 - **Audit pré-chantier 6** (8 septembre 2026) : aucun `TODO`, aucun
   `print`, aucun `except` trop large, séparation `core`/`ui` et i18n
   intactes. Quatre actions GitHub obsolètes dans `release.yml` corrigées
