@@ -23,9 +23,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   taguée, sur `//50`. Reste, hors agent (`CLAUDE.md` §6) : `flatpak
   update` depuis `1.0.0` et contrôle visuel de la page GitHub Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
-  testé hors agent (`CLAUDE.md` §6) le 8 septembre 2026, sans souci, via
-  le dépôt auto-hébergé. `1.0.0` → `1.1.0` pas encore testé de la même
-  façon.
+  testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
+  `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
+  (catalogue français vérifié au niveau fichier, 69 messages, valide),
+  rendu de l'interface en français confirmé par VertOurs le même jour
+  (`CLAUDE.md` §6).
 - **Suivi ouvert** : bump runtime `//50` → `//51` en `1.1.1`, pas avant
   le 16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
