@@ -5,23 +5,69 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rature — Flatpak repository</title>
+<title>Rature</title>
 <style>
   :root { color-scheme: light dark; }
-  body { max-width: 40rem; margin: 4rem auto; padding: 0 1.2rem;
+  body { max-width: 42rem; margin: 3rem auto; padding: 0 1.2rem;
          font: 16px/1.6 system-ui, sans-serif; }
   code, pre { font-family: ui-monospace, monospace; }
   pre { background: rgba(128,128,128,.12); padding: 1rem; border-radius: 6px;
         overflow-x: auto; }
   a { color: #c01c28; }
   h1 { margin-bottom: .2rem; }
-  .sub { color: gray; margin-top: 0; }
+  h2 { margin-top: 2.5rem; border-bottom: 1px solid rgba(128,128,128,.3);
+       padding-bottom: .3rem; }
+  ul { padding-left: 1.2rem; }
+  li { margin: .3rem 0; }
+  img { max-width: 100%; border-radius: 8px;
+        border: 1px solid rgba(128,128,128,.25); display: block; }
+  .hero { text-align: center; }
+  .hero h1 { margin-bottom: 1rem; }
+  .hero .icon { margin: 0 auto 1rem; border: none; border-radius: 0; }
+  .hero .tagline { color: gray; font-size: 1.15rem; margin: 0; }
+  .screenshots { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr;
+                 margin: 1.5rem 0; }
+  @media (max-width: 32rem) { .screenshots { grid-template-columns: 1fr; } }
+  footer { margin-top: 3rem; color: gray; font-size: .9rem; }
 </style>
 </head>
 <body>
+<header class="hero">
 <h1>Rature</h1>
-<p class="sub">Your day, one line at a time. A self-hosted Flatpak repository.</p>
+<img class="icon" src="icon.svg" width="96" height="96" alt="Rature icon">
+<p class="tagline">A support, not a coach.</p>
+</header>
 
+<p>Rature keeps one numbered list for the day. You add tasks one by one, in
+no particular order, and strike them through as the day goes. Struck tasks
+stay visible in a block at the top, as a trace of what got done. There is no
+planning, no categories, no scoring, no encouragement. Rature is a support,
+not a coach.</p>
+
+<div class="screenshots">
+<img src="screenshots/day.png" alt="The Day view: a numbered list, struck tasks in a block at the top">
+<img src="screenshots/recurring.png" alt="The Recurring view: task templates tied to weekdays">
+<img src="screenshots/archives.png" alt="The Archives window: every past day, read-only">
+<img src="screenshots/statistics.png" alt="The Statistics window: a plain table of counts per day">
+</div>
+
+<h2>Features</h2>
+<ul>
+<li><strong>Day view</strong> — add, strike, unstrike, rename in place,
+delete, reorder by drag-and-drop, freeze the list.</li>
+<li><strong>Reserve</strong> — an undated list you draw from in the
+morning; unfinished day tasks return to it at the day rollover.</li>
+<li><strong>Recurring</strong> — task templates tied to weekdays, injected
+automatically each new day.</li>
+<li><strong>Archives window</strong> — every past day, read-only, with a
+search over task text.</li>
+<li><strong>Statistics window</strong> — a plain table of counts per
+archived day, no chart and no judgement.</li>
+<li>Undo the last deletion, copy a day as plain text, keyboard shortcuts
+with a help window, and a full French translation.</li>
+</ul>
+
+<h2>Install</h2>
 <p>Add the repository, then install:</p>
 <pre>flatpak remote-add --if-not-exists rature \
   https://vertours.github.io/Rature/io.github.vertours.Rature.flatpakrepo
@@ -29,11 +75,17 @@ flatpak install rature io.github.vertours.Rature</pre>
 
 <p>Updates then arrive like any other Flatpak app. A standalone
 <code>.flatpak</code> bundle is attached to each
-<a href="https://github.com/VertOurs/Rature/releases">GitHub release</a>.</p>
-
-<p>Source, issues and the changelog:
-<a href="https://github.com/VertOurs/Rature">github.com/VertOurs/Rature</a>.
-The repository is signed with the key in
+<a href="https://github.com/VertOurs/Rature/releases">GitHub release</a>,
+for a one-off install without adding the repository. The repository is
+signed with the key in
 <a href="io.github.vertours.Rature.flatpakrepo">the <code>.flatpakrepo</code></a>.</p>
+
+<h2>Source</h2>
+<p>Code, issues and the changelog:
+<a href="https://github.com/VertOurs/Rature">github.com/VertOurs/Rature</a>,
+licensed GPL-3.0-or-later.</p>
+
+<footer>Built with AI assistance (Claude Code); the author writes the
+specification, reviews every change, and merges it.</footer>
 </body>
 </html>
