@@ -98,8 +98,10 @@ logic, the three views, the Archives and Statistics windows, keyboard
 shortcuts, plain-text export, a full French translation, and self-updating
 publication.
 
-Version 2 is under way: structured logging, native packaging, a refreshed
-README and project page, and further comfort features.
+Version 2 is under way. Milestone 6 (`1.1.0`) is done: structured
+logging, native packaging prepared for AUR/COPR/Mageia (submission still
+pending), and this refreshed README and project page. Capture from a
+synced folder and further comfort features are next.
 
 Built with AI assistance (Claude Code); I write the specification,
 review every change, and merge it.

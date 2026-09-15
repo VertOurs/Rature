@@ -48,6 +48,7 @@ rature/
 │   │   ├── reorder.py          Where a drag-and-drop reorder lands (no gi)
 │   │   └── weekdays.py         Locale weekday names via strftime (no gi)
 │   ├── i18n.py                 Launcher locale helpers (no gi)
+│   ├── logging_setup.py        Stderr handler, RATURE_LOG_LEVEL (no gi)
 │   └── main.py                 Process entry point
 ├── data/
 │   ├── ui/                     One .ui per @Gtk.Template module, same name
@@ -57,7 +58,11 @@ rature/
 │   └── *.gschema.xml           Window geometry settings
 ├── po/                         LINGUAS, POTFILES.in, fr.po
 ├── tests/                      pytest: core/, launcher wiring, packaging
-├── build-aux/flatpak/          Flatpak manifest
+├── build-aux/
+│   ├── flatpak/                 Flatpak manifest, repo signing, landing page
+│   ├── aur/                     PKGBUILD, .SRCINFO
+│   ├── copr/                    Fedora .spec
+│   └── mageia/                  Mageia .spec
 ├── docs/
 ├── meson.build
 └── pyproject.toml              ruff and pytest configuration

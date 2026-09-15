@@ -114,6 +114,7 @@ CI runs these plus a metadata-validation job and a Flatpak build.
 | `ci` | continuous integration |
 | `i18n` | translatable strings and catalogues |
 | `chore` | misc work with no effect on shipped code |
+| `release` | the version bump and its CHANGELOG entry, nothing else |
 
 - Imperative present, English, no leading capital, no trailing period, at
   most 72 characters in the description.
@@ -142,7 +143,7 @@ feat(storage): switch to atomic writes
 ## Branches and merging
 
 - One branch per task, prefixed with the commit type: `feat/`, `fix/`,
-  `refactor/`, `build/`, `ci/`, `docs/`, `test/`, `chore/`.
+  `refactor/`, `build/`, `ci/`, `docs/`, `test/`, `chore/`, `release/`.
 - Merge through a pull request, never a direct push to `main`.
 - Squash merge only, one commit per pull request. Merge commits and rebase
   merge are disabled in the repository settings, so the rule is enforced by

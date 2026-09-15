@@ -61,7 +61,7 @@ Discutées et tranchées. **Ne pas les rouvrir** sans demande explicite.
 | Identifiant | `io.github.vertours.Rature` |
 | Compte GitHub | VertOurs |
 | Périmètre | Application de bureau, PC uniquement |
-| Distribution | Dépôt Flatpak auto-hébergé, bundle, AUR, COPR. Pas Flathub |
+| Distribution | Dépôt Flatpak auto-hébergé, bundle, AUR, COPR, Mageia. Pas Flathub. Soumission AUR/COPR/Mageia repoussée en v3/v4 (comptes personnels requis), fichiers déjà prêts dans `build-aux/` |
 | Langue de l'interface | Anglais |
 | Langue du code, des noms et des commentaires | Anglais |
 | Langue des documents internes | Français, assumé |

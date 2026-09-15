@@ -392,9 +392,11 @@ Noté ici pour ne pas y penser pendant les chantiers.
   personnel de VertOurs (AUR : compte et clé SSH ; COPR : compte Fedora ;
   Mageia : processus propre au dépôt communautaire), que l'agent n'a pas et
   ne doit pas créer à sa place. Le chantier 6 prépare et vérifie les
-  fichiers : `PKGBUILD` mis à jour vers `1.0.0` et construction validée en
-  conteneur Arch le 15 septembre 2026 (`build-aux/aur/PKGBUILD`,
-  `.SRCINFO`).
+  fichiers : `PKGBUILD` et les `.spec` COPR/Mageia suivent la version du
+  projet (`1.1.0` à la clôture du chantier), constructions validées en
+  conteneur (Arch, Fedora, Mageia) le 15 septembre 2026
+  (`build-aux/aur/PKGBUILD`, `.SRCINFO`, `build-aux/copr/rature.spec`,
+  `build-aux/mageia/rature.spec`).
 
 Note : l'entrée « Traduction espéranto », auparavant repoussée, entre au
 chantier 8 et sort donc de cette section. L'entrée « capture depuis le
