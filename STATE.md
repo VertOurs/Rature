@@ -12,16 +12,20 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (capture et réserve) **pas commencé, ne pas démarrer sans accord
   explicite de VertOurs** (demande du 15 septembre 2026, y compris son
   ADR 0007 préalable).
-- **Release `1.1.0` en cours de coupe** (15 septembre 2026) : ferme le
-  chantier 6. Quatre sources de version à jour, `CHANGELOG` et metainfo
-  `<release>` à jour. Reste : merge de la PR, tag `v1.1.0` annoté et
-  signé, push du tag, contrôle que `release.yml` est vert, puis correctif
-  des sommes sha256 `PKGBUILD`/`.spec` sur le tarball réel du tag (elles
-  référencent encore celui de `1.0.0`, un commit de suivi immédiat les
-  corrige).
+- **`1.1.0` est publiée** (15 septembre 2026, sur `//50`) : ferme le
+  chantier 6. Sept sources de version d'accord, `CHANGELOG` et metainfo
+  `<release>` à jour, tag `v1.1.0` annoté et signé sur le commit de merge
+  de la PR #119, `release.yml` vert (dépôt et bundle reconstruits et
+  signés, `https://vertours.github.io/Rature/` republié — nouvelle page
+  de présentation en ligne —, `rature.flatpak` joint à la release, PKGBUILD
+  et .SRCINFO corrigés contre la vraie archive dans un commit de suivi
+  immédiat, reconstruction vérifiée en conteneur Arch). `1.0.0` reste
+  taguée, sur `//50`. Reste, hors agent (`CLAUDE.md` §6) : `flatpak
+  update` depuis `1.0.0` et contrôle visuel de la page GitHub Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé hors agent (`CLAUDE.md` §6) le 8 septembre 2026, sans souci, via
-  le dépôt auto-hébergé.
+  le dépôt auto-hébergé. `1.0.0` → `1.1.0` pas encore testé de la même
+  façon.
 - **Suivi ouvert** : bump runtime `//50` → `//51` en `1.1.1`, pas avant
   le 16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
