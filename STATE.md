@@ -82,8 +82,27 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   webhook de reconstruction sur push) et Mageia (dépôt communautaire,
   processus propre à leur infrastructure). Ni l'un ni l'autre ne demande
   de compte à créer par l'agent.
-- Reste du chantier 6 non commencé : README, logo, page GitHub Pages,
-  `FUNDING.yml`.
+- **README et page de présentation** (ROADMAP chantier 6, 15 septembre
+  2026) : statut du README corrigé (n'annonçait plus `1.0.0`), trois
+  badges ajoutés, en-tête recentré avec l'icône existante, nouvelle
+  section « Why another todo app » en première personne. Page
+  `build-aux/flatpak/index.html` étoffée en vraie présentation du projet
+  (captures, fonctionnalités), en plus des instructions d'installation
+  du dépôt Flatpak déjà servies là ; prend effet au prochain tag `v*` ou
+  déclenchement manuel du workflow Release. Logo abandonné, décision de
+  VertOurs le 15 septembre 2026 : l'icône actuelle est gardée, son
+  commentaire « placeholder » corrigé en conséquence.
+- **Sponsoring** (ROADMAP chantier 6, 15 septembre 2026) :
+  `.github/FUNDING.yml` créé (`github: [VertOurs]`), mention ajoutée au
+  README. **Reste à faire, à la charge de VertOurs** : aucun compte
+  GitHub Sponsors existant. Inscription sur `github.com/sponsors`,
+  2FA obligatoire, coordonnées bancaires via Stripe Connect, formulaire
+  fiscal, revue GitHub de quelques jours. Le bouton « Sponsor » et le
+  lien `github.com/sponsors/VertOurs` du README restent inactifs tant
+  que ce n'est pas fait.
+- Chantier 6 éditorial terminé (README, page de présentation, logo,
+  sponsoring). Reste : instrumentation confirmée en usage réel
+  (`journalctl`), puis le critère de fin du chantier.
 - **Mode de travail** : agent dans l'IDE, PyCharm
 
 ## Dépôt
