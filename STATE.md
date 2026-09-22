@@ -6,12 +6,29 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : aucun. Chantiers 0 à 6 terminés
-  (`docs/internal/ROADMAP.md`), critère de fin du chantier 6 atteint le
-  15 septembre 2026 (détail dans « Chantiers terminés »). Chantier 7
-  (capture et réserve) **pas commencé, ne pas démarrer sans accord
-  explicite de VertOurs** (demande du 15 septembre 2026, y compris son
-  ADR 0007 préalable).
+- **Chantier en cours** : chantier 7 (capture et réserve), lancé le
+  22 septembre 2026 sur accord explicite de VertOurs. **7.1 (boîte de
+  dépôt) terminé et fusionné dans `main`** le même jour (PR #124, squash
+  `4e4ecfb`) : ADR 0007, `SPECIFICATION.md` §2.8 et §3.15 (et la liste de
+  priorité des bannières étendue en §3.6), `core/inbox.py`, méthode
+  `App.import_inbox` (sauvegarde puis déplacement vers `processed/`,
+  jamais l'inverse), sélecteur de dossier via le portail (`Capture
+  Folder…`, clé GSettings `capture-folder`), déclenchement au démarrage
+  et à chaque retour de focus, deux bannières (dossier inaccessible,
+  fichier `inbox` illisible). Testé en conditions réelles avec VertOurs
+  (dossier `pCloudDrive/rature` synchronisé, fichier `inbox-phone-1.txt`
+  importé en réserve puis retrouvé dans `processed/`, pas de doublon au
+  relancement). Traduction : `fr.po` remis à 100 % (82 messages), y
+  compris un trou préexistant sans lien avec ce chantier — les légendes
+  du metainfo et les notes de version de `1.1.0`/`1.0.0`/`0.10.1`/`0.10.0`
+  n'avaient jamais été fusionnées depuis la traduction initiale (PR #76,
+  chantier 4) — et `po/meson.build` corrigé (`--msgid-bugs-address`
+  manquant, faisait disparaître l'en-tête `Report-Msgid-Bugs-To` à
+  chaque régénération). **7.2** (renvoi manuel vers la réserve,
+  réordonnancement, priorité, première migration réelle de
+  `migrations.py`) et **7.3** (préparer le lendemain, cadrage dédié
+  requis avant tout code) pas commencés. Chantiers 0 à 6 terminés
+  (`docs/internal/ROADMAP.md`), détail dans « Chantiers terminés ».
 - **`1.1.0` est publiée** (15 septembre 2026, sur `//50`) : ferme le
   chantier 6. Sept sources de version d'accord, `CHANGELOG` et metainfo
   `<release>` à jour, tag `v1.1.0` annoté et signé sur le commit de merge
@@ -94,7 +111,13 @@ confirmé par `journalctl` en usage réel, paquetage natif (AUR, COPR,
 Mageia) préparé et vérifié en conteneur mais pas encore soumis (repoussé
 en v3/v4), README et page de présentation refaits, `FUNDING.yml`. Aucune
 migration de format (`migrations.py` toujours à vide, rien à couvrir).
-`[Unreleased]` est vide ; l'incrément suivant est `1.1.1`, le bump `//51`.
+
+`[Unreleased]` contient la capture depuis un dossier synchronisé
+(chantier 7.1, fusionnée le 22 septembre 2026, voir « Avancement »).
+Prochain tag possible : `1.2.0` (mineur, `feat`), indépendamment du bump
+`//51` vers `1.1.1` toujours prévu au 16 octobre 2026 au plus tôt — les
+deux incréments ne sont pas liés, VertOurs tranche lequel sort en
+premier.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
