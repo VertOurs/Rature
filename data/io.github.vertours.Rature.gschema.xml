@@ -18,5 +18,14 @@
       <summary>Window maximized state</summary>
       <description>Whether the main window is maximized.</description>
     </key>
+    <key name="capture-folder" type="s">
+      <default>''</default>
+      <summary>Capture folder</summary>
+      <description>
+        URI of the folder watched for dropped inbox-*.txt files
+        (SPECIFICATION.md §2.8), chosen through the file portal. Empty
+        means no folder is configured yet.
+      </description>
+    </key>
   </schema>
 </schemalist>

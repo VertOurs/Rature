@@ -6,6 +6,7 @@
 import sys
 import traceback
 from gettext import gettext as _
+from pathlib import Path
 
 import gi
 
@@ -85,6 +86,7 @@ class RatureWindow(Adw.ApplicationWindow):
         self._restore_geometry()
         self.connect("close-request", self._on_close_request)
         self.connect("destroy", self._on_destroy)
+        self.connect("notify::is-active", self._on_active_changed)
         self.sidebar_list.connect("row-selected", self._on_row_selected)
         self.sidebar_list.connect("row-activated", self._on_row_activated)
         self._install_shortcuts()
@@ -96,10 +98,19 @@ class RatureWindow(Adw.ApplicationWindow):
         self._quarantine_dismissed = False
         self._new_day_pending = False
         self._new_day_dismissed = False
+        # SPECIFICATION.md §2.8: inbox files still unreadable as of the
+        # latest import_inbox call, and which of them the user has already
+        # dismissed (dismissing one never hides a later, different file).
+        self._inbox_unreadable: list[Path] = []
+        self._inbox_dismissed: set[Path] = set()
+        self._folder_missing_active = False
         self.day_view.banner.connect("button-clicked", self._on_banner_button_clicked)
         # StartupOutcome.RECOVERED_FROM_CORRUPTION is already known at this
         # point; show its banner immediately, not after the first tick.
         self._update_banner()
+        # SPECIFICATION.md §2.8: read the capture folder at startup too,
+        # not only on the focus-in _on_active_changed triggers from here on.
+        self._import_inbox()
 
         self._timer_id = GLib.timeout_add_seconds(
             _ENSURE_DAY_INTERVAL_SECONDS, self._on_ensure_day_tick
@@ -171,6 +182,42 @@ class RatureWindow(Adw.ApplicationWindow):
         self._perform(tick, clear_banner_on_success=False)
         self._refresh_all()
         return GLib.SOURCE_CONTINUE
+
+    def _on_active_changed(
+        self, _window: Gtk.Window, _pspec: GObject.ParamSpec
+    ) -> None:
+        # SPECIFICATION.md §2.8: a focus return, not every notify::is-active
+        # change (losing focus reads nothing).
+        if self.props.is_active:
+            self._import_inbox()
+
+    def _capture_folder(self) -> Path | None:
+        # ADR 0007: application.py's picker is the only writer of this key,
+        # and always stores a portal-backed folder URI whose get_path() is
+        # a real path on the document portal's FUSE mount.
+        uri = self._settings.get_string("capture-folder")
+        return Path(Gio.File.new_for_uri(uri).get_path()) if uri else None
+
+    def _import_inbox(self) -> None:
+        # SPECIFICATION.md §2.8: like _on_ensure_day_tick, this may run
+        # without writing anything (no folder configured, an empty folder),
+        # so the write-failure banner clears only when import_inbox itself
+        # reports a write, never merely because nothing raised.
+        def do_import() -> None:
+            outcome = self.app.import_inbox(self._capture_folder())
+            self._inbox_unreadable = outcome.unreadable
+            self._folder_missing_active = outcome.folder_missing
+            if outcome.write is EnsureOutcome.SAVED:
+                self._write_failure_active = False
+
+        self._perform(do_import, clear_banner_on_success=False)
+        self._refresh_all()
+
+    def _unreadable_inbox_file(self) -> Path | None:
+        for path in self._inbox_unreadable:
+            if path not in self._inbox_dismissed:
+                return path
+        return None
 
     def _refresh_all(self) -> None:
         self.day_view.refresh()
@@ -248,9 +295,12 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _update_banner(self) -> None:
         # SPECIFICATION.md §3.6: one AdwBanner, one message at a time,
-        # picked fresh on every call: write failure, then quarantine, then
-        # new day. A dismissed message is skipped even if still "active".
+        # picked fresh on every call, in priority order: write failure,
+        # data.json quarantine, capture folder inaccessible, an unreadable
+        # inbox file, new day. A dismissed message is skipped even if
+        # still "active".
         banner = self.day_view.banner
+        unreadable = self._unreadable_inbox_file()
         if self._write_failure_active:
             banner.set_title(_("Changes could not be saved to disk."))
             banner.set_button_label("")
@@ -265,6 +315,18 @@ class RatureWindow(Adw.ApplicationWindow):
             )
             banner.set_button_label(_("Dismiss"))
             banner.set_revealed(True)
+        elif self._folder_missing_active:
+            banner.set_title(
+                _("The capture folder could not be read. Choose it again.")
+            )
+            banner.set_button_label(_("Choose Folder"))
+            banner.set_revealed(True)
+        elif unreadable is not None:
+            banner.set_title(
+                _("The dropped file %s could not be read.") % unreadable.name
+            )
+            banner.set_button_label(_("Dismiss"))
+            banner.set_revealed(True)
         elif self._new_day_pending and not self._new_day_dismissed:
             banner.set_title(
                 _("A new day has started. The previous one has been archived.")
@@ -275,11 +337,17 @@ class RatureWindow(Adw.ApplicationWindow):
             banner.set_revealed(False)
 
     def _on_banner_button_clicked(self, _banner: Adw.Banner) -> None:
+        # Mirrors _update_banner's priority order (the write-failure case
+        # has no button, so it never reaches here).
         if (
             self.app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
             and not self._quarantine_dismissed
         ):
             self._quarantine_dismissed = True
+        elif self._folder_missing_active:
+            self.activate_action("app.capture-folder", None)
+        elif (unreadable := self._unreadable_inbox_file()) is not None:
+            self._inbox_dismissed.add(unreadable)
         else:
             self._new_day_dismissed = True
         self._update_banner()

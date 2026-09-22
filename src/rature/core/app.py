@@ -16,7 +16,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import NamedTuple
 
-from rature.core import export, search, stats, storage
+from rature.core import export, inbox, search, stats, storage
 from rature.core.migrations import FutureVersionError
 from rature.core.models import RecurringItem, ReserveItem, Task
 
@@ -61,6 +61,29 @@ class EnsureResult(NamedTuple):
 
     outcome: EnsureOutcome
     archived: Day | None
+
+
+class InboxOutcome(NamedTuple):
+    """What one App.import_inbox call found wrong, if anything, and whether
+    it wrote.
+
+    unreadable: inbox files left untouched in the watched folder because
+    their content was not valid UTF-8 (SPECIFICATION.md §2.8), in
+    list_inbox_files' order. folder_missing: the watched folder itself
+    could not be read, distinct from "no folder configured yet" (a None
+    argument, a silent no-op: neither field set, write is IDLE). Both
+    unreadable and folder_missing drive the §3.6/§3.15 banner.
+
+    write mirrors EnsureOutcome's IDLE/SAVED split (never SAVE_FAILED
+    here: an OSError from _save() propagates uncaught, per this class's
+    docstring, instead of being captured in the outcome). A caller that
+    also drives the write-failure banner (§3.6 situation 3) needs this
+    to avoid clearing it on a call that imported nothing.
+    """
+
+    unreadable: list[Path]
+    folder_missing: bool
+    write: EnsureOutcome
 
 
 def _default_clock() -> datetime:
@@ -349,6 +372,48 @@ class App:
         task = self.session.draw_from_reserve(item_id)
         self._save()
         return task
+
+    def import_inbox(self, folder: Path | None) -> InboxOutcome:
+        """SPECIFICATION.md §2.8: import inbox-*.txt files from folder into the reserve.
+
+        folder is None when no capture folder is configured yet: a
+        silent no-op, not an error. Each file is handled on its own:
+        its non-empty lines join the reserve (§2.5's add_to_reserve, no
+        deduplication) and data.json is saved before the file moves to
+        processed/, in that order (ADR 0007). A crash between the two
+        reimports that one file next time and produces a duplicate
+        reserve entry, never a loss. An empty file is not an error, it
+        moves straight to processed/ without a save. An unreadable file
+        (invalid UTF-8) is left where it is and reported, and does not
+        stop the files after it. Like every other mutation on this
+        class, a save's OSError is not caught here; it reaches the
+        caller with whatever files came before it already committed.
+        """
+        if folder is None:
+            return InboxOutcome(
+                unreadable=[], folder_missing=False, write=EnsureOutcome.IDLE
+            )
+        if not folder.is_dir():
+            return InboxOutcome(
+                unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
+            )
+        today = reference_date(self.clock())
+        unreadable: list[Path] = []
+        wrote = False
+        for path in inbox.list_inbox_files(folder):
+            try:
+                lines = inbox.read_inbox_lines(path)
+            except UnicodeDecodeError:
+                unreadable.append(path)
+                continue
+            for line in lines:
+                self.session.add_to_reserve(line, today=today)
+            if lines:
+                self._save()
+                wrote = True
+            inbox.move_to_processed(path, folder)
+        write = EnsureOutcome.SAVED if wrote else EnsureOutcome.IDLE
+        return InboxOutcome(unreadable=unreadable, folder_missing=False, write=write)
 
     def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
         item = self.session.add_recurring(text, weekdays)

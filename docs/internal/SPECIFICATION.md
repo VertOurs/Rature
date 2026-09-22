@@ -249,6 +249,55 @@ nuit par an.
 Le champ `created` des items de réserve reste une date simple, sans heure. Il
 n'est pas concerné.
 
+### 2.8 Boîte de dépôt
+
+Capture depuis le téléphone, sans application dédiée, sans réseau et sans
+compte tiers : un dossier choisi par l'utilisateur, surveillé pour des
+fichiers texte déposés depuis n'importe quel appareil qui y écrit, par
+exemple via un dossier synchronisé. Décision et justification complètes :
+`docs/adr/0007-boite-de-depot-texte.md`. Cette section n'en reprend que le
+comportement observable.
+
+**Dossier surveillé** : choisi une fois par l'utilisateur, mémorisé dans
+GSettings. Rien n'est lu tant qu'aucun dossier n'est choisi.
+
+**Moment de lecture** : au démarrage de l'application, puis à chaque retour
+de focus de la fenêtre. Jamais de surveillance continue.
+
+**Fichiers considérés** : uniquement ceux dont le nom correspond exactement
+au motif `inbox-*.txt`. Tout autre fichier présent dans le dossier, y
+compris un fichier temporaire laissé par un client de synchronisation en
+cours de transfert, est ignoré et n'est jamais touché.
+
+**Format** : texte brut, une tâche par ligne, lignes vides ignorées, aucune
+syntaxe à interpréter.
+
+**Import** : chaque ligne non vide d'un fichier retenu devient un nouvel
+item de réserve, par la même opération d'ajout que l'ajout manuel en
+réserve (§2.5). Aucun dédoublonnage à l'import, cohérent avec §2.7.4, qui
+réserve le dédoublonnage au seul passage du jour.
+
+**Ordre des opérations** : `data.json` est réécrit avec les nouveaux items
+de réserve avant que le fichier importé ne soit déplacé. Un plantage entre
+les deux étapes laisse le fichier en place ; il est réimporté au lancement
+suivant et produit un doublon dans la réserve, jamais une perte.
+
+**Après import** : le fichier est déplacé dans un sous-dossier `processed/`
+du dossier surveillé, jamais supprimé.
+
+**Fichier vide** : aucune tâche à importer, ce n'est pas une erreur. Le
+fichier est déplacé directement vers `processed/`.
+
+**Fichier illisible** : un fichier dont le contenu n'est pas de l'UTF-8
+valide n'est pas importé. Il reste dans le dossier surveillé, jamais dans
+`processed/`, et une bannière prévient (§3.6). C'est le même traitement
+que pour un `data.json` corrompu, §3.6 situation 2.
+
+**Dossier devenu inaccessible** (supprimé, ou droit d'accès révoqué) :
+aucune tentative silencieuse de le recréer. Une bannière prévient et
+l'utilisateur est renvoyé vers le choix d'un dossier, par le même chemin
+que le premier réglage.
+
 ---
 
 ## 3. Spécification d'interface
@@ -298,7 +347,8 @@ menu principal, dans une fenêtre distincte, voir §3.5.
 Le menu principal (`open-menu-symbolic`, en tête du panneau latéral) contient
 au chantier 3 : Archives, puis About Rature. Au chantier 4, Keyboard
 Shortcuts rejoint le menu, groupé avec About Rature (§3.11), et Statistics
-rejoint Archives dans le premier groupe (§3.14).
+rejoint Archives dans le premier groupe (§3.14). Au chantier 7, Capture
+Folder rejoint Archives et Statistics dans le même groupe (§3.15).
 
 **Taille et état.** La fenêtre lit `window-width`, `window-height` et
 `window-maximized` à la construction, et les écrit à la fermeture. Pas de
@@ -581,16 +631,19 @@ et affiche une `AdwBanner`. L'application reste utilisable, aucune boîte
 modale, aucune fermeture forcée. La bannière disparaît à la première
 écriture réussie.
 
-**Une seule bannière, trois messages possibles.** Les situations 2 et 3
-partagent la même `AdwBanner`, avec le nouveau jour (§3.1) : jamais deux
-bannières à la fois, jamais de file d'attente. À chaque rafraîchissement,
-une fonction unique choisit le message le plus prioritaire parmi ceux
-encore actifs et non fermés, et le pose sur cette bannière : échec
-d'écriture d'abord, puis quarantaine, puis nouveau jour. Un échec
-d'écriture masque ainsi temporairement une bannière de quarantaine
-affichée, qui réapparaît dès que l'écriture suivante réussit. Fermer un
-message ne ferme pas les autres, et un message fermé ne revient jamais,
-y compris au rafraîchissement suivant.
+**Une seule bannière, plusieurs messages possibles.** Les situations 2 et 3
+partagent la même `AdwBanner`, avec le nouveau jour (§3.1) et les deux
+situations de la boîte de dépôt (§2.8, §3.15 : fichier `inbox` illisible,
+dossier de capture inaccessible) : jamais deux bannières à la fois, jamais
+de file d'attente. À chaque rafraîchissement, une fonction unique choisit
+le message le plus prioritaire parmi ceux encore actifs et non fermés, et
+le pose sur cette bannière, dans cet ordre : échec d'écriture, puis
+quarantaine de `data.json`, puis dossier de capture inaccessible, puis
+fichier `inbox` illisible, puis nouveau jour. Un message de rang supérieur
+masque ainsi temporairement un message de rang inférieur déjà affiché, qui
+réapparaît dès que le message supérieur se résout. Fermer un message ne
+ferme pas les autres, et un message fermé ne revient jamais, y compris au
+rafraîchissement suivant.
 
 **Refus métier.** `LockedError`, `KeyError` et `ValueError` remontent de
 `core` mais ne doivent jamais atteindre l'utilisateur : l'interface rend
@@ -927,3 +980,32 @@ expose à l'interface sous la forme d'une liste `(date, compteurs)` du plus
 récent au plus ancien, dans le même ordre qu'`App.archives()`, les archives
 illisibles omises. Les totaux se somment dans l'interface, ils n'ont pas
 besoin de `core`.
+
+---
+
+### 3.15 Boîte de dépôt
+
+Ajoutée au chantier 7. Comportement produit en §2.8. Cette section fixe la
+forme.
+
+**Choix du dossier.** Entrée Capture Folder dans le menu principal (§3.1),
+groupée avec Archives et Statistics. Elle ouvre le sélecteur de dossier du
+système (`Gtk.FileDialog.select_folder`), à travers le portail de fichiers.
+Le dossier choisi remplace silencieusement un dossier déjà réglé, sans
+demande de confirmation : c'est un réglage, pas une action destructrice.
+
+**Aucun dossier réglé.** L'entrée de menu reste disponible mais aucune
+lecture n'a lieu tant que l'utilisateur ne l'a pas ouverte au moins une
+fois. Aucune bannière, aucun rappel : la boîte de dépôt est une fonction
+que l'utilisateur active volontairement, jamais un manque signalé.
+
+**Fichier `inbox` illisible.** Même bannière qu'en §3.6, avec son propre
+message, distinct de celui de `data.json` : elle nomme le fichier laissé de
+côté dans le dossier surveillé. Fermable, elle ne revient pas pour ce
+fichier ; un nouveau fichier illisible produit un nouveau message.
+
+**Dossier de capture devenu inaccessible.** Même bannière, avec un message
+qui propose directement de rechoisir un dossier : l'action de la bannière
+ouvre le même sélecteur que l'entrée de menu Capture Folder.
+
+**Priorité entre les messages de la bannière** : définie en §3.6.

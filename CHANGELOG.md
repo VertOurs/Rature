@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Capture from a synced folder (ROADMAP milestone 7.1, `docs/adr/0007-boite-de-depot-texte.md`):
+  a folder chosen through the file portal (Capture Folder… in the main
+  menu) is read at startup and on window focus, never continuously. A
+  text file named `inbox-*.txt` becomes one reserve entry per non-empty
+  line, then moves to `processed/`, never deleted. An unreadable file or
+  an inaccessible capture folder shows a banner instead of losing
+  anything; a crash between saving and moving a file reimports it,
+  producing a duplicate reserve entry rather than a loss.
+
 ## [1.1.0] - 2026-09-15
 
 Milestone 6 (observability and finishing) is complete: logging is in
