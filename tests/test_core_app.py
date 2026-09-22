@@ -9,7 +9,13 @@ from pathlib import Path
 import pytest
 
 from rature.core import storage
-from rature.core.app import App, EnsureOutcome, EnsureResult, StartupOutcome
+from rature.core.app import (
+    App,
+    EnsureOutcome,
+    EnsureResult,
+    InboxOutcome,
+    StartupOutcome,
+)
 from rature.core.migrations import FutureVersionError
 from rature.core.session import LockedError
 from rature.core.stats import DayCounts
@@ -504,3 +510,137 @@ def test_striking_twice_raises_value_error(tmp_path: Path) -> None:
     app.strike(task.id)
     with pytest.raises(ValueError):
         app.strike(task.id)
+
+
+def _make_app(tmp_path: Path, now: datetime) -> App:
+    return App.open(tmp_path / "data", clock=clock_at(now))
+
+
+def test_import_inbox_without_a_folder_is_a_noop(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    assert app.import_inbox(None) == InboxOutcome(unreadable=[], folder_missing=False)
+    assert app.session.reserve == []
+
+
+def test_import_inbox_reports_a_missing_folder(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    outcome = app.import_inbox(tmp_path / "no-such-folder")
+    assert outcome == InboxOutcome(unreadable=[], folder_missing=True)
+
+
+def test_import_inbox_adds_lines_to_the_reserve_and_saves(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text(
+        "water the plants\ncall the bank\n", encoding="utf-8"
+    )
+
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(unreadable=[], folder_missing=False)
+    assert [item.text for item in app.session.reserve] == [
+        "water the plants",
+        "call the bank",
+    ]
+    reloaded = load(data_dir=tmp_path / "data").into_session()
+    assert [item.text for item in reloaded.reserve] == [
+        "water the plants",
+        "call the bank",
+    ]
+    assert not (folder / "inbox-phone-1.txt").exists()
+    assert (folder / "processed" / "inbox-phone-1.txt").exists()
+
+
+def test_import_inbox_uses_the_reference_date(tmp_path: Path) -> None:
+    # 01:00 local is still the previous day, the boundary is 04:00 (§2.5).
+    now = datetime(2026, 8, 25, 1, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text("errand", encoding="utf-8")
+
+    app.import_inbox(folder)
+
+    assert app.session.reserve[0].created == date(2026, 8, 24)
+
+
+def test_import_inbox_moves_an_empty_file_without_touching_the_reserve(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text("   \n\n", encoding="utf-8")
+
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(unreadable=[], folder_missing=False)
+    assert app.session.reserve == []
+    assert (folder / "processed" / "inbox-phone-1.txt").exists()
+
+
+def test_import_inbox_leaves_an_unreadable_file_in_place_and_reports_it(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    bad = folder / "inbox-phone-1.txt"
+    bad.write_bytes(b"\xff\xfe not utf-8")
+
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(unreadable=[bad], folder_missing=False)
+    assert app.session.reserve == []
+    assert bad.exists()
+    assert not (folder / "processed").exists()
+
+
+def test_import_inbox_continues_past_an_unreadable_file(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-a-1.txt").write_bytes(b"\xff\xfe not utf-8")
+    (folder / "inbox-b-1.txt").write_text("good task", encoding="utf-8")
+
+    outcome = app.import_inbox(folder)
+
+    assert outcome.unreadable == [folder / "inbox-a-1.txt"]
+    assert [item.text for item in app.session.reserve] == ["good task"]
+    assert (folder / "processed" / "inbox-b-1.txt").exists()
+
+
+def test_import_inbox_never_deduplicates(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text(
+        "same task\nsame task\n", encoding="utf-8"
+    )
+
+    app.import_inbox(folder)
+
+    assert [item.text for item in app.session.reserve] == ["same task", "same task"]
+
+
+def test_import_inbox_ignores_a_sync_client_temp_file(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    stray = folder / "inbox-phone-1.txt.tmp"
+    stray.write_text("still being written", encoding="utf-8")
+
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(unreadable=[], folder_missing=False)
+    assert app.session.reserve == []
+    assert stray.exists()
