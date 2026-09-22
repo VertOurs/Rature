@@ -14,6 +14,10 @@
         <attribute name="label" translatable="yes">Statistics</attribute>
         <attribute name="action">app.statistics</attribute>
       </item>
+      <item>
+        <attribute name="label" translatable="yes">Capture Folder…</attribute>
+        <attribute name="action">app.capture-folder</attribute>
+      </item>
     </section>
     <section>
       <item>

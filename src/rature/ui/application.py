@@ -11,7 +11,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gdk, Gio, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gio, GLib, Gtk  # noqa: E402
 
 from rature import config  # noqa: E402
 from rature.core import storage  # noqa: E402
@@ -32,10 +32,12 @@ class RatureApplication(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
         self._app: App | None = None
+        self._settings = Gio.Settings.new(APP_ID)
         self._add_action("quit", self._on_quit, accels=["<primary>q"])
         self._add_action("about", self._on_about)
         self._add_action("archives", self._on_archives)
         self._add_action("statistics", self._on_statistics)
+        self._add_action("capture-folder", self._on_capture_folder)
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
@@ -107,6 +109,29 @@ class RatureApplication(Adw.Application):
             transient_for=self.props.active_window,
         )
         window.present()
+
+    def _on_capture_folder(self, _action, _param) -> None:
+        # SPECIFICATION.md §3.15, ADR 0007: goes through the file portal
+        # (automatic under Flatpak), which grants persistent access without
+        # a --filesystem permission in the manifest. Replaces a folder
+        # already set without confirmation: a setting, not a destructive
+        # action (§3.15).
+        dialog = Gtk.FileDialog()
+        dialog.set_title(_("Choose the Capture Folder"))
+        dialog.select_folder(
+            self.props.active_window, None, self._on_capture_folder_chosen
+        )
+
+    def _on_capture_folder_chosen(
+        self, dialog: Gtk.FileDialog, result: Gio.AsyncResult
+    ) -> None:
+        try:
+            folder = dialog.select_folder_finish(result)
+        except GLib.Error:
+            # Cancelled, or the portal refused: nothing to store, nothing
+            # to report, the previous setting (if any) is untouched.
+            return
+        self._settings.set_string("capture-folder", folder.get_uri())
 
     def _on_about(self, _action, _param) -> None:
         dialog = Adw.AboutDialog(
