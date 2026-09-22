@@ -64,18 +64,26 @@ class EnsureResult(NamedTuple):
 
 
 class InboxOutcome(NamedTuple):
-    """What one App.import_inbox call found wrong, if anything.
+    """What one App.import_inbox call found wrong, if anything, and whether
+    it wrote.
 
     unreadable: inbox files left untouched in the watched folder because
     their content was not valid UTF-8 (SPECIFICATION.md §2.8), in
     list_inbox_files' order. folder_missing: the watched folder itself
     could not be read, distinct from "no folder configured yet" (a None
-    argument, a silent no-op with neither field set). Both drive the
-    §3.6/§3.15 banner; a caller with neither has nothing to report.
+    argument, a silent no-op: neither field set, write is IDLE). Both
+    unreadable and folder_missing drive the §3.6/§3.15 banner.
+
+    write mirrors EnsureOutcome's IDLE/SAVED split (never SAVE_FAILED
+    here: an OSError from _save() propagates uncaught, per this class's
+    docstring, instead of being captured in the outcome). A caller that
+    also drives the write-failure banner (§3.6 situation 3) needs this
+    to avoid clearing it on a call that imported nothing.
     """
 
     unreadable: list[Path]
     folder_missing: bool
+    write: EnsureOutcome
 
 
 def _default_clock() -> datetime:
@@ -382,11 +390,16 @@ class App:
         caller with whatever files came before it already committed.
         """
         if folder is None:
-            return InboxOutcome(unreadable=[], folder_missing=False)
+            return InboxOutcome(
+                unreadable=[], folder_missing=False, write=EnsureOutcome.IDLE
+            )
         if not folder.is_dir():
-            return InboxOutcome(unreadable=[], folder_missing=True)
+            return InboxOutcome(
+                unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
+            )
         today = reference_date(self.clock())
         unreadable: list[Path] = []
+        wrote = False
         for path in inbox.list_inbox_files(folder):
             try:
                 lines = inbox.read_inbox_lines(path)
@@ -397,8 +410,10 @@ class App:
                 self.session.add_to_reserve(line, today=today)
             if lines:
                 self._save()
+                wrote = True
             inbox.move_to_processed(path, folder)
-        return InboxOutcome(unreadable=unreadable, folder_missing=False)
+        write = EnsureOutcome.SAVED if wrote else EnsureOutcome.IDLE
+        return InboxOutcome(unreadable=unreadable, folder_missing=False, write=write)
 
     def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
         item = self.session.add_recurring(text, weekdays)

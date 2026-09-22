@@ -519,7 +519,9 @@ def _make_app(tmp_path: Path, now: datetime) -> App:
 def test_import_inbox_without_a_folder_is_a_noop(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = _make_app(tmp_path, now)
-    assert app.import_inbox(None) == InboxOutcome(unreadable=[], folder_missing=False)
+    assert app.import_inbox(None) == InboxOutcome(
+        unreadable=[], folder_missing=False, write=EnsureOutcome.IDLE
+    )
     assert app.session.reserve == []
 
 
@@ -527,7 +529,9 @@ def test_import_inbox_reports_a_missing_folder(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = _make_app(tmp_path, now)
     outcome = app.import_inbox(tmp_path / "no-such-folder")
-    assert outcome == InboxOutcome(unreadable=[], folder_missing=True)
+    assert outcome == InboxOutcome(
+        unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
+    )
 
 
 def test_import_inbox_adds_lines_to_the_reserve_and_saves(tmp_path: Path) -> None:
@@ -541,7 +545,9 @@ def test_import_inbox_adds_lines_to_the_reserve_and_saves(tmp_path: Path) -> Non
 
     outcome = app.import_inbox(folder)
 
-    assert outcome == InboxOutcome(unreadable=[], folder_missing=False)
+    assert outcome == InboxOutcome(
+        unreadable=[], folder_missing=False, write=EnsureOutcome.SAVED
+    )
     assert [item.text for item in app.session.reserve] == [
         "water the plants",
         "call the bank",
@@ -579,7 +585,9 @@ def test_import_inbox_moves_an_empty_file_without_touching_the_reserve(
 
     outcome = app.import_inbox(folder)
 
-    assert outcome == InboxOutcome(unreadable=[], folder_missing=False)
+    assert outcome == InboxOutcome(
+        unreadable=[], folder_missing=False, write=EnsureOutcome.IDLE
+    )
     assert app.session.reserve == []
     assert (folder / "processed" / "inbox-phone-1.txt").exists()
 
@@ -596,7 +604,9 @@ def test_import_inbox_leaves_an_unreadable_file_in_place_and_reports_it(
 
     outcome = app.import_inbox(folder)
 
-    assert outcome == InboxOutcome(unreadable=[bad], folder_missing=False)
+    assert outcome == InboxOutcome(
+        unreadable=[bad], folder_missing=False, write=EnsureOutcome.IDLE
+    )
     assert app.session.reserve == []
     assert bad.exists()
     assert not (folder / "processed").exists()
@@ -613,6 +623,7 @@ def test_import_inbox_continues_past_an_unreadable_file(tmp_path: Path) -> None:
     outcome = app.import_inbox(folder)
 
     assert outcome.unreadable == [folder / "inbox-a-1.txt"]
+    assert outcome.write is EnsureOutcome.SAVED
     assert [item.text for item in app.session.reserve] == ["good task"]
     assert (folder / "processed" / "inbox-b-1.txt").exists()
 
@@ -641,6 +652,8 @@ def test_import_inbox_ignores_a_sync_client_temp_file(tmp_path: Path) -> None:
 
     outcome = app.import_inbox(folder)
 
-    assert outcome == InboxOutcome(unreadable=[], folder_missing=False)
+    assert outcome == InboxOutcome(
+        unreadable=[], folder_missing=False, write=EnsureOutcome.IDLE
+    )
     assert app.session.reserve == []
     assert stray.exists()
