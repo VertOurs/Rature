@@ -4,5 +4,8 @@
 i18n.gettext(
   'rature',
   preset: 'glib',
-  args: ['--from-code=UTF-8'],
+  args: [
+    '--from-code=UTF-8',
+    '--msgid-bugs-address=https://github.com/VertOurs/Rature/issues',
+  ],
 )

@@ -100,8 +100,10 @@ publication.
 
 Version 2 is under way. Milestone 6 (`1.1.0`) is done: structured
 logging, native packaging prepared for AUR/COPR/Mageia (submission still
-pending), and this refreshed README and project page. Capture from a
-synced folder and further comfort features are next.
+pending), and this refreshed README and project page. Milestone 7
+(capture and reserve) is under way: capture from a synced folder is
+done — drop a text file, each line joins the reserve on the next
+startup or window focus. Reserve editing and priority markers are next.
 
 Built with AI assistance (Claude Code); I write the specification,
 review every change, and merge it.
