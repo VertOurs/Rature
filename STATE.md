@@ -45,11 +45,23 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
   (`CLAUDE.md` §6).
-- **Suivi ouvert** : bump runtime `//50` → `//51` en `1.1.1`, pas avant
-  le 16 octobre 2026 (un mois après la sortie stable du 16 septembre,
+- **Suivi ouvert** : bump runtime `//50` → `//51`, pas avant le
+  16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
   réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
   retenues »).
+- **Image CI épinglée par digest, mise à jour manuelle** : `ci.yml` et
+  `release.yml` référencent
+  `ghcr.io/flathub-infra/flatpak-github-actions` par digest plutôt que
+  par étiquette flottante (`:gnome-50`), lot F de la revue de sécurité
+  du 24 septembre 2026. Dependabot ne suit pas les images des blocs
+  `container:` d'un fichier de workflow (`github-actions` ne couvre que
+  les actions, `docker` que les `Dockerfile`/Kubernetes/Helm ; vérifié
+  via `dependabot/dependabot-core#5819`, toujours ouverte). Bump manuel
+  à chaque changement d'image voulu (bump runtime `//51` inclus) :
+  `skopeo inspect docker://ghcr.io/flathub-infra/flatpak-github-actions:<étiquette>`,
+  copier le champ `Digest`, remplacer dans les deux fichiers, garder le
+  commentaire `# <étiquette>` en clair à côté.
 - **GitHub Sponsors actif** : compte de VertOurs en place et public,
   vérifié le 15 septembre 2026 (`sponsorsListing.isPublic: true` côté
   API, `github.com/sponsors/VertOurs` répond 200). Le lien du README et
@@ -114,16 +126,20 @@ migration de format (`migrations.py` toujours à vide, rien à couvrir).
 
 `[Unreleased]` contient la capture depuis un dossier synchronisé
 (chantier 7.1, fusionnée le 22 septembre 2026, voir « Avancement »).
-Prochain tag possible : `1.2.0` (mineur, `feat`), indépendamment du bump
-`//51` vers `1.1.1` toujours prévu au 16 octobre 2026 au plus tôt — les
-deux incréments ne sont pas liés, VertOurs tranche lequel sort en
-premier.
+Prochain tag possible : `1.2.0` (mineur, `feat` de 7.1 présent sur
+`main`), indépendamment du bump `//51`, pas avant le 16 octobre 2026 au
+plus tôt. Les deux incréments ne sont pas liés : pas de `1.1.1`, `main`
+porte déjà un `feat` non publié, donc tout tag depuis `main` est au
+minimum mineur (correction de VertOurs du 24 septembre 2026 sur le plan
+de revue de 7.1, voir « Avancement ») ; VertOurs tranche lequel des deux
+chantiers sort en premier.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
 runtime), et sous réserve que l'image CI `gnome-51` soit disponible à
-cette date. Touche le manifeste, la CI et la table ci-dessus. Livré en
-`1.1.1`, `1.1.0` restant sur `//50`.
+cette date. Touche le manifeste, la CI et la table ci-dessus. Livré dans
+la première version taguée après le bump, quel que soit son numéro ;
+`main` reste sur `//50` jusque-là.
 
 ## Environnement de la machine
 
