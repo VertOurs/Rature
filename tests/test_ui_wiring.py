@@ -309,6 +309,33 @@ def test_launcher_binds_the_c_gettext_domain() -> None:
     assert not missing, f"src/rature.in does not call {missing}"
 
 
+# Gio.File.get_path() returns None for a URI with no local mapping
+# (edited by hand outside the picker, or a non-file scheme). Path(None)
+# raises TypeError, so get_path()'s result must always pass through a
+# None check before Path(...), never straight into it, however deeply
+# the call is nested (a ternary caused this once, in _capture_folder).
+def _wraps_get_path_directly(node: ast.AST) -> bool:
+    return (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "Path"
+        and bool(node.args)
+        and isinstance(node.args[0], ast.Call)
+        and isinstance(node.args[0].func, ast.Attribute)
+        and node.args[0].func.attr == "get_path"
+    )
+
+
+def test_get_path_result_is_never_passed_straight_into_path() -> None:
+    violations = []
+    for py_path in sorted(UI_SRC.glob("*.py")):
+        tree = ast.parse(py_path.read_text(encoding="utf-8"), filename=str(py_path))
+        for node in ast.walk(tree):
+            if _wraps_get_path_directly(node):
+                violations.append(f"{py_path.name}:{node.lineno}")
+    assert not violations, f"Path(x.get_path()) unguarded against None: {violations}"
+
+
 def test_launcher_configures_logging() -> None:
     # ROADMAP chantier 6: RATURE_LOG_LEVEL only takes effect if
     # src/rature.in calls logging_setup.configure before anything else runs.
