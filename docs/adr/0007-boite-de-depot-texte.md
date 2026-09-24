@@ -111,3 +111,55 @@ Une boîte de dépôt basée sur un dossier texte, sans surveillance continue.
   sans le conditionner : la boîte de dépôt alimente la réserve existante,
   elle n'introduit pas de nouvelle structure de données hors le champ
   déjà prévu par `SPECIFICATION.md`.
+
+## Addendum (2026-09-24)
+
+Revue de bugs et de sécurité ciblée sur le code de 7.1, six lots. Ce qui
+suit affine la décision ci-dessus sans la rouvrir.
+
+- **Déplacement en deux temps** : `move_to_processed` (un seul
+  renommage) est remplacé par `claim` (déplacement vers
+  `processed/<nom>.pending`) puis `finalize` (renommage vers `<nom>` une
+  fois le contenu importé). Nécessaire pour que « fichier illisible ou
+  trop gros » (ci-dessous) et « sauvegarde puis déplacement » restent
+  vrais en même temps : sans cette étape intermédiaire, vérifier un
+  fichier avant de le réserver l'aurait laissé dans le dossier surveillé
+  pendant la vérification, alors que le réserver d'abord l'aurait fait
+  sortir du dossier surveillé avant que son contenu soit accepté,
+  contradiction directe avec `SPECIFICATION.md` §2.8. L'ordre retenu :
+  vérifier (taille, décodage) sur le fichier d'origine, réserver
+  (`claim`), relire depuis le `.pending` pour importer, puis finaliser.
+- **Anti-collision** : `claim` et `finalize` refusent tous deux
+  d'écraser un fichier déjà présent sous le nom cible, même esprit que
+  `storage.quarantine()` : un suffixe `-2`, `-3`... est inséré avant
+  l'extension finale plutôt que d'écraser un `.pending` non finalisé
+  d'un lancement précédent ou un fichier déjà dans `processed/`.
+- **Cas rare documenté** : si la relecture depuis le `.pending` échoue
+  (le contenu a changé entre la vérification et `claim`, en pratique une
+  resynchronisation concurrente), le fichier reste en `.pending`,
+  signalé par la bannière, sans tentative de réparation automatique.
+- **Duplication bornée à un par lancement** : si l'import est sauvegardé
+  mais que `finalize` échoue ensuite, l'application mémorise ce
+  `.pending` pour la durée du lancement et ne le réimporte pas à chaque
+  retour de focus (ce qui produirait un doublon supplémentaire à
+  chaque fois) ; seul le lancement suivant retente. Affine la
+  contrepartie doublon-plutôt-que-perte déjà actée ci-dessus, sans la
+  changer.
+- **Écoute du dossier surveillé** : une erreur de lecture au listage du
+  dossier surveillé lui-même (droit révoqué en cours de route) est
+  traitée comme un dossier devenu inaccessible, pas comme un échec
+  d'écriture : ce sont deux bannières différentes de `SPECIFICATION.md`
+  §3.6, et confondre les deux aurait pointé l'utilisateur vers le
+  mauvais correctif.
+- **Marque d'ordre d'octets** : une BOM UTF-8 en tête de fichier est
+  ignorée plutôt que traitée comme un caractère de la première tâche,
+  utile pour les applications de notes qui en écrivent une par défaut.
+- **Taille maximale** : 1 Mo par fichier (`SPECIFICATION.md` §2.8), pour
+  ne jamais charger un dépôt anormalement volumineux en mémoire avant de
+  savoir s'il doit être importé. Un fichier plus gros reçoit le même
+  traitement qu'un fichier illisible.
+- **Liens symboliques exclus** : un lien symbolique dans le dossier
+  surveillé peut pointer n'importe où sur le disque, en dehors de ce que
+  le portail a effectivement accordé au moment du choix du dossier.
+  L'ignorer, même si son nom correspond au motif, maintient le
+  périmètre d'accès à ce que l'utilisateur a réellement autorisé.

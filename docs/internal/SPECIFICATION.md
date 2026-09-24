@@ -267,10 +267,17 @@ de focus de la fenêtre. Jamais de surveillance continue.
 **Fichiers considérés** : uniquement ceux dont le nom correspond exactement
 au motif `inbox-*.txt`. Tout autre fichier présent dans le dossier, y
 compris un fichier temporaire laissé par un client de synchronisation en
-cours de transfert, est ignoré et n'est jamais touché.
+cours de transfert, est ignoré et n'est jamais touché. Un lien symbolique
+est ignoré même si son nom correspond, pour rester dans le périmètre
+effectivement accordé par le portail.
 
 **Format** : texte brut, une tâche par ligne, lignes vides ignorées, aucune
-syntaxe à interpréter.
+syntaxe à interpréter. Une marque d'ordre d'octets (BOM) UTF-8 en tête de
+fichier, si présente, est ignorée plutôt que gardée comme un caractère
+parasite sur la première ligne.
+
+**Taille maximale** : 1 Mo. Un fichier plus grand reçoit le même
+traitement qu'un fichier illisible ci-dessous.
 
 **Import** : chaque ligne non vide d'un fichier retenu devient un nouvel
 item de réserve, par la même opération d'ajout que l'ajout manuel en
