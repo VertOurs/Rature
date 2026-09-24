@@ -24,7 +24,19 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   n'avaient jamais été fusionnées depuis la traduction initiale (PR #76,
   chantier 4) — et `po/meson.build` corrigé (`--msgid-bugs-address`
   manquant, faisait disparaître l'en-tête `Report-Msgid-Bugs-To` à
-  chaque régénération). **7.2** (renvoi manuel vers la réserve,
+  chaque régénération). **Revue de bugs et de sécurité ciblée sur le
+  code de 7.1** (10 points, six lots A à F, validée par VertOurs le
+  24 septembre 2026 avec corrections) **close, cinq PR fusionnées le
+  même jour** : #126 (lot A, plantage au démarrage sur une URI de
+  dossier de capture non résolvable), #127 (lots B+C, import
+  `claim()`/`finalize()` résistant aux plantages, taille et BOM,
+  liens symboliques ignorés), #128 (lot D, balisage Pango désactivé
+  sur les lignes et bannières affichant du texte utilisateur), #129
+  (lot E, `data.json`/archives/répertoire en permissions
+  propriétaire seul), #130 (lot F, actions épinglées par SHA, image
+  CI par digest, secret de signature Flatpak isolé dans un
+  environment GitHub dédié). Voir ADR 0003 et ADR 0007 (addendums) et
+  `CHANGELOG.md`. **7.2** (renvoi manuel vers la réserve,
   réordonnancement, priorité, première migration réelle de
   `migrations.py`) et **7.3** (préparer le lendemain, cadrage dédié
   requis avant tout code) pas commencés. Chantiers 0 à 6 terminés
