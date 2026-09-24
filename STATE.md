@@ -36,27 +36,35 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   propriétaire seul), #130 (lot F, actions épinglées par SHA, image
   CI par digest, secret de signature Flatpak isolé dans un
   environment GitHub dédié). Voir ADR 0003 et ADR 0007 (addendums) et
-  `CHANGELOG.md`. **7.2** (renvoi manuel vers la réserve,
+  `CHANGELOG.md`. L'ensemble (7.1 et les six lots) est publié dans
+  `1.2.0`. **7.2** (renvoi manuel vers la réserve,
   réordonnancement, priorité, première migration réelle de
   `migrations.py`) et **7.3** (préparer le lendemain, cadrage dédié
   requis avant tout code) pas commencés. Chantiers 0 à 6 terminés
   (`docs/internal/ROADMAP.md`), détail dans « Chantiers terminés ».
-- **`1.1.0` est publiée** (15 septembre 2026, sur `//50`) : ferme le
-  chantier 6. Sept sources de version d'accord, `CHANGELOG` et metainfo
-  `<release>` à jour, tag `v1.1.0` annoté et signé sur le commit de merge
-  de la PR #119, `release.yml` vert (dépôt et bundle reconstruits et
-  signés, `https://vertours.github.io/Rature/` republié — nouvelle page
-  de présentation en ligne —, `rature.flatpak` joint à la release, PKGBUILD
-  et .SRCINFO corrigés contre la vraie archive dans un commit de suivi
-  immédiat, reconstruction vérifiée en conteneur Arch). `1.0.0` reste
-  taguée, sur `//50`. Reste, hors agent (`CLAUDE.md` §6) : `flatpak
-  update` depuis `1.0.0` et contrôle visuel de la page GitHub Pages.
+- **`1.2.0` est publiée** (24 septembre 2026, sur `//50`) : pas une
+  clôture de chantier (chantier 7 reste ouvert, 7.2/7.3 pas commencés),
+  une version mineure normale pour un `feat` (7.1) et ses cinq
+  correctifs. Sept sources de version d'accord, `CHANGELOG` et metainfo
+  `<release>` à jour, tag `v1.2.0` annoté et signé sur le commit de merge
+  de la PR #132, `release.yml` vert (dépôt et bundle reconstruits et
+  signés, `https://vertours.github.io/Rature/` republié, `rature.flatpak`
+  joint à la release, 73 112 octets), PKGBUILD et .SRCINFO corrigés
+  contre la vraie archive dans un commit de suivi immédiat. Reconstruction
+  en conteneur Arch tentée mais pas aboutie cette fois (miroir de paquets
+  trop lent pendant la session), contrairement à `1.1.0` : le sha256sum
+  reste vérifié directement contre l'archive réelle, mais la
+  reconstruction complète du paquet AUR n'a pas été confirmée. Sans
+  risque immédiat, AUR toujours pas soumis (v3/v4). `1.1.0` et `1.0.0`
+  restent taguées, sur `//50`. Reste, hors agent (`CLAUDE.md` §6) :
+  `flatpak update` depuis `1.1.0` et contrôle visuel de la page GitHub
+  Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6).
+  (`CLAUDE.md` §6). `1.1.0` → `1.2.0` pas encore testé de la même façon.
 - **Suivi ouvert** : bump runtime `//50` → `//51`, pas avant le
   16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
