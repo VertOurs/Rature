@@ -65,6 +65,19 @@
   </screenshots>
 
   <releases>
+    <release version="1.2.0" date="2026-09-24">
+      <description>
+        <p>
+          Capture tasks from a folder synced from your phone (a text file
+          named inbox-*.txt, one task per line): read at startup and
+          whenever the window regains focus, never continuously. Also
+          fixes two issues in previously released code: a recurring
+          item's title or a banner could show raw markup instead of
+          plain text, and the data file, its archives and their
+          directory are now written readable to their owner only.
+        </p>
+      </description>
+    </release>
     <release version="1.1.0" date="2026-09-15">
       <description>
         <p>
