@@ -108,6 +108,41 @@ def test_visible_properties_are_marked_translatable() -> None:
     assert not violations, violations
 
 
+# AdwActionRow, AdwBanner and AdwExpanderRow interpret Pango markup in
+# their title by default. Several titles in this app come from data the
+# user (or a dropped file's own name) controls, so every one of them
+# must disable it explicitly (lot D of the 2026-09 review). A widget
+# defined by a <template parent="..."> counts too, not only an
+# <object class="...">: the review's own bug was in a template.
+MARKUP_UNSAFE_WIDGETS = {"AdwActionRow", "AdwBanner", "AdwExpanderRow"}
+
+
+def _requires_markup_guard(node: ET.Element) -> str | None:
+    if node.tag == "object" and node.get("class") in MARKUP_UNSAFE_WIDGETS:
+        return node.get("class")
+    if node.tag == "template" and node.get("parent") in MARKUP_UNSAFE_WIDGETS:
+        return node.get("parent")
+    return None
+
+
+def _has_use_markup_false(node: ET.Element) -> bool:
+    return any(
+        prop.get("name") == "use-markup" and prop.text == "False"
+        for prop in node.findall("property")
+    )
+
+
+def test_markup_unsafe_rows_and_banners_disable_use_markup() -> None:
+    violations = []
+    for ui_path in _ui_files():
+        tree = ET.parse(ui_path)
+        for node in tree.iter():
+            widget = _requires_markup_guard(node)
+            if widget is not None and not _has_use_markup_false(node):
+                violations.append(f"{ui_path.name}: {widget} missing use-markup=False")
+    assert not violations, violations
+
+
 def _is_type_checking(expr: ast.expr) -> bool:
     if isinstance(expr, ast.Name):
         return expr.id == "TYPE_CHECKING"

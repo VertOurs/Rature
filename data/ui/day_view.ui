@@ -62,6 +62,10 @@
             <property name="orientation">vertical</property>
             <child>
               <object class="AdwBanner" id="banner">
+                <!-- Its title can be a dropped file's own name (§2.8):
+                     Pango markup in it must never be interpreted (lot D
+                     of the 2026-09 review). -->
+                <property name="use-markup">False</property>
                 <property name="revealed">False</property>
               </object>
             </child>
