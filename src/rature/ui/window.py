@@ -30,6 +30,16 @@ from rature.ui.reserve_view import ReserveView  # noqa: E402
 _ENSURE_DAY_INTERVAL_SECONDS = 60
 
 
+class _UnresolvableCaptureFolderError(Exception):
+    """capture-folder is set but Gio.File.get_path() found no local path.
+
+    Raised only inside _capture_folder and caught right where it is
+    called: it signals malformed external input (the GSettings key
+    edited by hand outside the picker, or a non-file URI scheme), not a
+    real error condition to propagate.
+    """
+
+
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/window.ui")
 class RatureWindow(Adw.ApplicationWindow):
     """Owns the App instance and mounts the Day, Reserve and Recurring views."""
@@ -194,9 +204,18 @@ class RatureWindow(Adw.ApplicationWindow):
     def _capture_folder(self) -> Path | None:
         # ADR 0007: application.py's picker is the only writer of this key,
         # and always stores a portal-backed folder URI whose get_path() is
-        # a real path on the document portal's FUSE mount.
+        # a real path on the document portal's FUSE mount. The key stays
+        # writable by hand (gsettings, dconf-editor) though, so a set URI
+        # is external input: get_path() can return None for it (a URI
+        # edited to a non-file scheme, or one the portal never granted),
+        # and that must never reach Path(...) directly.
         uri = self._settings.get_string("capture-folder")
-        return Path(Gio.File.new_for_uri(uri).get_path()) if uri else None
+        if not uri:
+            return None
+        path = Gio.File.new_for_uri(uri).get_path()
+        if path is None:
+            raise _UnresolvableCaptureFolderError
+        return Path(path)
 
     def _import_inbox(self) -> None:
         # SPECIFICATION.md §2.8: like _on_ensure_day_tick, this may run
@@ -204,7 +223,15 @@ class RatureWindow(Adw.ApplicationWindow):
         # so the write-failure banner clears only when import_inbox itself
         # reports a write, never merely because nothing raised.
         def do_import() -> None:
-            outcome = self.app.import_inbox(self._capture_folder())
+            try:
+                folder = self._capture_folder()
+            except _UnresolvableCaptureFolderError:
+                # Same banner as a folder that no longer exists (§3.15):
+                # from the user's side, both mean "reopen the picker".
+                self._inbox_unreadable = []
+                self._folder_missing_active = True
+                return
+            outcome = self.app.import_inbox(folder)
             self._inbox_unreadable = outcome.unreadable
             self._folder_missing_active = outcome.folder_missing
             if outcome.write is EnsureOutcome.SAVED:
