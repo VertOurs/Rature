@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   anything; a crash between saving and moving a file reimports it,
   producing a duplicate reserve entry rather than a loss.
 
+### Fixed
+
+- A recurring item's title (`recurring_row.ui`) and the drop-box banner
+  (`day_view.ui`) could interpret Pango markup in text the user, or a
+  dropped file's own name, controls. Both now disable it explicitly, and
+  a structural test guards every `AdwActionRow`/`AdwBanner`/
+  `AdwExpanderRow` in the interface against the same mistake.
+
 ## [1.1.0] - 2026-09-15
 
 Milestone 6 (observability and finishing) is complete: logging is in

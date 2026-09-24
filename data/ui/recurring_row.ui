@@ -6,7 +6,10 @@
   <requires lib="libadwaita" version="1.0"/>
   <template class="RatureRecurringRow" parent="AdwActionRow">
     <!-- title and subtitle are set from Python: the subtitle is a
-         locale-derived list of weekday names, not a catalogue string. -->
+         locale-derived list of weekday names, not a catalogue string,
+         and the title is the user's own task text, so Pango markup in
+         it must never be interpreted (lot D of the 2026-09 review). -->
+    <property name="use-markup">False</property>
     <child type="suffix">
       <object class="GtkMenuButton" id="menu_button">
         <property name="icon-name">view-more-symbolic</property>

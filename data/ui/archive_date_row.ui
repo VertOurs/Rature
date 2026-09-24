@@ -6,6 +6,9 @@
   <requires lib="libadwaita" version="1.0"/>
   <template class="RatureArchiveDateRow" parent="AdwActionRow">
     <!-- title is set from Python: a locale-formatted date, not a
-         catalogue string. -->
+         catalogue string, and not user-controlled either, but every
+         AdwActionRow disables markup regardless (lot D of the 2026-09
+         review): nothing here should depend on staying that way. -->
+    <property name="use-markup">False</property>
   </template>
 </interface>
