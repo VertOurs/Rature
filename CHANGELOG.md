@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-24
+
+Chantier 7.1 (capture depuis une boîte de dépôt) ships for the first
+time. Its own code went through a targeted bug/security review before
+this release (`docs/adr/0007-boite-de-depot-texte.md`'s addendum), and
+two of its findings turned out to affect code already published in
+`1.1.0` as well, fixed here too. Chantier 7 is not closed: 7.2 and 7.3
+have not started (`docs/internal/ROADMAP.md`).
+
 ### Added
 
 - Capture from a synced folder (ROADMAP milestone 7.1, `docs/adr/0007-boite-de-depot-texte.md`):
