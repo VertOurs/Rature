@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from rature.core import storage
+from rature.core import inbox, storage
 from rature.core.app import (
     App,
     EnsureOutcome,
@@ -657,3 +657,107 @@ def test_import_inbox_ignores_a_sync_client_temp_file(tmp_path: Path) -> None:
     )
     assert app.session.reserve == []
     assert stray.exists()
+
+
+def test_import_inbox_leaves_an_oversized_file_in_place_and_reports_it(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    huge = folder / "inbox-phone-1.txt"
+    huge.write_bytes(b"a" * (inbox.MAX_INBOX_FILE_SIZE + 1))
+
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(
+        unreadable=[huge], folder_missing=False, write=EnsureOutcome.IDLE
+    )
+    assert app.session.reserve == []
+    assert huge.exists()
+    assert not (folder / "processed").exists()
+
+
+def test_import_inbox_resumes_an_orphaned_pending_file_at_the_next_launch(
+    tmp_path: Path,
+) -> None:
+    # A .pending file is what an interrupted run leaves behind (crash
+    # between claim() and finalize()): the next App.open must pick it up
+    # like any other candidate, ADR 0007's documented duplicate-over-loss
+    # tradeoff.
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    dropped = folder / "inbox-phone-1.txt"
+    dropped.write_text("errand", encoding="utf-8")
+    pending = inbox.claim(dropped, folder)
+
+    app = _make_app(tmp_path, now)
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(
+        unreadable=[], folder_missing=False, write=EnsureOutcome.SAVED
+    )
+    assert [item.text for item in app.session.reserve] == ["errand"]
+    assert not pending.exists()
+    assert (folder / "processed" / "inbox-phone-1.txt").exists()
+
+
+def test_import_inbox_rolls_back_this_files_additions_on_save_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text("errand", encoding="utf-8")
+
+    monkeypatch.setattr(storage, "save", _raise_oserror)
+    with pytest.raises(OSError):
+        app.import_inbox(folder)
+
+    assert app.session.reserve == []
+    assert not (folder / "inbox-phone-1.txt").exists()  # already claimed
+    assert (folder / "processed" / "inbox-phone-1.txt.pending").exists()
+
+
+def test_import_inbox_does_not_reimport_within_the_same_run_after_a_failed_finalize(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text("errand", encoding="utf-8")
+
+    monkeypatch.setattr(inbox, "finalize", _raise_oserror)
+    first = app.import_inbox(folder)
+    assert [item.text for item in app.session.reserve] == ["errand"]
+    assert first.write is EnsureOutcome.SAVED
+    assert first.unreadable == [folder / "processed" / "inbox-phone-1.txt.pending"]
+
+    second = app.import_inbox(folder)
+    assert [item.text for item in app.session.reserve] == ["errand"]  # no duplicate
+    assert second.write is EnsureOutcome.IDLE
+    assert second.unreadable == [folder / "processed" / "inbox-phone-1.txt.pending"]
+
+
+def test_import_inbox_reports_folder_missing_on_a_listing_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Point 4 of the review: a listing failure on the watched folder
+    # itself is the same "please reopen the picker" situation as a
+    # folder that no longer exists, never the unrelated write-failure
+    # banner.
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+
+    monkeypatch.setattr(inbox, "list_inbox_files", _raise_oserror)
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(
+        unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
+    )
