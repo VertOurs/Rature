@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dropped file's own name, controls. Both now disable it explicitly, and
   a structural test guards every `AdwActionRow`/`AdwBanner`/
   `AdwExpanderRow` in the interface against the same mistake.
+- `data.json`, its archives and their directory were readable by anyone
+  on the machine (`0o644`/`0o755`, the umask-masked default), even
+  though they hold the user's own task text. New writes land at
+  `0o600`/`0o700`, and the data directory is narrowed to `0o700` on
+  every launch, which alone also protects files written before this fix
+  without touching them individually.
 
 ## [1.1.0] - 2026-09-15
 

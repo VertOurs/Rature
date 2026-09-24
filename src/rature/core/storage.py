@@ -68,12 +68,19 @@ class Store:
         return Session(self.day, reserve=self.reserve, recurring=self.recurring)
 
 
+def _open_private(path: str, flags: int) -> int:
+    # ADR 0007 addendum: 0o600 has no group/other bit for the umask to
+    # remove, so this is the actual mode on every platform, not just
+    # ones with a permissive default umask.
+    return os.open(path, flags, 0o600)
+
+
 def _atomic_write_json(path: Path, obj: dict) -> None:
     # docs/adr/0003-fichier-json-unique.md: temp file in the same directory,
     # flush, fsync the file, replace, then fsync the directory.
     tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:
-        with open(tmp, "w", encoding="utf-8") as handle:
+        with open(tmp, "w", encoding="utf-8", opener=_open_private) as handle:
             json.dump(obj, handle, ensure_ascii=False, indent=2)
             handle.write("\n")
             handle.flush()
@@ -106,8 +113,25 @@ def load(*, data_dir: Path | None = None) -> Store:
 
 def save(store: Store, *, data_dir: Path | None = None) -> None:
     target = data_dir or xdg_data_dir()
-    target.mkdir(parents=True, exist_ok=True)
+    # Explicit 0o700, not the umask-masked default: same reasoning as
+    # _open_private (ADR 0007 addendum).
+    target.mkdir(parents=True, exist_ok=True, mode=0o700)
     _atomic_write_json(target / _MAIN_FILE, store.to_dict())
+
+
+def restrict_data_dir_permissions(*, data_dir: Path | None = None) -> None:
+    """Narrow the data directory itself to owner-only access (0o700).
+
+    Called once per App.open (ADR 0007 addendum), not on every write: a
+    directory at 0o700 already denies access to everything inside it,
+    whatever each individual file's own mode is, so this alone also
+    covers a data directory or archives created before this restriction
+    existed, self-healing on every launch rather than only a fresh
+    install. Raises OSError uncaught; the caller decides whether that is
+    fatal.
+    """
+    target = data_dir or xdg_data_dir()
+    os.chmod(target, 0o700)
 
 
 def quarantine(now: datetime, *, data_dir: Path | None = None) -> Path:
@@ -133,7 +157,7 @@ def quarantine(now: datetime, *, data_dir: Path | None = None) -> Path:
 def archive(day: Day, *, data_dir: Path | None = None) -> Path:
     """Write the day to archive/<day.date>.json, overwriting any earlier archive."""
     directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
-    directory.mkdir(parents=True, exist_ok=True)
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     path = directory / f"{day.date.isoformat()}.json"
     _atomic_write_json(path, {"version": FILE_VERSION, **day.to_dict()})
     _logger.info("archived %s", path)

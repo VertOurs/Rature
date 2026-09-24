@@ -3,6 +3,7 @@
 """App.open: first launch, loading, corruption recovery, the rollover catch-up."""
 
 import logging
+import stat
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -56,6 +57,28 @@ def test_open_logs_the_data_directory(
     with caplog.at_level(logging.INFO, logger="rature.core.app"):
         App.open(tmp_path)
     assert str(tmp_path) in caplog.text
+
+
+def test_open_restricts_an_already_existing_directorys_permissions(
+    tmp_path: Path,
+) -> None:
+    # ADR 0007 addendum: self-healing on every launch, not just mkdir's
+    # exist_ok=True no-op on a directory that already existed loosely
+    # permissioned from before this restriction, or an older version.
+    tmp_path.chmod(0o755)
+    App.open(tmp_path)
+    assert stat.S_IMODE(tmp_path.stat().st_mode) == 0o700
+
+
+def test_open_survives_a_permission_restriction_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    monkeypatch.setattr(storage, "restrict_data_dir_permissions", _raise_oserror)
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        app = App.open(tmp_path)
+    assert app.session.day is not None  # startup completed, not blocked
+    assert caplog.records[0].levelno == logging.WARNING
+    assert "permission" in caplog.text.lower()
 
 
 def test_open_loads_an_existing_file(tmp_path: Path) -> None:

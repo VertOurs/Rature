@@ -175,6 +175,17 @@ class App:
                 clock=clock,
                 startup=StartupOutcome.LOADED,
             )
+        try:
+            storage.restrict_data_dir_permissions(data_dir=resolved_dir)
+        except OSError:
+            # Self-healing, not a startup requirement (ADR 0007
+            # addendum): the data directory already existed by now in
+            # every branch above, so this never blocks a launch over a
+            # permission narrowing it would be nice, not essential, to
+            # have.
+            _logger.warning(
+                "could not restrict data directory permissions: %s", resolved_dir
+            )
         app.ensure_day()
         return app
 

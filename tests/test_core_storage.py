@@ -5,6 +5,8 @@
 import json
 import logging
 import os
+import stat
+from contextlib import contextmanager
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -23,6 +25,7 @@ from rature.core.storage import (
     load_archive,
     main_file_path,
     quarantine,
+    restrict_data_dir_permissions,
     save,
     xdg_data_dir,
 )
@@ -68,6 +71,64 @@ def test_save_creates_the_directory(tmp_path: Path) -> None:
     nested = tmp_path / "not" / "there" / "yet"
     save(make_store(), data_dir=nested)
     assert (nested / "data.json").is_file()
+
+
+@contextmanager
+def _permissive_umask():
+    # 0o700/0o600 must hold even under the most permissive umask a
+    # caller could plausibly have; a restrictive one on the test runner
+    # (0o077, common on some distributions) would let the bug hide.
+    previous = os.umask(0o022)
+    try:
+        yield
+    finally:
+        os.umask(previous)
+
+
+def test_save_creates_the_directory_at_owner_only_permissions(
+    tmp_path: Path,
+) -> None:
+    nested = tmp_path / "not" / "there" / "yet"
+    with _permissive_umask():
+        save(make_store(), data_dir=nested)
+    assert stat.S_IMODE(nested.stat().st_mode) == 0o700
+
+
+def test_save_writes_data_json_at_owner_only_permissions(tmp_path: Path) -> None:
+    with _permissive_umask():
+        save(make_store(), data_dir=tmp_path)
+    path = tmp_path / "data.json"
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+
+
+def test_archive_creates_the_directory_at_owner_only_permissions(
+    tmp_path: Path,
+) -> None:
+    with _permissive_umask():
+        archive(Day(date=date(2026, 8, 24)), data_dir=tmp_path)
+    assert stat.S_IMODE((tmp_path / "archive").stat().st_mode) == 0o700
+
+
+def test_archive_writes_the_file_at_owner_only_permissions(tmp_path: Path) -> None:
+    with _permissive_umask():
+        archive(Day(date=date(2026, 8, 24)), data_dir=tmp_path)
+    path = tmp_path / "archive" / "2026-08-24.json"
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+
+
+def test_restrict_data_dir_permissions_narrows_an_existing_directory(
+    tmp_path: Path,
+) -> None:
+    tmp_path.chmod(0o755)
+    restrict_data_dir_permissions(data_dir=tmp_path)
+    assert stat.S_IMODE(tmp_path.stat().st_mode) == 0o700
+
+
+def test_restrict_data_dir_permissions_raises_on_a_missing_directory(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(OSError):
+        restrict_data_dir_permissions(data_dir=tmp_path / "missing")
 
 
 def test_save_leaves_no_temporary_file(tmp_path: Path) -> None:
