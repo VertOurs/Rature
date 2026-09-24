@@ -761,3 +761,72 @@ def test_import_inbox_reports_folder_missing_on_a_listing_failure(
     assert outcome == InboxOutcome(
         unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
     )
+
+
+def test_import_inbox_leaves_a_file_in_place_when_claim_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    dropped = folder / "inbox-phone-1.txt"
+    dropped.write_text("errand", encoding="utf-8")
+
+    monkeypatch.setattr(inbox, "claim", _raise_oserror)
+    outcome = app.import_inbox(folder)
+
+    assert outcome == InboxOutcome(
+        unreadable=[dropped], folder_missing=False, write=EnsureOutcome.IDLE
+    )
+    assert app.session.reserve == []
+    assert dropped.exists()
+
+
+def test_import_inbox_leaves_the_pending_file_when_the_post_claim_reread_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The rare race documented in the ADR 0007 addendum: claim() already
+    # moved the file, but re-reading it from processed/ fails.
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text("errand", encoding="utf-8")
+
+    monkeypatch.setattr(inbox, "read_inbox_lines", _raise_oserror)
+    outcome = app.import_inbox(folder)
+
+    pending = folder / "processed" / "inbox-phone-1.txt.pending"
+    assert outcome == InboxOutcome(
+        unreadable=[pending], folder_missing=False, write=EnsureOutcome.IDLE
+    )
+    assert app.session.reserve == []
+    assert pending.exists()
+
+
+def test_import_inbox_retries_a_failed_finalize_on_an_empty_file_every_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # An empty file never reaches _save(), so a failed finalize() carries
+    # no duplicate risk: unlike a saved import, it is not remembered in
+    # _stuck_pending and is retried on every call.
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = _make_app(tmp_path, now)
+    folder = tmp_path / "inbox"
+    folder.mkdir()
+    (folder / "inbox-phone-1.txt").write_text("   \n\n", encoding="utf-8")
+
+    monkeypatch.setattr(inbox, "finalize", _raise_oserror)
+    pending = folder / "processed" / "inbox-phone-1.txt.pending"
+
+    first = app.import_inbox(folder)
+    assert first == InboxOutcome(
+        unreadable=[pending], folder_missing=False, write=EnsureOutcome.IDLE
+    )
+
+    second = app.import_inbox(folder)
+    assert second == InboxOutcome(
+        unreadable=[pending], folder_missing=False, write=EnsureOutcome.IDLE
+    )
+    assert app.session.reserve == []

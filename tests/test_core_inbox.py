@@ -198,6 +198,21 @@ def test_claim_never_overwrites_an_existing_pending_of_the_same_name(
     assert target.read_text(encoding="utf-8") == "newly dropped"
 
 
+def test_claim_tries_a_second_suffix_when_the_first_is_also_taken(
+    tmp_path: Path,
+) -> None:
+    processed = tmp_path / "processed"
+    processed.mkdir()
+    (processed / "inbox-phone-1.txt.pending").write_text("first", encoding="utf-8")
+    (processed / "inbox-phone-1.txt-2.pending").write_text("second", encoding="utf-8")
+    path = tmp_path / "inbox-phone-1.txt"
+    path.write_text("third", encoding="utf-8")
+
+    target = claim(path, tmp_path)
+
+    assert target == processed / "inbox-phone-1.txt-3.pending"
+
+
 def test_finalize_renames_pending_to_the_plain_name(tmp_path: Path) -> None:
     path = tmp_path / "inbox-phone-1.txt"
     path.write_text("a", encoding="utf-8")
