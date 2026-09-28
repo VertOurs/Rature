@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Capture from a synced folder, added in `1.2.0`: the Capture Folder…
+  menu entry, the `capture-folder` setting and its two banners are gone.
+  Dropping a text file turned out not to fit daily use, and phone sync
+  is postponed indefinitely (`docs/adr/0007-boite-de-depot-texte.md`,
+  "Retrait"). Nothing already imported is touched: items stay in the
+  reserve, files stay in `processed/`.
+
+### Fixed
+
+- The "⋯" menu on a Day view task stopped working: Rename and Delete
+  did nothing. Opening the menu changed the window's focus state, which
+  triggered a capture-folder read and rebuilt every row, destroying the
+  one whose menu was open. Removing the capture folder removes the
+  trigger.
+
 ## [1.2.0] - 2026-09-24
 
 Chantier 7.1 (capture depuis une boîte de dépôt) ships for the first

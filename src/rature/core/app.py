@@ -16,7 +16,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import NamedTuple
 
-from rature.core import export, inbox, search, stats, storage
+from rature.core import export, search, stats, storage
 from rature.core.migrations import FutureVersionError
 from rature.core.models import RecurringItem, ReserveItem, Task
 
@@ -63,34 +63,6 @@ class EnsureResult(NamedTuple):
     archived: Day | None
 
 
-class InboxOutcome(NamedTuple):
-    """What one App.import_inbox call found wrong, if anything, and whether
-    it wrote.
-
-    unreadable: paths that could not be imported and were reported
-    instead (SPECIFICATION.md §2.8): watched-folder files left untouched
-    because they were not valid UTF-8 or over inbox.MAX_INBOX_FILE_SIZE,
-    and already-claimed .pending files stuck behind a decode/read race
-    or a failed finalize(), in that order (resumed .pending files first,
-    then the watched folder's own candidates, each list internally in
-    list_pending_files'/list_inbox_files' order). folder_missing: the
-    watched folder itself could not be read, distinct from "no folder
-    configured yet" (a None argument, a silent no-op: neither field set,
-    write is IDLE). Both unreadable and folder_missing drive the
-    §3.6/§3.15 banner.
-
-    write mirrors EnsureOutcome's IDLE/SAVED split (never SAVE_FAILED
-    here: an OSError from _save() propagates uncaught, per this class's
-    docstring, instead of being captured in the outcome). A caller that
-    also drives the write-failure banner (§3.6 situation 3) needs this
-    to avoid clearing it on a call that imported nothing.
-    """
-
-    unreadable: list[Path]
-    folder_missing: bool
-    write: EnsureOutcome
-
-
 def _default_clock() -> datetime:
     return datetime.now().astimezone()
 
@@ -125,13 +97,6 @@ class App:
         # True between a rollover that archived a day and the write that
         # persists it: a failed write leaves it set so ensure_day retries.
         self._save_pending = False
-        # .pending files whose import was saved but whose finalize()
-        # failed: import_inbox reports them but does not retry the save
-        # again this run, only the App.open that starts the next one
-        # (ADR 0007 addendum point 3). Bounds the crash-safety tradeoff
-        # documented on import_inbox to one duplicate per launch, not one
-        # per focus-return.
-        self._stuck_pending: set[Path] = set()
 
     @property
     def save_pending(self) -> bool:
@@ -395,116 +360,6 @@ class App:
         task = self.session.draw_from_reserve(item_id)
         self._save()
         return task
-
-    def import_inbox(self, folder: Path | None) -> InboxOutcome:
-        """SPECIFICATION.md §2.8: import inbox-*.txt files from folder into the reserve.
-
-        folder is None when no capture folder is configured yet: a
-        silent no-op, not an error. Each candidate file is checked
-        (size, decoding) before it is touched: one that fails either
-        check is left exactly where it is and reported, never moved
-        (§2.8). One that passes is claimed (moved to
-        processed/<name>.pending, inbox.claim), so a sync client never
-        re-syncs it mid-import, then re-read from there: its non-empty
-        lines join the reserve (§2.5's add_to_reserve, no deduplication)
-        and data.json is saved before the file is finalized (renamed to
-        its plain name in processed/), in that order. A crash between
-        the save and the finalize reimports that one file, as a
-        .pending, the next time import_inbox runs, producing a
-        duplicate reserve entry, never a loss (ADR 0007). If finalize()
-        itself then fails again, the file stays reported but is not
-        retried a second time this run: only the next App.open does,
-        bounding the duplicate to one per launch rather than one per
-        focus-return (self._stuck_pending, ADR 0007 addendum).
-
-        Every failure from here down is per file, and none of them stop
-        the files after it: an OSError raised while listing the watched
-        folder itself, though, means the folder itself cannot be read,
-        so it is reported as folder_missing exactly like one that no
-        longer exists, never surfaced as the unrelated write-failure
-        banner. Like every other mutation on this class, a save's
-        OSError is not caught here; it reaches the caller with whatever
-        files came before it already committed, and this file's own
-        reserve additions rolled back first (they are not on disk
-        either, and nothing should reference them until a retry).
-        """
-        if folder is None:
-            return InboxOutcome(
-                unreadable=[], folder_missing=False, write=EnsureOutcome.IDLE
-            )
-        if not folder.is_dir():
-            return InboxOutcome(
-                unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
-            )
-        try:
-            candidates = inbox.list_inbox_files(folder)
-            pending = inbox.list_pending_files(folder)
-        except OSError:
-            return InboxOutcome(
-                unreadable=[], folder_missing=True, write=EnsureOutcome.IDLE
-            )
-
-        today = reference_date(self.clock())
-        unreadable: list[Path] = []
-        wrote = False
-
-        for claimed in pending:
-            if claimed in self._stuck_pending:
-                unreadable.append(claimed)
-                continue
-            wrote = self._import_claimed_file(claimed, today, unreadable) or wrote
-
-        for path in candidates:
-            try:
-                inbox.check_inbox_file(path)
-            except (UnicodeDecodeError, inbox.InboxFileTooLargeError, OSError):
-                unreadable.append(path)
-                continue
-            try:
-                claimed = inbox.claim(path, folder)
-            except OSError:
-                unreadable.append(path)
-                continue
-            wrote = self._import_claimed_file(claimed, today, unreadable) or wrote
-
-        write = EnsureOutcome.SAVED if wrote else EnsureOutcome.IDLE
-        return InboxOutcome(unreadable=unreadable, folder_missing=False, write=write)
-
-    def _import_claimed_file(
-        self, claimed: Path, today: date, unreadable: list[Path]
-    ) -> bool:
-        """Read, reserve and finalize one already-claimed inbox file.
-
-        Returns whether a save reached disk. See import_inbox's
-        docstring for the crash-safety tradeoff this implements and its
-        _stuck_pending bound.
-        """
-        try:
-            lines = inbox.read_inbox_lines(claimed)
-        except (UnicodeDecodeError, OSError):
-            # claim() moved it here safely; content changing before this
-            # re-read (a race, or a disk error) is rare enough to just
-            # leave the .pending in place and report it, rather than
-            # design a recovery for it (ADR 0007 addendum).
-            unreadable.append(claimed)
-            return False
-        item_ids = [self.session.add_to_reserve(line, today=today).id for line in lines]
-        wrote = False
-        if lines:
-            try:
-                self._save()
-            except OSError:
-                for item_id in item_ids:
-                    self.session.delete_from_reserve(item_id)
-                raise
-            wrote = True
-        try:
-            inbox.finalize(claimed)
-        except OSError:
-            unreadable.append(claimed)
-            if wrote:
-                self._stuck_pending.add(claimed)
-        return wrote
 
     def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
         item = self.session.add_recurring(text, weekdays)

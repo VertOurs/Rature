@@ -7,41 +7,25 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : chantier 7 (capture et réserve), lancé le
-  22 septembre 2026 sur accord explicite de VertOurs. **7.1 (boîte de
-  dépôt) terminé et fusionné dans `main`** le même jour (PR #124, squash
-  `4e4ecfb`) : ADR 0007, `SPECIFICATION.md` §2.8 et §3.15 (et la liste de
-  priorité des bannières étendue en §3.6), `core/inbox.py`, méthode
-  `App.import_inbox` (sauvegarde puis déplacement vers `processed/`,
-  jamais l'inverse), sélecteur de dossier via le portail (`Capture
-  Folder…`, clé GSettings `capture-folder`), déclenchement au démarrage
-  et à chaque retour de focus, deux bannières (dossier inaccessible,
-  fichier `inbox` illisible). Testé en conditions réelles avec VertOurs
-  (dossier `pCloudDrive/rature` synchronisé, fichier `inbox-phone-1.txt`
-  importé en réserve puis retrouvé dans `processed/`, pas de doublon au
-  relancement). Traduction : `fr.po` remis à 100 % (82 messages), y
-  compris un trou préexistant sans lien avec ce chantier — les légendes
-  du metainfo et les notes de version de `1.1.0`/`1.0.0`/`0.10.1`/`0.10.0`
-  n'avaient jamais été fusionnées depuis la traduction initiale (PR #76,
-  chantier 4) — et `po/meson.build` corrigé (`--msgid-bugs-address`
-  manquant, faisait disparaître l'en-tête `Report-Msgid-Bugs-To` à
-  chaque régénération). **Revue de bugs et de sécurité ciblée sur le
-  code de 7.1** (10 points, six lots A à F, validée par VertOurs le
-  24 septembre 2026 avec corrections) **close, cinq PR fusionnées le
-  même jour** : #126 (lot A, plantage au démarrage sur une URI de
-  dossier de capture non résolvable), #127 (lots B+C, import
-  `claim()`/`finalize()` résistant aux plantages, taille et BOM,
-  liens symboliques ignorés), #128 (lot D, balisage Pango désactivé
-  sur les lignes et bannières affichant du texte utilisateur), #129
-  (lot E, `data.json`/archives/répertoire en permissions
-  propriétaire seul), #130 (lot F, actions épinglées par SHA, image
-  CI par digest, secret de signature Flatpak isolé dans un
-  environment GitHub dédié). Voir ADR 0003 et ADR 0007 (addendums) et
-  `CHANGELOG.md`. L'ensemble (7.1 et les six lots) est publié dans
-  `1.2.0`. **7.2** (renvoi manuel vers la réserve,
-  réordonnancement, priorité, première migration réelle de
-  `migrations.py`) et **7.3** (préparer le lendemain, cadrage dédié
-  requis avant tout code) pas commencés. Chantiers 0 à 6 terminés
-  (`docs/internal/ROADMAP.md`), détail dans « Chantiers terminés ».
+  22 septembre 2026. **7.1 (boîte de dépôt) retirée** le
+  28 septembre 2026 sur décision de VertOurs, après une semaine d'usage :
+  le dépôt d'un fichier texte ne convient pas, la synchronisation avec le
+  téléphone est repoussée sans date. Branche
+  `feat/remove-capture-folder` : code, clé GSettings, bannières,
+  `SPECIFICATION.md` §2.8/§3.15 retirés, ADR 0007 passé en
+  « abandonnée » avec une section « Retrait », `ROADMAP.md` à jour. Les
+  correctifs de la revue de 7.1 sans lien avec la boîte de dépôt restent
+  (#128 Pango, #129 permissions, #130 CI). Le retrait corrige aussi une
+  régression de `1.2.0` : le menu « ⋯ » des tâches n'avait plus d'effet,
+  le retour de focus déclenché par son ouverture reconstruisait les
+  lignes (cause déduite du code, **contrôle manuel par VertOurs requis**,
+  `CLAUDE.md` §6). `fr.po` : 78/78, y compris la note de version
+  `1.2.0` du metainfo, jamais fusionnée jusque-là.
+  **7.2** (renvoi manuel vers la réserve, réordonnancement, priorité,
+  première migration réelle de `migrations.py`) et **7.3** (préparer le
+  lendemain, cadrage dédié requis avant tout code) pas commencés.
+  Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
+  « Chantiers terminés ».
 - **`1.2.0` est publiée** (24 septembre 2026, sur `//50`) : pas une
   clôture de chantier (chantier 7 reste ouvert, 7.2/7.3 pas commencés),
   une version mineure normale pour un `feat` (7.1) et ses cinq
@@ -144,15 +128,11 @@ Mageia) préparé et vérifié en conteneur mais pas encore soumis (repoussé
 en v3/v4), README et page de présentation refaits, `FUNDING.yml`. Aucune
 migration de format (`migrations.py` toujours à vide, rien à couvrir).
 
-`[Unreleased]` contient la capture depuis un dossier synchronisé
-(chantier 7.1, fusionnée le 22 septembre 2026, voir « Avancement »).
-Prochain tag possible : `1.2.0` (mineur, `feat` de 7.1 présent sur
-`main`), indépendamment du bump `//51`, pas avant le 16 octobre 2026 au
-plus tôt. Les deux incréments ne sont pas liés : pas de `1.1.1`, `main`
-porte déjà un `feat` non publié, donc tout tag depuis `main` est au
-minimum mineur (correction de VertOurs du 24 septembre 2026 sur le plan
-de revue de 7.1, voir « Avancement ») ; VertOurs tranche lequel des deux
-chantiers sort en premier.
+`[Unreleased]` contiendra le retrait de la boîte de dépôt et le
+correctif du menu « ⋯ ». Prochain tag recommandé : `1.3.0` (mineure).
+Un retrait de fonctionnalité serait majeur en SemVer strict, mais
+`ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
+(`CONTRIBUTING.md`, « Versioning »). Indépendant du bump `//51`.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le

@@ -259,32 +259,20 @@ soumission effective repoussée en v3/v4.
 
 ## Chantier 7 : capture et réserve
 
-La capture depuis le téléphone revient, sans application dédiée, sans
-réseau et sans compte tiers : un fichier texte déposé dans un dossier
-synchronisé.
+Travail sur la réserve et la priorité. La capture depuis le téléphone,
+prévue en 7.1, a été livrée puis retirée (voir ci-dessous).
 
 La vue Jour n'est pas concernée. Les numéros, les rayées, le passage à
 04:00, l'annulation de suppression et les archives restent locaux et
 inchangés.
 
-### 7.1 Boîte de dépôt
+### 7.1 Boîte de dépôt (retirée)
 
-- [ ] ADR 0007 : boîte de dépôt texte, écrite avant le code
-- [ ] Dossier surveillé choisi par l'utilisateur via le portail de fichiers,
-      mémorisé dans GSettings. Aucune permission large ajoutée au manifeste
-- [ ] Lecture au démarrage, puis à chaque retour de focus de la fenêtre.
-      Pas de surveillance continue
-- [ ] Format : une tâche par ligne, lignes vides ignorées, aucune syntaxe
-- [ ] Un fichier importé est déplacé dans un sous-dossier `traité/`, jamais
-      supprimé
-- [ ] Aucun dédoublonnage à l'import, conformément à `SPECIFICATION.md`
-      §2.7.4 qui ne dédoublonne qu'au passage du jour
-- [ ] Fichier illisible ou mal encodé : rien n'est importé, le fichier reste
-      en place, une bannière prévient. Réutilise le motif de quarantaine déjà
-      en place pour `data.json`
-- [ ] Chaque source de capture écrit son propre fichier
-      (`inbox-<machine>-<horodatage>.txt`), donc jamais deux écrivains sur un
-      même fichier
+Livrée dans `1.2.0` le 24 septembre 2026, retirée le 28 septembre 2026 sur
+décision de VertOurs : le dépôt d'un fichier texte ne convient pas à
+l'usage réel. Motifs et périmètre du retrait :
+`docs/adr/0007-boite-de-depot-texte.md`, section « Retrait ». La
+synchronisation avec le téléphone passe dans « Repoussé volontairement ».
 
 ### 7.2 Réserve et priorité
 
@@ -298,10 +286,7 @@ inchangés.
 - [ ] Migration de format pour le champ de priorité. Première utilisation
       réelle du socle `migrations.py` posé au chantier 1
 
-**Critère de fin** : un fichier texte déposé depuis un téléphone via un
-dossier synchronisé apparaît en réserve au retour de focus, et se retrouve
-dans `traité/` ; un fichier illisible ne fait perdre aucune tâche et
-déclenche la bannière ; la priorité n'a aucun effet sur l'ordre ; la
+**Critère de fin** : la priorité n'a aucun effet sur l'ordre ; la
 migration s'applique sans perte sur un fichier de version antérieure.
 
 ### 7.3 Préparer le lendemain
@@ -368,9 +353,7 @@ Noté ici pour ne pas y penser pendant les chantiers.
   chantier 7.
 - **Synchronisation avec Todoist ou un autre service tiers.** Repoussée
   hors v2 : besoin réel reconfirmé le 8 septembre 2026, candidate pour la
-  v3, au profit pour l'instant de la boîte de dépôt texte du chantier 7,
-  qui couvre une partie du même besoin sans réseau, sans jeton et sans
-  compte.
+  v3.
 - **Étiquettes temporelles ou catégories** (« cet après-midi », « à faire
   après »). Abandonnée le 8 septembre 2026 : ce sont des catégories, que
   la méthode exclut par construction (`CLAUDE.md` §1) et que
@@ -383,8 +366,12 @@ Noté ici pour ne pas y penser pendant les chantiers.
   §2.3 interdit explicitement.
 - **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
   mais dans la maintenance de deux bases à vie, pour une personne seule.
-  La capture depuis le téléphone est traitée au chantier 7 par n'importe
-  quelle application de notes capable d'écrire dans un dossier synchronisé.
+  Voir aussi « Capture depuis le téléphone » ci-dessous.
+- **Capture depuis le téléphone.** Repoussée sans date le
+  28 septembre 2026. La boîte de dépôt texte du chantier 7.1 a été livrée
+  dans `1.2.0` puis retirée : le geste ne convient pas à l'usage
+  (`docs/adr/0007-boite-de-depot-texte.md`, section « Retrait »). Aucune
+  autre approche n'est retenue pour l'instant.
 - **Version mobile de l'application.** Écartée le 24 août 2026. Le projet
   reste une application de bureau.
 - **Soumission effective des paquets AUR, COPR et Mageia.** Repoussée en
@@ -400,6 +387,6 @@ Noté ici pour ne pas y penser pendant les chantiers.
 
 Note : l'entrée « Traduction espéranto », auparavant repoussée, entre au
 chantier 8 et sort donc de cette section. L'entrée « capture depuis le
-téléphone », auparavant regroupée avec « version mobile » et repoussée le
-24 août 2026, entre au chantier 7 sous la forme d'une boîte de dépôt texte
-et sort donc, elle aussi, de cette section.
+téléphone », entrée au chantier 7 le 24 août 2026 sous la forme d'une boîte
+de dépôt texte, y revient le 28 septembre 2026 après le retrait de
+celle-ci.
