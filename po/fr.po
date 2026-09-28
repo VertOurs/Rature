@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-09-28 13:00+0200\n"
+"POT-Creation-Date: 2026-09-28 13:13+0200\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -80,6 +80,17 @@ msgstr "La fenêtre Statistiques : des comptages par journée archivée"
 
 #: data/io.github.vertours.Rature.metainfo.xml.in:70
 msgid ""
+"Capture from a synced folder is removed: it did not fit daily use. Tasks it "
+"already imported stay in the reserve. Also fixes the task menu in the Day "
+"view, where Rename and Delete had stopped working."
+msgstr ""
+"La capture depuis un dossier synchronisé est retirée : elle ne convenait pas "
+"à l'usage quotidien. Les tâches déjà importées restent dans la réserve. "
+"Corrige aussi le menu des tâches de la vue Jour, où Renommer et Supprimer "
+"ne fonctionnaient plus."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:80
+msgid ""
 "Capture tasks from a folder synced from your phone (a text file named inbox-"
 "*.txt, one task per line): read at startup and whenever the window regains "
 "focus, never continuously. Also fixes two issues in previously released "
@@ -88,14 +99,14 @@ msgid ""
 "written readable to their owner only."
 msgstr ""
 "Capture de tâches depuis un dossier synchronisé avec votre téléphone (un "
-"fichier texte nommé inbox-*.txt, une tâche par ligne) : lu au démarrage et "
-"à chaque retour du focus sur la fenêtre, jamais en continu. Corrige aussi "
-"deux problèmes dans du code déjà publié : le titre d'une récurrente ou une "
+"fichier texte nommé inbox-*.txt, une tâche par ligne) : lu au démarrage et à "
+"chaque retour du focus sur la fenêtre, jamais en continu. Corrige aussi deux "
+"problèmes dans du code déjà publié : le titre d'une récurrente ou une "
 "bannière pouvait afficher du balisage brut au lieu de texte simple, et le "
 "fichier de données, ses archives et leur répertoire ne sont désormais "
 "lisibles que par leur propriétaire."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:83
+#: data/io.github.vertours.Rature.metainfo.xml.in:93
 msgid ""
 "Structured logging: startup, the data directory, a day rolling over, an "
 "archive being written and a write failure now show up in the system journal, "
@@ -106,7 +117,7 @@ msgstr ""
 "désormais dans le journal système, sans aucun texte de tâche ou de réserve "
 "au niveau par défaut."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:93
+#: data/io.github.vertours.Rature.metainfo.xml.in:103
 msgid ""
 "Rature 1.0. The application installs and updates itself from the self-hosted "
 "Flatpak repository, verified end to end on a clean machine. No functional "
@@ -116,7 +127,7 @@ msgstr ""
 "Flatpak auto-hébergé, vérifié de bout en bout sur une machine propre. Aucun "
 "changement fonctionnel depuis 0.10.1."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:102
+#: data/io.github.vertours.Rature.metainfo.xml.in:112
 msgid ""
 "Rature is now installable from a self-hosted Flatpak repository, with "
 "automatic updates, and as a standalone bundle attached to each release. This "
@@ -128,7 +139,7 @@ msgstr ""
 "version. Cette version corrige aussi l'interface qui restait en anglais sur "
 "un système traduit en Flatpak."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:112
+#: data/io.github.vertours.Rature.metainfo.xml.in:122
 msgid ""
 "The comfort features and the translation. You can undo the last deletion, "
 "add a task already struck in one gesture, copy a day to the clipboard as "
@@ -145,7 +156,7 @@ msgstr ""
 "lecture seule affiche de simples comptages par journée archivée, et "
 "l'interface est entièrement traduite en français."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:125
+#: data/io.github.vertours.Rature.metainfo.xml.in:135
 msgid ""
 "The main window adapts to narrow widths: under 500 units, the sidebar "
 "becomes its own page with a back button, and the Day view keeps its entry "
@@ -156,7 +167,7 @@ msgstr ""
 "Jour conserve sa barre de saisie et le texte complet des tâches. Cela achève "
 "la reconstruction de l'interface."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:135
+#: data/io.github.vertours.Rature.metainfo.xml.in:145
 msgid ""
 "A read-only Archives window, opened from the main menu: a sidebar of every "
 "archived date, most recent first, and the matching day on the right, laid "
@@ -169,7 +180,7 @@ msgstr ""
 "Jour. Une archive qui ne se charge pas affiche un message neutre au lieu de "
 "bloquer les autres."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:146
+#: data/io.github.vertours.Rature.metainfo.xml.in:156
 msgid ""
 "The Recurring view: create, edit and delete task templates and pick the "
 "weekdays they run on. A reserve row can now be dragged onto the Day entry in "
@@ -182,7 +193,7 @@ msgstr ""
 "de jours et de mois suivent la langue du système. Cela achève la "
 "reconstruction de l'interface."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:156
+#: data/io.github.vertours.Rature.metainfo.xml.in:166
 msgid ""
 "The Reserve view: add entries, rename them in place, delete them, and send "
 "one into the day. The Recurring view and the archive window are still to "
@@ -192,7 +203,7 @@ msgstr ""
 "et en envoyer une dans la journée. La vue Récurrentes et la fenêtre "
 "d'archives restent à venir."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:165
+#: data/io.github.vertours.Rature.metainfo.xml.in:175
 msgid ""
 "Day view tasks can be reordered by dragging a row within its own block. The "
 "Reserve and Recurring views and the archive window are still to come."
@@ -201,7 +212,7 @@ msgstr ""
 "l'intérieur de son propre bloc. Les vues Réserve et Récurrentes et la "
 "fenêtre d'archives restent à venir."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:174
+#: data/io.github.vertours.Rature.metainfo.xml.in:184
 msgid ""
 "The Day view works: add, strike, unstrike, rename in place, delete and "
 "freeze the list. Drag-and-drop reordering, the Reserve and Recurring views, "
@@ -211,7 +222,7 @@ msgstr ""
 "supprimer et figer la liste. Le réordonnancement par glisser-déposer, les "
 "vues Réserve et Récurrentes et la fenêtre d'archives restent à venir."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:183
+#: data/io.github.vertours.Rature.metainfo.xml.in:193
 msgid ""
 "The first visible feature: a main window with sidebar navigation between the "
 "Day, Reserve and Recurring views (still placeholders), window size "
@@ -223,7 +234,7 @@ msgstr ""
 "la taille de la fenêtre conservée, une fenêtre À propos. Relire la liste du "
 "jour n'est toujours pas possible."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:193
+#: data/io.github.vertours.Rature.metainfo.xml.in:203
 msgid ""
 "Complete core business logic and the App coordination layer: the day list "
 "and its operations, the reserve, recurring templates, the day rollover, "
@@ -233,7 +244,7 @@ msgstr ""
 "ses opérations, la réserve, les modèles récurrents, le passage du jour, le "
 "stockage JSON atomique. Toujours pas d'interface graphique."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:202
+#: data/io.github.vertours.Rature.metainfo.xml.in:212
 msgid "Project foundations. Not a functional release."
 msgstr "Fondations du projet. Ce n'est pas une version fonctionnelle."
 
