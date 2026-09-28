@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-28
+
+Withdraws chantier 7.1 (capture from a synced folder), shipped in
+`1.2.0`, and fixes the task menu regression it caused. Chantier 7 is not
+closed: 7.2 and 7.3 have not started (`docs/internal/ROADMAP.md`).
+
 ### Removed
 
 - Capture from a synced folder, added in `1.2.0`: the Capture Folder…
@@ -331,7 +337,9 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/VertOurs/Rature/releases/tag/v1.3.0
+[1.2.0]: https://github.com/VertOurs/Rature/releases/tag/v1.2.0
 [1.1.0]: https://github.com/VertOurs/Rature/releases/tag/v1.1.0
 [1.0.0]: https://github.com/VertOurs/Rature/releases/tag/v1.0.0
 [0.10.1]: https://github.com/VertOurs/Rature/releases/tag/v0.10.1

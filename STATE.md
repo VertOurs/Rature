@@ -10,8 +10,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   22 septembre 2026. **7.1 (boîte de dépôt) retirée** le
   28 septembre 2026 sur décision de VertOurs, après une semaine d'usage :
   le dépôt d'un fichier texte ne convient pas, la synchronisation avec le
-  téléphone est repoussée sans date. Branche
-  `feat/remove-capture-folder` : code, clé GSettings, bannières,
+  téléphone est repoussée sans date. PR #135 (squash `ab05045`) : code, clé GSettings, bannières,
   `SPECIFICATION.md` §2.8/§3.15 retirés, ADR 0007 passé en
   « abandonnée » avec une section « Retrait », `ROADMAP.md` à jour. Les
   correctifs de la revue de 7.1 sans lien avec la boîte de dépôt restent
@@ -104,7 +103,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.1.0` | Ferme le chantier 6 (v2). Coupée le 15 septembre 2026 |
+| Version du projet | `1.3.0` | Retrait de 7.1 et correctif du menu « ⋯ ». Coupée le 28 septembre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -128,11 +127,13 @@ Mageia) préparé et vérifié en conteneur mais pas encore soumis (repoussé
 en v3/v4), README et page de présentation refaits, `FUNDING.yml`. Aucune
 migration de format (`migrations.py` toujours à vide, rien à couvrir).
 
-`[Unreleased]` contiendra le retrait de la boîte de dépôt et le
-correctif du menu « ⋯ ». Prochain tag recommandé : `1.3.0` (mineure).
-Un retrait de fonctionnalité serait majeur en SemVer strict, mais
-`ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
-(`CONTRIBUTING.md`, « Versioning »). Indépendant du bump `//51`.
+`1.3.0` (28 septembre 2026) retire la boîte de dépôt et corrige le menu
+« ⋯ » des tâches. Mineure : un retrait serait majeur en SemVer strict,
+mais `ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
+(`CONTRIBUTING.md`, « Versioning »). Indépendante du bump `//51`.
+Préparée sur `release/1.3.0` ; tag, `release.yml` et correction du
+`sha256sum` du PKGBUILD (et `.SRCINFO`) contre la vraie archive restent
+à faire, comme pour `1.2.0`.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
