@@ -1,7 +1,7 @@
 # ADR 0007 : boîte de dépôt texte
 
 - **Date** : 2026-09-22
-- **Statut** : acceptée
+- **Statut** : abandonnée le 2026-09-28, voir « Retrait » en fin de document
 
 ## Contexte
 
@@ -163,3 +163,30 @@ suit affine la décision ci-dessus sans la rouvrir.
   le portail a effectivement accordé au moment du choix du dossier.
   L'ignorer, même si son nom correspond au motif, maintient le
   périmètre d'accès à ce que l'utilisateur a réellement autorisé.
+
+## Retrait (2026-09-28)
+
+La boîte de dépôt, publiée dans `1.2.0`, est retirée dans la version
+suivante sur décision de VertOurs, après une semaine d'usage réel.
+
+- **Motif** : le geste lui-même ne convient pas à l'usage. Écrire un
+  fichier texte depuis le téléphone, dans un dossier synchronisé, reste
+  plus lourd que la dictée en conversation que la méthode remplace.
+- **Effet de bord constaté** : la lecture à chaque retour de focus
+  reconstruisait toutes les lignes de la vue Jour. L'ouverture du menu
+  « ⋯ » d'une tâche change l'état actif de la fenêtre, la ligne était
+  détruite pendant que son menu était ouvert, et Rename comme Delete
+  n'avaient plus d'effet. Tout futur déclencheur au retour de focus
+  devra éviter de reconstruire les lignes sans changement de données.
+- **Ce qui est retiré** : `core/inbox.py`, `App.import_inbox`, l'entrée
+  de menu, la clé GSettings `capture-folder`, les deux bannières,
+  `SPECIFICATION.md` §2.8 et §3.15.
+- **Ce qui reste** : les correctifs de la revue de septembre 2026 sans
+  lien avec la boîte de dépôt (balisage Pango, permissions des données,
+  durcissement de la CI), et le correctif de `po/meson.build`.
+- **Données des utilisateurs** : rien n'est touché. Les fichiers déjà
+  déplacés dans `processed/` restent où ils sont, et les items importés
+  restent dans la réserve.
+- **Suite** : la synchronisation avec le téléphone est repoussée sans
+  date (`ROADMAP.md`, « Repoussé volontairement »). Une reprise
+  repartirait d'un nouvel ADR, pas de celui-ci.
