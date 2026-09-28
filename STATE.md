@@ -25,29 +25,24 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   lendemain, cadrage dédié requis avant tout code) pas commencés.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
-- **`1.2.0` est publiée** (24 septembre 2026, sur `//50`) : pas une
-  clôture de chantier (chantier 7 reste ouvert, 7.2/7.3 pas commencés),
-  une version mineure normale pour un `feat` (7.1) et ses cinq
-  correctifs. Sept sources de version d'accord, `CHANGELOG` et metainfo
-  `<release>` à jour, tag `v1.2.0` annoté et signé sur le commit de merge
-  de la PR #132, `release.yml` vert (dépôt et bundle reconstruits et
-  signés, `https://vertours.github.io/Rature/` republié, `rature.flatpak`
-  joint à la release, 73 112 octets), PKGBUILD et .SRCINFO corrigés
-  contre la vraie archive dans un commit de suivi immédiat. Reconstruction
-  en conteneur Arch tentée mais pas aboutie cette fois (miroir de paquets
-  trop lent pendant la session), contrairement à `1.1.0` : le sha256sum
-  reste vérifié directement contre l'archive réelle, mais la
-  reconstruction complète du paquet AUR n'a pas été confirmée. Sans
-  risque immédiat, AUR toujours pas soumis (v3/v4). `1.1.0` et `1.0.0`
-  restent taguées, sur `//50`. Reste, hors agent (`CLAUDE.md` §6) :
-  `flatpak update` depuis `1.1.0` et contrôle visuel de la page GitHub
+- **`1.3.0` est publiée** (28 septembre 2026, sur `//50`) : retrait de
+  la boîte de dépôt (PR #135) et correctif du menu « ⋯ », version mineure
+  (PR #136, squash `e7b4506`). Tag `v1.3.0` annoté et signé, poussé,
+  `release.yml` vert (build et deploy), `rature.flatpak` joint à la
+  release (69 064 octets), `https://vertours.github.io/Rature/` répond
+  200. PKGBUILD et `.SRCINFO` corrigés contre la vraie archive
+  (`sha256sum` calculé sur l'archive du tag) dans un commit de suivi ;
+  reconstruction du paquet AUR en conteneur non tentée. `1.2.0`, `1.1.0`
+  et `1.0.0` restent taguées. Menu « ⋯ » confirmé
+  fonctionnel par VertOurs sur `1.3.0` installée, le 28 septembre 2026.
+  Reste, hors agent (`CLAUDE.md` §6) : contrôle visuel de la page GitHub
   Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6). `1.1.0` → `1.2.0` pas encore testé de la même façon.
+  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`.
 - **Suivi ouvert** : bump runtime `//50` → `//51`, pas avant le
   16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
@@ -131,9 +126,6 @@ migration de format (`migrations.py` toujours à vide, rien à couvrir).
 « ⋯ » des tâches. Mineure : un retrait serait majeur en SemVer strict,
 mais `ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
 (`CONTRIBUTING.md`, « Versioning »). Indépendante du bump `//51`.
-Préparée sur `release/1.3.0` ; tag, `release.yml` et correction du
-`sha256sum` du PKGBUILD (et `.SRCINFO`) contre la vraie archive restent
-à faire, comme pour `1.2.0`.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
