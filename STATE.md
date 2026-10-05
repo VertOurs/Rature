@@ -25,8 +25,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   ligne, spec §2.5 et §3.2), PR #139. Précédé de la PR #138 (squash
   `2473631`) : focus et défilement conservés à la reconstruction des
   vues Jour et Réserve. Les deux contrôlées visuellement par VertOurs
-  le 5 octobre 2026 sur le build local. Pas encore de release : la
-  prochaine est `1.4.0` (mineure, nouvelle fonctionnalité).
+  le 5 octobre 2026 sur le build local. Livrés dans `1.4.0`.
   Restent en 7.2 : renvoi par glisser-déposer, réordonnancement,
   priorité, première migration réelle de `migrations.py`. **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
@@ -106,7 +105,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.3.0` | Retrait de 7.1 et correctif du menu « ⋯ ». Coupée le 28 septembre 2026 |
+| Version du projet | `1.4.0` | Renvoi en réserve (7.2) et place conservée dans les listes. Préparée le 5 octobre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -134,6 +133,11 @@ migration de format (`migrations.py` toujours à vide, rien à couvrir).
 « ⋯ » des tâches. Mineure : un retrait serait majeur en SemVer strict,
 mais `ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
 (`CONTRIBUTING.md`, « Versioning »). Indépendante du bump `//51`.
+
+`1.4.0` (5 octobre 2026) publie le renvoi manuel d'une tâche du jour
+vers la réserve (première case de 7.2, PR #139) et la conservation du
+focus et du défilement à la reconstruction des listes (PR #138).
+Mineure : nouvelle fonctionnalité, aucune migration de format.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le

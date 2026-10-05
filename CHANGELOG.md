@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-05
+
+First step of chantier 7.2: a Day view task can be sent back to the
+reserve. Chantier 7 is not closed: the rest of 7.2 and 7.3 have not
+started (`docs/internal/ROADMAP.md`).
+
 ### Added
 
 - A left-arrow button at the start of each Day view task sends it back
@@ -352,7 +358,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/VertOurs/Rature/releases/tag/v1.4.0
 [1.3.0]: https://github.com/VertOurs/Rature/releases/tag/v1.3.0
 [1.2.0]: https://github.com/VertOurs/Rature/releases/tag/v1.2.0
 [1.1.0]: https://github.com/VertOurs/Rature/releases/tag/v1.1.0
