@@ -356,6 +356,10 @@ class App:
         self.session.delete_from_reserve(item_id)
         self._save()
 
+    def move_reserve_before(self, item_id: str, target_id: str | None) -> None:
+        self.session.move_reserve_before(item_id, target_id)
+        self._save()
+
     def draw_from_reserve(self, item_id: str) -> Task:
         task = self.session.draw_from_reserve(item_id)
         self._save()

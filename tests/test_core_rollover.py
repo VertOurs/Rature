@@ -129,6 +129,29 @@ def test_step_2_does_not_dedup_against_a_matching_day_task() -> None:
     assert [item.id for item in session.reserve] == [origin.id]
 
 
+def test_rollover_appends_reserve_tasks_then_day_tasks_in_day_order() -> None:
+    # SPECIFICATION.md §2.5: two groups at the end of the reserve, step 2
+    # then step 3, each in the day list's order, reorders included.
+    session = session_on(D24)
+    kept = session.add_to_reserve("kept", today=date(2026, 8, 1))
+    first = session.add_to_reserve("drawn first", today=date(2026, 8, 2))
+    second = session.add_to_reserve("drawn second", today=date(2026, 8, 3))
+    day_a = session.add("day a")
+    drawn_first = session.draw_from_reserve(first.id)
+    day_b = session.add("day b")
+    drawn_second = session.draw_from_reserve(second.id)
+    session.move_before(drawn_second.id, drawn_first.id)
+    session.move_before(day_b.id, day_a.id)
+    session.roll_over(NEXT_MORNING)
+    assert [item.text for item in session.reserve] == [
+        kept.text,
+        "drawn second",
+        "drawn first",
+        "day b",
+        "day a",
+    ]
+
+
 def test_an_unfinished_day_task_goes_to_the_reserve_verbatim() -> None:
     session = session_on(D24)
     session.add("  buy milk  ")
