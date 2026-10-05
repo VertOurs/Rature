@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Sending a reserve item to the day threw focus back to the first row
+  and scrolled the list to its top. The Day and Reserve views now keep
+  your place whenever their rows are rebuilt: after any row action, and
+  on the timer that checks for a new day every minute.
+
 ## [1.3.0] - 2026-09-28
 
 Withdraws chantier 7.1 (capture from a synced folder), shipped in

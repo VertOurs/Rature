@@ -82,10 +82,13 @@ class DayView(Adw.Bin):
         # date; between midnight and 04:00 they disagree. The widget lives
         # in the .ui; refresh only rewrites its text.
         self.title.set_title(session.day.date.strftime("%A %d %B"))
-        self._fill(self.struck_list, session.struck)
-        self._fill(self.active_list, session.active)
-        self.struck_list.set_visible(bool(session.struck))
-        self.active_list.set_visible(bool(session.active))
+        with list_helpers.keeping_place(
+            self.scrolled_window, self.struck_list, self.active_list
+        ):
+            self._fill(self.struck_list, session.struck)
+            self._fill(self.active_list, session.active)
+            self.struck_list.set_visible(bool(session.struck))
+            self.active_list.set_visible(bool(session.active))
         self.stack.set_visible_child_name("tasks" if session.day.tasks else "empty")
 
         # SPECIFICATION.md §3.2: recomputed from session state every time,
