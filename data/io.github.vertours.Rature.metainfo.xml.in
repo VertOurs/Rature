@@ -65,6 +65,14 @@
   </screenshots>
 
   <releases>
+    <release version="1.4.1" date="2026-10-05">
+      <description>
+        <p>
+          In the Day view, struck and recurring tasks line up with the other
+          rows again.
+        </p>
+      </description>
+    </release>
     <release version="1.4.0" date="2026-10-05">
       <description>
         <p>

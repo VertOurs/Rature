@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-10-05
+
+Fixes the row alignment broken by the send-back arrow in `1.4.0`.
+
 ### Fixed
 
 - In the Day view, struck and recurring tasks had their number and text
@@ -364,7 +368,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/VertOurs/Rature/releases/tag/v1.4.1
 [1.4.0]: https://github.com/VertOurs/Rature/releases/tag/v1.4.0
 [1.3.0]: https://github.com/VertOurs/Rature/releases/tag/v1.3.0
 [1.2.0]: https://github.com/VertOurs/Rature/releases/tag/v1.2.0
