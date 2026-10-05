@@ -282,8 +282,9 @@ synchronisation avec le téléphone passe dans « Repoussé volontairement ».
 - [x] Renvoi par glisser-déposer d'une tâche du jour vers l'entrée
       Reserve du panneau latéral, même méthode que le bouton
       (`SPECIFICATION.md` §3.2), le 5 octobre 2026
-- [ ] Réordonnancement manuel (monter/descendre) des items de la réserve,
-      à côté du glisser-déposer déjà en place pour la vue Jour
+- [x] Réordonnancement manuel des items de la réserve, par
+      glisser-déposer comme la vue Jour (`SPECIFICATION.md` §2.5 et
+      §3.3), le 5 octobre 2026
 - [ ] Priorité : marqueur visuel seul, aucun effet sur l'ordre d'affichage
       ni sur les numéros. S'applique aux tâches du jour et aux items de
       réserve

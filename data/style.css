@@ -7,8 +7,9 @@
   text-decoration-line: line-through;
 }
 
-/* SPECIFICATION.md §3.2: the row being dragged for a reorder is dimmed in
-   place while its drag icon follows the pointer. */
+/* SPECIFICATION.md §3.2 and §3.3: the row being dragged, from the Day view
+   or the reserve, is dimmed in place while its drag icon follows the
+   pointer. */
 .rature-drag-source {
   opacity: 0.3;
 }
