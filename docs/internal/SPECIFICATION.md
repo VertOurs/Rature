@@ -99,6 +99,14 @@ le comportement de l'utilisateur est hors sujet.
 **Réserve** : liste mère sans date. Tout ce qui traîne. On y puise le matin,
 elle n'est jamais affichée mélangée à la liste du jour.
 
+**Ordre de la réserve** : celui de la liste, sans tri. Un ajout, un renvoi
+manuel et un retour au passage du jour vont en fin de réserve. Au passage
+du jour, les tâches non faites y arrivent en deux groupes : d'abord celles
+issues de la réserve (point 2 ci-dessous), puis celles créées dans le jour
+(point 3), chaque groupe dans l'ordre de la liste du jour, réordonnancement
+compris. L'utilisateur peut réordonner les items à la main (§3.3) ; rien
+d'autre ne déplace un item. Ajouté au chantier 7.2.
+
 **Tirage depuis la réserve** : c'est un déplacement, jamais une copie.
 L'item quitte la réserve au moment du tirage. La tâche créée conserve dans
 `source_id` l'identifiant de l'item d'origine. Si elle n'est pas faite, elle
@@ -509,6 +517,15 @@ l'identifiant de l'item. La cible est l'entrée Day du panneau latéral. Le
 dépôt et le bouton d'envoi appellent **la même méthode de la fenêtre**,
 jamais deux chemins parallèles. Quand la liste du jour est figée, la cible
 refuse le dépôt et ne s'illumine pas.
+
+**Réordonner.** Ajouté au chantier 7.2. Le même glissement, déposé sur une
+autre ligne de la réserve, déplace l'item, avec les règles de la vue Jour
+(§3.2) : moitié haute de la ligne visée, l'item passe devant elle ; moitié
+basse, devant la suivante, ou en fin de liste sur la dernière. Un dépôt sur
+la ligne elle-même ne change rien. Une seule source de glissement par ligne,
+deux cibles possibles : l'entrée Day tire l'item, une autre ligne le
+déplace. Autorisé sur une liste du jour figée, qui ne concerne pas la
+réserve (§2.1 point 3).
 
 ---
 
