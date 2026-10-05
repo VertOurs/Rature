@@ -361,6 +361,11 @@ class App:
         self._save()
         return task
 
+    def send_to_reserve(self, task_id: str) -> ReserveItem:
+        item = self.session.send_to_reserve(task_id, today=reference_date(self.clock()))
+        self._save()
+        return item
+
     def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
         item = self.session.add_recurring(text, weekdays)
         self._save()

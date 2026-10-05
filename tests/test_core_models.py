@@ -197,3 +197,20 @@ def test_generated_ids_are_unique() -> None:
         Task(num=1, text="a", origin=Origin.DAY).id
         != Task(num=2, text="b", origin=Origin.DAY).id
     )
+
+
+def test_only_an_active_non_recurring_task_can_go_back_to_reserve() -> None:
+    day = Task(num=1, text="t", origin=Origin.DAY)
+    reserve = Task(
+        num=2,
+        text="t",
+        origin=Origin.RESERVE,
+        source_id="r",
+        source_created=date(2026, 8, 1),
+    )
+    recurring = Task(num=3, text="t", origin=Origin.RECURRING, template_id="x")
+    struck = Task(num=4, text="t", origin=Origin.DAY, done=True, done_at=STAMP)
+    assert day.can_go_back_to_reserve
+    assert reserve.can_go_back_to_reserve
+    assert not recurring.can_go_back_to_reserve
+    assert not struck.can_go_back_to_reserve

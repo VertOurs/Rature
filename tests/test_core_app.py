@@ -480,6 +480,13 @@ def test_mutation_wrappers_persist_through_a_full_walkthrough(tmp_path: Path) ->
     assert reloaded.reserve == []
     assert reloaded.day.tasks[-1].id == drawn.id
 
+    sent = app.add("send back")
+    back = app.send_to_reserve(sent.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert sent.id not in [t.id for t in reloaded.day.tasks]
+    assert reloaded.reserve == [back]
+    app.delete_from_reserve(back.id)
+
     other_item = app.add_to_reserve("gone")
     app.delete_from_reserve(other_item.id)
     assert load(data_dir=tmp_path).into_session().reserve == []
