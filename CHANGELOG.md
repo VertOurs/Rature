@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A left-arrow button at the start of each Day view task sends it back
+  to the end of the reserve. A task drawn from the reserve returns as
+  its original item, renamed text included; a task created during the
+  day becomes a new item. Not offered on struck or recurring tasks.
+  Works on a frozen list. (Milestone 7.2, first step.)
+
 ### Fixed
 
 - Sending a reserve item to the day threw focus back to the first row

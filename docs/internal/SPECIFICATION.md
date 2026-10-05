@@ -104,6 +104,30 @@ L'item quitte la réserve au moment du tirage. La tâche créée conserve dans
 `source_id` l'identifiant de l'item d'origine. Si elle n'est pas faite, elle
 retourne en réserve au passage du jour, par son `source_id`.
 
+**Renvoi manuel en réserve** : l'inverse du tirage, à la demande, sans
+attendre le passage du jour. C'est aussi un déplacement : la tâche quitte la
+journée et rejoint la fin de la réserve. Ajouté au chantier 7.2.
+
+- une tâche issue de la réserve y retourne comme au passage du jour (point 2
+  ci-dessous) : même `id` d'item, même `created`, texte renommé compris
+  (§2.7.1)
+- une tâche créée dans le jour devient un item neuf, daté du jour de
+  référence. Aucun dédoublonnage : le geste est explicite, comme un ajout
+  manuel (§2.7.4)
+- une tâche issue d'une récurrente ne peut pas être renvoyée. Le passage du
+  jour l'abandonne (point 4), elle reviendra d'elle-même ; la renvoyer en
+  ferait un doublon de son propre modèle
+- une tâche rayée ne peut pas être renvoyée : elle est faite
+- autorisé sur une liste figée. Figer arrête la composition de la journée,
+  pas son déroulement (§2.1 point 3), et retirer une tâche reste possible,
+  comme la supprimer
+
+Le numéro de la tâche n'est jamais réattribué, le compteur ne recule pas
+(§2.4). La tâche ne laisse aucune trace dans la journée : elle n'est ni dans
+l'archive, ni dans le journal de suppressions, donc absente des comptages de
+§2.6, comme si elle n'avait jamais été tirée. Aucune annulation : le geste
+inverse est le tirage.
+
 **Récurrentes** : modèles de tâches associés à des jours de la semaine,
 injectés automatiquement au passage à une nouvelle journée.
 
@@ -341,13 +365,14 @@ n'est jamais recalculé dans l'interface.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  12   text of the task                            ✓      ⋮   │
+│  ←   12   text of the task                        ✓      ⋮   │
 └──────────────────────────────────────────────────────────────┘
-   │     │                                          │       │
-   │     │                                          │       └ menu de ligne
-   │     │                                          └ rayer ou dérayer
-   │     └ texte, barré si la tâche est rayée
-   └ numéro, chiffres tabulaires, atténué, jamais recalculé
+   │    │     │                                     │       │
+   │    │     │                                     │       └ menu de ligne
+   │    │     │                                     └ rayer ou dérayer
+   │    │     └ texte, barré si la tâche est rayée
+   │    └ numéro, chiffres tabulaires, atténué, jamais recalculé
+   └ renvoyer en réserve, absent sur une rayée ou une récurrente
 ```
 
 Le numéro affiché est `task.num`. Il ne dépend ni de la position, ni du bloc,
@@ -384,6 +409,14 @@ reste actif quand la liste est figée, comme la suppression elle-même.
 
 Une tâche tirée de la réserve puis restaurée repart en réserve au passage du
 jour suivant si elle n'a pas été rayée, par le mécanisme normal (§2.7.3).
+
+**Renvoyer en réserve.** Ajouté au chantier 7.2. Un bouton plat (`←`), tout
+à gauche de la ligne, avant le numéro, appelle `send_to_reserve`. La ligne
+disparaît de la journée et réapparaît en fin de réserve, règles en §2.5. Le
+bouton n'existe que sur une tâche en cours qui n'est pas issue d'une
+récurrente : il est masqué, pas insensible, sur les autres, puisqu'aucun
+état ne le rendra jamais utilisable. Il reste actif sur une liste figée.
+Aucun retour visuel au-delà du déplacement, §2.3.
 
 **Menu de ligne.** Rename, puis Delete. Rien d'autre au chantier 3.
 
@@ -638,6 +671,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Fenêtre des raccourcis, titres de groupe | `General`, `Navigation`, `Tasks` |
 | Fenêtre des raccourcis, descriptions | `Quit`, `Keyboard Shortcuts`, `Show the Day view`, `Show the Reserve view`, `Show the Recurring view`, `Add a task`, `Add a task already struck`, `Undo the last deletion`, `Cancel an edit` |
 | Infobulle d'envoi | `Send to the day` |
+| Infobulle de renvoi | `Send back to the reserve` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
 | Infobulle d'ajout de récurrente | `Add a recurring task` |
 | Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Cancel`, `Save` |
@@ -689,6 +723,7 @@ image cassée, et ça ne se voit qu'à l'exécution.
 | Supprimer | `user-trash-symbolic` |
 | Renommer | `document-edit-symbolic` |
 | Envoyer au jour | `go-next-symbolic` |
+| Renvoyer en réserve | `go-previous-symbolic` |
 | Figer | `changes-prevent-symbolic` |
 | Déverrouiller | `changes-allow-symbolic` |
 | Ajouter une récurrente | `list-add-symbolic` |

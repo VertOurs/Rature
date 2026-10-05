@@ -98,3 +98,78 @@ def test_a_drawn_then_deleted_task_journals_its_source() -> None:
     task = session.draw_from_reserve(item.id)
     session.delete(task.id, now=STAMP)
     assert session.day.deletions[0].source_id == item.id
+
+
+def test_send_to_reserve_returns_a_drawn_task_as_its_original_item() -> None:
+    session = make_session()
+    item = session.add_to_reserve("original", today=date(2026, 8, 1))
+    task = session.draw_from_reserve(item.id)
+    session.rename(task.id, "renamed")
+    back = session.send_to_reserve(task.id, today=TODAY)
+    assert session.day.tasks == []
+    assert session.reserve == [back]
+    assert back.id == item.id
+    assert back.created == date(2026, 8, 1)
+    assert back.text == "renamed"
+
+
+def test_send_to_reserve_turns_a_day_task_into_a_new_item() -> None:
+    session = make_session()
+    task = session.add("made today")
+    back = session.send_to_reserve(task.id, today=TODAY)
+    assert session.day.tasks == []
+    assert back.text == "made today"
+    assert back.created == TODAY
+    assert back.id != task.id
+
+
+def test_send_to_reserve_appends_and_never_de_duplicates() -> None:
+    session = make_session()
+    first = session.add_to_reserve("same", today=TODAY)
+    task = session.add("same")
+    back = session.send_to_reserve(task.id, today=TODAY)
+    assert session.reserve == [first, back]
+
+
+def test_send_to_reserve_never_reuses_the_number() -> None:
+    session = make_session()
+    task = session.add("first")
+    session.send_to_reserve(task.id, today=TODAY)
+    assert session.add("second").num == 2
+    assert session.day.deletions == []
+
+
+def test_send_to_reserve_works_while_the_day_is_frozen() -> None:
+    session = make_session()
+    task = session.add("still movable")
+    session.lock()
+    session.send_to_reserve(task.id, today=TODAY)
+    assert session.day.tasks == []
+    assert [item.text for item in session.reserve] == ["still movable"]
+
+
+def test_send_to_reserve_refuses_a_struck_task() -> None:
+    session = make_session()
+    task = session.add("done")
+    session.strike(task.id, now=STAMP)
+    with pytest.raises(ValueError, match="reserve"):
+        session.send_to_reserve(task.id, today=TODAY)
+    assert session.day.tasks == [task]
+    assert session.reserve == []
+
+
+def test_send_to_reserve_refuses_a_recurring_task() -> None:
+    session = make_session()
+    session.add_recurring("water plants", [TODAY.weekday()])
+    (task,) = session.inject_recurring(TODAY.weekday())
+    assert task.origin == Origin.RECURRING
+    with pytest.raises(ValueError, match="reserve"):
+        session.send_to_reserve(task.id, today=TODAY)
+    assert session.day.tasks == [task]
+    assert session.reserve == []
+
+
+def test_send_to_reserve_with_an_unknown_id_is_a_key_error() -> None:
+    session = make_session()
+    with pytest.raises(KeyError):
+        session.send_to_reserve("no-such-id", today=TODAY)

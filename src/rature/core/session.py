@@ -257,6 +257,31 @@ class Session:
         self.reserve.remove(item)
         return task
 
+    def send_to_reserve(self, task_id: str, *, today: date) -> ReserveItem:
+        """Move an active task back to the end of the reserve.
+
+        SPECIFICATION.md §2.5's manual send-back: the draw in reverse.
+        Allowed on a frozen list, like a delete; refused where
+        Task.can_go_back_to_reserve says so. The task
+        leaves no trace in the day and its number is never reused.
+        """
+        task = self._task(task_id)
+        if not task.can_go_back_to_reserve:
+            raise ValueError(f"task {task.num} cannot go back to the reserve")
+        if task.origin == Origin.RESERVE:
+            # Same as the rollover's point 2: the original item comes back,
+            # renamed text included (SPECIFICATION.md §2.7.1).
+            item = ReserveItem(
+                id=task.source_id, text=task.text, created=task.source_created
+            )
+        else:
+            # SPECIFICATION.md §2.7.4: an explicit gesture, never
+            # de-duplicated, unlike the rollover's point 3.
+            item = ReserveItem(text=task.text, created=today)
+        self.day.tasks.remove(task)
+        self.reserve.append(item)
+        return item
+
     def _recurring_item(self, item_id: str) -> RecurringItem:
         for item in self.recurring:
             if item.id == item_id:

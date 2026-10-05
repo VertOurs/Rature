@@ -49,6 +49,15 @@ class Task:
                 "a reserve-origin task needs both source_id and source_created"
             )
 
+    @property
+    def can_go_back_to_reserve(self) -> bool:
+        """SPECIFICATION.md §2.5: active, and not from a recurring template.
+
+        The rollover drops a recurring task anyway; sending it back would
+        duplicate its own template. A struck task is done.
+        """
+        return not self.done and self.origin != Origin.RECURRING
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
