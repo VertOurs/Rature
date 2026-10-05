@@ -26,8 +26,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `2473631`) : focus et défilement conservés à la reconstruction des
   vues Jour et Réserve. Les deux contrôlées visuellement par VertOurs
   le 5 octobre 2026 sur le build local. Livrés dans `1.4.0`.
-  Restent en 7.2 : renvoi par glisser-déposer, réordonnancement,
-  priorité, première migration réelle de `migrations.py`. **7.3**
+  Renvoi par glisser-déposer sur l'entrée Reserve (spec §3.2, même
+  méthode `window.send_to_reserve` que le bouton) codé sur
+  `feat/send-back-drag`, **contrôle manuel par VertOurs requis**.
+  Restent en 7.2 : réordonnancement, priorité, première migration
+  réelle de `migrations.py`. **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
   commencé.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans

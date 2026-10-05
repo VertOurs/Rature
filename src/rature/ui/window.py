@@ -24,6 +24,7 @@ from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
 from rature.ui.reserve_view import ReserveView  # noqa: E402
+from rature.ui.task_row import TaskRow  # noqa: E402
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
 _ENSURE_DAY_INTERVAL_SECONDS = 60
@@ -48,7 +49,10 @@ class RatureWindow(Adw.ApplicationWindow):
         super().__init__(**kwargs)
         self.app = app
         self.day_view = DayView(
-            app=app, run_action=self._run_app_action, perform=self._perform
+            app=app,
+            run_action=self._run_app_action,
+            perform=self._perform,
+            send_to_reserve=self.send_to_reserve,
         )
         self.day_page.set_child(self.day_view)
         self.reserve_view = ReserveView(
@@ -80,6 +84,15 @@ class RatureWindow(Adw.ApplicationWindow):
         drop_target.connect("accept", self._on_sidebar_drop_accept)
         drop_target.connect("drop", self._on_sidebar_drop)
         self.day_sidebar_row.add_controller(drop_target)
+
+        # SPECIFICATION.md §3.2: a day task row dragged onto the Reserve
+        # sidebar entry sends it back. MOVE, the action the row's drag
+        # source already offers for a reorder; the row leaves the day by
+        # _refresh_all, never by a widget removal here, as above.
+        send_back_target = Gtk.DropTarget.new(TaskRow.__gtype__, Gdk.DragAction.MOVE)
+        send_back_target.connect("accept", self._on_send_back_drop_accept)
+        send_back_target.connect("drop", self._on_send_back_drop)
+        self.reserve_sidebar_row.add_controller(send_back_target)
 
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
@@ -202,6 +215,28 @@ class RatureWindow(Adw.ApplicationWindow):
         self, _target: Gtk.DropTarget, value: str, _x: float, _y: float
     ) -> bool:
         self.send_to_day(value)
+        return True
+
+    def send_to_reserve(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.2: the send-back button and the Reserve
+        # sidebar entry's drop target call this one method, the mirror of
+        # send_to_day. Same KeyError swallowing for a task gone mid-drag.
+        self._run_app_action(lambda: self.app.send_to_reserve(task_id))
+
+    def _on_send_back_drop_accept(
+        self, _target: Gtk.DropTarget, _drop: Gdk.Drop
+    ) -> bool:
+        # SPECIFICATION.md §3.2: refused, and never highlighted, wherever
+        # the button is hidden (struck or recurring task). The payload is
+        # not read yet in accept, hence the shared dragged row. A frozen
+        # list still accepts, like the button.
+        row = TaskRow.dragged()
+        return row is not None and row.task.can_go_back_to_reserve
+
+    def _on_send_back_drop(
+        self, _target: Gtk.DropTarget, value: TaskRow, _x: float, _y: float
+    ) -> bool:
+        self.send_to_reserve(value.task.id)
         return True
 
     def _perform(self, action, *, clear_banner_on_success: bool = True) -> bool:

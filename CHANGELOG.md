@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A Day view task can be sent back to the reserve by dragging it onto
+  the Reserve entry of the sidebar, the same move as the left-arrow
+  button. The entry refuses struck and recurring tasks, which have no
+  arrow either.
+
 ## [1.4.1] - 2026-10-05
 
 Fixes the row alignment broken by the send-back arrow in `1.4.0`.
