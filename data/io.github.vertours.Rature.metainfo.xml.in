@@ -65,6 +65,15 @@
   </screenshots>
 
   <releases>
+    <release version="1.5.0" date="2026-10-05">
+      <description>
+        <p>
+          A Day view task can be sent back to the reserve by dragging it onto
+          the Reserve entry of the sidebar. Reserve items can be reordered by
+          drag-and-drop.
+        </p>
+      </description>
+    </release>
     <release version="1.4.1" date="2026-10-05">
       <description>
         <p>
