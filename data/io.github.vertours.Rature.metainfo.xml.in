@@ -65,6 +65,15 @@
   </screenshots>
 
   <releases>
+    <release version="1.4.0" date="2026-10-05">
+      <description>
+        <p>
+          A Day view task can be sent back to the reserve with the arrow at
+          the start of its row. Sending a reserve item to the day no longer
+          scrolls the list back to the top.
+        </p>
+      </description>
+    </release>
     <release version="1.3.0" date="2026-09-28">
       <description>
         <p>
