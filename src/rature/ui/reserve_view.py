@@ -63,17 +63,18 @@ class ReserveView(Adw.Bin):
         # user was mid-typing.
         self._commit_pending_renames()
         reserve = self.app.session.reserve
-        list_helpers.clear(self.item_list)
-        for item in reserve:
-            self.item_list.append(
-                ReserveRow(
-                    item,
-                    app=self.app,
-                    run_action=self.run_action,
-                    perform=self.perform,
-                    send_to_day=self.send_to_day,
+        with list_helpers.keeping_place(self.scrolled_window, self.item_list):
+            list_helpers.clear(self.item_list)
+            for item in reserve:
+                self.item_list.append(
+                    ReserveRow(
+                        item,
+                        app=self.app,
+                        run_action=self.run_action,
+                        perform=self.perform,
+                        send_to_day=self.send_to_day,
+                    )
                 )
-            )
         self.stack.set_visible_child_name("items" if reserve else "empty")
 
     def _on_entry_activate(self, entry: Gtk.Entry) -> None:

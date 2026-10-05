@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 import gi
@@ -29,6 +30,52 @@ def clear(list_box: Gtk.ListBox) -> None:
     """Remove every row from a ListBox."""
     while (row := list_box.get_row_at_index(0)) is not None:
         list_box.remove(row)
+
+
+@contextmanager
+def keeping_place(
+    scrolled_window: Gtk.ScrolledWindow, *list_boxes: Gtk.ListBox
+) -> Iterator[None]:
+    """Rebuild the rows of ``list_boxes`` without moving the user's place.
+
+    Rebuilding destroys the focused row, often the very row whose button
+    triggered the rebuild, and GtkWindow then hands focus to the first
+    focusable widget, which drags the list back to its top. Checked
+    against a real window: sending the 31st reserve item to the day left
+    focus on the first row. So focus goes to the row now at the same
+    index, or the last row if the list got shorter, and the scroll
+    offset is put back once the new rows are allocated.
+    """
+    adjustment = scrolled_window.get_vadjustment()
+    value = adjustment.get_value()
+    focused = _focused_row(list_boxes)
+    yield
+    if focused is not None:
+        list_box, index = focused
+        row = list_box.get_row_at_index(index) or list_box.get_last_child()
+        if row is not None:
+            row.grab_focus()
+
+    def restore_once() -> bool:
+        adjustment.set_value(value)
+        return GLib.SOURCE_REMOVE
+
+    GLib.idle_add(restore_once)
+
+
+def _focused_row(
+    list_boxes: tuple[Gtk.ListBox, ...],
+) -> tuple[Gtk.ListBox, int] | None:
+    """The list holding the focus widget and the index of its row, if any."""
+    root = list_boxes[0].get_root() if list_boxes else None
+    focus = root.get_focus() if root is not None else None
+    if focus is None:
+        return None
+    row = focus.get_ancestor(Gtk.ListBoxRow)
+    for list_box in list_boxes:
+        if row is not None and row.get_parent() is list_box:
+            return list_box, row.get_index()
+    return None
 
 
 def scroll_to_bottom(scrolled_window: Gtk.ScrolledWindow) -> None:
