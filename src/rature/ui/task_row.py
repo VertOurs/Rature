@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/task_row.ui")
 class TaskRow(Gtk.ListBoxRow):
-    """Number, text, strike button, row menu (Rename, then Delete)."""
+    """Send-back button, number, text, strike button, row menu."""
 
     __gtype_name__ = "RatureTaskRow"
 
@@ -36,6 +36,7 @@ class TaskRow(Gtk.ListBoxRow):
     # time in one process, so a class attribute is enough.
     _dragged: ClassVar[TaskRow | None] = None
 
+    send_back_button: Gtk.Button = Gtk.Template.Child()
     num_label: Gtk.Label = Gtk.Template.Child()
     text_label: Gtk.Label = Gtk.Template.Child()
     rename_entry: Gtk.Entry = Gtk.Template.Child()
@@ -69,6 +70,12 @@ class TaskRow(Gtk.ListBoxRow):
             self.strike_button.set_icon_name("object-select-symbolic")
             self.strike_button.set_tooltip_text(_("Strike through"))
 
+        # SPECIFICATION.md §3.2: hidden, not insensitive, on a struck or a
+        # recurring task, since no state will ever make it usable there.
+        # Left sensitive on a frozen list (SPECIFICATION.md §2.5).
+        self.send_back_button.set_visible(task.can_go_back_to_reserve)
+
+        self.send_back_button.connect("clicked", self._on_send_back_clicked)
         self.strike_button.connect("clicked", self._on_strike_clicked)
         self.rename_button.connect("clicked", self._on_rename_clicked)
         self.delete_button.connect("clicked", self._on_delete_clicked)
@@ -144,6 +151,9 @@ class TaskRow(Gtk.ListBoxRow):
         target_id = reorder.drop_target_id(y, self.get_height(), self.task.id, next_id)
         self.run_action(lambda: self.app.move_before(source.task.id, target_id))
         return True
+
+    def _on_send_back_clicked(self, _button: Gtk.Button) -> None:
+        self.run_action(lambda: self.app.send_to_reserve(self.task.id))
 
     def _on_strike_clicked(self, _button: Gtk.Button) -> None:
         if self.task.done:

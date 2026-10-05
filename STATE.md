@@ -20,9 +20,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   lignes (cause déduite du code, **contrôle manuel par VertOurs requis**,
   `CLAUDE.md` §6). `fr.po` : 78/78, y compris la note de version
   `1.2.0` du metainfo, jamais fusionnée jusque-là.
-  **7.2** (renvoi manuel vers la réserve, réordonnancement, priorité,
-  première migration réelle de `migrations.py`) et **7.3** (préparer le
-  lendemain, cadrage dédié requis avant tout code) pas commencés.
+  **7.2 commencé** le 5 octobre 2026 : renvoi manuel d'une tâche du
+  jour vers la réserve (`Session.send_to_reserve`, bouton `←` en tête de
+  ligne, spec §2.5 et §3.2), branche `feat/send-to-reserve`, empilée sur
+  `fix/keep-place-on-rebuild` (focus et défilement conservés à la
+  reconstruction des vues Jour et Réserve). Ni l'une ni l'autre poussée.
+  Restent en 7.2 : renvoi par glisser-déposer, réordonnancement,
+  priorité, première migration réelle de `migrations.py`. **7.3**
+  (préparer le lendemain, cadrage dédié requis avant tout code) pas
+  commencé.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
 - **`1.3.0` est publiée** (28 septembre 2026, sur `//50`) : retrait de

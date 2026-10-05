@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-09-28 13:13+0200\n"
+"POT-Creation-Date: 2026-10-05 12:37+0200\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -86,8 +86,8 @@ msgid ""
 msgstr ""
 "La capture depuis un dossier synchronisé est retirée : elle ne convenait pas "
 "à l'usage quotidien. Les tâches déjà importées restent dans la réserve. "
-"Corrige aussi le menu des tâches de la vue Jour, où Renommer et Supprimer "
-"ne fonctionnaient plus."
+"Corrige aussi le menu des tâches de la vue Jour, où Renommer et Supprimer ne "
+"fonctionnaient plus."
 
 #: data/io.github.vertours.Rature.metainfo.xml.in:80
 msgid ""
@@ -277,11 +277,15 @@ msgstr "Réserve"
 msgid "Recurring"
 msgstr "Récurrentes"
 
-#: data/ui/task_row.ui:64 data/ui/reserve_row.ui:57
+#: data/ui/task_row.ui:18
+msgid "Send back to the reserve"
+msgstr "Renvoyer dans la réserve"
+
+#: data/ui/task_row.ui:74 data/ui/reserve_row.ui:57
 msgid "Rename"
 msgstr "Renommer"
 
-#: data/ui/task_row.ui:73 data/ui/reserve_row.ui:66 data/ui/recurring_row.ui:40
+#: data/ui/task_row.ui:83 data/ui/reserve_row.ui:66 data/ui/recurring_row.ui:40
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -437,19 +441,19 @@ msgstr ""
 "L'ouvrir pourrait écraser des données. Mettez Rature à jour pour ouvrir ce "
 "fichier : %s"
 
-#: src/rature/ui/day_view.py:98
+#: src/rature/ui/day_view.py:101
 msgid "Unfreeze the list"
 msgstr "Libérer la liste"
 
-#: src/rature/ui/day_view.py:101
+#: src/rature/ui/day_view.py:104
 msgid "Freeze the list"
 msgstr "Figer la liste"
 
-#: src/rature/ui/task_row.py:67
+#: src/rature/ui/task_row.py:69
 msgid "Undo the strike"
 msgstr "Annuler la rature"
 
-#: src/rature/ui/task_row.py:70
+#: src/rature/ui/task_row.py:72
 msgid "Strike through"
 msgstr "Rayer"
 
