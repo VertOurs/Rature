@@ -73,7 +73,10 @@ class TaskRow(Gtk.ListBoxRow):
         # SPECIFICATION.md §3.2: hidden, not insensitive, on a struck or a
         # recurring task, since no state will ever make it usable there.
         # Left sensitive on a frozen list (SPECIFICATION.md §2.5).
-        self.send_back_button.set_visible(task.can_go_back_to_reserve)
+        # set_child_visible, not set_visible: the button is neither drawn
+        # nor focusable, but keeps its width, so the number and text
+        # columns line up with the rows that do show it.
+        self.send_back_button.set_child_visible(task.can_go_back_to_reserve)
 
         self.send_back_button.connect("clicked", self._on_send_back_clicked)
         self.strike_button.connect("clicked", self._on_strike_clicked)
