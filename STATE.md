@@ -27,10 +27,13 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   vues Jour et Réserve. Les deux contrôlées visuellement par VertOurs
   le 5 octobre 2026 sur le build local. Livrés dans `1.4.0`.
   Renvoi par glisser-déposer sur l'entrée Reserve (spec §3.2, même
-  méthode `window.send_to_reserve` que le bouton) codé sur
-  `feat/send-back-drag`, **contrôle manuel par VertOurs requis**.
-  Restent en 7.2 : réordonnancement, priorité, première migration
-  réelle de `migrations.py`. **7.3**
+  méthode `window.send_to_reserve` que le bouton), PR #144 (squash
+  `0b0bf93`), contrôlé par VertOurs. Réordonnancement de la réserve par
+  glisser-déposer (spec §2.5 et §3.3, `Session.move_reserve_before`,
+  règle partagée `_moved_before` avec `move_before`) codé sur
+  `feat/reserve-reorder`. Ordre porté par la liste JSON, aucune
+  migration. Restent en 7.2 : priorité, première migration réelle de
+  `migrations.py`. `1.5.0` (mineure) pas encore coupée. **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
   commencé.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans

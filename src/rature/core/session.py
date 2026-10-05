@@ -205,16 +205,7 @@ class Session:
         active task "before" a struck one has no visible effect until
         it is struck too.
         """
-        self._task(task_id)
-        if task_id == target_id:
-            return
-        ordered = [task.id for task in self.day.tasks if task.id != task_id]
-        if target_id is None:
-            ordered.append(task_id)
-        else:
-            self._task(target_id)
-            ordered.insert(ordered.index(target_id), task_id)
-        self.reorder(ordered)
+        self.day.tasks = _moved_before(self.day.tasks, task_id, target_id)
 
     def lock(self) -> None:
         self.day.locked = True
@@ -239,6 +230,15 @@ class Session:
 
     def delete_from_reserve(self, item_id: str) -> None:
         self.reserve.remove(self._reserve_item(item_id))
+
+    def move_reserve_before(self, item_id: str, target_id: str | None) -> None:
+        """Reorder the reserve so item_id sits right before target_id.
+
+        SPECIFICATION.md §2.5 and §3.3: same rule as move_before,
+        target_id=None moves the item to the end. Allowed on a frozen day,
+        which only stops the day's composition.
+        """
+        self.reserve = _moved_before(self.reserve, item_id, target_id)
 
     def draw_from_reserve(self, item_id: str) -> Task:
         if self.day.locked:
@@ -360,3 +360,25 @@ class Session:
         self.day = Day(date=new_date)
         self.inject_recurring(new_date.weekday())
         return old
+
+
+def _moved_before[T: (Task, ReserveItem)](
+    items: list[T], item_id: str, target_id: str | None
+) -> list[T]:
+    """items with item_id moved right before target_id, or to the end on None.
+
+    The one rule behind Session.move_before and move_reserve_before.
+    item_id == target_id returns the list unchanged: a drag-and-drop that
+    drops a row back where it was picked up. Unknown ids raise KeyError.
+    """
+    by_id = {item.id: item for item in items}
+    moving = by_id[item_id]
+    if item_id == target_id:
+        return items
+    rest = [item for item in items if item.id != item_id]
+    if target_id is None:
+        return [*rest, moving]
+    if target_id not in by_id:
+        raise KeyError(target_id)
+    index = [item.id for item in rest].index(target_id)
+    return [*rest[:index], moving, *rest[index:]]

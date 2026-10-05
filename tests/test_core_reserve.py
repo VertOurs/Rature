@@ -173,3 +173,65 @@ def test_send_to_reserve_with_an_unknown_id_is_a_key_error() -> None:
     session = make_session()
     with pytest.raises(KeyError):
         session.send_to_reserve("no-such-id", today=TODAY)
+
+
+def _texts(session: Session) -> list[str]:
+    return [item.text for item in session.reserve]
+
+
+def _reserve_of(*texts: str) -> tuple[Session, list[str]]:
+    session = make_session()
+    ids = [session.add_to_reserve(text, today=TODAY).id for text in texts]
+    return session, ids
+
+
+def test_move_reserve_before_places_the_item_ahead_of_the_target() -> None:
+    session, (_a, b, c) = _reserve_of("a", "b", "c")
+    session.move_reserve_before(c, b)
+    assert _texts(session) == ["a", "c", "b"]
+
+
+def test_move_reserve_before_moves_an_item_down() -> None:
+    session, (a, _b, c) = _reserve_of("a", "b", "c")
+    session.move_reserve_before(a, c)
+    assert _texts(session) == ["b", "a", "c"]
+
+
+def test_move_reserve_before_none_moves_the_item_to_the_end() -> None:
+    session, (a, _b, _c) = _reserve_of("a", "b", "c")
+    session.move_reserve_before(a, None)
+    assert _texts(session) == ["b", "c", "a"]
+
+
+def test_move_reserve_before_itself_is_a_no_op() -> None:
+    session, (a, _b) = _reserve_of("a", "b")
+    session.move_reserve_before(a, a)
+    assert _texts(session) == ["a", "b"]
+
+
+def test_move_reserve_before_rejects_an_unknown_item_id() -> None:
+    session, (a,) = _reserve_of("a")
+    with pytest.raises(KeyError):
+        session.move_reserve_before("no-such-id", a)
+
+
+def test_move_reserve_before_rejects_an_unknown_target_id() -> None:
+    session, (a, _b) = _reserve_of("a", "b")
+    with pytest.raises(KeyError):
+        session.move_reserve_before(a, "no-such-id")
+    assert _texts(session) == ["a", "b"]
+
+
+def test_move_reserve_before_works_while_the_day_is_frozen() -> None:
+    session, (a, b) = _reserve_of("a", "b")
+    session.lock()
+    session.move_reserve_before(b, a)
+    assert _texts(session) == ["b", "a"]
+
+
+def test_move_reserve_before_keeps_every_item_intact() -> None:
+    session, (a, b) = _reserve_of("a", "b")
+    before = {item.id: item for item in session.reserve}
+    session.move_reserve_before(b, a)
+    assert {item.id: item for item in session.reserve} == before
+    assert [item.id for item in session.reserve] == [b, a]

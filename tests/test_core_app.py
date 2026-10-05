@@ -487,6 +487,13 @@ def test_mutation_wrappers_persist_through_a_full_walkthrough(tmp_path: Path) ->
     assert reloaded.reserve == [back]
     app.delete_from_reserve(back.id)
 
+    first, second = app.add_to_reserve("first"), app.add_to_reserve("second")
+    app.move_reserve_before(second.id, first.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert [i.text for i in reloaded.reserve] == ["second", "first"]
+    app.delete_from_reserve(first.id)
+    app.delete_from_reserve(second.id)
+
     other_item = app.add_to_reserve("gone")
     app.delete_from_reserve(other_item.id)
     assert load(data_dir=tmp_path).into_session().reserve == []

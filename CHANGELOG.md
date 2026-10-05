@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Reserve items can be reordered by drag-and-drop within the Reserve
+  view, with the same rules as the Day view. Dragging an item onto the
+  Day entry of the sidebar still draws it into the day.
+
 - A Day view task can be sent back to the reserve by dragging it onto
   the Reserve entry of the sidebar, the same move as the left-arrow
   button. The entry refuses struck and recurring tasks, which have no

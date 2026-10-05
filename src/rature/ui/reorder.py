@@ -17,8 +17,9 @@ def drop_target_id(
     """The id Session.move_before should place the dragged row before.
 
     ``y`` is the pointer offset inside the row the drop happened on,
-    ``height`` that row's height, ``row_id`` its task id and ``next_id``
-    the following row's task id, or None when it is the last of its block.
+    ``height`` that row's height, ``row_id`` its task or reserve item id
+    and ``next_id`` the following row's, or None when it is the last of
+    its block. Session.move_reserve_before takes the same answer.
     The exact midpoint counts as the bottom half.
     """
     if y < height / 2:
