@@ -32,24 +32,24 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   commencé.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
-- **`1.3.0` est publiée** (28 septembre 2026, sur `//50`) : retrait de
-  la boîte de dépôt (PR #135) et correctif du menu « ⋯ », version mineure
-  (PR #136, squash `e7b4506`). Tag `v1.3.0` annoté et signé, poussé,
-  `release.yml` vert (build et deploy), `rature.flatpak` joint à la
-  release (69 064 octets), `https://vertours.github.io/Rature/` répond
-  200. PKGBUILD et `.SRCINFO` corrigés contre la vraie archive
-  (`sha256sum` calculé sur l'archive du tag) dans un commit de suivi ;
-  reconstruction du paquet AUR en conteneur non tentée. `1.2.0`, `1.1.0`
-  et `1.0.0` restent taguées. Menu « ⋯ » confirmé
-  fonctionnel par VertOurs sur `1.3.0` installée, le 28 septembre 2026.
-  Reste, hors agent (`CLAUDE.md` §6) : contrôle visuel de la page GitHub
-  Pages.
+- **`1.4.0` est publiée** (5 octobre 2026, sur `//50`) : renvoi d'une
+  tâche du jour vers la réserve (PR #139) et place conservée dans les
+  listes (PR #138), version mineure (PR #140, squash `76d1a9f`). Tag
+  `v1.4.0` annoté et signé, poussé, `release.yml` vert (run
+  `37300182426`, build et deploy), `rature.flatpak` joint à la release
+  (70 056 octets), `https://vertours.github.io/Rature/` répond 200.
+  PKGBUILD et `.SRCINFO` corrigés contre la vraie archive (`sha256sum`
+  calculé sur l'archive du tag) dans un commit de suivi ; reconstruction
+  du paquet AUR en conteneur non tentée. `1.3.0` et antérieures restent
+  taguées. Flèche de renvoi confirmée fonctionnelle par VertOurs sur
+  `1.4.0` installée, le 5 octobre 2026. Reste, hors agent (`CLAUDE.md`
+  §6) : contrôle visuel de la page GitHub Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`.
+  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée.
 - **Suivi ouvert** : bump runtime `//50` → `//51`, pas avant le
   16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
@@ -105,7 +105,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.4.0` | Renvoi en réserve (7.2) et place conservée dans les listes. Préparée le 5 octobre 2026 |
+| Version du projet | `1.4.0` | Renvoi en réserve (7.2) et place conservée dans les listes. Coupée le 5 octobre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
