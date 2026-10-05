@@ -30,10 +30,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   méthode `window.send_to_reserve` que le bouton), PR #144 (squash
   `0b0bf93`), contrôlé par VertOurs. Réordonnancement de la réserve par
   glisser-déposer (spec §2.5 et §3.3, `Session.move_reserve_before`,
-  règle partagée `_moved_before` avec `move_before`) codé sur
-  `feat/reserve-reorder`. Ordre porté par la liste JSON, aucune
-  migration. Restent en 7.2 : priorité, première migration réelle de
-  `migrations.py`. `1.5.0` (mineure) pas encore coupée. **7.3**
+  règle partagée `_moved_before` avec `move_before`), PR #145 (squash
+  `b72bcce`), contrôlé par VertOurs sur des données jetables. Ordre
+  porté par la liste JSON, aucune migration. Les deux livrés dans
+  `1.5.0`. Restent en 7.2 : priorité, première migration réelle de
+  `migrations.py`. **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
   commencé.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
@@ -116,7 +117,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.4.1` | Correctif d'alignement des lignes de la vue Jour. Coupée le 5 octobre 2026 |
+| Version du projet | `1.5.0` | Renvoi par glisser-déposer et réordonnancement de la réserve. Coupée le 5 octobre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -153,6 +154,11 @@ Mineure : nouvelle fonctionnalité, aucune migration de format.
 `1.4.1` (5 octobre 2026) corrige le décalage de 46 px des numéros et
 textes sur les lignes sans flèche (rayées, récurrentes), relevé à la
 revue de code (PR #142). Corrective.
+
+`1.5.0` (5 octobre 2026) publie le renvoi d'une tâche du jour par
+glisser-déposer sur l'entrée Reserve (PR #144) et le réordonnancement
+de la réserve par glisser-déposer (PR #145). Mineure : deux
+fonctionnalités, aucune migration de format.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le

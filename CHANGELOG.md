@@ -7,16 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [1.5.0] - 2026-10-05
 
-- Reserve items can be reordered by drag-and-drop within the Reserve
-  view, with the same rules as the Day view. Dragging an item onto the
-  Day entry of the sidebar still draws it into the day.
+Two more steps of chantier 7.2, both by drag-and-drop. Chantier 7 is not
+closed: priority and its data migration, then 7.3, remain
+(`docs/internal/ROADMAP.md`). No change to the data format.
+
+### Added
 
 - A Day view task can be sent back to the reserve by dragging it onto
   the Reserve entry of the sidebar, the same move as the left-arrow
   button. The entry refuses struck and recurring tasks, which have no
   arrow either.
+- Reserve items can be reordered by drag-and-drop within the Reserve
+  view, with the same rules as the Day view. Dragging an item onto the
+  Day entry of the sidebar still draws it into the day.
 
 ## [1.4.1] - 2026-10-05
 
@@ -379,7 +384,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/VertOurs/Rature/releases/tag/v1.5.0
 [1.4.1]: https://github.com/VertOurs/Rature/releases/tag/v1.4.1
 [1.4.0]: https://github.com/VertOurs/Rature/releases/tag/v1.4.0
 [1.3.0]: https://github.com/VertOurs/Rature/releases/tag/v1.3.0
