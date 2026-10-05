@@ -39,23 +39,19 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   commencé.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
-- **`1.4.0` est publiée** (5 octobre 2026, sur `//50`) : renvoi d'une
-  tâche du jour vers la réserve (PR #139) et place conservée dans les
-  listes (PR #138), version mineure (PR #140, squash `76d1a9f`). Tag
-  `v1.4.0` annoté et signé, poussé, `release.yml` vert (run
-  `37300182426`, build et deploy), `rature.flatpak` joint à la release
-  (70 056 octets), `https://vertours.github.io/Rature/` répond 200.
-  PKGBUILD et `.SRCINFO` corrigés contre la vraie archive (`sha256sum`
-  calculé sur l'archive du tag) dans un commit de suivi ; reconstruction
-  du paquet AUR en conteneur non tentée. `1.3.0` et antérieures restent
-  taguées. Flèche de renvoi confirmée fonctionnelle par VertOurs sur
-  `1.4.0` installée, le 5 octobre 2026. Reste, hors agent (`CLAUDE.md`
-  §6) : contrôle visuel de la page GitHub Pages.
-  Revue de code du 5 octobre 2026 sur #138 à #141 : numéros et textes
-  désalignés de 46 px sur les lignes sans flèche (rayées, récurrentes),
-  corrigé sur `fix/send-back-alignment` (`set_child_visible`), README mis
-  à jour ; accessibilité des boutons à icône et tests GTK réels notés au
-  chantier 8. Livré dans `1.4.1` (PR #142, squash `a4897c6`).
+- **`1.5.0` est publiée** (5 octobre 2026, sur `//50`) : renvoi d'une
+  tâche du jour par glisser-déposer (PR #144) et réordonnancement de la
+  réserve (PR #145), version mineure (PR #146, squash `9c319f8`). Tag
+  `v1.5.0` annoté et signé, poussé, `release.yml` vert (run
+  `37326260876`, build et deploy), `rature.flatpak` joint à la release
+  (70 024 octets), `https://vertours.github.io/Rature/` répond 200.
+  PKGBUILD et `.SRCINFO` recalés sur l'archive du tag (`sha256sum`
+  calculé sur l'archive téléchargée) dans un commit de suivi ; ils
+  étaient restés sur `1.4.0`, `1.4.1` n'ayant pas eu ce suivi.
+  Reconstruction du paquet AUR en conteneur non tentée. `1.4.1` et
+  antérieures restent taguées. Reste, hors agent (`CLAUDE.md` §6) :
+  `flatpak update` vers `1.5.0` et contrôle visuel de la page GitHub
+  Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
