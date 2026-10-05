@@ -22,9 +22,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `1.2.0` du metainfo, jamais fusionnée jusque-là.
   **7.2 commencé** le 5 octobre 2026 : renvoi manuel d'une tâche du
   jour vers la réserve (`Session.send_to_reserve`, bouton `←` en tête de
-  ligne, spec §2.5 et §3.2), branche `feat/send-to-reserve`, empilée sur
-  `fix/keep-place-on-rebuild` (focus et défilement conservés à la
-  reconstruction des vues Jour et Réserve). Ni l'une ni l'autre poussée.
+  ligne, spec §2.5 et §3.2), PR #139. Précédé de la PR #138 (squash
+  `2473631`) : focus et défilement conservés à la reconstruction des
+  vues Jour et Réserve. Les deux contrôlées visuellement par VertOurs
+  le 5 octobre 2026 sur le build local. Pas encore de release : la
+  prochaine est `1.4.0` (mineure, nouvelle fonctionnalité).
   Restent en 7.2 : renvoi par glisser-déposer, réordonnancement,
   priorité, première migration réelle de `migrations.py`. **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
