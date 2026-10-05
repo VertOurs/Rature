@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- In the Day view, struck and recurring tasks had their number and text
+  shifted left, out of line with the other rows: the send-back arrow
+  added in `1.4.0` was hidden without keeping its space.
+
 ## [1.4.0] - 2026-10-05
 
 First step of chantier 7.2: a Day view task can be sent back to the
