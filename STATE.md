@@ -44,6 +44,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   taguées. Flèche de renvoi confirmée fonctionnelle par VertOurs sur
   `1.4.0` installée, le 5 octobre 2026. Reste, hors agent (`CLAUDE.md`
   §6) : contrôle visuel de la page GitHub Pages.
+  Revue de code du 5 octobre 2026 sur #138 à #141 : numéros et textes
+  désalignés de 46 px sur les lignes sans flèche (rayées, récurrentes),
+  corrigé sur `fix/send-back-alignment` (`set_child_visible`), README mis
+  à jour ; accessibilité des boutons à icône et tests GTK réels notés au
+  chantier 8. Prochaine version : `1.4.1`.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026

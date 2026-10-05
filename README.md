@@ -62,7 +62,8 @@ The method it reproduces:
 - **Day view** — add, strike, unstrike, rename in place, delete, reorder by
   drag-and-drop, freeze the list. `Shift+Enter` logs a task already struck.
 - **Reserve** — an undated list you draw from in the morning; unfinished
-  day tasks return to it at the day rollover.
+  day tasks return to it at the day rollover, or right away with the arrow
+  at the start of a Day view row.
 - **Recurring** — task templates tied to weekdays, injected automatically
   each new day.
 - **Archives window** — every past day, read-only, with a search over task
@@ -101,8 +102,8 @@ publication.
 Version 2 is under way. Milestone 6 (`1.1.0`) is done: structured
 logging, native packaging prepared for AUR/COPR/Mageia (submission still
 pending), and this refreshed README and project page. Milestone 7
-(capture and reserve) is under way: reserve editing and priority markers
-are next. Capture from a synced folder shipped in `1.2.0` and was
+(capture and reserve) is under way: sending a task back to the reserve
+shipped in `1.4.0`; reordering the reserve and priority markers are next. Capture from a synced folder shipped in `1.2.0` and was
 withdrawn in `1.3.0`; phone sync is postponed indefinitely.
 
 Built with AI assistance (Claude Code); I write the specification,

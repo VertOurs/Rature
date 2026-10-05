@@ -326,6 +326,13 @@ codée avant que la spec ne la décrive.
 - [ ] Les traductions produites par machine sont signalées comme telles dans
       l'en-tête du `.po` concerné. Transparence sur l'origine, pas de
       traducteur humain attribué à tort
+- [ ] Nom accessible (`accessibility` / `label`) sur chaque bouton à icône
+      seule des lignes et des en-têtes : aujourd'hui seule l'infobulle les
+      décrit. Relevé à la revue de code du 5 octobre 2026
+- [ ] Tests d'interface réels sous `gtk4-broadwayd` en CI, à la place des
+      gardes-fous qui lisent le source (`test_place_kept_on_rebuild.py`,
+      `test_focus_kept_on_add.py`). Demande une validation : nouvel
+      outillage de CI (`CLAUDE.md` §4 règle 6)
 
 **Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
 traduite pour chaque catalogue livré, le job CI de traduction est vert, et
