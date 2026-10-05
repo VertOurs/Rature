@@ -30,7 +30,8 @@ class TaskRow(Gtk.ListBoxRow):
 
     __gtype_name__ = "RatureTaskRow"
 
-    # SPECIFICATION.md §3.2: the row currently being dragged for a reorder.
+    # SPECIFICATION.md §3.2: the row currently being dragged, for a reorder
+    # or a send-back onto the Reserve sidebar entry (window.py).
     # Shared across every row so a drop target can identify its source
     # without waiting on asynchronous content negotiation. One drag at a
     # time in one process, so a class attribute is enough.
@@ -52,6 +53,7 @@ class TaskRow(Gtk.ListBoxRow):
         app: App,
         run_action: Callable[[Callable[[], None]], bool],
         perform: Callable[[Callable[[], None]], bool],
+        send_to_reserve: Callable[[str], None],
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -59,6 +61,7 @@ class TaskRow(Gtk.ListBoxRow):
         self.app = app
         self.run_action = run_action
         self.perform = perform
+        self.send_to_reserve = send_to_reserve
 
         self.num_label.set_label(str(task.num))
         self.text_label.set_label(task.text)
@@ -155,8 +158,13 @@ class TaskRow(Gtk.ListBoxRow):
         self.run_action(lambda: self.app.move_before(source.task.id, target_id))
         return True
 
+    @classmethod
+    def dragged(cls) -> TaskRow | None:
+        """The row being dragged right now, or None outside a drag."""
+        return cls._dragged
+
     def _on_send_back_clicked(self, _button: Gtk.Button) -> None:
-        self.run_action(lambda: self.app.send_to_reserve(self.task.id))
+        self.send_to_reserve(self.task.id)
 
     def _on_strike_clicked(self, _button: Gtk.Button) -> None:
         if self.task.done:

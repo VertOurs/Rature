@@ -418,6 +418,15 @@ récurrente : il est masqué, pas insensible, sur les autres, puisqu'aucun
 état ne le rendra jamais utilisable. Il reste actif sur une liste figée.
 Aucun retour visuel au-delà du déplacement, §2.3.
 
+**Renvoyer par glisser-déposer.** Ajouté au chantier 7.2. Une ligne de la
+vue Jour, déjà source de glissement pour le réordonnancement, peut aussi
+être déposée sur l'entrée Reserve du panneau latéral. Le dépôt et le bouton
+`←` appellent **la même méthode de la fenêtre**, jamais deux chemins
+parallèles, comme en §3.3. La cible refuse le dépôt et ne s'illumine pas
+quand le bouton serait absent : tâche rayée ou issue d'une récurrente. Elle
+l'accepte sur une liste figée, comme le bouton. Indisponible en mode
+replié, l'entrée n'étant pas à l'écran ; le bouton couvre ce cas (§3.7).
+
 **Menu de ligne.** Rename, puis Delete. Rien d'autre au chantier 3.
 
 **Renommer.** L'étiquette de texte est remplacée sur place par une zone de
@@ -648,7 +657,9 @@ Contraintes qui restent vraies en étroit :
 
 Le glisser-déposer de la réserve vers l'entrée Day n'est pas disponible en
 mode replié, l'entrée n'étant pas à l'écran. Le bouton d'envoi couvre ce cas,
-c'est la raison pour laquelle les deux existent.
+c'est la raison pour laquelle les deux existent. Il en va de même, dans
+l'autre sens, du dépôt d'une tâche du jour sur l'entrée Reserve et du
+bouton de renvoi (§3.2).
 
 ---
 
