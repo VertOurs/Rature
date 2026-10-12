@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-12
+
+Priority, the last step of chantier 7.2. The data file moves to format
+version 3. Chantier 7 is not closed: 7.3 remains
+(`docs/internal/ROADMAP.md`).
+
 ### Added
 
 - A Day view task or a reserve item can be marked as priority from its
@@ -424,7 +430,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/VertOurs/Rature/releases/tag/v1.7.0
 [1.6.0]: https://github.com/VertOurs/Rature/releases/tag/v1.6.0
 [1.5.0]: https://github.com/VertOurs/Rature/releases/tag/v1.5.0
 [1.4.1]: https://github.com/VertOurs/Rature/releases/tag/v1.4.1

@@ -34,8 +34,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `b72bcce`), contrôlé par VertOurs sur des données jetables. Ordre
   porté par la liste JSON, aucune migration. Les deux livrés dans
   `1.5.0`. **Priorité**, dernière case de 7.2, le 12 octobre 2026
-  (spec §2.1, §2.5, §2.7.8, §3.2, §3.3, §3.8, §3.9) : branche
-  `feat/priority`, cinq commits, **non poussée**. `priority` sur `Task`,
+  (spec §2.1, §2.5, §2.7.8, §3.2, §3.3, §3.8, §3.9) : PR #152 (squash
+  `9fc8f6d`, pied `BREAKING CHANGE`), livrée dans `1.7.0`. `priority` sur `Task`,
   `ReserveItem` et `Deletion`, aucun effet sur l'ordre ni les numéros
   (testé), suit la tâche au tirage, au renvoi, au passage du jour et à
   l'annulation ; un doublon marqué écarté au passage du jour marque
@@ -43,8 +43,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   des fichiers v2 principal et archive fabriqués, et chaîne 1 → 3.
   Entrée de menu et icône `starred-symbolic` (accent) dans les vues Jour
   et Réserve, colonne conservée par `set_child_visible` ; widgets
-  exercés par script, **contrôle visuel par VertOurs requis**
-  (`CLAUDE.md` §6). `fr.po` : 93/93. 7.2 est complète ; **7.3**
+  exercés par script, contrôlés visuellement par VertOurs le
+  12 octobre 2026. 7.2 est complète ; **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
   commencé.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
@@ -141,7 +141,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.6.0` | Récurrente une semaine sur deux, format de données version 2. Coupée le 12 octobre 2026 |
+| Version du projet | `1.7.0` | Priorité (fin de 7.2), format de données version 3. Coupée le 12 octobre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -190,6 +190,11 @@ Mineure : le changement de format serait majeur en SemVer strict, mais
 `ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
 (`CONTRIBUTING.md`, « Versioning »). Un fichier écrit en version 2 n'est
 plus lisible par `1.5.0` et antérieures.
+
+`1.7.0` (12 octobre 2026) publie la priorité, dernière case de 7.2
+(PR #152), et le format de données version 3. Mineure pour la même
+raison que `1.6.0`. Un fichier écrit en version 3 n'est plus lisible par
+`1.6.0` et antérieures.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
