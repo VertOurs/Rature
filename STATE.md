@@ -66,26 +66,25 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   migration ; `1.6.0` confirmée sur ses données le 12 octobre 2026.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
-- **`1.7.0` est publiée** (12 octobre 2026, sur `//50`) : priorité,
-  dernière case de 7.2 (PR #152, squash `9fc8f6d`), et format de données
-  version 3, version mineure (PR #153, squash `b8373b1`). Tag `v1.7.0`
-  annoté et signé, poussé, `release.yml` vert (run `38270835617`, build
-  et deploy), `rature.flatpak` joint à la release (72 792 octets),
-  `https://vertours.github.io/Rature/` répond 200. PKGBUILD et
-  `.SRCINFO` recalés sur l'archive du tag (`sha256sum` identique sur
-  deux téléchargements) dans un commit de suivi. Reconstruction du
-  paquet AUR en conteneur non tentée. `1.6.0` et antérieures restent
-  taguées. `flatpak update` vers `1.7.0` lancé par l'agent le
-  12 octobre 2026 (`flatpak info` affiche `1.7.0`). Migration 2 → 3
-  confirmée par VertOurs sur ses vraies données le 12 octobre 2026,
-  après relance. Reste, hors agent (`CLAUDE.md` §6) : contrôle visuel
-  de la page GitHub Pages.
+- **`1.7.1` est publiée** (12 octobre 2026, sur `//51`) : runtime
+  GNOME 51 (PR #156, squash `f9d8537`), version corrective (PR #157,
+  squash `ffa0b88`). Tag `v1.7.1` annoté et signé, poussé, `release.yml`
+  vert (run `38277336124`, build et deploy), `rature.flatpak` joint à la
+  release (72 960 octets), `https://vertours.github.io/Rature/` répond
+  200. PKGBUILD et `.SRCINFO` recalés sur l'archive du tag (`sha256sum`
+  identique sur deux téléchargements) dans un commit de suivi.
+  Reconstruction du paquet AUR en conteneur non tentée. `1.7.0` et
+  antérieures restent taguées. `flatpak update` vers `1.7.1` lancé par
+  l'agent le 12 octobre 2026 (`flatpak info` : `1.7.1`, runtime
+  `org.gnome.Platform/x86_64/51`). Reste, hors agent (`CLAUDE.md` §6) :
+  relancer Rature et vérifier l'application installée sous `//51`,
+  contrôle visuel de la page GitHub Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour.
+  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour. `1.7.0` → `1.7.1` : `flatpak update` lancé par l'agent le 12 octobre 2026, passage au runtime `//51`, sans migration.
 - **Bump runtime `//50` → `//51`** : PR #156 (squash `f9d8537`), livré dans `1.7.1`, avancé au
   12 octobre 2026 par décision de VertOurs (GNOME 51 sorti le
   16 septembre, image CI `gnome-51` publiée). Manifeste et image CI
