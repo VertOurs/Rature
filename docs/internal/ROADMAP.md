@@ -302,13 +302,14 @@ initial du chantier 7. Besoin réel : deux activités toujours en semaine A,
 deux autres toujours en semaine B. Décisions et règle de parité :
 `SPECIFICATION.md` §2.5, §2.7.7 et §3.4.
 
-- [ ] `RecurringItem.every_other_week_from` (lundi d'une semaine active,
+- [x] `RecurringItem.every_other_week_from` (lundi d'une semaine active,
       `null` pour chaque semaine) et règle de parité dans `recurrence.py`,
-      lundi calculé dans `core` à partir de la date de référence
-- [ ] Format de données version 2, migration 1 → 2 testée sur un fichier
-      principal et une archive de version 1
-- [ ] Formulaire et sous-titre de la vue Récurrentes (`SPECIFICATION.md`
-      §3.4), chaînes traduites
+      lundi calculé dans `core` à partir de la date de référence, le
+      12 octobre 2026
+- [x] Format de données version 2, migration 1 → 2 testée sur un fichier
+      principal et une archive de version 1, le 12 octobre 2026
+- [x] Formulaire et sous-titre de la vue Récurrentes (`SPECIFICATION.md`
+      §3.4), chaînes traduites, le 12 octobre 2026
 
 **Critère de fin** : sur quatre semaines consécutives incluant le passage
 de 2026 à 2027, chaque semaine n'injecte que la paire attendue, jamais les
@@ -397,6 +398,14 @@ Noté ici pour ne pas y penser pendant les chantiers.
   pour la v3 sinon. Si le besoin ressurgit, attention : un suivi de
   régularité frôle la série de jours consécutifs que `SPECIFICATION.md`
   §2.3 interdit explicitement.
+- **Mettre une récurrente en pause sans la supprimer.** Candidate,
+  relevée le 12 octobre 2026 : pendant les vacances scolaires, une
+  activité s'arrête puis reprend. Aujourd'hui il faut la supprimer puis
+  la recréer, ou décocher tous ses jours, ce que `SPECIFICATION.md`
+  §2.7.2 interdit ; le besoin rejoint le motif de ce cas tranché (une
+  désactivation ne doit jamais passer par une liste de jours vide). À
+  rediscuter au cadrage de la priorité (7.2), avec qui elle pourrait
+  partager la migration de format 2 → 3. Rien de codé.
 - **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
   mais dans la maintenance de deux bases à vie, pour une personne seule.
   Voir aussi « Capture depuis le téléphone » ci-dessous.
