@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 
 Name:           rature
-Version:        1.5.0
+Version:        1.6.0
 Release:        1
 Summary:        Your day, one line at a time: a daily-list desktop app for GNOME
 
