@@ -56,25 +56,26 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   migration, à garder jusqu'à la `1.6.0` confirmée sur ses données.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
-- **`1.5.0` est publiée** (5 octobre 2026, sur `//50`) : renvoi d'une
-  tâche du jour par glisser-déposer (PR #144) et réordonnancement de la
-  réserve (PR #145), version mineure (PR #146, squash `9c319f8`). Tag
-  `v1.5.0` annoté et signé, poussé, `release.yml` vert (run
-  `37326260876`, build et deploy), `rature.flatpak` joint à la release
-  (70 024 octets), `https://vertours.github.io/Rature/` répond 200.
-  PKGBUILD et `.SRCINFO` recalés sur l'archive du tag (`sha256sum`
-  calculé sur l'archive téléchargée) dans un commit de suivi ; ils
-  étaient restés sur `1.4.0`, `1.4.1` n'ayant pas eu ce suivi.
-  Reconstruction du paquet AUR en conteneur non tentée. `1.4.1` et
-  antérieures restent taguées. Reste, hors agent (`CLAUDE.md` §6) :
-  `flatpak update` vers `1.5.0` et contrôle visuel de la page GitHub
-  Pages.
+- **`1.6.0` est publiée** (12 octobre 2026, sur `//50`) : récurrente
+  une semaine sur deux (PR #148, squash `6dda0d2`) et format de données
+  version 2, version mineure (PR #149, squash `803c11b`). Tag `v1.6.0`
+  annoté et signé, poussé, `release.yml` vert (run `38264310493`, build
+  et deploy), `rature.flatpak` joint à la release (71 840 octets),
+  `https://vertours.github.io/Rature/` répond 200. PKGBUILD et
+  `.SRCINFO` recalés sur l'archive du tag (`sha256sum` identique sur
+  deux téléchargements) dans un commit de suivi. Reconstruction du
+  paquet AUR en conteneur non tentée. `1.5.0` et antérieures restent
+  taguées. `flatpak update` vers `1.6.0` lancé par l'agent le
+  12 octobre 2026 (`flatpak info` affiche `1.6.0`). Reste, hors agent
+  (`CLAUDE.md` §6) : relancer Rature (l'instance ouverte tournait
+  encore en `1.5.0`), confirmer la migration 1 → 2 sur les vraies
+  données, contrôle visuel de la page GitHub Pages.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée.
+  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration sur données réelles à confirmer.
 - **Suivi ouvert** : bump runtime `//50` → `//51`, pas avant le
   16 octobre 2026 (un mois après la sortie stable du 16 septembre,
   choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
