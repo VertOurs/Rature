@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-05 16:31+0200\n"
+"POT-Creation-Date: 2026-10-12 16:10+0200\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -369,6 +369,18 @@ msgstr "Texte de la tâche"
 msgid "Days"
 msgstr "Jours"
 
+#: data/ui/recurring_form.ui:71
+msgid "Every two weeks"
+msgstr "Une semaine sur deux"
+
+#: data/ui/recurring_form.ui:82
+msgid "This week"
+msgstr "Cette semaine"
+
+#: data/ui/recurring_form.ui:88
+msgid "Next week"
+msgstr "La semaine prochaine"
+
 #: data/ui/recurring_view.ui:15
 msgid "Add a recurring task"
 msgstr "Ajouter une tâche récurrente"
@@ -476,6 +488,18 @@ msgstr "Libérer la liste"
 #: src/rature/ui/day_view.py:106
 msgid "Freeze the list"
 msgstr "Figer la liste"
+
+#: src/rature/ui/recurring_row.py:67
+msgid "this week"
+msgstr "cette semaine"
+
+#: src/rature/ui/recurring_row.py:69
+msgid "next week"
+msgstr "la semaine prochaine"
+
+#: src/rature/ui/recurring_row.py:70
+msgid "every two weeks"
+msgstr "une semaine sur deux"
 
 #: src/rature/ui/task_row.py:71
 msgid "Undo the strike"
