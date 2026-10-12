@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from gettext import gettext as _
 from typing import TYPE_CHECKING, ClassVar
 
 import gi
@@ -43,7 +44,9 @@ class ReserveRow(Gtk.ListBoxRow):
     send_button: Gtk.Button = Gtk.Template.Child()
     row_popover: Gtk.Popover = Gtk.Template.Child()
     rename_button: Gtk.Button = Gtk.Template.Child()
+    priority_button: Gtk.Button = Gtk.Template.Child()
     delete_button: Gtk.Button = Gtk.Template.Child()
+    priority_icon: Gtk.Image = Gtk.Template.Child()
 
     def __init__(
         self,
@@ -67,9 +70,16 @@ class ReserveRow(Gtk.ListBoxRow):
         # day list is frozen; core also refuses the draw (SPECIFICATION.md
         # §2.1 point 3), the two barriers are deliberate.
         self.send_button.set_sensitive(not app.session.day.locked)
+        # SPECIFICATION.md §3.3: the Day view's priority column, kept
+        # even when empty (set_child_visible keeps the width).
+        self.priority_icon.set_child_visible(item.priority)
+        self.priority_button.set_label(
+            _("Remove priority") if item.priority else _("Mark as priority")
+        )
 
         self.send_button.connect("clicked", self._on_send_clicked)
         self.rename_button.connect("clicked", self._on_rename_clicked)
+        self.priority_button.connect("clicked", self._on_priority_clicked)
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
         self._rename = InlineRename(
@@ -151,6 +161,12 @@ class ReserveRow(Gtk.ListBoxRow):
     def _on_delete_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
         self.run_action(lambda: self.app.delete_from_reserve(self.item.id))
+
+    def _on_priority_clicked(self, _button: Gtk.Button) -> None:
+        self.row_popover.popdown()
+        self.run_action(
+            lambda: self.app.set_reserve_priority(self.item.id, not self.item.priority)
+        )
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()

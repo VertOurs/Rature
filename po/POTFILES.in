@@ -20,5 +20,6 @@ data/ui/shortcuts.ui
 src/rature/ui/application.py
 src/rature/ui/day_view.py
 src/rature/ui/recurring_row.py
+src/rature/ui/reserve_row.py
 src/rature/ui/task_row.py
 src/rature/ui/window.py

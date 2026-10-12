@@ -179,13 +179,20 @@ V1_ARCHIVE = {
 }
 
 
-def test_version_two_is_current() -> None:
-    assert CURRENT_VERSION == 2
+def test_version_three_is_current() -> None:
+    assert CURRENT_VERSION == 3
+
+
+def _with_priority(entries: list[dict]) -> list[dict]:
+    return [{**entry, "priority": False} for entry in entries]
+
+
+# Step 1 -> 2 alone: every recurring template gains every_other_week_from.
 
 
 def test_a_version_1_main_file_loses_nothing() -> None:
     original = copy.deepcopy(V1_MAIN)
-    migrated = migrate(copy.deepcopy(V1_MAIN))
+    migrated = migrate(copy.deepcopy(V1_MAIN), target=2)
     expected = {
         **original,
         "version": 2,
@@ -208,23 +215,123 @@ def test_the_migration_leaves_its_input_untouched() -> None:
 
 
 def test_a_version_1_archive_only_gets_the_version_bump() -> None:
-    assert migrate(copy.deepcopy(V1_ARCHIVE)) == {**V1_ARCHIVE, "version": 2}
-
-
-def test_a_version_1_archive_file_loads(tmp_path: Path) -> None:
-    (tmp_path / "archive").mkdir()
-    (tmp_path / "archive" / "2026-08-24.json").write_text(
-        json.dumps(V1_ARCHIVE), encoding="utf-8"
-    )
-    day = storage.load_archive(date(2026, 8, 24), data_dir=tmp_path)
-    assert Day.from_dict({**V1_ARCHIVE, "version": 2}) == day
-    assert [task.id for task in day.tasks] == ["t1", "t2"]
-    assert [entry.id for entry in day.deletions] == ["t3"]
+    migrated = migrate(copy.deepcopy(V1_ARCHIVE), target=2)
+    assert migrated == {**V1_ARCHIVE, "version": 2}
 
 
 def test_a_non_object_template_is_rejected() -> None:
     with pytest.raises(TypeError):
         migrate({**V1_MAIN, "recurring": ["water plants"]})
+
+
+# Step 2 -> 3 alone, on version 2 files as 1.6.0 wrote them. The template
+# is every other week, to check the 1.6.0 field survives untouched.
+
+V2_MAIN = {
+    **copy.deepcopy(V1_MAIN),
+    "version": 2,
+    "recurring": [
+        {
+            "id": "w1",
+            "text": "water plants",
+            "weekdays": [1],
+            "every_other_week_from": "2026-08-24",
+        }
+    ],
+}
+
+V2_ARCHIVE = {**copy.deepcopy(V1_ARCHIVE), "version": 2}
+
+
+def test_a_version_2_main_file_loses_nothing() -> None:
+    original = copy.deepcopy(V2_MAIN)
+    migrated = migrate(copy.deepcopy(V2_MAIN))
+    expected = {
+        **original,
+        "version": 3,
+        "tasks": _with_priority(original["tasks"]),
+        "deletions": _with_priority(original["deletions"]),
+        "reserve": _with_priority(original["reserve"]),
+    }
+    assert migrated == expected
+
+
+def test_the_priority_migration_leaves_its_input_untouched() -> None:
+    data = copy.deepcopy(V2_MAIN)
+    migrate(data)
+    assert data == V2_MAIN
+
+
+def test_a_version_2_archive_gains_priority_but_no_reserve() -> None:
+    original = copy.deepcopy(V2_ARCHIVE)
+    migrated = migrate(copy.deepcopy(V2_ARCHIVE))
+    assert migrated == {
+        **original,
+        "version": 3,
+        "tasks": _with_priority(original["tasks"]),
+        "deletions": _with_priority(original["deletions"]),
+    }
+    assert "reserve" not in migrated
+
+
+def test_a_non_object_reserve_item_is_rejected() -> None:
+    with pytest.raises(TypeError):
+        migrate({**V2_MAIN, "reserve": ["fix the bike"]})
+
+
+def test_a_version_2_file_opens_with_nothing_marked(tmp_path: Path) -> None:
+    (tmp_path / "data.json").write_text(json.dumps(V2_MAIN), encoding="utf-8")
+    monday = datetime(2026, 8, 24, 18, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=lambda: monday)
+
+    assert app.startup is StartupOutcome.LOADED
+    assert [task.id for task in app.session.day.tasks] == ["t1", "t2"]
+    assert [task.num for task in app.session.day.tasks] == [1, 2]
+    assert not any(task.priority for task in app.session.day.tasks)
+    assert [item.id for item in app.session.reserve] == ["r1"]
+    assert not app.session.reserve[0].priority
+    assert not app.session.day.deletions[0].priority
+    assert app.session.recurring[0].every_other_week_from == date(2026, 8, 24)
+
+
+# Both steps chained, from a version 1 file.
+
+
+def test_a_version_1_main_file_migrates_to_3_with_no_loss() -> None:
+    original = copy.deepcopy(V1_MAIN)
+    assert migrate(copy.deepcopy(V1_MAIN)) == {
+        **original,
+        "version": 3,
+        "tasks": _with_priority(original["tasks"]),
+        "deletions": _with_priority(original["deletions"]),
+        "reserve": _with_priority(original["reserve"]),
+        "recurring": [
+            {
+                "id": "w1",
+                "text": "water plants",
+                "weekdays": [1],
+                "every_other_week_from": None,
+            }
+        ],
+    }
+
+
+@pytest.mark.parametrize("archive", [V1_ARCHIVE, V2_ARCHIVE])
+def test_an_older_archive_file_loads(tmp_path: Path, archive: dict) -> None:
+    (tmp_path / "archive").mkdir()
+    (tmp_path / "archive" / "2026-08-24.json").write_text(
+        json.dumps(archive), encoding="utf-8"
+    )
+    day = storage.load_archive(date(2026, 8, 24), data_dir=tmp_path)
+    expected = {
+        **archive,
+        "version": 3,
+        "tasks": _with_priority(archive["tasks"]),
+        "deletions": _with_priority(archive["deletions"]),
+    }
+    assert Day.from_dict(expected) == day
+    assert [task.id for task in day.tasks] == ["t1", "t2"]
+    assert [entry.id for entry in day.deletions] == ["t3"]
 
 
 def test_a_version_1_file_is_migrated_and_injects_as_before(tmp_path: Path) -> None:
@@ -248,5 +355,6 @@ def test_a_version_1_file_is_migrated_and_injects_as_before(tmp_path: Path) -> N
     archived = storage.load_archive(date(2026, 8, 24), data_dir=tmp_path)
     assert [task.id for task in archived.tasks] == ["t1", "t2"]
     on_disk = json.loads((tmp_path / "data.json").read_text(encoding="utf-8"))
-    assert on_disk["version"] == 2
+    assert on_disk["version"] == 3
     assert on_disk["recurring"][0]["every_other_week_from"] is None
+    assert not any(item["priority"] for item in on_disk["reserve"])

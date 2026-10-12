@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A Day view task or a reserve item can be marked as priority from its
+  row menu ("Mark as priority", "Remove priority"), including on a
+  frozen list or a struck task. A marked row shows a star in the accent
+  colour before the menu button. It is a marker only: the order and the
+  numbers never change. The priority follows the task when it is drawn,
+  sent back, returned by the rollover or restored by undo; a marked
+  duplicate dropped by the rollover marks the existing reserve item.
+
+### Changed
+
+- The data file moves to format version 3. Version 1 and 2 files,
+  archives included, are migrated on open with no loss: nothing is
+  marked. Once a file has been written in version 3, earlier Rature
+  versions refuse to open it.
+
 ## [1.6.0] - 2026-10-12
 
 Recurring tasks every two weeks, decided outside the planned steps of

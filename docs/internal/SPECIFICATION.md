@@ -20,8 +20,8 @@ technique. Ceci est le produit.
 1. Les tâches sont dictées une par une, en vrac, sans ordre imposé
 2. Chaque tâche est ajoutée à une liste numérotée, sans commentaire
 3. La liste peut être figée. Une liste figée bloque l'ajout d'une tâche et
-   le tirage depuis la réserve. Rayer, dérayer, renommer, supprimer et
-   réordonner restent possibles. Figer arrête la composition de la journée,
+   le tirage depuis la réserve. Rayer, dérayer, renommer, marquer ou
+   retirer la priorité, supprimer et réordonner restent possibles. Figer arrête la composition de la journée,
    pas son déroulement
 4. Rayer une tâche la barre et la remonte dans un bloc « Rayées », en haut
 5. La liste complète reste visible en permanence : rayées en haut, en cours
@@ -135,6 +135,28 @@ Le numéro de la tâche n'est jamais réattribué, le compteur ne recule pas
 l'archive, ni dans le journal de suppressions, donc absente des comptages de
 §2.6, comme si elle n'avait jamais été tirée. Aucune annulation : le geste
 inverse est le tirage.
+
+**Priorité** : un seul niveau, une tâche du jour ou un item de réserve est
+prioritaire ou ne l'est pas (`priority`, faux par défaut). C'est un
+marqueur visuel, rien d'autre : il ne change **ni l'ordre d'affichage, ni
+les numéros**, dans aucune vue. Ajouté au chantier 7.2.
+
+La priorité suit la tâche partout, rien ne se perd :
+
+- tirage depuis la réserve, renvoi manuel, retour au passage du jour
+  (point 2 ci-dessous) : la priorité passe de l'item à la tâche et
+  inversement, comme le texte renommé (§2.7.1)
+- une tâche créée dans le jour qui part en réserve (renvoi manuel ou
+  point 3) : l'item neuf garde sa priorité
+- une tâche écartée comme doublon au passage du jour transmet sa priorité
+  à l'item qui la remplace (§2.7.8)
+- suppression puis annulation : la priorité est restaurée avec la tâche
+
+Une tâche issue d'une récurrente peut être marquée, comme toute tâche du
+jour ; elle est abandonnée au passage du jour avec sa priorité (point 4).
+Les modèles récurrents n'ont pas de priorité. La priorité n'apparaît ni
+dans les statistiques (§2.6), ni dans la copie texte (§3.12), ni dans la
+fenêtre d'archives (§3.5) ; la donnée reste conservée dans les archives.
 
 **Récurrentes** : modèles de tâches associés à des jours de la semaine,
 injectés automatiquement au passage à une nouvelle journée.
@@ -331,6 +353,22 @@ le cas demande de garder le formulaire ouvert pendant la nuit du dimanche
 au lundi, et le sous-titre de la ligne montre le résultat dès
 l'enregistrement.
 
+**2.7.8 Priorité d'une tâche écartée comme doublon**
+
+Ajouté le 12 octobre 2026, au chantier 7.2. Au passage du jour, une tâche
+non faite créée dans le jour n'entre pas en réserve si son texte y figure
+déjà (§2.5 point 3). Si cette tâche écartée était prioritaire, **l'item
+existant devient prioritaire**. Un item déjà prioritaire le reste : le
+doublon ne retire jamais une priorité.
+
+L'item existant est celui que la comparaison de §2.5 point 3 a trouvé,
+qu'il soit en réserve depuis longtemps, revenu au point 2 ou ajouté au même
+passage du jour par une autre tâche du jour au texte identique.
+
+Motif : la priorité est une information que l'utilisateur a posée. Écarter
+le doublon sans la reporter la perdrait silencieusement, ce qui contredit la
+garantie « aucune donnée n'est perdue » de §2.5.
+
 ---
 
 ## 3. Spécification d'interface
@@ -423,11 +461,12 @@ n'est jamais recalculé dans l'interface.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  ←   12   text of the task                        ✓      ⋮   │
+│  ←   12   text of the task                     ✓    ★    ⋮   │
 └──────────────────────────────────────────────────────────────┘
-   │    │     │                                     │       │
-   │    │     │                                     │       └ menu de ligne
-   │    │     │                                     └ rayer ou dérayer
+   │    │     │                                  │    │    │
+   │    │     │                                  │    │    └ menu de ligne
+   │    │     │                                  │    └ priorité, §2.5
+   │    │     │                                  └ rayer ou dérayer
    │    │     └ texte, barré si la tâche est rayée
    │    └ numéro, chiffres tabulaires, atténué, jamais recalculé
    └ renvoyer en réserve, absent sur une rayée ou une récurrente
@@ -485,7 +524,19 @@ quand le bouton serait absent : tâche rayée ou issue d'une récurrente. Elle
 l'accepte sur une liste figée, comme le bouton. Indisponible en mode
 replié, l'entrée n'étant pas à l'écran ; le bouton couvre ce cas (§3.7).
 
-**Menu de ligne.** Rename, puis Delete. Rien d'autre au chantier 3.
+**Menu de ligne.** Rename, puis Delete au chantier 3. Depuis le
+chantier 7.2 : Rename, `Mark as priority` ou `Remove priority` selon l'état
+de la tâche, puis Delete.
+
+**Priorité.** Ajouté au chantier 7.2, règles en §2.5. L'entrée du menu
+marque ou retire la priorité, mêmes autorisations que le renommage : liste
+figée et tâche rayée comprises (§2.1 point 3). Une tâche prioritaire porte
+une icône symbolique discrète (§3.9), à droite, juste avant le bouton de
+menu, dans la couleur d'accent du système, jamais en rouge. Nom accessible
+et infobulle : `Priority`. Sur une tâche non prioritaire, l'emplacement
+reste réservé mais vide : l'icône forme une colonne stable et ne décale ni
+le texte ni les boutons. Ni l'ordre, ni le numéro, ni le bloc ne changent.
+Aucun autre retour visuel, §2.3.
 
 **Renommer.** L'étiquette de texte est remplacée sur place par une zone de
 saisie contenant le texte actuel, sélectionné. Entrée valide, Échap annule,
@@ -512,8 +563,8 @@ d'aide des raccourcis (autre point du chantier 4).
 
 - la zone de saisie est insensible
 - le dépôt d'un élément de réserve est refusé, voir §3.6
-- rayer, dérayer, renommer, supprimer, annuler une suppression et
-  réordonner restent actifs
+- rayer, dérayer, renommer, marquer ou retirer la priorité, supprimer,
+  annuler une suppression et réordonner restent actifs
 
 Aucun autre changement d'apparence. Pas de bandeau, pas de message. L'état du
 bouton suffit.
@@ -537,9 +588,9 @@ deux blocs, jamais la barre de saisie, qui reste utilisable.
 │  Reserve                                           │
 ├────────────────────────────────────────────────────┤
 │  ┌──────────────────────────────────────────────┐  │
-│  │  repair the bike light               →   ⋮   │  │
-│  │  call the insurance                  →   ⋮   │  │
-│  │  sort the photos                     →   ⋮   │  │
+│  │  repair the bike light          →    ★   ⋮   │  │
+│  │  call the insurance             →        ⋮   │  │
+│  │  sort the photos                →        ⋮   │  │
 │  └──────────────────────────────────────────────┘  │
 ├────────────────────────────────────────────────────┤
 │  [ Add to the reserve…                          ]  │
@@ -559,8 +610,11 @@ comportement de l'utilisateur, ce que §2.3 interdit.
 la réserve, c'est un déplacement et non une copie, §2.5. Il est insensible
 quand la liste du jour est figée.
 
-**Menu de ligne** : Rename, puis Delete. Le renommage est en place, comme en
-§3.2.
+**Menu de ligne** : Rename, `Mark as priority` ou `Remove priority` selon
+l'état de l'item, puis Delete. Le renommage est en place, comme en §3.2. La
+priorité s'affiche comme en §3.2 : même icône, même colonne, juste avant le
+bouton de menu. Marquer est autorisé sur une liste du jour figée, qui ne
+concerne pas la réserve.
 
 **Glisser-déposer.** Chaque ligne est une source de glissement portant
 l'identifiant de l'item. La cible est l'entrée Day du panneau latéral. Le
@@ -766,7 +820,8 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Saisie du jour | `Add a task…` |
 | Saisie de la réserve | `Add to the reserve…` |
 | Recherche dans les archives | `Search the archives…` |
-| Menu de ligne | `Rename`, `Edit`, `Delete` |
+| Menu de ligne | `Rename`, `Edit`, `Mark as priority`, `Remove priority`, `Delete` |
+| Icône de priorité, nom accessible et infobulle | `Priority` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
 | Infobulle d'annulation de suppression | `Undo delete` |
 | Infobulle de copie | `Copy as text` |
@@ -830,6 +885,7 @@ image cassée, et ça ne se voit qu'à l'exécution.
 | Figer | `changes-prevent-symbolic` |
 | Déverrouiller | `changes-allow-symbolic` |
 | Ajouter une récurrente | `list-add-symbolic` |
+| Priorité | `starred-symbolic` |
 
 ---
 

@@ -37,6 +37,19 @@
           </object>
         </child>
         <child>
+          <object class="GtkImage" id="priority_icon">
+            <property name="icon-name">starred-symbolic</property>
+            <property name="valign">center</property>
+            <property name="tooltip-text" translatable="yes">Priority</property>
+            <accessibility>
+              <property name="label" translatable="yes">Priority</property>
+            </accessibility>
+            <style>
+              <class name="accent"/>
+            </style>
+          </object>
+        </child>
+        <child>
           <object class="GtkMenuButton" id="menu_button">
             <property name="icon-name">view-more-symbolic</property>
             <property name="valign">center</property>
@@ -55,6 +68,14 @@
                     <child>
                       <object class="GtkButton" id="rename_button">
                         <property name="label" translatable="yes">Rename</property>
+                        <property name="halign">fill</property>
+                        <style>
+                          <class name="flat"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="priority_button">
                         <property name="halign">fill</property>
                         <style>
                           <class name="flat"/>

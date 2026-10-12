@@ -285,12 +285,13 @@ synchronisation avec le téléphone passe dans « Repoussé volontairement ».
 - [x] Réordonnancement manuel des items de la réserve, par
       glisser-déposer comme la vue Jour (`SPECIFICATION.md` §2.5 et
       §3.3), le 5 octobre 2026
-- [ ] Priorité : marqueur visuel seul, aucun effet sur l'ordre d'affichage
+- [x] Priorité : marqueur visuel seul, aucun effet sur l'ordre d'affichage
       ni sur les numéros. S'applique aux tâches du jour et aux items de
-      réserve
-- [ ] Migration de format pour le champ de priorité, version 2 → 3. La
+      réserve (`SPECIFICATION.md` §2.5, §2.7.8, §3.2 et §3.3), le
+      12 octobre 2026
+- [x] Migration de format pour le champ de priorité, version 2 → 3. La
       première migration réelle (1 → 2) est celle de la récurrente une
-      semaine sur deux, ci-dessous
+      semaine sur deux, ci-dessous. Le 12 octobre 2026
 
 **Critère de fin** : la priorité n'a aucun effet sur l'ordre ; la
 migration s'applique sans perte sur un fichier de version antérieure.
@@ -403,9 +404,9 @@ Noté ici pour ne pas y penser pendant les chantiers.
   activité s'arrête puis reprend. Aujourd'hui il faut la supprimer puis
   la recréer, ou décocher tous ses jours, ce que `SPECIFICATION.md`
   §2.7.2 interdit ; le besoin rejoint le motif de ce cas tranché (une
-  désactivation ne doit jamais passer par une liste de jours vide). À
-  rediscuter au cadrage de la priorité (7.2), avec qui elle pourrait
-  partager la migration de format 2 → 3. Rien de codé.
+  désactivation ne doit jamais passer par une liste de jours vide). Non
+  retenue au cadrage de la priorité (7.2) ; demanderait sa propre
+  migration de format 3 → 4. Rien de codé.
 - **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
   mais dans la maintenance de deux bases à vie, pour une personne seule.
   Voir aussi « Capture depuis le téléphone » ci-dessous.

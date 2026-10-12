@@ -107,9 +107,10 @@ previous version's data.
 The format is born at version 1 with the reserve and the recurring
 templates; the base existed from day one, because adding it later, over
 real data, is far riskier. Version 2 adds `every_other_week_from` to each
-recurring template, `null` for all of them on migration. Archive files go
-through the same chain; they carry no `recurring` key and only get the
-version bump.
+recurring template, `null` for all of them on migration. Version 3 adds
+`priority` to each task, deletion entry and reserve item, `false` for all of
+them. Archive files go through the same chain; they carry no `recurring` or
+`reserve` key, so only their tasks and deletion entries change.
 
 ### `core/app.py`
 `App` coordinates a `Session` with `storage` behind a single injectable
@@ -184,7 +185,7 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
 
 ```json
 {
-  "version": 2,
+  "version": 3,
   "date": "2026-08-24",
   "counter": 12,
   "locked": false,
@@ -192,10 +193,11 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
     {"id": "uuid", "num": 1, "text": "...", "done": true,
      "done_at": "2026-08-24T14:32:07+02:00",
      "origin": "day|reserve|recurring",
-     "source_id": null, "source_created": null, "template_id": null}
+     "source_id": null, "source_created": null, "template_id": null,
+     "priority": false}
   ],
   "reserve": [
-    {"id": "uuid", "text": "...", "created": "2026-08-20"}
+    {"id": "uuid", "text": "...", "created": "2026-08-20", "priority": false}
   ],
   "recurring": [
     {"id": "uuid", "text": "...", "weekdays": [0,1,2,3,4],
@@ -204,7 +206,7 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
   "deletions": [
     {"id": "uuid", "num": 4, "text": "...", "origin": "day", "index": 1,
      "source_id": null, "source_created": null, "template_id": null,
-     "done": false, "done_at": null,
+     "done": false, "done_at": null, "priority": false,
      "deleted_at": "2026-08-24T14:32:07+02:00"}
   ]
 }
@@ -221,6 +223,7 @@ Task fields:
 | `source_id` | uuid of the originating reserve item, `null` otherwise. It, not the text, drives the return to the reserve. Non-null if and only if `origin` is `reserve`: `core/models.py` rejects a `reserve` task built without `source_id` |
 | `source_created` | `created` date of the originating reserve item, copied at draw time, `null` otherwise. Read back at rollover to restore the item with its original date. Same constraint as `source_id` |
 | `template_id` | uuid of the originating recurring template, `null` otherwise |
+| `priority` | a visual marker only, never an order or a number. Reserve items carry it too, and it moves with the task through draws, send-backs and the rollover, see `SPECIFICATION.md` §2.5 and §2.7.8 |
 
 A `deletions` entry adds two fields to the task fields of the same name
 (`id`, `num`, `text`, `origin`, `source_id`, `source_created`,
@@ -229,7 +232,7 @@ A `deletions` entry adds two fields to the task fields of the same name
 | Field | Role |
 |---|---|
 | `index` | the task's position in `day.tasks` when it was deleted, to reinsert it in the same place on undo |
-| `done`, `done_at` | strike state at deletion time, to restore a struck task as it was |
+| `done`, `done_at`, `priority` | state at deletion time, to restore the task as it was |
 
 `weekdays` is never empty, see `SPECIFICATION.md` §2.7.2. Monday is 0;
 "every day" is `[0,1,2,3,4,5,6]`.
