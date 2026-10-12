@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from gettext import gettext as _
 from typing import TYPE_CHECKING
 
 import gi
@@ -14,6 +15,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.core.app import Cadence  # noqa: E402
 from rature.ui import weekdays  # noqa: E402
 from rature.ui.recurring_form import RecurringForm  # noqa: E402
 
@@ -26,7 +28,7 @@ if TYPE_CHECKING:
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/recurring_row.ui")
 class RecurringRow(Adw.ActionRow):
-    """Text as title, abbreviated weekdays as subtitle, an Edit/Delete menu."""
+    """Text as title, weekdays and cadence as subtitle, an Edit/Delete menu."""
 
     __gtype_name__ = "RatureRecurringRow"
 
@@ -49,10 +51,23 @@ class RecurringRow(Adw.ActionRow):
         self.run_action = run_action
 
         self.set_title(item.text)
-        self.set_subtitle(weekdays.subtitle(item.weekdays))
+        self.set_subtitle(self._subtitle())
 
         self.edit_button.connect("clicked", self._on_edit_clicked)
         self.delete_button.connect("clicked", self._on_delete_clicked)
+
+    def _subtitle(self) -> str:
+        days = weekdays.subtitle(self.item.weekdays)
+        cadence = self.app.cadence(self.item)
+        if cadence is Cadence.WEEKLY:
+            return days
+        # SPECIFICATION.md §3.4: the week comes from core, for the
+        # reference date; the separator is not translated, like the days.
+        if cadence is Cadence.EVERY_OTHER_FROM_THIS_WEEK:
+            week = _("this week")
+        else:
+            week = _("next week")
+        return " · ".join((days, _("every two weeks"), week))
 
     def _on_edit_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()

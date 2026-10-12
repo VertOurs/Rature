@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
 
-"""The migration base. The format is born at version 1, so nothing to run yet."""
+"""Data format migrations, one function per version step."""
 
 from __future__ import annotations
 
 import logging
 from collections.abc import Callable
 
-CURRENT_VERSION = 1
+CURRENT_VERSION = 2
 _logger = logging.getLogger(__name__)
 
 
@@ -22,7 +22,7 @@ class FutureVersionError(Exception):
 
 
 # One entry per version step, keyed by the version it upgrades from. Each
-# function returns the data with "version" bumped. Empty until a version 2.
+# function returns the data with "version" bumped.
 _MIGRATIONS: dict[int, Callable[[dict], dict]] = {}
 
 
@@ -32,6 +32,24 @@ def _migration(from_version: int) -> Callable[[Callable[[dict], dict]], Callable
         return func
 
     return register
+
+
+@_migration(1)
+def _every_other_week(data: dict) -> dict:
+    """Version 2: every recurring template gains every_other_week_from.
+
+    null means every week, what every version 1 template was. Archive
+    files carry no "recurring" key; they only get the version bump. A
+    template that is not an object raises TypeError, which App.open
+    folds into the corrupted-file path. Builds a new dict, never edits
+    the one it was given.
+    """
+    migrated = {**data, "version": 2}
+    if "recurring" in data:
+        migrated["recurring"] = [
+            {**item, "every_other_week_from": None} for item in data["recurring"]
+        ]
+    return migrated
 
 
 def migrate(

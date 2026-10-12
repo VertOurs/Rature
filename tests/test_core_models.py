@@ -121,6 +121,26 @@ def test_recurring_item_rejects_a_weekday_out_of_range() -> None:
         RecurringItem(text="broken", weekdays=[0, 7])
 
 
+def test_every_other_week_recurring_item_round_trips() -> None:
+    item = RecurringItem(
+        text="swimming", weekdays=[1], every_other_week_from=date(2026, 12, 21)
+    )
+    assert item.to_dict()["every_other_week_from"] == "2026-12-21"
+    assert RecurringItem.from_dict(item.to_dict()) == item
+
+
+def test_a_weekly_recurring_item_stores_a_null_start() -> None:
+    item = RecurringItem(text="water plants", weekdays=[0])
+    assert item.to_dict()["every_other_week_from"] is None
+
+
+def test_recurring_item_rejects_a_start_that_is_not_a_monday() -> None:
+    with pytest.raises(ValueError, match="Monday"):
+        RecurringItem(
+            text="broken", weekdays=[1], every_other_week_from=date(2026, 12, 22)
+        )
+
+
 def test_deletion_round_trips() -> None:
     entry = Deletion(
         id="task-uuid",

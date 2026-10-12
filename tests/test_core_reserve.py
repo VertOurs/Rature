@@ -161,7 +161,7 @@ def test_send_to_reserve_refuses_a_struck_task() -> None:
 def test_send_to_reserve_refuses_a_recurring_task() -> None:
     session = make_session()
     session.add_recurring("water plants", [TODAY.weekday()])
-    (task,) = session.inject_recurring(TODAY.weekday())
+    (task,) = session.inject_recurring(TODAY)
     assert task.origin == Origin.RECURRING
     with pytest.raises(ValueError, match="reserve"):
         session.send_to_reserve(task.id, today=TODAY)

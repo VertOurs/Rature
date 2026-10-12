@@ -21,16 +21,12 @@ def test_due_on_returns_the_matching_templates_in_order() -> None:
     mon_wed = RecurringItem(text="mon/wed", weekdays=[0, 2])
     every = RecurringItem(text="every", weekdays=[0, 1, 2, 3, 4, 5, 6])
     tue = RecurringItem(text="tue", weekdays=[1])
-    assert due_on(2, [mon_wed, every, tue]) == [mon_wed, every]
+    wednesday = date(2026, 8, 26)
+    assert due_on(wednesday, [mon_wed, every, tue]) == [mon_wed, every]
 
 
 def test_due_on_an_empty_list_is_empty() -> None:
-    assert due_on(0, []) == []
-
-
-def test_due_on_rejects_a_weekday_out_of_range() -> None:
-    with pytest.raises(ValueError):
-        due_on(7, [])
+    assert due_on(TODAY, []) == []
 
 
 def test_add_recurring_appends_and_validates() -> None:
@@ -98,7 +94,7 @@ def test_inject_recurring_creates_recurring_origin_tasks() -> None:
     session.add("a day task")
     mon = session.add_recurring("monday only", [0])
     tue = session.add_recurring("tuesday only", [1])
-    created = session.inject_recurring(0)
+    created = session.inject_recurring(TODAY)  # a Monday
     assert [task.text for task in created] == ["monday only"]
     task = created[0]
     assert (task.origin, task.template_id, task.num) == (Origin.RECURRING, mon.id, 2)
@@ -111,4 +107,4 @@ def test_inject_recurring_is_refused_while_the_day_is_frozen() -> None:
     session.add_recurring("daily", [0, 1, 2, 3, 4, 5, 6])
     session.lock()
     with pytest.raises(LockedError):
-        session.inject_recurring(0)
+        session.inject_recurring(TODAY)

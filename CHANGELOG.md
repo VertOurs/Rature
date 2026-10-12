@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A recurring task can apply every two weeks. Under the days, the form
+  has an "Every two weeks" check box, unchecked by default, and two
+  toggles to pick the active week: this week or next week. The row
+  subtitle shows the cadence and whether the current week is active.
+  Weeks alternate without exception across years with 53 ISO weeks,
+  such as 2026.
+
+### Changed
+
+- The data file moves to format version 2. Version 1 files, archives
+  included, are migrated on open with no loss: every existing recurring
+  task stays weekly. Once a file has been written in version 2, earlier
+  Rature versions refuse to open it.
+
 ## [1.5.0] - 2026-10-05
 
 Two more steps of chantier 7.2, both by drag-and-drop. Chantier 7 is not

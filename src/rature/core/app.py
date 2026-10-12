@@ -16,9 +16,13 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import NamedTuple
 
-from rature.core import export, search, stats, storage
+from rature.core import export, recurrence, search, stats, storage
 from rature.core.migrations import FutureVersionError
 from rature.core.models import RecurringItem, ReserveItem, Task
+
+# Cadence is part of this module's interface: ui/ may only import
+# rature.core.app, and the recurring wrappers below take it as is.
+from rature.core.recurrence import Cadence
 
 # LockedError re-exported: ui/ may only import rature.core.app, and its
 # mutation wrappers below raise it straight from Session.
@@ -370,8 +374,15 @@ class App:
         self._save()
         return item
 
-    def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
-        item = self.session.add_recurring(text, weekdays)
+    def add_recurring(
+        self,
+        text: str,
+        weekdays: list[int],
+        cadence: Cadence = Cadence.WEEKLY,
+    ) -> RecurringItem:
+        item = self.session.add_recurring(
+            text, weekdays, cadence=cadence, today=reference_date(self.clock())
+        )
         self._save()
         return item
 
@@ -381,10 +392,25 @@ class App:
         *,
         text: str | None = None,
         weekdays: list[int] | None = None,
+        cadence: Cadence | None = None,
     ) -> RecurringItem:
-        item = self.session.edit_recurring(item_id, text=text, weekdays=weekdays)
+        item = self.session.edit_recurring(
+            item_id,
+            text=text,
+            weekdays=weekdays,
+            cadence=cadence,
+            today=reference_date(self.clock()),
+        )
         self._save()
         return item
+
+    def cadence(self, item: RecurringItem) -> Cadence:
+        """``item``'s cadence seen from the reference date's week.
+
+        Feeds the row subtitle and the form's preselection
+        (SPECIFICATION.md §3.4): the interface computes no parity.
+        """
+        return recurrence.cadence_on(item, reference_date(self.clock()))
 
     def delete_recurring(self, item_id: str) -> None:
         self.session.delete_recurring(item_id)

@@ -14,6 +14,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.core.app import Cadence  # noqa: E402
 from rature.ui import weekdays  # noqa: E402
 
 if TYPE_CHECKING:
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/recurring_form.ui")
 class RecurringForm(Adw.Dialog):
-    """A text field and seven weekday toggles, Monday first.
+    """A text field, seven weekday toggles (Monday first) and a cadence.
 
     One dialog for both create and edit. It keeps the template id, not
     the object: the 60-second timer may rebuild the session between the
@@ -37,6 +38,9 @@ class RecurringForm(Adw.Dialog):
 
     text_entry: Gtk.Entry = Gtk.Template.Child()
     days_box: Gtk.Box = Gtk.Template.Child()
+    every_other_week_check: Gtk.CheckButton = Gtk.Template.Child()
+    this_week_toggle: Gtk.ToggleButton = Gtk.Template.Child()
+    next_week_toggle: Gtk.ToggleButton = Gtk.Template.Child()
     cancel_button: Gtk.Button = Gtk.Template.Child()
     save_button: Gtk.Button = Gtk.Template.Child()
 
@@ -76,11 +80,26 @@ class RecurringForm(Adw.Dialog):
             self.text_entry.set_text(item.text)
             for day in item.weekdays:
                 self._day_toggles[day].set_active(True)
+            # SPECIFICATION.md §3.4: core says which week is active for
+            # the reference date; saving untouched sends that cadence
+            # back, and core keeps the stored Monday for it.
+            cadence = self.app.cadence(item)
+            if cadence is not Cadence.WEEKLY:
+                self.every_other_week_check.set_active(True)
+            if cadence is Cadence.EVERY_OTHER_FROM_NEXT_WEEK:
+                self.next_week_toggle.set_active(True)
 
         self.text_entry.connect("changed", lambda _e: self._validate())
         self.cancel_button.connect("clicked", lambda _b: self.close())
         self.save_button.connect("clicked", self._on_save_clicked)
         self._validate()
+
+    def _selected_cadence(self) -> Cadence:
+        if not self.every_other_week_check.get_active():
+            return Cadence.WEEKLY
+        if self.next_week_toggle.get_active():
+            return Cadence.EVERY_OTHER_FROM_NEXT_WEEK
+        return Cadence.EVERY_OTHER_FROM_THIS_WEEK
 
     def _selected_weekdays(self) -> list[int]:
         return [i for i, toggle in enumerate(self._day_toggles) if toggle.get_active()]
@@ -96,14 +115,18 @@ class RecurringForm(Adw.Dialog):
     def _on_save_clicked(self, _button: Gtk.Button) -> None:
         text = self.text_entry.get_text().strip()
         weekdays_selected = self._selected_weekdays()
+        cadence = self._selected_cadence()
         if self._item_id is None:
             saved = self.run_action(
-                lambda: self.app.add_recurring(text, weekdays_selected)
+                lambda: self.app.add_recurring(text, weekdays_selected, cadence)
             )
         else:
             saved = self.run_action(
                 lambda: self.app.edit_recurring(
-                    self._item_id, text=text, weekdays=weekdays_selected
+                    self._item_id,
+                    text=text,
+                    weekdays=weekdays_selected,
+                    cadence=cadence,
                 )
             )
         # SPECIFICATION.md §3.6: on a write failure the mutation is not

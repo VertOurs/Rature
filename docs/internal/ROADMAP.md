@@ -288,11 +288,32 @@ synchronisation avec le téléphone passe dans « Repoussé volontairement ».
 - [ ] Priorité : marqueur visuel seul, aucun effet sur l'ordre d'affichage
       ni sur les numéros. S'applique aux tâches du jour et aux items de
       réserve
-- [ ] Migration de format pour le champ de priorité. Première utilisation
-      réelle du socle `migrations.py` posé au chantier 1
+- [ ] Migration de format pour le champ de priorité, version 2 → 3. La
+      première migration réelle (1 → 2) est celle de la récurrente une
+      semaine sur deux, ci-dessous
 
 **Critère de fin** : la priorité n'a aucun effet sur l'ordre ; la
 migration s'applique sans perte sur un fichier de version antérieure.
+
+### Hors cases prévues : récurrente une semaine sur deux
+
+Ajoutée le 12 octobre 2026 sur décision de VertOurs, en dehors du cadrage
+initial du chantier 7. Besoin réel : deux activités toujours en semaine A,
+deux autres toujours en semaine B. Décisions et règle de parité :
+`SPECIFICATION.md` §2.5, §2.7.7 et §3.4.
+
+- [ ] `RecurringItem.every_other_week_from` (lundi d'une semaine active,
+      `null` pour chaque semaine) et règle de parité dans `recurrence.py`,
+      lundi calculé dans `core` à partir de la date de référence
+- [ ] Format de données version 2, migration 1 → 2 testée sur un fichier
+      principal et une archive de version 1
+- [ ] Formulaire et sous-titre de la vue Récurrentes (`SPECIFICATION.md`
+      §3.4), chaînes traduites
+
+**Critère de fin** : sur quatre semaines consécutives incluant le passage
+de 2026 à 2027, chaque semaine n'injecte que la paire attendue, jamais les
+deux, jamais aucune ; un fichier de version 1 migre sans perte et ses
+récurrentes hebdomadaires s'injectent comme avant.
 
 ### 7.3 Préparer le lendemain
 

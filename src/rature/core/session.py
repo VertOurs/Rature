@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
 from rature.core.models import Deletion, Origin, RecurringItem, ReserveItem, Task
-from rature.core.recurrence import due_on
+from rature.core.recurrence import Cadence, due_on, start_monday
 
 
 class LockedError(Exception):
@@ -288,8 +288,20 @@ class Session:
                 return item
         raise KeyError(item_id)
 
-    def add_recurring(self, text: str, weekdays: list[int]) -> RecurringItem:
-        item = RecurringItem(text=text, weekdays=list(weekdays))
+    def add_recurring(
+        self,
+        text: str,
+        weekdays: list[int],
+        *,
+        cadence: Cadence = Cadence.WEEKLY,
+        today: date | None = None,
+    ) -> RecurringItem:
+        """Append a template. ``today`` is required for every other week."""
+        item = RecurringItem(
+            text=text,
+            weekdays=list(weekdays),
+            every_other_week_from=start_monday(cadence, today),
+        )
         self.recurring.append(item)
         return item
 
@@ -299,12 +311,19 @@ class Session:
         *,
         text: str | None = None,
         weekdays: list[int] | None = None,
+        cadence: Cadence | None = None,
+        today: date | None = None,
     ) -> RecurringItem:
+        """Replace the fields given; None keeps the current value."""
         old = self._recurring_item(item_id)
+        start = old.every_other_week_from
+        if cadence is not None:
+            start = start_monday(cadence, today, start)
         new = RecurringItem(
             id=old.id,
             text=old.text if text is None else text,
             weekdays=list(old.weekdays if weekdays is None else weekdays),
+            every_other_week_from=start,
         )
         self.recurring[self.recurring.index(old)] = new
         return new
@@ -312,11 +331,11 @@ class Session:
     def delete_recurring(self, item_id: str) -> None:
         self.recurring.remove(self._recurring_item(item_id))
 
-    def inject_recurring(self, weekday: int) -> list[Task]:
+    def inject_recurring(self, day: date) -> list[Task]:
         if self.day.locked:
             raise LockedError("the list is frozen")
         created: list[Task] = []
-        for template in due_on(weekday, self.recurring):
+        for template in due_on(day, self.recurring):
             task = Task(
                 num=self.day.counter,
                 text=template.text,
@@ -358,7 +377,7 @@ class Session:
                     self.reserve.append(ReserveItem(text=task.text, created=new_date))
                     seen.add(key)
         self.day = Day(date=new_date)
-        self.inject_recurring(new_date.weekday())
+        self.inject_recurring(new_date)
         return old
 
 

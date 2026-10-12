@@ -33,10 +33,27 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   règle partagée `_moved_before` avec `move_before`), PR #145 (squash
   `b72bcce`), contrôlé par VertOurs sur des données jetables. Ordre
   porté par la liste JSON, aucune migration. Les deux livrés dans
-  `1.5.0`. Restent en 7.2 : priorité, première migration réelle de
-  `migrations.py`. **7.3**
+  `1.5.0`. Reste en 7.2 : priorité et sa migration de format, qui
+  passera en 2 → 3. **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
   commencé.
+  **Récurrente une semaine sur deux**, hors cases prévues, décidée par
+  VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
+  section dédiée du chantier 7) : branche `feat/biweekly-recurring`,
+  six commits, **non poussée**, PR à ouvrir. `RecurringItem` gagne
+  `every_other_week_from` (lundi d'une semaine active, `null` = chaque
+  semaine), parité comptée depuis ce lundi dans `recurrence.py`, jamais
+  par semaine ISO. L'interface transmet un `Cadence` à trois valeurs,
+  `App` calcule le lundi depuis la date de référence et conserve le lundi
+  stocké si la semaine choisie est déjà active. **Première migration
+  réelle** : format version 2, 1 → 2 testée sur un fichier principal et
+  une archive v1 fabriqués dans les tests, et vue tourner sur un
+  lancement réel (données jetables, bus D-Bus isolé pour ne pas croiser
+  l'instance Flatpak ouverte). Formulaire et sous-titres exercés par
+  script sur les vrais widgets ; **contrôle visuel par VertOurs
+  requis** (`CLAUDE.md` §6). Sauvegarde du dossier `data/rature` réelle
+  faite par VertOurs avant la migration, à garder jusqu'à la `1.6.0`
+  confirmée. `fr.po` : 89/89.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
 - **`1.5.0` est publiée** (5 octobre 2026, sur `//50`) : renvoi d'une
