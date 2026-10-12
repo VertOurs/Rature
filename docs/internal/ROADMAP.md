@@ -398,6 +398,14 @@ Noté ici pour ne pas y penser pendant les chantiers.
   pour la v3 sinon. Si le besoin ressurgit, attention : un suivi de
   régularité frôle la série de jours consécutifs que `SPECIFICATION.md`
   §2.3 interdit explicitement.
+- **Mettre une récurrente en pause sans la supprimer.** Candidate,
+  relevée le 12 octobre 2026 : pendant les vacances scolaires, une
+  activité s'arrête puis reprend. Aujourd'hui il faut la supprimer puis
+  la recréer, ou décocher tous ses jours, ce que `SPECIFICATION.md`
+  §2.7.2 interdit ; le besoin rejoint le motif de ce cas tranché (une
+  désactivation ne doit jamais passer par une liste de jours vide). À
+  rediscuter au cadrage de la priorité (7.2), avec qui elle pourrait
+  partager la migration de format 2 → 3. Rien de codé.
 - **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
   mais dans la maintenance de deux bases à vie, pour une personne seule.
   Voir aussi « Capture depuis le téléphone » ci-dessous.
