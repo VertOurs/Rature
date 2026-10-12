@@ -325,17 +325,34 @@ passage de 04:00. Ce n'est pas un simple ajout : `SPECIFICATION.md` §2.5
 ne connaît aujourd'hui qu'une seule journée active, et `CLAUDE.md` pose
 « sans planification » comme principe fondateur du projet (§1).
 
-- [ ] Session de cadrage dédiée avant tout code : qu'est-ce qu'on prépare
-      exactement (une liste séparée ? des tâches ajoutées au jour suivant
-      qui basculent au rollover ?), et en quoi ça reste distinct de la
-      réserve. Tranche aussi ces deux points, qui en dépendent :
-      - décaler un item du jour directement au lendemain
-      - paramètre : un item non rayé en fin de journée retourne en
-        réserve ou bascule au lendemain, au choix
-- [ ] ADR documentant la décision et son articulation avec §2.5
-- [ ] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après
+- [x] Session de cadrage dédiée avant tout code, tenue avec VertOurs le
+      12 octobre 2026 : une vue Demain, liste séparée de la journée et de
+      la réserve, qui devient la liste du prochain jour qui démarre.
+      Décaler une tâche du jour vers Demain : oui, geste explicite.
+      Paramètre de report automatique : non, voir « Repoussé
+      volontairement »
+- [x] ADR documentant la décision et son articulation avec §2.5 :
+      `docs/adr/0008-preparer-le-lendemain.md`, le 12 octobre 2026
+- [ ] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après :
+      points de détail à trancher d'abord (raccourcis, place dans le
+      panneau, suppression et annulation dans Demain, format)
+- [ ] `core` : liste Demain (ajout, renommage, réordonnancement,
+      suppression, priorité, tirage depuis la réserve), décalage d'une
+      tâche du jour vers Demain et retour de Demain vers le jour, étape 7
+      du passage du jour, récurrentes dues affichées
+- [ ] Format de données version 4, migration 3 → 4 testée sur des
+      fichiers v3 principal et archive, et chaîne depuis v1
+- [ ] Vue Demain dans le panneau latéral, entrées de menu et
+      glisser-déposer « Move to tomorrow » (jour et réserve) et « Move to
+      today », raccourcis `Ctrl+1` à `Ctrl+4` dans l'ordre du panneau,
+      chaînes traduites
 
-**Ne commence pas avant que le cadrage ci-dessus soit fait.** L'abandon du
+**Critère de fin** : une liste préparée devient la liste du jour au
+passage suivant, après les récurrentes et dans son ordre, même après
+plusieurs jours sans ouverture ; rien n'est perdu ; aucune tâche de Demain
+ne porte de numéro avant d'entrer dans une journée.
+
+**Ne commence pas avant que la spec ci-dessus soit validée.** L'abandon du
 POC (ADR 0004) vient exactement du scénario inverse : une fonctionnalité
 codée avant que la spec ne la décrive.
 
@@ -394,6 +411,16 @@ Noté ici pour ne pas y penser pendant les chantiers.
   la méthode exclut par construction (`CLAUDE.md` §1) et que
   `SPECIFICATION.md` §2.3 interdit (« pas de tri automatique, pas de
   priorisation implicite »). À revoir seulement si le besoin ressurgit.
+- **Agenda à la semaine ou au mois.** Candidate pour la v3, écartée au
+  cadrage de 7.3 le 12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`) :
+  des tâches datées sont la planification que `CLAUDE.md` §1 exclut, et
+  montrent des retards par construction. La vue Demain couvre le besoin
+  exprimé ; à revoir seulement si elle ne suffit pas.
+- **Paramètre de report automatique des tâches non rayées vers Demain.**
+  À réévaluer après deux semaines d'usage de la vue Demain, décision du
+  12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`). D'ici là, le
+  report reste un geste explicite ; une tâche non rayée suit toujours le
+  passage du jour de `SPECIFICATION.md` §2.5.
 - **Statistiques de suivi sur les récurrentes.** Abandonnée le
   8 septembre 2026, le temps de voir si le besoin persiste ; candidate
   pour la v3 sinon. Si le besoin ressurgit, attention : un suivi de

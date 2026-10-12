@@ -44,9 +44,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   Entrée de menu et icône `starred-symbolic` (accent) dans les vues Jour
   et Réserve, colonne conservée par `set_child_visible` ; widgets
   exercés par script, contrôlés visuellement par VertOurs le
-  12 octobre 2026. 7.2 est complète ; **7.3**
-  (préparer le lendemain, cadrage dédié requis avant tout code) pas
-  commencé.
+  12 octobre 2026. 7.2 est complète. **7.3** (préparer le lendemain) :
+  cadrage tenu avec VertOurs le 12 octobre 2026, décision dans
+  `docs/adr/0008-preparer-le-lendemain.md` (vue Demain, liste séparée qui
+  devient la liste du prochain jour qui démarre, après les récurrentes ;
+  décalage explicite depuis le jour ; ni agenda ni report automatique).
+  Seize points de détail validés par VertOurs le même jour (raccourcis
+  `Ctrl+1` à `Ctrl+4` dans l'ordre du panneau, « Move to tomorrow » et
+  « Move to today », barre « Add a task for tomorrow… », format v4…).
+  **Aucun code** : ces points sont à reporter dans `SPECIFICATION.md`
+  avant toute implémentation, pas encore fait.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
   VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
   section dédiée du chantier 7) : PR #148 (squash `6dda0d2`, pied
@@ -76,15 +83,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   Reconstruction du paquet AUR en conteneur non tentée. `1.7.0` et
   antérieures restent taguées. `flatpak update` vers `1.7.1` lancé par
   l'agent le 12 octobre 2026 (`flatpak info` : `1.7.1`, runtime
-  `org.gnome.Platform/x86_64/51`). Reste, hors agent (`CLAUDE.md` §6) :
-  relancer Rature et vérifier l'application installée sous `//51`,
-  contrôle visuel de la page GitHub Pages.
+  `org.gnome.Platform/x86_64/51`). Application installée relancée et
+  vérifiée sous `//51` par VertOurs le 12 octobre 2026, page GitHub Pages
+  contrôlée le même jour : rien ne reste à sa charge pour `1.7.1`.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour. `1.7.0` → `1.7.1` : `flatpak update` lancé par l'agent le 12 octobre 2026, passage au runtime `//51`, sans migration.
+  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour. `1.7.0` → `1.7.1` : `flatpak update` lancé par l'agent le 12 octobre 2026, passage au runtime `//51`, sans migration, confirmé par VertOurs le même jour.
 - **Bump runtime `//50` → `//51`** : PR #156 (squash `f9d8537`), livré dans `1.7.1`, avancé au
   12 octobre 2026 par décision de VertOurs (GNOME 51 sorti le
   16 septembre, image CI `gnome-51` publiée). Manifeste et image CI
