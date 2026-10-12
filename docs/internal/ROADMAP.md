@@ -302,13 +302,14 @@ initial du chantier 7. Besoin réel : deux activités toujours en semaine A,
 deux autres toujours en semaine B. Décisions et règle de parité :
 `SPECIFICATION.md` §2.5, §2.7.7 et §3.4.
 
-- [ ] `RecurringItem.every_other_week_from` (lundi d'une semaine active,
+- [x] `RecurringItem.every_other_week_from` (lundi d'une semaine active,
       `null` pour chaque semaine) et règle de parité dans `recurrence.py`,
-      lundi calculé dans `core` à partir de la date de référence
-- [ ] Format de données version 2, migration 1 → 2 testée sur un fichier
-      principal et une archive de version 1
-- [ ] Formulaire et sous-titre de la vue Récurrentes (`SPECIFICATION.md`
-      §3.4), chaînes traduites
+      lundi calculé dans `core` à partir de la date de référence, le
+      12 octobre 2026
+- [x] Format de données version 2, migration 1 → 2 testée sur un fichier
+      principal et une archive de version 1, le 12 octobre 2026
+- [x] Formulaire et sous-titre de la vue Récurrentes (`SPECIFICATION.md`
+      §3.4), chaînes traduites, le 12 octobre 2026
 
 **Critère de fin** : sur quatre semaines consécutives incluant le passage
 de 2026 à 2027, chaque semaine n'injecte que la paire attendue, jamais les
