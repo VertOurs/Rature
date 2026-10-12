@@ -36,6 +36,7 @@ class Task:
     source_id: str | None = None
     source_created: date | None = None
     template_id: str | None = None
+    priority: bool = False
 
     def __post_init__(self) -> None:
         if self.done_at is not None and self.done_at.tzinfo is None:
@@ -71,6 +72,7 @@ class Task:
                 self.source_created.isoformat() if self.source_created else None
             ),
             "template_id": self.template_id,
+            "priority": self.priority,
         }
 
     @classmethod
@@ -89,6 +91,7 @@ class Task:
                 date.fromisoformat(source_created) if source_created else None
             ),
             template_id=data["template_id"],
+            priority=data["priority"],
         )
 
 
@@ -99,12 +102,14 @@ class ReserveItem:
     text: str
     created: date
     id: str = field(default_factory=_new_id)
+    priority: bool = False
 
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "text": self.text,
             "created": self.created.isoformat(),
+            "priority": self.priority,
         }
 
     @classmethod
@@ -113,6 +118,7 @@ class ReserveItem:
             id=data["id"],
             text=data["text"],
             created=date.fromisoformat(data["created"]),
+            priority=data["priority"],
         )
 
 
@@ -164,8 +170,8 @@ class Deletion:
     """A journal entry for a deleted task. Never shown, see ADR 0005.
 
     Carries enough of the task's state (done, done_at, source_created,
-    template_id, index) to restore it exactly, as milestone 4's undo
-    will need to.
+    template_id, priority, index) to restore it exactly, as milestone
+    4's undo will need to.
     """
 
     id: str
@@ -179,6 +185,7 @@ class Deletion:
     template_id: str | None = None
     done: bool = False
     done_at: datetime | None = None
+    priority: bool = False
 
     def __post_init__(self) -> None:
         if self.deleted_at.tzinfo is None:
@@ -199,6 +206,7 @@ class Deletion:
             "template_id": self.template_id,
             "done": self.done,
             "done_at": self.done_at.isoformat() if self.done_at else None,
+            "priority": self.priority,
             "index": self.index,
             "deleted_at": self.deleted_at.isoformat(),
         }
@@ -219,6 +227,7 @@ class Deletion:
             template_id=data["template_id"],
             done=data["done"],
             done_at=datetime.fromisoformat(done_at) if done_at else None,
+            priority=data["priority"],
             index=data["index"],
             deleted_at=datetime.fromisoformat(data["deleted_at"]),
         )

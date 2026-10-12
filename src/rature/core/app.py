@@ -326,6 +326,10 @@ class App:
         self.session.rename(task_id, text)
         self._save()
 
+    def set_priority(self, task_id: str, priority: bool) -> None:
+        self.session.set_priority(task_id, priority)
+        self._save()
+
     def delete(self, task_id: str) -> None:
         self.session.delete(task_id, now=self.clock())
         self._save()
@@ -354,6 +358,10 @@ class App:
 
     def rename_reserve(self, item_id: str, text: str) -> None:
         self.session.rename_reserve(item_id, text)
+        self._save()
+
+    def set_reserve_priority(self, item_id: str, priority: bool) -> None:
+        self.session.set_reserve_priority(item_id, priority)
         self._save()
 
     def delete_from_reserve(self, item_id: str) -> None:

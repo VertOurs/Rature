@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 
-CURRENT_VERSION = 2
+CURRENT_VERSION = 3
 _logger = logging.getLogger(__name__)
 
 
@@ -49,6 +49,22 @@ def _every_other_week(data: dict) -> dict:
         migrated["recurring"] = [
             {**item, "every_other_week_from": None} for item in data["recurring"]
         ]
+    return migrated
+
+
+@_migration(2)
+def _priority(data: dict) -> dict:
+    """Version 3: tasks, deletion entries and reserve items gain priority.
+
+    false for all of them, what every version 2 entry was. Archive files
+    carry no "reserve" key; their tasks and deletions still get the
+    field. Same guarantees as _every_other_week: a new dict, and an
+    entry that is not an object raises TypeError.
+    """
+    migrated = {**data, "version": 3}
+    for key in ("tasks", "deletions", "reserve"):
+        if key in data:
+            migrated[key] = [{**entry, "priority": False} for entry in data[key]]
     return migrated
 
 

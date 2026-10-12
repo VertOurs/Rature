@@ -140,6 +140,14 @@ class Session:
     def rename(self, task_id: str, text: str) -> None:
         self._task(task_id).text = text
 
+    def set_priority(self, task_id: str, priority: bool) -> None:
+        """Mark or unmark a task. SPECIFICATION.md §2.5: a marker only.
+
+        Never touches the order or the number. Allowed on a frozen list
+        and on a struck task, like a rename (§2.1 point 3).
+        """
+        self._task(task_id).priority = priority
+
     def delete(self, task_id: str, *, now: datetime) -> None:
         task = self._task(task_id)
         index = self.day.tasks.index(task)
@@ -154,6 +162,7 @@ class Session:
                 template_id=task.template_id,
                 done=task.done,
                 done_at=task.done_at,
+                priority=task.priority,
                 index=index,
                 deleted_at=_stamp(now),
             )
@@ -183,6 +192,7 @@ class Session:
             source_id=entry.source_id,
             source_created=entry.source_created,
             template_id=entry.template_id,
+            priority=entry.priority,
         )
         self.day.tasks.insert(min(entry.index, len(self.day.tasks)), task)
         return task
@@ -228,6 +238,10 @@ class Session:
     def rename_reserve(self, item_id: str, text: str) -> None:
         self._reserve_item(item_id).text = text
 
+    def set_reserve_priority(self, item_id: str, priority: bool) -> None:
+        """Mark or unmark a reserve item; never moves it (§2.5)."""
+        self._reserve_item(item_id).priority = priority
+
     def delete_from_reserve(self, item_id: str) -> None:
         self.reserve.remove(self._reserve_item(item_id))
 
@@ -251,6 +265,7 @@ class Session:
             origin=Origin.RESERVE,
             source_id=item.id,
             source_created=item.created,
+            priority=item.priority,
         )
         self.day.counter += 1
         self.day.tasks.append(task)
@@ -272,12 +287,15 @@ class Session:
             # Same as the rollover's point 2: the original item comes back,
             # renamed text included (SPECIFICATION.md §2.7.1).
             item = ReserveItem(
-                id=task.source_id, text=task.text, created=task.source_created
+                id=task.source_id,
+                text=task.text,
+                created=task.source_created,
+                priority=task.priority,
             )
         else:
             # SPECIFICATION.md §2.7.4: an explicit gesture, never
             # de-duplicated, unlike the rollover's point 3.
-            item = ReserveItem(text=task.text, created=today)
+            item = ReserveItem(text=task.text, created=today, priority=task.priority)
         self.day.tasks.remove(task)
         self.reserve.append(item)
         return item
@@ -367,15 +385,27 @@ class Session:
                         id=task.source_id,
                         text=task.text,
                         created=task.source_created,
+                        priority=task.priority,
                     )
                 )
-        seen = {_norm(item.text) for item in self.reserve}
+        # The first item per normalised text: the one a duplicate is
+        # compared against, and the one it hands its priority to
+        # (SPECIFICATION.md §2.7.8).
+        seen: dict[str, ReserveItem] = {}
+        for item in self.reserve:
+            seen.setdefault(_norm(item.text), item)
         for task in old.tasks:
             if not task.done and task.origin == Origin.DAY:
                 key = _norm(task.text)
-                if key not in seen:
-                    self.reserve.append(ReserveItem(text=task.text, created=new_date))
-                    seen.add(key)
+                if key in seen:
+                    if task.priority:
+                        seen[key].priority = True
+                    continue
+                item = ReserveItem(
+                    text=task.text, created=new_date, priority=task.priority
+                )
+                self.reserve.append(item)
+                seen[key] = item
         self.day = Day(date=new_date)
         self.inject_recurring(new_date)
         return old
