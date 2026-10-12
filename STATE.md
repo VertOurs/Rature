@@ -44,9 +44,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   Entrée de menu et icône `starred-symbolic` (accent) dans les vues Jour
   et Réserve, colonne conservée par `set_child_visible` ; widgets
   exercés par script, contrôlés visuellement par VertOurs le
-  12 octobre 2026. 7.2 est complète ; **7.3**
-  (préparer le lendemain, cadrage dédié requis avant tout code) pas
-  commencé.
+  12 octobre 2026. 7.2 est complète. **7.3** (préparer le lendemain) :
+  cadrage tenu avec VertOurs le 12 octobre 2026, décision dans
+  `docs/adr/0008-preparer-le-lendemain.md` (vue Demain, liste séparée qui
+  devient la liste du prochain jour qui démarre, après les récurrentes ;
+  décalage explicite depuis le jour ; ni agenda ni report automatique).
+  Seize points de détail validés par VertOurs le même jour (raccourcis
+  `Ctrl+1` à `Ctrl+4` dans l'ordre du panneau, « Move to tomorrow » et
+  « Move to today », barre « Add a task for tomorrow… », format v4…).
+  **Aucun code** : ces points sont à reporter dans `SPECIFICATION.md`
+  avant toute implémentation, pas encore fait.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
   VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
   section dédiée du chantier 7) : PR #148 (squash `6dda0d2`, pied
