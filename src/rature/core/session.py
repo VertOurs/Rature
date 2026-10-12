@@ -312,11 +312,11 @@ class Session:
     def delete_recurring(self, item_id: str) -> None:
         self.recurring.remove(self._recurring_item(item_id))
 
-    def inject_recurring(self, weekday: int) -> list[Task]:
+    def inject_recurring(self, day: date) -> list[Task]:
         if self.day.locked:
             raise LockedError("the list is frozen")
         created: list[Task] = []
-        for template in due_on(weekday, self.recurring):
+        for template in due_on(day, self.recurring):
             task = Task(
                 num=self.day.counter,
                 text=template.text,
@@ -358,7 +358,7 @@ class Session:
                     self.reserve.append(ReserveItem(text=task.text, created=new_date))
                     seen.add(key)
         self.day = Day(date=new_date)
-        self.inject_recurring(new_date.weekday())
+        self.inject_recurring(new_date)
         return old
 
 

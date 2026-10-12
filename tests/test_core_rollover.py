@@ -188,7 +188,7 @@ def test_internal_spaces_are_not_normalised_for_the_dedup() -> None:
 def test_an_unfinished_recurring_task_is_not_carried_to_the_reserve() -> None:
     daily = RecurringItem(text="water", weekdays=[0, 1, 2, 3, 4, 5, 6])
     session = session_on(D24, recurring=[daily])
-    old_task = session.inject_recurring(D24.weekday())[0]
+    old_task = session.inject_recurring(D24)[0]
     session.roll_over(NEXT_MORNING)
     assert session.reserve == []
     assert [task.text for task in session.day.tasks] == ["water"]
