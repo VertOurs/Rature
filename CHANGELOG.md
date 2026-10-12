@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The Flatpak now runs on the GNOME 51 runtime instead of GNOME 50.
+
 ## [1.7.0] - 2026-10-12
 
 Priority, the last step of chantier 7.2. The data file moves to format

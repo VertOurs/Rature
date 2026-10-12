@@ -22,25 +22,41 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       # pip 25.1+ is required for `--group`; setup-python does not guarantee it.
       - run: python -m pip install --upgrade pip
       - run: pip install --group dev
       - run: ruff check .
       - run: ruff format --check .
 
-  test:
+  # The floor (3.13, Mageia 10) and the runtime (3.14, GNOME 51): ruff's
+  # py313 target blocks 3.14-only syntax, not a 3.14-only stdlib call.
+  test-python:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.13', '3.14']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: '3.13'
+          python-version: ${{ matrix.python-version }}
       # msgfmt, for tests/test_translations.py: no skipif, it must run here.
       - run: sudo apt-get update && sudo apt-get install --yes gettext
       - run: python -m pip install --upgrade pip
       - run: pip install --group dev
       - run: pytest --cov=rature.core --cov-branch --cov-fail-under=100
+
+  # The ruleset on main requires a check named exactly "test"; a matrix
+  # reports "test-python (3.13)" and "test-python (3.14)" instead. This
+  # job keeps that name and passes only when every leg passed.
+  test:
+    needs: test-python
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.test-python.result }}" = success
 
   meson:
     runs-on: ubuntu-latest
@@ -48,7 +64,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       - run: >
           sudo apt-get update && sudo apt-get install --yes
           ninja-build libglib2.0-dev libglib2.0-dev-bin gettext
@@ -64,9 +80,9 @@ jobs:
   flatpak:
     runs-on: ubuntu-latest
     container:
-      # gnome-50, pinned by digest, per manifest index (§4 rule 8: Dependabot
+      # gnome-51, pinned by digest, per manifest index (§4 rule 8: Dependabot
       # does not track this reference, see STATE.md for the manual bump).
-      image: ghcr.io/flathub-infra/flatpak-github-actions@sha256:1de59efef01a946d9f28f1ec3458bf6f61dcee3507d7fecdd473f8134da4ec77
+      image: ghcr.io/flathub-infra/flatpak-github-actions@sha256:78d969b18225ae107ca29497bf09c4a3f791e5f1838a9a912a529d0024fb6210
       options: --privileged
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
