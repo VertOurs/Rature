@@ -29,18 +29,34 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
 
-  test:
+  # The floor (3.13, Mageia 10) and the runtime (3.14, GNOME 51): ruff's
+  # py313 target blocks 3.14-only syntax, not a 3.14-only stdlib call.
+  test-python:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.13', '3.14']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: '3.14'
+          python-version: ${{ matrix.python-version }}
       # msgfmt, for tests/test_translations.py: no skipif, it must run here.
       - run: sudo apt-get update && sudo apt-get install --yes gettext
       - run: python -m pip install --upgrade pip
       - run: pip install --group dev
       - run: pytest --cov=rature.core --cov-branch --cov-fail-under=100
+
+  # The ruleset on main requires a check named exactly "test"; a matrix
+  # reports "test-python (3.13)" and "test-python (3.14)" instead. This
+  # job keeps that name and passes only when every leg passed.
+  test:
+    needs: test-python
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.test-python.result }}" = success
 
   meson:
     runs-on: ubuntu-latest
