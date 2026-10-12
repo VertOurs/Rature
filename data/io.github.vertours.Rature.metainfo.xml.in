@@ -65,6 +65,14 @@
   </screenshots>
 
   <releases>
+    <release version="1.7.1" date="2026-10-12">
+      <description>
+        <p>
+          Rature now runs on the GNOME 51 runtime. No new feature and no
+          change to the data format.
+        </p>
+      </description>
+    </release>
     <release version="1.7.0" date="2026-10-12">
       <description>
         <p>

@@ -86,7 +86,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
   (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour.
-- **Bump runtime `//50` → `//51`** : branche `build/gnome-51`, avancé au
+- **Bump runtime `//50` → `//51`** : PR #156 (squash `f9d8537`), livré dans `1.7.1`, avancé au
   12 octobre 2026 par décision de VertOurs (GNOME 51 sorti le
   16 septembre, image CI `gnome-51` publiée). Manifeste et image CI
   seuls ; les planchers Python et Meson ne bougent pas (voir « Versions
@@ -95,8 +95,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   aucun avertissement GTK ni libadwaita. Seuls signalements, forcés par
   `warnings.simplefilter("always")` : deux `DeprecationWarning` internes
   à PyGObject 3.58 (`gi/events.py`, API `asyncio` retirées en
-  Python 3.16), hors de notre code. **Contrôle visuel complet par
-  VertOurs requis avant fusion.**
+  Python 3.16), hors de notre code. Contrôle visuel complet sous `//51`
+  fait par VertOurs le 12 octobre 2026, avant fusion.
 - **Image CI épinglée par digest, mise à jour manuelle** : `ci.yml` et
   `release.yml` référencent
   `ghcr.io/flathub-infra/flatpak-github-actions` par digest plutôt que
@@ -151,7 +151,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `1.7.0` | Priorité (fin de 7.2), format de données version 3. Coupée le 12 octobre 2026 |
+| Version du projet | `1.7.1` | Runtime GNOME 51, sans changement fonctionnel ni de format. Coupée le 12 octobre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -205,6 +205,9 @@ plus lisible par `1.5.0` et antérieures.
 (PR #152), et le format de données version 3. Mineure pour la même
 raison que `1.6.0`. Un fichier écrit en version 3 n'est plus lisible par
 `1.6.0` et antérieures.
+
+`1.7.1` (12 octobre 2026) passe le runtime à GNOME 51 (PR #156).
+Corrective : aucune fonctionnalité, aucun changement de format.
 
 **Bump vers GNOME 51** : avancé au 12 octobre 2026 par décision de
 VertOurs, initialement prévu pas avant le 16 octobre. Touche le

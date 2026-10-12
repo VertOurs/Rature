@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-10-12
+
+Runtime update only: no new feature and no change to the data format.
+
 ### Changed
 
 - The Flatpak now runs on the GNOME 51 runtime instead of GNOME 50.
@@ -434,7 +438,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/VertOurs/Rature/releases/tag/v1.7.1
 [1.7.0]: https://github.com/VertOurs/Rature/releases/tag/v1.7.0
 [1.6.0]: https://github.com/VertOurs/Rature/releases/tag/v1.6.0
 [1.5.0]: https://github.com/VertOurs/Rature/releases/tag/v1.5.0
