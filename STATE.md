@@ -39,8 +39,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   commencé.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
   VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
-  section dédiée du chantier 7) : branche `feat/biweekly-recurring`,
-  six commits, **non poussée**, PR à ouvrir. `RecurringItem` gagne
+  section dédiée du chantier 7) : PR #148 (squash `6dda0d2`, pied
+  `BREAKING CHANGE`), livrée dans `1.6.0`. `RecurringItem` gagne
   `every_other_week_from` (lundi d'une semaine active, `null` = chaque
   semaine), parité comptée depuis ce lundi dans `recurrence.py`, jamais
   par semaine ISO. L'interface transmet un `Cadence` à trois valeurs,
@@ -50,10 +50,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   une archive v1 fabriqués dans les tests, et vue tourner sur un
   lancement réel (données jetables, bus D-Bus isolé pour ne pas croiser
   l'instance Flatpak ouverte). Formulaire et sous-titres exercés par
-  script sur les vrais widgets ; **contrôle visuel par VertOurs
-  requis** (`CLAUDE.md` §6). Sauvegarde du dossier `data/rature` réelle
-  faite par VertOurs avant la migration, à garder jusqu'à la `1.6.0`
-  confirmée. `fr.po` : 89/89.
+  script sur les vrais widgets, contrôlés visuellement par VertOurs le
+  12 octobre 2026 ; libellé « every two weeks » retenu à ce contrôle.
+  Sauvegarde du dossier `data/rature` réel faite par VertOurs avant la
+  migration, à garder jusqu'à la `1.6.0` confirmée sur ses données.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
 - **`1.5.0` est publiée** (5 octobre 2026, sur `//50`) : renvoi d'une
@@ -130,7 +130,7 @@ manifeste (`CLAUDE.md` §4 règle 8).
 |---|---|---|
 | Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
 | Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
-| Version du projet | `1.5.0` | Renvoi par glisser-déposer et réordonnancement de la réserve. Coupée le 5 octobre 2026 |
+| Version du projet | `1.6.0` | Récurrente une semaine sur deux, format de données version 2. Coupée le 12 octobre 2026 |
 | Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -172,6 +172,13 @@ revue de code (PR #142). Corrective.
 glisser-déposer sur l'entrée Reserve (PR #144) et le réordonnancement
 de la réserve par glisser-déposer (PR #145). Mineure : deux
 fonctionnalités, aucune migration de format.
+
+`1.6.0` (12 octobre 2026) publie la récurrente une semaine sur deux
+(PR #148) et le format de données version 2, première migration réelle.
+Mineure : le changement de format serait majeur en SemVer strict, mais
+`ROADMAP.md` réserve `2.0.0` à la fin du chantier 8 et prévaut
+(`CONTRIBUTING.md`, « Versioning »). Un fichier écrit en version 2 n'est
+plus lisible par `1.5.0` et antérieures.
 
 **Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
 sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le

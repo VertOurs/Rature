@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-12
+
+Recurring tasks every two weeks, decided outside the planned steps of
+chantier 7. The data file moves to format version 2: the first real
+migration, applied on open. Chantier 7 is not closed: priority and its
+data migration, then 7.3, remain (`docs/internal/ROADMAP.md`).
+
 ### Added
 
 - A recurring task can apply every two weeks. Under the days, the form
@@ -400,7 +407,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/VertOurs/Rature/releases/tag/v1.6.0
 [1.5.0]: https://github.com/VertOurs/Rature/releases/tag/v1.5.0
 [1.4.1]: https://github.com/VertOurs/Rature/releases/tag/v1.4.1
 [1.4.0]: https://github.com/VertOurs/Rature/releases/tag/v1.4.0
