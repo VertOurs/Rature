@@ -33,8 +33,18 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   règle partagée `_moved_before` avec `move_before`), PR #145 (squash
   `b72bcce`), contrôlé par VertOurs sur des données jetables. Ordre
   porté par la liste JSON, aucune migration. Les deux livrés dans
-  `1.5.0`. Reste en 7.2 : priorité et sa migration de format, qui
-  passera en 2 → 3. **7.3**
+  `1.5.0`. **Priorité**, dernière case de 7.2, le 12 octobre 2026
+  (spec §2.1, §2.5, §2.7.8, §3.2, §3.3, §3.8, §3.9) : branche
+  `feat/priority`, cinq commits, **non poussée**. `priority` sur `Task`,
+  `ReserveItem` et `Deletion`, aucun effet sur l'ordre ni les numéros
+  (testé), suit la tâche au tirage, au renvoi, au passage du jour et à
+  l'annulation ; un doublon marqué écarté au passage du jour marque
+  l'item existant (§2.7.8). Format version 3, migration 2 → 3 testée sur
+  des fichiers v2 principal et archive fabriqués, et chaîne 1 → 3.
+  Entrée de menu et icône `starred-symbolic` (accent) dans les vues Jour
+  et Réserve, colonne conservée par `set_child_visible` ; widgets
+  exercés par script, **contrôle visuel par VertOurs requis**
+  (`CLAUDE.md` §6). `fr.po` : 93/93. 7.2 est complète ; **7.3**
   (préparer le lendemain, cadrage dédié requis avant tout code) pas
   commencé.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
