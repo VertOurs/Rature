@@ -139,6 +139,17 @@ inverse est le tirage.
 **Récurrentes** : modèles de tâches associés à des jours de la semaine,
 injectés automatiquement au passage à une nouvelle journée.
 
+**Récurrente une semaine sur deux** : un modèle peut ne valoir qu'une
+semaine sur deux. Il porte alors, en plus de ses jours, le lundi d'une
+semaine active (`every_other_week_from`). Absent (`null`), le modèle vaut
+chaque semaine, comme avant. Un modèle est dû à la date D si le jour de D
+fait partie de ses jours et, s'il est une semaine sur deux, si le nombre de
+semaines entre ce lundi et le lundi de D est pair (§2.7.7). L'utilisateur ne
+saisit jamais de date : il choisit « cette semaine » ou « la semaine
+prochaine » comme semaine active, `core` en déduit le lundi à partir de la
+date de référence. Ajouté au chantier 7, hors des cases prévues, sur
+décision de VertOurs.
+
 **Date de référence** : la date locale, jamais UTC. La bascule d'un jour à
 l'autre a lieu à 04:00 heure locale. Une liste remplie à 01:00 appartient à
 la journée de la veille. Au changement d'heure, la bascule suit l'heure
@@ -280,6 +291,45 @@ nuit par an.
 
 Le champ `created` des items de réserve reste une date simple, sans heure. Il
 n'est pas concerné.
+
+**2.7.7 Parité d'une récurrente une semaine sur deux**
+
+Ajouté le 12 octobre 2026. La parité se compte en semaines écoulées depuis
+le lundi stocké dans `every_other_week_from`, jamais par le numéro de
+semaine ISO.
+
+Une année ISO compte parfois 53 semaines : 2026 en compte 53. Les semaines
+53 de 2026 et 1 de 2027 se suivent et sont toutes deux impaires. Une parité
+ISO injecterait la même récurrente deux semaines de suite, puis l'oublierait
+deux semaines de suite pour l'autre groupe. Le compte depuis un lundi fixe
+ne connaît pas l'année et alterne sans exception.
+
+Conséquences :
+
+- `core` refuse un `every_other_week_from` qui n'est pas un lundi
+- le lundi est calculé dans `core`, à partir de la date de référence
+  (bascule 04:00, §2.5), jamais dans l'interface. Un dimanche à 02:00
+  appartient encore à la semaine qui finit
+- modifier le seul texte ou les seuls jours d'une récurrente ne décale pas
+  ses semaines. Choisir de nouveau la semaine déjà active n'y change rien
+  non plus : le lundi stocké est conservé
+- une modification n'a jamais d'effet rétroactif sur la journée en cours :
+  l'injection n'a lieu qu'au passage du jour, comme pour toute récurrente
+- si plusieurs jours se sont écoulés, seules les récurrentes dues à la date
+  de référence sont injectées (§2.5), la parité ne change rien à cette règle
+
+Le choix transmis par l'interface a trois valeurs explicites, une par état
+du formulaire : chaque semaine (case décochée), une semaine sur deux active
+cette semaine, une semaine sur deux active la semaine prochaine. Repasser
+une récurrente en hebdomadaire est donc possible : son
+`every_other_week_from` redevient `null`.
+
+**Limite acceptée** : un formulaire laissé ouvert pendant la bascule du
+lundi 04:00 interprète le choix avec la nouvelle semaine. « This week »
+désigne alors la semaine qui vient de commencer. Aucun code ne le corrige :
+le cas demande de garder le formulaire ouvert pendant la nuit du dimanche
+au lundi, et le sous-titre de la ligne montre le résultat dès
+l'enregistrement.
 
 ---
 
@@ -541,12 +591,19 @@ réserve (§2.1 point 3).
 │  ├──────────────────────────────────────────────┤  │
 │  │  weekly backup                           ⋮   │  │
 │  │  Sun                                         │  │
+│  ├──────────────────────────────────────────────┤  │
+│  │  swimming                                ⋮   │  │
+│  │  Tue Thu · every two weeks · this week       │  │
 │  └──────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────┘
 ```
 
 Une `AdwActionRow` par modèle : le texte en titre, les jours en sous-titre,
-abrégés et dans l'ordre de la semaine, lundi premier. Pas de barre de saisie
+abrégés et dans l'ordre de la semaine, lundi premier. Pour une récurrente
+une semaine sur deux (§2.5), le sous-titre ajoute `· every two weeks`
+puis `· this week` si la semaine de la date de référence est active, sinon
+`· next week`. Cette information vient de `core`, l'interface ne calcule
+aucune parité. Pas de barre de saisie
 en pied : la création demande un texte et des jours, donc un formulaire.
 
 Le bouton `+` de l'en-tête ouvre le formulaire de création. Le menu de ligne
@@ -562,8 +619,25 @@ contient Edit, qui ouvre le même formulaire prérempli, puis Delete.
 │                                          │
 │  Days                                    │
 │  (Mon)(Tue)(Wed)(Thu)(Fri)(Sat)(Sun)     │
+│                                          │
+│  [x] Every two weeks                     │
+│  (This week)(Next week)                  │
 └──────────────────────────────────────────┘
 ```
+
+Sous les jours, une case à cocher `Every two weeks`, **décochée par
+défaut** : pour une récurrente hebdomadaire, le formulaire se remplit
+exactement comme avant. Cochée, elle révèle deux bascules exclusives,
+`This week` et `Next week`, groupées et du même style que les jours,
+`This week` active par défaut. Elles désignent la semaine active à partir de
+la date de référence ; l'interface ne transmet que ce choix, `core` en
+déduit le lundi (§2.7.7). Décochée, les deux bascules sont masquées et la
+récurrente redevient hebdomadaire à l'enregistrement.
+
+En édition d'une récurrente une semaine sur deux, la case est cochée et la
+bascule présélectionnée est celle que `core` indique pour la date de
+référence : `This week` si la semaine courante est active, sinon
+`Next week`. Enregistrer sans y toucher ne décale donc pas les semaines.
 
 Sept boutons bascules, lundi à gauche. **Save est insensible tant que le
 texte est vide ou qu'aucun jour n'est coché.** L'interdiction de §2.7.2 se
@@ -702,7 +776,8 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Infobulle de renvoi | `Send back to the reserve` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
 | Infobulle d'ajout de récurrente | `Add a recurring task` |
-| Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Cancel`, `Save` |
+| Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Every two weeks`, `This week`, `Next week`, `Cancel`, `Save` |
+| Sous-titre de récurrente une semaine sur deux | `every two weeks`, `this week`, `next week` |
 | Vue Jour vide | `The list is empty.` |
 | Réserve vide | `The reserve is empty.` |
 | Récurrentes vides | `No recurring tasks.` |
