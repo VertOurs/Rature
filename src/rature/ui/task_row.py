@@ -44,7 +44,9 @@ class TaskRow(Gtk.ListBoxRow):
     strike_button: Gtk.Button = Gtk.Template.Child()
     row_popover: Gtk.Popover = Gtk.Template.Child()
     rename_button: Gtk.Button = Gtk.Template.Child()
+    priority_button: Gtk.Button = Gtk.Template.Child()
     delete_button: Gtk.Button = Gtk.Template.Child()
+    priority_icon: Gtk.Image = Gtk.Template.Child()
 
     def __init__(
         self,
@@ -80,10 +82,17 @@ class TaskRow(Gtk.ListBoxRow):
         # nor focusable, but keeps its width, so the number and text
         # columns line up with the rows that do show it.
         self.send_back_button.set_child_visible(task.can_go_back_to_reserve)
+        # SPECIFICATION.md §3.2: same trick for the priority column, so
+        # an unmarked row keeps the slot and nothing shifts.
+        self.priority_icon.set_child_visible(task.priority)
+        self.priority_button.set_label(
+            _("Remove priority") if task.priority else _("Mark as priority")
+        )
 
         self.send_back_button.connect("clicked", self._on_send_back_clicked)
         self.strike_button.connect("clicked", self._on_strike_clicked)
         self.rename_button.connect("clicked", self._on_rename_clicked)
+        self.priority_button.connect("clicked", self._on_priority_clicked)
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
         self._rename = InlineRename(
@@ -175,6 +184,14 @@ class TaskRow(Gtk.ListBoxRow):
     def _on_delete_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
         self.run_action(lambda: self.app.delete(self.task.id))
+
+    def _on_priority_clicked(self, _button: Gtk.Button) -> None:
+        # Allowed on a frozen list and a struck task, like a rename
+        # (SPECIFICATION.md §3.2).
+        self.row_popover.popdown()
+        self.run_action(
+            lambda: self.app.set_priority(self.task.id, not self.task.priority)
+        )
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
