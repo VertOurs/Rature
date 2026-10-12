@@ -66,6 +66,31 @@
                 <child><object class="GtkToggleButton"/></child>
               </object>
             </child>
+            <child>
+              <object class="GtkCheckButton" id="every_other_week_check">
+                <property name="label" translatable="yes">Every two weeks</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="spacing">6</property>
+                <property name="homogeneous">True</property>
+                <property name="visible" bind-source="every_other_week_check" bind-property="active" bind-flags="sync-create"/>
+                <child>
+                  <object class="GtkToggleButton" id="this_week_toggle">
+                    <property name="label" translatable="yes">This week</property>
+                    <property name="active">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkToggleButton" id="next_week_toggle">
+                    <property name="label" translatable="yes">Next week</property>
+                    <property name="group">this_week_toggle</property>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </property>
       </object>
