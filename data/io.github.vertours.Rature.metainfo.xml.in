@@ -65,6 +65,16 @@
   </screenshots>
 
   <releases>
+    <release version="1.7.0" date="2026-10-12">
+      <description>
+        <p>
+          Tasks and reserve items can be marked as priority from their row
+          menu. The marker never changes the order or the numbers. Existing
+          data is migrated on first launch; earlier versions of Rature can
+          no longer open it afterwards.
+        </p>
+      </description>
+    </release>
     <release version="1.6.0" date="2026-10-12">
       <description>
         <p>
