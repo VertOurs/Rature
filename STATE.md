@@ -86,20 +86,26 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
   (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour.
-- **Suivi ouvert** : bump runtime `//50` → `//51`, pas avant le
-  16 octobre 2026 (un mois après la sortie stable du 16 septembre,
-  choix délibéré de VertOurs pour laisser mûrir le runtime), et sous
-  réserve que l'image CI `gnome-51` existe à cette date (voir « Versions
-  retenues »).
+- **Bump runtime `//50` → `//51`** : branche `build/gnome-51`, avancé au
+  12 octobre 2026 par décision de VertOurs (GNOME 51 sorti le
+  16 septembre, image CI `gnome-51` publiée). Manifeste et image CI
+  seuls ; les planchers Python et Meson ne bougent pas (voir « Versions
+  retenues »). Flatpak construit et parcouru sous `//51` sur des données
+  jetables (toutes les fenêtres et dialogues ouverts, `G_ENABLE_DIAGNOSTIC=1`) :
+  aucun avertissement GTK ni libadwaita. Seuls signalements, forcés par
+  `warnings.simplefilter("always")` : deux `DeprecationWarning` internes
+  à PyGObject 3.58 (`gi/events.py`, API `asyncio` retirées en
+  Python 3.16), hors de notre code. **Contrôle visuel complet par
+  VertOurs requis avant fusion.**
 - **Image CI épinglée par digest, mise à jour manuelle** : `ci.yml` et
   `release.yml` référencent
   `ghcr.io/flathub-infra/flatpak-github-actions` par digest plutôt que
-  par étiquette flottante (`:gnome-50`), lot F de la revue de sécurité
+  par étiquette flottante (`:gnome-51` depuis le bump runtime), lot F de la revue de sécurité
   du 24 septembre 2026. Dependabot ne suit pas les images des blocs
   `container:` d'un fichier de workflow (`github-actions` ne couvre que
   les actions, `docker` que les `Dockerfile`/Kubernetes/Helm ; vérifié
   via `dependabot/dependabot-core#5819`, toujours ouverte). Bump manuel
-  à chaque changement d'image voulu (bump runtime `//51` inclus) :
+  à chaque changement d'image voulu (fait pour `gnome-51` le 12 octobre 2026) :
   `skopeo inspect docker://ghcr.io/flathub-infra/flatpak-github-actions:<étiquette>`,
   copier le champ `Digest`, remplacer dans les deux fichiers, garder le
   commentaire `# <étiquette>` en clair à côté.
@@ -134,15 +140,19 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Versions retenues
 
-Revérifiées le 29 août 2026, à revérifier avant toute mise à jour du
-manifeste (`CLAUDE.md` §4 règle 8).
+Revérifiées le 12 octobre 2026, à revérifier avant toute mise à jour du
+manifeste (`CLAUDE.md` §4 règle 8). Sur Flathub, `//51` est la branche la
+plus récente (publiée le 9 octobre 2026), `//52` n'existe pas, aucune
+branche n'est marquée en fin de vie. La documentation Flathub des runtimes
+ne liste pas les versions, seulement la règle : une branche est supportée
+environ un an, jusqu'à la sortie de la stable suivante.
 
 | Élément | Version | Motif |
 |---|---|---|
-| Runtime | `org.gnome.Platform//50` | Jusqu'à `1.1.0` incluse. GNOME 51 sort le 16 septembre 2026 ; bump `//51` en `1.1.1` pas avant le 16 octobre 2026 (choix délibéré, un mois de recul), sous réserve de l'image CI `gnome-51` |
-| Python cible | 3.13 | Celui du runtime 50, pas le 3.14 de la machine |
+| Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
+| Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313` ; la CI teste en 3.14, celui du runtime. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
 | Version du projet | `1.7.0` | Priorité (fin de 7.2), format de données version 3. Coupée le 12 octobre 2026 |
-| Meson minimal | 1.9 | Version de `org.gnome.Sdk//50`, pas celle de la machine (1.11) |
+| Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
 (annulation de la dernière suppression, ajout d'une tâche déjà rayée,
@@ -196,12 +206,10 @@ plus lisible par `1.5.0` et antérieures.
 raison que `1.6.0`. Un fichier écrit en version 3 n'est plus lisible par
 `1.6.0` et antérieures.
 
-**Bump vers GNOME 51** : pas avant le 16 octobre 2026 (un mois après la
-sortie stable du 16 septembre, décision de VertOurs pour laisser mûrir le
-runtime), et sous réserve que l'image CI `gnome-51` soit disponible à
-cette date. Touche le manifeste, la CI et la table ci-dessus. Livré dans
-la première version taguée après le bump, quel que soit son numéro ;
-`main` reste sur `//50` jusque-là.
+**Bump vers GNOME 51** : avancé au 12 octobre 2026 par décision de
+VertOurs, initialement prévu pas avant le 16 octobre. Touche le
+manifeste et l'image CI. Livré dans `1.7.1` (corrective), première
+version taguée après le bump.
 
 ## Environnement de la machine
 
