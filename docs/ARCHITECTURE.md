@@ -21,7 +21,7 @@ rature/
 │   ├── core/                   Business logic, zero GTK
 │   │   ├── models.py           Task, ReserveItem, RecurringItem, Deletion
 │   │   ├── session.py          Rules: add, strike, day rollover
-│   │   ├── recurrence.py       Which recurring templates apply today
+│   │   ├── recurrence.py       Which recurring templates apply on a date
 │   │   ├── storage.py          XDG paths, atomic JSON writes, archiving
 │   │   ├── migrations.py       Version-to-version migration base
 │   │   ├── app.py              Coordination: App, one Session, one clock
@@ -105,8 +105,11 @@ One function per version jump, each with its own test over a sample of the
 previous version's data.
 
 The format is born at version 1 with the reserve and the recurring
-templates. There is no migration to write yet, but the base exists from day
-one: adding it later, over real data, is far riskier.
+templates; the base existed from day one, because adding it later, over
+real data, is far riskier. Version 2 adds `every_other_week_from` to each
+recurring template, `null` for all of them on migration. Archive files go
+through the same chain; they carry no `recurring` key and only get the
+version bump.
 
 ### `core/app.py`
 `App` coordinates a `Session` with `storage` behind a single injectable
@@ -181,7 +184,7 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "date": "2026-08-24",
   "counter": 12,
   "locked": false,
@@ -195,7 +198,8 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
     {"id": "uuid", "text": "...", "created": "2026-08-20"}
   ],
   "recurring": [
-    {"id": "uuid", "text": "...", "weekdays": [0,1,2,3,4]}
+    {"id": "uuid", "text": "...", "weekdays": [0,1,2,3,4],
+     "every_other_week_from": null}
   ],
   "deletions": [
     {"id": "uuid", "num": 4, "text": "...", "origin": "day", "index": 1,
@@ -229,6 +233,14 @@ A `deletions` entry adds two fields to the task fields of the same name
 
 `weekdays` is never empty, see `SPECIFICATION.md` §2.7.2. Monday is 0;
 "every day" is `[0,1,2,3,4,5,6]`.
+
+`every_other_week_from` is `null` for a template that applies every week.
+Otherwise it is the Monday of one active week, and the template applies
+when the number of weeks between that Monday and the Monday of the date is
+even. Counting from a fixed Monday, never by ISO week number, keeps the
+alternation across 53-week years, see `SPECIFICATION.md` §2.7.7. Only
+`core/recurrence.py` knows that rule; `App` computes the Monday from the
+reference date, the interface only sends a `Cadence`.
 
 `done_at` and `deleted_at` always carry their UTC offset, see
 `SPECIFICATION.md` §2.7.6. The `created` field of reserve items and the

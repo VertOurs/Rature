@@ -118,11 +118,16 @@ class ReserveItem:
 
 @dataclass(kw_only=True)
 class RecurringItem:
-    """A task template injected on its weekdays."""
+    """A task template injected on its weekdays.
+
+    every_other_week_from is the Monday of one active week, or None for a
+    template that applies every week (SPECIFICATION.md §2.5, §2.7.7).
+    """
 
     text: str
     weekdays: list[int]
     id: str = field(default_factory=_new_id)
+    every_other_week_from: date | None = None
 
     def __post_init__(self) -> None:
         # SPECIFICATION.md §2.7.2: weekdays is never empty; core refuses it.
@@ -130,20 +135,27 @@ class RecurringItem:
             raise ValueError("weekdays must not be empty")
         if any(day not in range(7) for day in self.weekdays):
             raise ValueError("weekdays entries must be 0..6, Monday is 0")
+        start = self.every_other_week_from
+        if start is not None and start.weekday() != 0:
+            raise ValueError("every_other_week_from must be a Monday")
 
     def to_dict(self) -> dict:
+        start = self.every_other_week_from
         return {
             "id": self.id,
             "text": self.text,
             "weekdays": list(self.weekdays),
+            "every_other_week_from": start.isoformat() if start else None,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> RecurringItem:
+        start = data["every_other_week_from"]
         return cls(
             id=data["id"],
             text=data["text"],
             weekdays=list(data["weekdays"]),
+            every_other_week_from=date.fromisoformat(start) if start else None,
         )
 
 
