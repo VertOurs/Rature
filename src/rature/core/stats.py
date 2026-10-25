@@ -37,8 +37,9 @@ def day_counts(day: Day) -> DayCounts:
 
     - ``added``: every task that received a number that day, the tasks still
       in the day plus the ``deletions`` journal's entries. Only the entry
-      count is used, never the entries' text (§2.2, §2.6). Equals
-      ``day.counter - 1``.
+      count is used, never the entries' text (§2.2, §2.6). Not
+      ``day.counter - 1``: a task sent back to the reserve or moved to
+      Tomorrow used a number and left no trace.
     - ``struck``: tasks marked done in the archived day. A struck-then-deleted
       task is gone from the day (§3.5) and counts only in ``deleted``.
     - ``deleted``: the number of ``deletions`` journal entries.
