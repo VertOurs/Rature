@@ -27,17 +27,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   jour. Fenêtre Archives notée au chantier 8 de la roadmap, après 8.4.
   8.2 et 8.3 livrés dans `1.9.0`. Suivante : 8.4, une langue par PR. **À réévaluer vers le
   8 novembre 2026** : report automatique vers Demain (ADR 0008).
-- **`1.8.0` est publiée** (25 octobre 2026, sur `//51`) : vue Demain,
-  chantier 7.3 (PR #160 à #165), format version 4, release PR #166
-  (squash `3116013`). Tag `v1.8.0` annoté et signé, poussé, `release.yml`
-  vert (run `40221765519`, build et deploy), `rature.flatpak` joint à la
-  release (77 096 octets), `https://vertours.github.io/Rature/` répond
-  200 et le dépôt sert un commit « Built from 3116013 ». PKGBUILD et
-  `.SRCINFO` recalés sur l'archive du tag (`sha256sum` identique sur deux
-  téléchargements) dans un commit de suivi. Reconstruction du paquet AUR
-  en conteneur non tentée. Sauvegarde du dossier `data/rature` réel,
-  `flatpak update` et migration 3 → 4 confirmée par VertOurs le
-  25 octobre 2026 : rien ne reste à sa charge pour `1.8.0`.
+- **`1.9.0` est publiée** (25 octobre 2026, sur `//51`) : noms accessibles
+  (PR #170) et Statistiques rafraîchies au passage du jour (PR #171),
+  release PR #172 (squash `ef49ffe`). Tag `v1.9.0` annoté et signé,
+  poussé, `release.yml` vert (run `40226573062`, build et deploy),
+  `rature.flatpak` joint à la release (78 224 octets),
+  `https://vertours.github.io/Rature/` répond 200 et le dépôt sert un
+  commit « Built from ef49ffe ». PKGBUILD et `.SRCINFO` recalés sur
+  l'archive du tag (`sha256sum` identique sur deux téléchargements) dans un
+  commit de suivi. Aucune migration. **Reste à la charge de VertOurs** :
+  `flatpak update`.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
