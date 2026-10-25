@@ -2,13 +2,15 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The Tomorrow list, SPECIFICATION.md §2.5 and §2.7.9."""
 
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
 from rature.core.models import Origin
-from rature.core.session import Day, Session
+from rature.core.session import Day, LockedError, Session
 
+PARIS = timezone(timedelta(hours=2))
+STAMP = datetime(2026, 8, 24, 14, 32, 7, tzinfo=PARIS)
 TODAY = date(2026, 8, 24)
 
 
@@ -109,3 +111,205 @@ def test_editing_tomorrow_is_allowed_on_a_frozen_day() -> None:
     session.move_tomorrow_before(b.id, a.id)
     session.delete_from_tomorrow(a.id)
     assert session.tomorrow == [b]
+
+
+# Move to tomorrow, from the day.
+
+
+def test_move_to_tomorrow_keeps_the_task_but_not_its_number() -> None:
+    session = make_session()
+    session.add("stays")
+    task = session.add("later")
+    session.set_priority(task.id, True)
+    prepared = session.move_to_tomorrow(task.id)
+    assert session.tomorrow == [prepared]
+    assert (prepared.id, prepared.text, prepared.origin) == (
+        task.id,
+        "later",
+        Origin.DAY,
+    )
+    assert prepared.priority
+    assert "num" not in prepared.to_dict()
+    assert [t.text for t in session.day.tasks] == ["stays"]
+
+
+def test_move_to_tomorrow_leaves_no_trace_and_never_reuses_the_number() -> None:
+    session = make_session()
+    task = session.add("later")
+    session.move_to_tomorrow(task.id)
+    assert session.day.deletions == []
+    assert session.day.counter == 2
+    assert session.add("next").num == 2
+
+
+def test_move_to_tomorrow_keeps_the_reserve_link() -> None:
+    session = make_session()
+    item = session.add_to_reserve("from the reserve", today=date(2026, 8, 20))
+    task = session.draw_from_reserve(item.id)
+    prepared = session.move_to_tomorrow(task.id)
+    assert prepared.origin == Origin.RESERVE
+    assert (prepared.source_id, prepared.source_created) == (
+        item.id,
+        date(2026, 8, 20),
+    )
+
+
+def test_move_to_tomorrow_goes_to_the_end() -> None:
+    session = make_session()
+    first = session.add_to_tomorrow("first")
+    task = session.add("moved")
+    assert session.tomorrow == [first, session.move_to_tomorrow(task.id)]
+
+
+def test_move_to_tomorrow_refuses_a_struck_task() -> None:
+    session = make_session()
+    task = session.add("done")
+    session.strike(task.id, now=STAMP)
+    with pytest.raises(ValueError):
+        session.move_to_tomorrow(task.id)
+    assert session.tomorrow == []
+
+
+def test_move_to_tomorrow_refuses_a_recurring_task() -> None:
+    session = make_session()
+    session.add_recurring("water plants", [0])
+    (task,) = session.inject_recurring(TODAY)
+    with pytest.raises(ValueError):
+        session.move_to_tomorrow(task.id)
+    assert session.tomorrow == []
+
+
+def test_move_to_tomorrow_is_allowed_on_a_frozen_list() -> None:
+    session = make_session()
+    task = session.add("later")
+    session.lock()
+    session.move_to_tomorrow(task.id)
+    assert session.day.tasks == []
+
+
+# Move to tomorrow, from the reserve.
+
+
+def test_move_reserve_to_tomorrow_is_a_move_with_a_link_back() -> None:
+    session = make_session()
+    item = session.add_to_reserve("someday", today=date(2026, 8, 20))
+    session.set_reserve_priority(item.id, True)
+    prepared = session.move_reserve_to_tomorrow(item.id)
+    assert session.reserve == []
+    assert session.tomorrow == [prepared]
+    assert prepared.origin == Origin.RESERVE
+    assert (prepared.text, prepared.source_id, prepared.source_created) == (
+        "someday",
+        item.id,
+        date(2026, 8, 20),
+    )
+    assert prepared.priority
+
+
+def test_move_reserve_to_tomorrow_is_allowed_on_a_frozen_day() -> None:
+    session = frozen_session()
+    item = session.add_to_reserve("someday", today=TODAY)
+    session.move_reserve_to_tomorrow(item.id)
+    assert session.reserve == []
+
+
+def test_move_reserve_to_tomorrow_unknown_item_raises_key_error() -> None:
+    with pytest.raises(KeyError):
+        make_session().move_reserve_to_tomorrow("nope")
+
+
+# Move to today.
+
+
+def test_move_to_today_gives_the_next_number_at_the_end() -> None:
+    session = make_session()
+    session.add("first")
+    prepared = session.add_to_tomorrow("prepared")
+    session.set_tomorrow_priority(prepared.id, True)
+    task = session.move_to_today(prepared.id)
+    assert session.tomorrow == []
+    assert session.day.tasks[-1] is task
+    assert (task.id, task.num, task.text, task.origin) == (
+        prepared.id,
+        2,
+        "prepared",
+        Origin.DAY,
+    )
+    assert task.priority
+    assert not task.done
+    assert session.day.counter == 3
+
+
+def test_move_to_today_keeps_the_reserve_link() -> None:
+    session = make_session()
+    item = session.add_to_reserve("someday", today=date(2026, 8, 20))
+    prepared = session.move_reserve_to_tomorrow(item.id)
+    task = session.move_to_today(prepared.id)
+    assert task.origin == Origin.RESERVE
+    assert (task.source_id, task.source_created) == (item.id, date(2026, 8, 20))
+
+
+def test_a_task_moved_to_tomorrow_by_mistake_comes_back_with_a_new_number() -> None:
+    session = make_session()
+    task = session.add("oops")
+    back = session.move_to_today(session.move_to_tomorrow(task.id).id)
+    assert back.id == task.id
+    assert back.num == 2
+
+
+def test_move_to_today_is_refused_on_a_frozen_list() -> None:
+    session = make_session()
+    prepared = session.add_to_tomorrow("prepared")
+    session.lock()
+    with pytest.raises(LockedError):
+        session.move_to_today(prepared.id)
+    assert session.tomorrow == [prepared]
+    assert session.day.tasks == []
+    assert session.day.counter == 1
+
+
+def test_move_to_today_unknown_task_raises_key_error() -> None:
+    with pytest.raises(KeyError):
+        make_session().move_to_today("nope")
+
+
+# Send back to the reserve, from Tomorrow.
+
+
+def test_send_tomorrow_to_reserve_returns_a_drawn_item_as_it_was() -> None:
+    session = make_session()
+    item = session.add_to_reserve("someday", today=date(2026, 8, 20))
+    prepared = session.move_reserve_to_tomorrow(item.id)
+    session.rename_tomorrow(prepared.id, "someday, renamed")
+    session.set_tomorrow_priority(prepared.id, True)
+    back = session.send_tomorrow_to_reserve(prepared.id, today=TODAY)
+    assert session.tomorrow == []
+    assert session.reserve == [back]
+    assert (back.id, back.text, back.created) == (
+        item.id,
+        "someday, renamed",
+        date(2026, 8, 20),
+    )
+    assert back.priority
+
+
+def test_send_tomorrow_to_reserve_makes_a_new_item_from_a_day_task() -> None:
+    session = make_session()
+    session.add_to_reserve("same", today=date(2026, 8, 20))
+    prepared = session.add_to_tomorrow("same")
+    back = session.send_tomorrow_to_reserve(prepared.id, today=TODAY)
+    assert back.created == TODAY
+    assert back.id != prepared.id
+    assert [item.text for item in session.reserve] == ["same", "same"]
+
+
+def test_send_tomorrow_to_reserve_is_allowed_on_a_frozen_day() -> None:
+    session = frozen_session()
+    prepared = session.add_to_tomorrow("prepared")
+    session.send_tomorrow_to_reserve(prepared.id, today=TODAY)
+    assert session.tomorrow == []
+
+
+def test_send_tomorrow_to_reserve_unknown_task_raises_key_error() -> None:
+    with pytest.raises(KeyError):
+        make_session().send_tomorrow_to_reserve("nope", today=TODAY)

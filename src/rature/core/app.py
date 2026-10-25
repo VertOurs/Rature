@@ -403,6 +403,28 @@ class App:
         self.session.move_tomorrow_before(task_id, target_id)
         self._save()
 
+    def move_to_tomorrow(self, task_id: str) -> PreparedTask:
+        task = self.session.move_to_tomorrow(task_id)
+        self._save()
+        return task
+
+    def move_reserve_to_tomorrow(self, item_id: str) -> PreparedTask:
+        task = self.session.move_reserve_to_tomorrow(item_id)
+        self._save()
+        return task
+
+    def move_to_today(self, task_id: str) -> Task:
+        task = self.session.move_to_today(task_id)
+        self._save()
+        return task
+
+    def send_tomorrow_to_reserve(self, task_id: str) -> ReserveItem:
+        item = self.session.send_tomorrow_to_reserve(
+            task_id, today=reference_date(self.clock())
+        )
+        self._save()
+        return item
+
     def add_recurring(
         self,
         text: str,

@@ -534,6 +534,34 @@ def test_tomorrow_wrappers_persist(tmp_path: Path) -> None:
     assert load(data_dir=tmp_path).into_session().tomorrow == [second]
 
 
+def test_tomorrow_moves_persist(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+
+    task = app.add("later")
+    prepared = app.move_to_tomorrow(task.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.day.tasks == []
+    assert reloaded.tomorrow == [prepared]
+
+    back = app.move_to_today(prepared.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.tomorrow == []
+    assert reloaded.day.tasks == [back]
+
+    item = app.add_to_reserve("someday")
+    from_reserve = app.move_reserve_to_tomorrow(item.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.reserve == []
+    assert reloaded.tomorrow == [from_reserve]
+
+    returned = app.send_tomorrow_to_reserve(from_reserve.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert reloaded.tomorrow == []
+    assert reloaded.reserve == [returned]
+    assert returned.id == item.id
+
+
 def test_add_on_a_locked_list_raises_and_is_not_saved(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))
