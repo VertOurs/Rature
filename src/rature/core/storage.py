@@ -14,7 +14,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from rature.core.migrations import CURRENT_VERSION, migrate
-from rature.core.models import RecurringItem, ReserveItem
+from rature.core.models import PreparedTask, RecurringItem, ReserveItem
 from rature.core.session import Day, Session
 
 FILE_VERSION = CURRENT_VERSION
@@ -32,10 +32,11 @@ def xdg_data_dir() -> Path:
 
 @dataclass(kw_only=True)
 class Store:
-    """The whole data file: the current day plus the reserve and templates."""
+    """The whole data file: the current day, the reserve, Tomorrow, templates."""
 
     day: Day
     reserve: list[ReserveItem] = field(default_factory=list)
+    tomorrow: list[PreparedTask] = field(default_factory=list)
     recurring: list[RecurringItem] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -43,6 +44,7 @@ class Store:
             "version": FILE_VERSION,
             **self.day.to_dict(),
             "reserve": [item.to_dict() for item in self.reserve],
+            "tomorrow": [task.to_dict() for task in self.tomorrow],
             "recurring": [item.to_dict() for item in self.recurring],
         }
 
@@ -51,6 +53,9 @@ class Store:
         return cls(
             day=Day.from_dict(data),
             reserve=[ReserveItem.from_dict(item) for item in data.get("reserve", [])],
+            tomorrow=[
+                PreparedTask.from_dict(task) for task in data.get("tomorrow", [])
+            ],
             recurring=[
                 RecurringItem.from_dict(item) for item in data.get("recurring", [])
             ],
@@ -61,11 +66,17 @@ class Store:
         return cls(
             day=session.day,
             reserve=session.reserve,
+            tomorrow=session.tomorrow,
             recurring=session.recurring,
         )
 
     def into_session(self) -> Session:
-        return Session(self.day, reserve=self.reserve, recurring=self.recurring)
+        return Session(
+            self.day,
+            reserve=self.reserve,
+            tomorrow=self.tomorrow,
+            recurring=self.recurring,
+        )
 
 
 def _open_private(path: str, flags: int) -> int:

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The data file moves to format version 4, which adds the list prepared
+  for the next day (chantier 7.3, not yet visible). Version 1 to 3
+  files, archives included, are migrated on open with no loss: the list
+  starts empty. Once a file has been written in version 4, earlier
+  Rature versions refuse to open it.
+
 ## [1.7.1] - 2026-10-12
 
 Runtime update only: no new feature and no change to the data format.

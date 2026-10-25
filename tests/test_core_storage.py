@@ -13,7 +13,13 @@ from pathlib import Path
 import pytest
 
 from rature.core.migrations import FutureVersionError
-from rature.core.models import Origin, RecurringItem, ReserveItem, Task
+from rature.core.models import (
+    Origin,
+    PreparedTask,
+    RecurringItem,
+    ReserveItem,
+    Task,
+)
 from rature.core.session import Day, Session
 from rature.core.storage import (
     FILE_VERSION,
@@ -44,6 +50,16 @@ def make_store() -> Store:
     return Store(
         day=session.day,
         reserve=[ReserveItem(text="someday", created=date(2026, 8, 20))],
+        tomorrow=[
+            PreparedTask(text="book the train", origin=Origin.DAY),
+            PreparedTask(
+                text="call the insurance",
+                origin=Origin.RESERVE,
+                source_id="r1",
+                source_created=date(2026, 8, 19),
+                priority=True,
+            ),
+        ],
         recurring=[RecurringItem(text="water plants", weekdays=[0, 3])],
     )
 
@@ -233,6 +249,24 @@ def test_reserve_and_recurring_survive_the_round_trip(tmp_path: Path) -> None:
     loaded = load(data_dir=tmp_path)
     assert loaded.reserve[0].text == "someday"
     assert loaded.recurring[0].weekdays == [0, 3]
+
+
+def test_tomorrow_survives_the_round_trip_in_order(tmp_path: Path) -> None:
+    store = make_store()
+    save(store, data_dir=tmp_path)
+    assert load(data_dir=tmp_path).tomorrow == store.tomorrow
+
+
+def test_tomorrow_reaches_the_session_and_back() -> None:
+    store = make_store()
+    session = store.into_session()
+    assert session.tomorrow is store.tomorrow
+    assert Store.from_session(session).tomorrow is store.tomorrow
+
+
+def test_an_archive_carries_no_tomorrow_list(tmp_path: Path) -> None:
+    path = archive(make_store().day, data_dir=tmp_path)
+    assert "tomorrow" not in json.loads(path.read_text(encoding="utf-8"))
 
 
 def test_accented_text_stays_readable(tmp_path: Path) -> None:

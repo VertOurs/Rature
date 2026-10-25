@@ -60,7 +60,18 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `Ctrl+Z` limité au jour, dépôt d'une tâche de Demain sur l'entrée
   Reserve. §3.14 corrigé : Added n'est plus égal à `counter - 1` depuis
   7.2 ; la docstring de `core/stats.py` reste à corriger dans la PR de
-  code. **Aucun code encore** : prochaine étape, `core` de 7.3.
+  code. **Découpage validé le 25 octobre 2026**, une PR par lettre, aucune
+  version coupée avant C, puis `1.8.0` (mineure, `ROADMAP.md` prévaut) :
+  **A** format v4 (`PreparedTask`, clé `tomorrow`, migration 3 → 4) ;
+  **B1** opérations sur la liste Demain (ajout, renommage,
+  réordonnancement, suppression, priorité, « Move to tomorrow », « Move
+  to today », renvoi en réserve) et docstring de `stats.py` ; **B2**
+  étape 7 du passage du jour et récurrentes dues demain ; **C**
+  interface. A en cours sur `feat/tomorrow-format` : `PreparedTask`
+  (commit `27dfcfd`), format v4 et migration 3 → 4 testée sur des
+  fichiers v3 principal et archive fabriqués et sur la chaîne depuis v1.
+  Sauvegarde du dossier `data/rature` réel à faire par VertOurs avant la
+  mise à jour vers `1.8.0`.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
   VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
   section dédiée du chantier 7) : PR #148 (squash `6dda0d2`, pied
