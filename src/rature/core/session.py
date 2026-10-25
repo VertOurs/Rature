@@ -292,20 +292,114 @@ class Session:
         task = self._task(task_id)
         if not task.can_go_back_to_reserve:
             raise ValueError(f"task {task.num} cannot go back to the reserve")
-        if task.origin == Origin.RESERVE:
-            # Same as the rollover's point 2: the original item comes back,
-            # renamed text included (SPECIFICATION.md §2.7.1).
-            item = ReserveItem(
-                id=task.source_id,
-                text=task.text,
-                created=task.source_created,
-                priority=task.priority,
-            )
-        else:
-            # SPECIFICATION.md §2.7.4: an explicit gesture, never
-            # de-duplicated, unlike the rollover's point 3.
-            item = ReserveItem(text=task.text, created=today, priority=task.priority)
+        item = _returning_item(task, today)
         self.day.tasks.remove(task)
+        self.reserve.append(item)
+        return item
+
+    # The Tomorrow list, SPECIFICATION.md §2.5. Nothing here checks
+    # day.locked: freezing the day stops its composition, and Tomorrow is
+    # not the day.
+
+    def _prepared(self, task_id: str) -> PreparedTask:
+        for task in self.tomorrow:
+            if task.id == task_id:
+                return task
+        raise KeyError(task_id)
+
+    def add_to_tomorrow(self, text: str) -> PreparedTask:
+        # SPECIFICATION.md §2.5: never de-duplicated, an explicit gesture.
+        task = PreparedTask(text=text, origin=Origin.DAY)
+        self.tomorrow.append(task)
+        return task
+
+    def rename_tomorrow(self, task_id: str, text: str) -> None:
+        self._prepared(task_id).text = text
+
+    def set_tomorrow_priority(self, task_id: str, priority: bool) -> None:
+        """Mark or unmark a prepared task; never moves it (§2.5)."""
+        self._prepared(task_id).priority = priority
+
+    def delete_from_tomorrow(self, task_id: str) -> None:
+        """Remove a prepared task for good, SPECIFICATION.md §2.7.9.
+
+        No journal entry and no undo: the journal belongs to the day. A task
+        drawn from the reserve takes its original item with it (§2.7.3).
+        """
+        self.tomorrow.remove(self._prepared(task_id))
+
+    def move_tomorrow_before(self, task_id: str, target_id: str | None) -> None:
+        """Reorder Tomorrow with move_before's rule (SPECIFICATION.md §3.16)."""
+        self.tomorrow = _moved_before(self.tomorrow, task_id, target_id)
+
+    def move_to_tomorrow(self, task_id: str) -> PreparedTask:
+        """Move an active day task to the end of Tomorrow, SPECIFICATION.md §2.5.
+
+        Same restrictions as send_to_reserve and allowed on a frozen list
+        like it. The task keeps its id, origin, reserve link and priority,
+        loses its number, and leaves no trace in the day.
+        """
+        task = self._task(task_id)
+        if not task.can_go_back_to_reserve:
+            raise ValueError(f"task {task.num} cannot move to tomorrow")
+        prepared = PreparedTask(
+            id=task.id,
+            text=task.text,
+            origin=task.origin,
+            source_id=task.source_id,
+            source_created=task.source_created,
+            priority=task.priority,
+        )
+        self.day.tasks.remove(task)
+        self.tomorrow.append(prepared)
+        return prepared
+
+    def move_reserve_to_tomorrow(self, item_id: str) -> PreparedTask:
+        """Move a reserve item to the end of Tomorrow, SPECIFICATION.md §2.5.
+
+        A move like draw_from_reserve, linked back by source_id, but allowed
+        on a frozen day.
+        """
+        item = self._reserve_item(item_id)
+        prepared = PreparedTask(
+            text=item.text,
+            origin=Origin.RESERVE,
+            source_id=item.id,
+            source_created=item.created,
+            priority=item.priority,
+        )
+        self.reserve.remove(item)
+        self.tomorrow.append(prepared)
+        return prepared
+
+    def move_to_today(self, task_id: str) -> Task:
+        """Bring a prepared task to the end of the day, SPECIFICATION.md §2.5.
+
+        Refused on a frozen list, like a draw. The task gets the next number
+        and keeps its id, origin, reserve link and priority.
+        """
+        if self.day.locked:
+            raise LockedError("the list is frozen")
+        prepared = self._prepared(task_id)
+        task = Task(
+            id=prepared.id,
+            num=self.day.counter,
+            text=prepared.text,
+            origin=prepared.origin,
+            source_id=prepared.source_id,
+            source_created=prepared.source_created,
+            priority=prepared.priority,
+        )
+        self.day.counter += 1
+        self.day.tasks.append(task)
+        self.tomorrow.remove(prepared)
+        return task
+
+    def send_tomorrow_to_reserve(self, task_id: str, *, today: date) -> ReserveItem:
+        """Move a prepared task to the end of the reserve, like send_to_reserve."""
+        prepared = self._prepared(task_id)
+        item = _returning_item(prepared, today)
+        self.tomorrow.remove(prepared)
         self.reserve.append(item)
         return item
 
@@ -420,12 +514,32 @@ class Session:
         return old
 
 
-def _moved_before[T: (Task, ReserveItem)](
+def _returning_item(task: Task | PreparedTask, today: date) -> ReserveItem:
+    """The reserve item a task becomes when sent back by hand (§2.5).
+
+    Shared by send_to_reserve and send_tomorrow_to_reserve.
+    """
+    if task.origin == Origin.RESERVE:
+        # Same as the rollover's point 2: the original item comes back,
+        # renamed text included (SPECIFICATION.md §2.7.1).
+        return ReserveItem(
+            id=task.source_id,
+            text=task.text,
+            created=task.source_created,
+            priority=task.priority,
+        )
+    # SPECIFICATION.md §2.7.4: an explicit gesture, never de-duplicated,
+    # unlike the rollover's point 3.
+    return ReserveItem(text=task.text, created=today, priority=task.priority)
+
+
+def _moved_before[T: (Task, ReserveItem, PreparedTask)](
     items: list[T], item_id: str, target_id: str | None
 ) -> list[T]:
     """items with item_id moved right before target_id, or to the end on None.
 
-    The one rule behind Session.move_before and move_reserve_before.
+    The one rule behind Session.move_before, move_reserve_before and
+    move_tomorrow_before.
     item_id == target_id returns the list unchanged: a drag-and-drop that
     drops a row back where it was picked up. Unknown ids raise KeyError.
     """

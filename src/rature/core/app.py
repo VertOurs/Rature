@@ -18,7 +18,7 @@ from typing import NamedTuple
 
 from rature.core import export, recurrence, search, stats, storage
 from rature.core.migrations import FutureVersionError
-from rature.core.models import RecurringItem, ReserveItem, Task
+from rature.core.models import PreparedTask, RecurringItem, ReserveItem, Task
 
 # Cadence is part of this module's interface: ui/ may only import
 # rature.core.app, and the recurring wrappers below take it as is.
@@ -379,6 +379,49 @@ class App:
 
     def send_to_reserve(self, task_id: str) -> ReserveItem:
         item = self.session.send_to_reserve(task_id, today=reference_date(self.clock()))
+        self._save()
+        return item
+
+    def add_to_tomorrow(self, text: str) -> PreparedTask:
+        task = self.session.add_to_tomorrow(text)
+        self._save()
+        return task
+
+    def rename_tomorrow(self, task_id: str, text: str) -> None:
+        self.session.rename_tomorrow(task_id, text)
+        self._save()
+
+    def set_tomorrow_priority(self, task_id: str, priority: bool) -> None:
+        self.session.set_tomorrow_priority(task_id, priority)
+        self._save()
+
+    def delete_from_tomorrow(self, task_id: str) -> None:
+        self.session.delete_from_tomorrow(task_id)
+        self._save()
+
+    def move_tomorrow_before(self, task_id: str, target_id: str | None) -> None:
+        self.session.move_tomorrow_before(task_id, target_id)
+        self._save()
+
+    def move_to_tomorrow(self, task_id: str) -> PreparedTask:
+        task = self.session.move_to_tomorrow(task_id)
+        self._save()
+        return task
+
+    def move_reserve_to_tomorrow(self, item_id: str) -> PreparedTask:
+        task = self.session.move_reserve_to_tomorrow(item_id)
+        self._save()
+        return task
+
+    def move_to_today(self, task_id: str) -> Task:
+        task = self.session.move_to_today(task_id)
+        self._save()
+        return task
+
+    def send_tomorrow_to_reserve(self, task_id: str) -> ReserveItem:
+        item = self.session.send_tomorrow_to_reserve(
+            task_id, today=reference_date(self.clock())
+        )
         self._save()
         return item
 

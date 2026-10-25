@@ -67,9 +67,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   réordonnancement, suppression, priorité, « Move to tomorrow », « Move
   to today », renvoi en réserve) et docstring de `stats.py` ; **B2**
   étape 7 du passage du jour et récurrentes dues demain ; **C**
-  interface. A en cours sur `feat/tomorrow-format` : `PreparedTask`
-  (commit `27dfcfd`), format v4 et migration 3 → 4 testée sur des
-  fichiers v3 principal et archive fabriqués et sur la chaîne depuis v1.
+  interface. **A fusionnée** (PR #161, squash `9fecc28`, pied
+  `BREAKING CHANGE`) : `PreparedTask`, format v4, migration 3 → 4 testée
+  sur des fichiers v3 principal et archive fabriqués et sur la chaîne
+  depuis v1. **B1 en cours** sur `feat/tomorrow-operations` : édition de
+  Demain (`add_to_tomorrow`, `rename_tomorrow`, `set_tomorrow_priority`,
+  `delete_from_tomorrow`, `move_tomorrow_before`), gestes
+  (`move_to_tomorrow`, `move_reserve_to_tomorrow`, `move_to_today`,
+  `send_tomorrow_to_reserve`) dans `Session` et `App`, construction de
+  l'item de réserve partagée avec `send_to_reserve` (`_returning_item`),
+  docstring de `stats.day_counts` corrigée. Suivante : B2.
   Sauvegarde du dossier `data/rature` réel à faire par VertOurs avant la
   mise à jour vers `1.8.0`.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
