@@ -102,10 +102,13 @@ class DayView(Adw.Bin):
         # every programmatic update to avoid fighting that.
         if session.day.locked:
             self.lock_button.set_icon_name("changes-allow-symbolic")
-            self.lock_button.set_tooltip_text(_("Unfreeze the list"))
+            lock_text = _("Unfreeze the list")
         else:
             self.lock_button.set_icon_name("changes-prevent-symbolic")
-            self.lock_button.set_tooltip_text(_("Freeze the list"))
+            lock_text = _("Freeze the list")
+        # SPECIFICATION.md §3.8: the accessible name follows the tooltip.
+        self.lock_button.set_tooltip_text(lock_text)
+        self.lock_button.update_property([Gtk.AccessibleProperty.LABEL], [lock_text])
         self.entry.set_sensitive(not session.day.locked)
 
     def _on_entry_activate(self, _entry: Gtk.Entry) -> None:

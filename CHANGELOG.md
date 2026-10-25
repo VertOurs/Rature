@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Every icon-only button now has an accessible name, so a screen reader
+  announces what it does instead of just "button". The row menu buttons
+  and the main menu button also gain a tooltip ("More options", "Main
+  menu").
+
 ## [1.8.0] - 2026-10-25
 
 The Tomorrow view, chantier 7.3. The data file moves to format version

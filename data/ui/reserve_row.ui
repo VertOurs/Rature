@@ -30,6 +30,9 @@
           <object class="GtkButton" id="send_button">
             <property name="icon-name">go-next-symbolic</property>
             <property name="tooltip-text" translatable="yes">Send to the day</property>
+            <accessibility>
+              <property name="label" translatable="yes">Send to the day</property>
+            </accessibility>
             <property name="valign">center</property>
             <style>
               <class name="flat"/>
@@ -52,6 +55,10 @@
         <child>
           <object class="GtkMenuButton" id="menu_button">
             <property name="icon-name">view-more-symbolic</property>
+            <property name="tooltip-text" translatable="yes">More options</property>
+            <accessibility>
+              <property name="label" translatable="yes">More options</property>
+            </accessibility>
             <property name="valign">center</property>
             <style>
               <class name="flat"/>

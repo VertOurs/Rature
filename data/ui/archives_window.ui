@@ -89,6 +89,9 @@
                         <property name="icon-name">edit-copy-symbolic</property>
                         <property name="valign">center</property>
                         <property name="tooltip-text" translatable="yes">Copy as text</property>
+                        <accessibility>
+                          <property name="label" translatable="yes">Copy as text</property>
+                        </accessibility>
                         <style>
                           <class name="flat"/>
                         </style>
