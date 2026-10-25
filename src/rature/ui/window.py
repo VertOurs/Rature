@@ -25,6 +25,7 @@ from rature.ui.day_view import DayView  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
 from rature.ui.reserve_view import ReserveView  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
+from rature.ui.tomorrow_view import TomorrowView  # noqa: E402
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
 _ENSURE_DAY_INTERVAL_SECONDS = 60
@@ -32,16 +33,18 @@ _ENSURE_DAY_INTERVAL_SECONDS = 60
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/window.ui")
 class RatureWindow(Adw.ApplicationWindow):
-    """Owns the App instance and mounts the Day, Reserve and Recurring views."""
+    """Owns the App instance and mounts the Day, Tomorrow, Reserve, Recurring views."""
 
     __gtype_name__ = "RatureWindow"
 
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()
     sidebar_list: Gtk.ListBox = Gtk.Template.Child()
     day_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
+    tomorrow_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     reserve_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     recurring_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     day_page: Adw.NavigationPage = Gtk.Template.Child()
+    tomorrow_page: Adw.NavigationPage = Gtk.Template.Child()
     reserve_page: Adw.NavigationPage = Gtk.Template.Child()
     recurring_page: Adw.NavigationPage = Gtk.Template.Child()
 
@@ -55,6 +58,14 @@ class RatureWindow(Adw.ApplicationWindow):
             send_to_reserve=self.send_to_reserve,
         )
         self.day_page.set_child(self.day_view)
+        self.tomorrow_view = TomorrowView(
+            app=app,
+            run_action=self._run_app_action,
+            perform=self._perform,
+            send_to_reserve=self.send_tomorrow_to_reserve,
+            move_to_today=self.move_to_today,
+        )
+        self.tomorrow_page.set_child(self.tomorrow_view)
         self.reserve_view = ReserveView(
             app=app,
             run_action=self._run_app_action,
@@ -68,6 +79,7 @@ class RatureWindow(Adw.ApplicationWindow):
         # Each sidebar row carries the content page it selects, so
         # _on_row_selected never depends on the row order in window.ui.
         self.day_sidebar_row.page = self.day_page
+        self.tomorrow_sidebar_row.page = self.tomorrow_page
         self.reserve_sidebar_row.page = self.reserve_page
         self.recurring_sidebar_row.page = self.recurring_page
 
@@ -187,6 +199,7 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _refresh_all(self) -> None:
         self.day_view.refresh()
+        self.tomorrow_view.refresh()
         self.reserve_view.refresh()
         self.recurring_view.refresh()
         # SPECIFICATION.md §3.2: the undo control, header button and
@@ -238,6 +251,16 @@ class RatureWindow(Adw.ApplicationWindow):
     ) -> bool:
         self.send_to_reserve(value.task.id)
         return True
+
+    def move_to_today(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.16: the row menu entry; the Day sidebar
+        # entry's drop calls it too. Same KeyError swallowing as above.
+        self._run_app_action(lambda: self.app.move_to_today(task_id))
+
+    def send_tomorrow_to_reserve(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.16: a prepared row's ← button; the Reserve
+        # sidebar entry's drop calls it too.
+        self._run_app_action(lambda: self.app.send_tomorrow_to_reserve(task_id))
 
     def _perform(self, action, *, clear_banner_on_success: bool = True) -> bool:
         # SPECIFICATION.md §3.6 point 3: the one place that catches OSError,

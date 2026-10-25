@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-FileCopyrightText: 2026 VertOurs -->
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="RatureTomorrowRecurringRow" parent="GtkListBoxRow">
+    <property name="activatable">False</property>
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <property name="spacing">12</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-top">8</property>
+        <property name="margin-bottom">8</property>
+        <!-- Never shown: holds the send-back button's width so the text
+             lines up with the prepared rows below (the 1.4.1 offset fix).
+             Hidden by set_child_visible in tomorrow_recurring_row.py. -->
+        <child>
+          <object class="GtkButton" id="spacer">
+            <property name="icon-name">go-previous-symbolic</property>
+            <property name="valign">center</property>
+            <property name="focusable">False</property>
+            <property name="can-target">False</property>
+            <style>
+              <class name="flat"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="text_label">
+            <property name="xalign">0</property>
+            <property name="hexpand">True</property>
+            <property name="wrap">True</property>
+            <property name="wrap-mode">word-char</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

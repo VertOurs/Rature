@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-12 18:21+0200\n"
+"POT-Creation-Date: 2026-10-25 18:57+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -324,32 +324,37 @@ msgstr "Raccourcis clavier"
 msgid "About Rature"
 msgstr "À propos de Rature"
 
-#: data/ui/window.ui:59 data/ui/window.ui:105 data/ui/statistics_window.ui:33
+#: data/ui/window.ui:59 data/ui/window.ui:121 data/ui/statistics_window.ui:33
 msgid "Day"
 msgstr "Jour"
 
-#: data/ui/window.ui:73 data/ui/window.ui:126
+#: data/ui/window.ui:75 data/ui/window.ui:142
+msgid "Tomorrow"
+msgstr "Demain"
+
+#: data/ui/window.ui:89 data/ui/window.ui:145
 msgid "Reserve"
 msgstr "Réserve"
 
-#: data/ui/window.ui:87 data/ui/window.ui:129
+#: data/ui/window.ui:103 data/ui/window.ui:148
 msgid "Recurring"
 msgstr "Récurrentes"
 
-#: data/ui/task_row.ui:18
+#: data/ui/task_row.ui:18 data/ui/prepared_row.ui:18
 msgid "Send back to the reserve"
 msgstr "Renvoyer dans la réserve"
 
-#: data/ui/task_row.ui:60 data/ui/task_row.ui:62 data/ui/reserve_row.ui:43
+#: data/ui/task_row.ui:60 data/ui/task_row.ui:62 data/ui/prepared_row.ui:44
+#: data/ui/prepared_row.ui:46 data/ui/reserve_row.ui:43
 #: data/ui/reserve_row.ui:45
 msgid "Priority"
 msgstr "Prioritaire"
 
-#: data/ui/task_row.ui:87 data/ui/reserve_row.ui:70
+#: data/ui/task_row.ui:87 data/ui/prepared_row.ui:71 data/ui/reserve_row.ui:70
 msgid "Rename"
 msgstr "Renommer"
 
-#: data/ui/task_row.ui:104 data/ui/reserve_row.ui:87
+#: data/ui/task_row.ui:104 data/ui/prepared_row.ui:97 data/ui/reserve_row.ui:87
 #: data/ui/recurring_row.ui:40
 msgid "Delete"
 msgstr "Supprimer"
@@ -369,6 +374,18 @@ msgstr "Ajouter une tâche…"
 #: data/ui/day_view.ui:116 data/ui/archives_window.ui:143
 msgid "The list is empty."
 msgstr "La liste est vide."
+
+#: data/ui/prepared_row.ui:88
+msgid "Move to today"
+msgstr "Ramener à aujourd'hui"
+
+#: data/ui/tomorrow_view.ui:17
+msgid "Add a task for tomorrow…"
+msgstr "Ajouter une tâche pour demain…"
+
+#: data/ui/tomorrow_view.ui:68
+msgid "Nothing is prepared."
+msgstr "Rien n'est préparé."
 
 #: data/ui/reserve_row.ui:32
 msgid "Send to the day"
@@ -526,6 +543,16 @@ msgstr "Libérer la liste"
 msgid "Freeze the list"
 msgstr "Figer la liste"
 
+#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:77
+#: src/rature/ui/task_row.py:89
+msgid "Remove priority"
+msgstr "Retirer la priorité"
+
+#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:77
+#: src/rature/ui/task_row.py:89
+msgid "Mark as priority"
+msgstr "Marquer comme prioritaire"
+
 #: src/rature/ui/recurring_row.py:67
 msgid "this week"
 msgstr "cette semaine"
@@ -538,14 +565,6 @@ msgstr "la semaine prochaine"
 msgid "every two weeks"
 msgstr "une semaine sur deux"
 
-#: src/rature/ui/reserve_row.py:77 src/rature/ui/task_row.py:89
-msgid "Remove priority"
-msgstr "Retirer la priorité"
-
-#: src/rature/ui/reserve_row.py:77 src/rature/ui/task_row.py:89
-msgid "Mark as priority"
-msgstr "Marquer comme prioritaire"
-
 #: src/rature/ui/task_row.py:73
 msgid "Undo the strike"
 msgstr "Annuler la rature"
@@ -554,21 +573,21 @@ msgstr "Annuler la rature"
 msgid "Strike through"
 msgstr "Rayer"
 
-#: src/rature/ui/window.py:290
+#: src/rature/ui/window.py:313
 msgid "Changes could not be saved to disk."
 msgstr "Les modifications n'ont pas pu être enregistrées sur le disque."
 
-#: src/rature/ui/window.py:298
+#: src/rature/ui/window.py:321
 #, python-format
 msgid "The data file could not be read. It was moved aside as %s."
 msgstr ""
 "Le fichier de données n'a pas pu être lu. Il a été mis de côté sous le nom "
 "%s."
 
-#: src/rature/ui/window.py:301 src/rature/ui/window.py:307
+#: src/rature/ui/window.py:324 src/rature/ui/window.py:330
 msgid "Dismiss"
 msgstr "Ignorer"
 
-#: src/rature/ui/window.py:305
+#: src/rature/ui/window.py:328
 msgid "A new day has started. The previous one has been archived."
 msgstr "Une nouvelle journée a commencé. La précédente a été archivée."
