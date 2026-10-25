@@ -52,8 +52,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   Seize points de détail validés par VertOurs le même jour (raccourcis
   `Ctrl+1` à `Ctrl+4` dans l'ordre du panneau, « Move to tomorrow » et
   « Move to today », barre « Add a task for tomorrow… », format v4…).
-  **Aucun code** : ces points sont à reporter dans `SPECIFICATION.md`
-  avant toute implémentation, pas encore fait.
+  Points reportés dans `SPECIFICATION.md` le 25 octobre 2026 (bloc
+  Demain et étape 7 en §2.5, §2.7.9 suppression définitive, §3.16 vue
+  Demain, §3.15 laissé vacant), plus cinq précisions validées le même
+  jour : entrées de menu avant Delete, « Move to tomorrow » absent sur une
+  rayée ou une récurrente, page vide seulement sans récurrente due,
+  `Ctrl+Z` limité au jour, dépôt d'une tâche de Demain sur l'entrée
+  Reserve. §3.14 corrigé : Added n'est plus égal à `counter - 1` depuis
+  7.2 ; la docstring de `core/stats.py` reste à corriger dans la PR de
+  code. **Aucun code encore** : prochaine étape, `core` de 7.3.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
   VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
   section dédiée du chantier 7) : PR #148 (squash `6dda0d2`, pied

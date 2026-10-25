@@ -19,8 +19,9 @@ technique. Ceci est le produit.
 
 1. Les tâches sont dictées une par une, en vrac, sans ordre imposé
 2. Chaque tâche est ajoutée à une liste numérotée, sans commentaire
-3. La liste peut être figée. Une liste figée bloque l'ajout d'une tâche et
-   le tirage depuis la réserve. Rayer, dérayer, renommer, marquer ou
+3. La liste peut être figée. Une liste figée bloque l'ajout d'une tâche,
+   le tirage depuis la réserve et le retour d'une tâche de Demain
+   (§2.5). Rayer, dérayer, renommer, marquer ou
    retirer la priorité, supprimer et réordonner restent possibles. Figer arrête la composition de la journée,
    pas son déroulement
 4. Rayer une tâche la barre et la remonte dans un bloc « Rayées », en haut
@@ -85,14 +86,17 @@ le comportement de l'utilisateur est hors sujet.
 - Ajouter une tâche puis la rayer immédiatement est un usage normal, c'est de
   la journalisation rétroactive, pas une erreur à corriger. Maj+Entrée dans
   la zone de saisie du jour le fait en un geste (§3.2)
-- Le numéro d'une tâche est une étiquette attribuée à l'ajout. Il ne change
-  jamais, ni à la rature, ni à la suppression, ni au réordonnancement, ni au
+- Le numéro d'une tâche est une étiquette attribuée à son entrée dans la
+  journée : à l'ajout, au tirage depuis la réserve, au retour depuis Demain
+  ou au passage du jour pour une tâche préparée (§2.5). Une tâche de Demain
+  n'a pas de numéro. Il ne change jamais, ni à la rature, ni à la suppression, ni au réordonnancement, ni au
   passage d'une tâche dans le bloc « Rayées »
 - L'ordre d'affichage est indépendant du numéro. Une liste réordonnée peut
   très bien afficher 3, 1, 7. C'est voulu
 - Un numéro libéré par une suppression n'est jamais réattribué dans la
   journée
-- Rien n'est perdu au passage d'une journée à l'autre
+- Rien n'est perdu au passage d'une journée à l'autre, liste préparée
+  dans Demain comprise
 
 ### 2.5 Réserve et récurrentes
 
@@ -172,6 +176,76 @@ prochaine » comme semaine active, `core` en déduit le lundi à partir de la
 date de référence. Ajouté au chantier 7, hors des cases prévues, sur
 décision de VertOurs.
 
+**Demain** : la liste préparée pour la prochaine journée qui démarrera.
+Demain n'est pas une date : après plusieurs jours sans ouverture, la liste
+préparée devient quand même la liste du jour qui s'ouvre (point 7
+ci-dessous). Décision et alternatives écartées :
+`docs/adr/0008-preparer-le-lendemain.md`. Ajouté au chantier 7.3.
+
+- **Une tâche préparée** porte un identifiant, un texte, une origine, la
+  trace de son item de réserve (`source_id`, `source_created`) et sa
+  priorité. Pas de numéro, pas de rature : on ne raye pas dans Demain.
+  L'origine est celle du jour (`day`) pour une tâche ajoutée dans Demain,
+  celle de la réserve pour un item tiré, jamais celle d'une récurrente
+- **On y ajoute, renomme, réordonne, supprime, marque ou retire la
+  priorité.** Un ajout va en fin de liste. Aucun dédoublonnage, nulle
+  part : chaque entrée dans Demain est un geste explicite (§2.7.4)
+- **Demain n'a pas de verrou**, et figer la journée ne la concerne pas
+  (§2.1 point 3)
+- **Supprimer dans Demain est définitif** (§2.7.9)
+
+Trois gestes y font entrer une tâche, chacun en fin de liste. Le même
+libellé, `Move to tomorrow`, les désigne depuis le jour et depuis la
+réserve (§3.8).
+
+- **Depuis la réserve** : un déplacement, comme le tirage vers le jour.
+  L'item quitte la réserve, la tâche préparée garde son `id` dans
+  `source_id`, sa date dans `source_created`, son texte et sa priorité.
+  Autorisé sur une journée figée, qui ne concerne pas Demain
+- **Depuis le jour** : décaler une tâche en cours. La tâche garde son
+  `id`, son origine, `source_id`, `source_created` et sa priorité, et perd
+  son numéro. Mêmes restrictions que le renvoi manuel en réserve : ni une
+  tâche rayée, ni une tâche issue d'une récurrente. Autorisé sur une liste
+  figée. Comme le renvoi, aucune trace dans la journée : ni archive, ni
+  journal, numéro jamais réattribué, absente des comptages de §2.6
+- **Ajout direct** dans la vue Demain (§3.16)
+
+Deux gestes l'en font sortir avant le passage du jour :
+
+- **Retour vers le jour** (`Move to today`) : la tâche entre dans la
+  journée en fin de liste et reçoit le numéro suivant, comme un tirage. Elle
+  garde son `id`, son origine, sa trace de réserve et sa priorité. Refusé
+  sur une liste figée, comme le tirage. C'est le geste qui défait un
+  décalage par erreur, faute d'annulation
+- **Renvoi en réserve** : mêmes règles que le renvoi depuis le jour. Une
+  tâche issue de la réserve y retourne sous son `id` d'item et sa date
+  d'origine ; une tâche créée dans le jour ou dans Demain devient un item
+  neuf, daté du jour de référence, sans dédoublonnage
+
+Une tâche tirée de la réserve vers Demain qui n'est pas faite le lendemain
+retourne en réserve au passage du jour suivant, par son `source_id`, comme
+toute tâche tirée (point 2).
+
+**Récurrentes affichées dans Demain** : celles qui sont dues à la date de
+référence plus un jour, parité comprise (§2.7.7), dans l'ordre où le passage
+du jour les injecterait. En lecture seule : aucune action sur elles depuis
+Demain. Limite acceptée : après plusieurs jours sans ouverture, le passage
+du jour injecte les récurrentes de la date qui s'ouvre réellement, qui
+peuvent différer de celles affichées la veille. L'affichage est une
+indication, la règle reste le point 6.
+
+**Ce que Demain ne touche pas** : ni les statistiques (§2.6), ni la copie
+texte (§3.12), ni les archives. La liste vit dans le fichier principal
+seulement. Une tâche préparée n'apparaît dans une archive qu'une fois entrée
+dans une journée.
+
+**Format** : version 4. Le fichier principal gagne une clé `tomorrow`, liste
+ordonnée de tâches préparées (`PreparedTask` : `id`, `text`, `origin`,
+`source_id`, `source_created`, `priority`). La migration 3 → 4 ajoute
+`"tomorrow": []` au fichier principal ; un fichier d'archive ne change que
+de numéro de version. Testée sur des fichiers v3 principal et archive
+fabriqués, et sur la chaîne depuis la version 1 (`CLAUDE.md` §4 règle 7).
+
 **Date de référence** : la date locale, jamais UTC. La bascule d'un jour à
 l'autre a lieu à 04:00 heure locale. Une liste remplie à 01:00 appartient à
 la journée de la veille. Au changement d'heure, la bascule suit l'heure
@@ -192,13 +266,20 @@ changé, et vérifié périodiquement tant que l'application reste ouverte :
    suppressions part avec l'archive, la nouvelle journée démarre avec un
    journal vide
 6. Les récurrentes du jour sont injectées
+7. Les tâches préparées dans Demain entrent dans la journée, dans leur
+   ordre, à la suite des récurrentes, comme si elles avaient été dictées en
+   début de journée. Elles reçoivent leurs numéros à ce moment-là et
+   gardent leur `id`, leur origine, leur trace de réserve et leur priorité.
+   Demain se vide. Ajouté au chantier 7.3
 
 Si plusieurs jours se sont écoulés depuis la dernière ouverture, le passage
 du jour ne s'exécute qu'une fois. La journée enregistrée est archivée sous sa
 propre date. Les jours intermédiaires n'existent pas, ils ne sont ni
-archivés, ni peuplés. Seules les récurrentes du jour courant sont injectées.
+archivés, ni peuplés. Seules les récurrentes du jour courant sont injectées,
+puis la liste préparée, une seule fois, dans la journée qui s'ouvre.
 
-Aucune donnée n'est perdue lors d'un passage de jour. C'est cette garantie
+Aucune donnée n'est perdue lors d'un passage de jour, liste préparée
+comprise. C'est cette garantie
 qui autorise à le déclencher sans demander confirmation. Une tâche supprimée
 fait exception : la suppression est un abandon volontaire, elle ne revient
 donc pas en réserve, y compris si la tâche en était issue.
@@ -215,6 +296,11 @@ depuis le menu. Elle est en lecture seule et porte sur les archives.
 
 **Autorisé** : nombres bruts par jour et par période. Tâches ajoutées,
 rayées, supprimées, renvoyées en réserve. Une répartition dans le temps.
+
+Demain n'est jamais compté. Une tâche préparée n'est comptée qu'une fois
+entrée dans une journée, comme ajoutée ce jour-là. Une tâche décalée du jour
+vers Demain n'y laisse aucune trace, comme un renvoi en réserve. Ajouté au
+chantier 7.3.
 
 Les trois premiers comptages se déduisent des tâches archivées. Les
 suppressions se comptent à partir du journal décrit en §2.2. Ce journal
@@ -369,6 +455,22 @@ Motif : la priorité est une information que l'utilisateur a posée. Écarter
 le doublon sans la reporter la perdrait silencieusement, ce qui contredit la
 garantie « aucune donnée n'est perdue » de §2.5.
 
+**2.7.9 Suppression dans Demain**
+
+Ajouté le 12 octobre 2026, au chantier 7.3. Supprimer une tâche de Demain
+est **définitif** : aucune entrée de journal, aucune annulation.
+
+Le journal de suppressions appartient à la journée (§2.2, ADR 0005) : il
+part avec son archive et ne sert qu'au comptage de §2.6, qui ne voit pas
+Demain. Y inscrire une tâche qui n'a jamais été dans une journée fausserait
+ce comptage, et l'annulation de §3.2 restaure dans la journée, pas dans
+Demain.
+
+Comme en §2.7.3, supprimer une tâche préparée tirée de la réserve détruit
+définitivement l'item d'origine. La protection reste celle de §3.2 : la
+suppression est une entrée de menu, jamais un bouton de ligne, et §2.3
+interdit la confirmation.
+
 ---
 
 ## 3. Spécification d'interface
@@ -390,8 +492,10 @@ jamais les pixels. Le contrôle du rendu réel reste humain, voir `CLAUDE.md`
 ### 3.1 Fenêtre principale
 
 Une seule fenêtre, `AdwApplicationWindow`, contenant un
-`AdwNavigationSplitView`. Le panneau latéral porte trois entrées : Day,
-Reserve, Recurring. Chaque entrée affiche sa vue dans le panneau de contenu.
+`AdwNavigationSplitView`. Le panneau latéral porte quatre entrées, dans cet
+ordre : Day, Tomorrow, Reserve, Recurring. Chaque entrée affiche sa vue dans
+le panneau de contenu. Tomorrow rejoint le panneau au chantier 7.3, juste
+après Day (§3.16).
 
 Les archives ne sont pas une entrée du panneau. Elles s'ouvrent depuis le
 menu principal, dans une fenêtre distincte, voir §3.5.
@@ -401,9 +505,9 @@ menu principal, dans une fenêtre distincte, voir §3.5.
 │ Rature                    ⋮  │  Monday 31 August                     🔒 │
 ├──────────────────────────────┼──────────────────────────────────────────┤
 │  Day                         │  ┌────────────────────────────────────┐  │
-│  Reserve                     │  │  2   call the dentist       ↺   ⋮  │  │
-│  Recurring                   │  │  5   take out the bin       ↺   ⋮  │  │
-│                              │  └────────────────────────────────────┘  │
+│  Tomorrow                    │  │  2   call the dentist       ↺   ⋮  │  │
+│  Reserve                     │  │  5   take out the bin       ↺   ⋮  │  │
+│  Recurring                   │  └────────────────────────────────────┘  │
 │                              │  ┌────────────────────────────────────┐  │
 │                              │  │  1   finish the meson file  ✓   ⋮  │  │
 │                              │  │  3   answer Marie           ✓   ⋮  │  │
@@ -430,8 +534,10 @@ fois, avant toute fenêtre, et la garde. Le traitement des échecs de démarrage
 est en §3.6. Aucun autre objet n'appelle `App.open`.
 
 **Passage du jour en cours d'exécution.** Une minuterie de soixante secondes
-appelle `App.ensure_day`. Si elle rend une journée, les trois vues se
-rafraîchissent et une bannière neutre l'annonce, voir §3.8. Un délai fixe et
+appelle `App.ensure_day`. Si elle rend une journée, toutes les vues se
+rafraîchissent et une bannière neutre l'annonce, voir §3.8. La bannière ne
+change pas avec Demain : elle ne dit rien de la liste préparée entrée dans
+la journée. Un délai fixe et
 court, plutôt qu'un réveil calculé jusqu'à 04:00, parce que le calcul se
 trompe une nuit par an au changement d'heure.
 
@@ -526,7 +632,18 @@ replié, l'entrée n'étant pas à l'écran ; le bouton couvre ce cas (§3.7).
 
 **Menu de ligne.** Rename, puis Delete au chantier 3. Depuis le
 chantier 7.2 : Rename, `Mark as priority` ou `Remove priority` selon l'état
-de la tâche, puis Delete.
+de la tâche, puis Delete. Depuis le chantier 7.3, `Move to tomorrow` s'insère
+avant Delete, qui reste la dernière entrée.
+
+**Décaler vers Demain.** Ajouté au chantier 7.3, règles en §2.5. L'entrée
+`Move to tomorrow` du menu, ou le dépôt de la ligne sur l'entrée Tomorrow du
+panneau latéral, appellent **la même méthode de la fenêtre**. La ligne
+disparaît de la journée et réapparaît en fin de Demain. L'entrée de menu
+n'existe que là où le bouton `←` existe : tâche en cours, non issue d'une
+récurrente. Elle est absente, pas insensible, sur les autres. La cible
+refuse le dépôt et ne s'illumine pas dans les mêmes cas. Les deux restent
+actifs sur une liste figée. Aucun retour visuel au-delà du déplacement,
+§2.3.
 
 **Priorité.** Ajouté au chantier 7.2, règles en §2.5. L'entrée du menu
 marque ou retire la priorité, mêmes autorisations que le renommage : liste
@@ -563,8 +680,10 @@ d'aide des raccourcis (autre point du chantier 4).
 
 - la zone de saisie est insensible
 - le dépôt d'un élément de réserve est refusé, voir §3.6
+- le retour d'une tâche de Demain est refusé, menu et dépôt (§3.16)
 - rayer, dérayer, renommer, marquer ou retirer la priorité, supprimer,
-  annuler une suppression et réordonner restent actifs
+  annuler une suppression, réordonner, renvoyer en réserve et décaler vers
+  Demain restent actifs
 
 Aucun autre changement d'apparence. Pas de bandeau, pas de message. L'état du
 bouton suffit.
@@ -611,7 +730,8 @@ la réserve, c'est un déplacement et non une copie, §2.5. Il est insensible
 quand la liste du jour est figée.
 
 **Menu de ligne** : Rename, `Mark as priority` ou `Remove priority` selon
-l'état de l'item, puis Delete. Le renommage est en place, comme en §3.2. La
+l'état de l'item, `Move to tomorrow` depuis le chantier 7.3, puis Delete. Le
+renommage est en place, comme en §3.2. La
 priorité s'affiche comme en §3.2 : même icône, même colonne, juste avant le
 bouton de menu. Marquer est autorisé sur une liste du jour figée, qui ne
 concerne pas la réserve.
@@ -627,9 +747,15 @@ autre ligne de la réserve, déplace l'item, avec les règles de la vue Jour
 (§3.2) : moitié haute de la ligne visée, l'item passe devant elle ; moitié
 basse, devant la suivante, ou en fin de liste sur la dernière. Un dépôt sur
 la ligne elle-même ne change rien. Une seule source de glissement par ligne,
-deux cibles possibles : l'entrée Day tire l'item, une autre ligne le
-déplace. Autorisé sur une liste du jour figée, qui ne concerne pas la
+plusieurs cibles : l'entrée Day tire l'item, une autre ligne le déplace,
+l'entrée Tomorrow le prépare (ci-dessous). Autorisé sur une liste du jour figée, qui ne concerne pas la
 réserve (§2.1 point 3).
+
+**Préparer pour demain.** Ajouté au chantier 7.3, règles en §2.5. L'entrée
+`Move to tomorrow` du menu, ou le dépôt de la ligne sur l'entrée Tomorrow du
+panneau latéral, appellent **la même méthode de la fenêtre**. L'item quitte
+la réserve et réapparaît en fin de Demain. Toujours disponible, y compris
+sur une liste du jour figée : Demain n'a pas de verrou.
 
 ---
 
@@ -806,6 +932,13 @@ c'est la raison pour laquelle les deux existent. Il en va de même, dans
 l'autre sens, du dépôt d'une tâche du jour sur l'entrée Reserve et du
 bouton de renvoi (§3.2).
 
+Depuis le chantier 7.3, le panneau compte une entrée de plus, Tomorrow,
+sans autre traitement particulier. Les dépôts sur l'entrée Tomorrow, depuis
+le jour ou la réserve, et sur les entrées Day et Reserve depuis Demain, sont
+indisponibles en mode replié pour la même raison ; les entrées
+`Move to tomorrow` et `Move to today` des menus de ligne et le bouton `←`
+couvrent ces cas.
+
 ---
 
 ### 3.8 Textes affichés
@@ -815,18 +948,20 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 
 | Emplacement | Texte |
 |---|---|
-| Entrée de navigation | `Day`, `Reserve`, `Recurring` |
+| Entrée de navigation | `Day`, `Tomorrow`, `Reserve`, `Recurring` |
+| Titre de la vue Demain | `Tomorrow` |
 | Menu principal | `Archives`, `Statistics`, `Keyboard Shortcuts`, `About Rature` |
 | Saisie du jour | `Add a task…` |
+| Saisie de Demain | `Add a task for tomorrow…` |
 | Saisie de la réserve | `Add to the reserve…` |
 | Recherche dans les archives | `Search the archives…` |
-| Menu de ligne | `Rename`, `Edit`, `Mark as priority`, `Remove priority`, `Delete` |
+| Menu de ligne | `Rename`, `Edit`, `Mark as priority`, `Remove priority`, `Move to tomorrow`, `Move to today`, `Delete` |
 | Icône de priorité, nom accessible et infobulle | `Priority` |
 | Infobulle de rature | `Strike through`, `Undo the strike` |
 | Infobulle d'annulation de suppression | `Undo delete` |
 | Infobulle de copie | `Copy as text` |
 | Fenêtre des raccourcis, titres de groupe | `General`, `Navigation`, `Tasks` |
-| Fenêtre des raccourcis, descriptions | `Quit`, `Keyboard Shortcuts`, `Show the Day view`, `Show the Reserve view`, `Show the Recurring view`, `Add a task`, `Add a task already struck`, `Undo the last deletion`, `Cancel an edit` |
+| Fenêtre des raccourcis, descriptions | `Quit`, `Keyboard Shortcuts`, `Show the Day view`, `Show the Tomorrow view`, `Show the Reserve view`, `Show the Recurring view`, `Add a task`, `Add a task already struck`, `Undo the last deletion`, `Cancel an edit` |
 | Infobulle d'envoi | `Send to the day` |
 | Infobulle de renvoi | `Send back to the reserve` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
@@ -834,6 +969,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Every two weeks`, `This week`, `Next week`, `Cancel`, `Save` |
 | Sous-titre de récurrente une semaine sur deux | `every two weeks`, `this week`, `next week` |
 | Vue Jour vide | `The list is empty.` |
+| Demain vide | `Nothing is prepared.` |
 | Réserve vide | `The reserve is empty.` |
 | Récurrentes vides | `No recurring tasks.` |
 | Archives vides | `No archived days.` |
@@ -916,13 +1052,20 @@ rien de propre à l'application au-delà de ce qui existait déjà.
 | `Échap` | Annuler un renommage en cours | déjà en place, §3.2 |
 | `Ctrl+Q` | Quitter | déjà en place |
 | `Ctrl+Z` | Annuler la dernière suppression | nouveau, déclenche l'action de §3.2 |
-| `Ctrl+1`, `Ctrl+2`, `Ctrl+3` | Aller à Day, Reserve, Recurring | nouveau |
+| `Ctrl+1`, `Ctrl+2`, `Ctrl+3`, `Ctrl+4` | Aller à Day, Tomorrow, Reserve, Recurring | `Ctrl+4` et décalage au chantier 7.3 |
 | `Ctrl+?`, `F1` | Ouvrir la fenêtre d'aide | nouveau |
 
 Rien pour figer la liste ni pour rayer une tâche : aucune touche standard, et
 §2.3 veut que la suppression comme la rature restent des gestes explicites, à
-la souris ou au menu. `Ctrl+1/2/3` changent seulement la vue affichée, sans
-rien sélectionner dans les listes.
+la souris ou au menu. `Ctrl+1` à `Ctrl+4` changent seulement la vue
+affichée, sans rien sélectionner dans les listes.
+
+**Ordre du panneau.** Les chiffres suivent l'ordre des entrées du panneau
+latéral (§3.1). Depuis le chantier 7.3, Tomorrow prend `Ctrl+2`, Reserve
+passe de `Ctrl+2` à `Ctrl+3` et Recurring de `Ctrl+3` à `Ctrl+4`. C'est un
+changement visible pour qui avait pris l'habitude des anciens chiffres : il
+figure dans la rubrique « Changed » du `CHANGELOG.md` de la version qui le
+livre.
 
 **Fenêtre d'aide.** Un `AdwShortcutsDialog` chargé depuis un `.ui`, ouvert
 par `present`. `GtkShortcutsWindow` est écarté : déprécié depuis GTK 4.18,
@@ -931,7 +1074,7 @@ qu'un `GtkShortcutsWindow`, l'action `win.show-help-overlay` et ses
 accélérateurs `Ctrl+?` et `F1` sont posés à la main. Trois sections :
 
 - **General** : Quitter, Keyboard Shortcuts
-- **Navigation** : les trois vues
+- **Navigation** : les quatre vues, dans l'ordre du panneau
 - **Tasks** : Ajouter une tâche, Ajouter une tâche déjà rayée, Annuler la
   dernière suppression, Annuler un renommage
 
@@ -1079,7 +1222,10 @@ ancien, exactement l'ordre d'`App.archives()`. Cinq colonnes, en-têtes en
   semaine (`%A %d %B`), comme les titres d'en-tête de la vue Jour et de la
   fenêtre d'archives.
 - **Added** : `len(day.tasks) + len(day.deletions)`, c'est à dire toute
-  tâche ayant reçu un numéro ce jour-là, égal à `day.counter - 1`. Le
+  tâche ayant reçu un numéro ce jour-là et restée dans la journée,
+  rayée, en cours ou supprimée. Ce n'est pas `day.counter - 1` : une tâche
+  renvoyée en réserve (§2.5, chantier 7.2) ou décalée vers Demain
+  (chantier 7.3) a consommé un numéro sans laisser de trace. Le
   journal `deletions` n'est utilisé que pour son **nombre d'entrées**,
   jamais pour leur texte (§2.2, §2.6).
 - **Struck** : les tâches `done` de la journée archivée. Une tâche rayée
@@ -1121,3 +1267,85 @@ expose à l'interface sous la forme d'une liste `(date, compteurs)` du plus
 récent au plus ancien, dans le même ordre qu'`App.archives()`, les archives
 illisibles omises. Les totaux se somment dans l'interface, ils n'ont pas
 besoin de `core`.
+
+---
+
+### 3.16 Vue Demain
+
+Ajoutée au chantier 7.3, règles produit en §2.5 et §2.7.9. Le numéro §3.15
+n'est pas réutilisé : il désignait la boîte de dépôt, retirée, et
+l'ADR 0007 le cite encore.
+
+```
+┌────────────────────────────────────────────────────┐
+│  Tomorrow                                          │
+├────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────┐  │
+│  │  water the plants                            │  │
+│  │  weekly backup                               │  │
+│  └──────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────┐  │
+│  │  ←   call the insurance              ★   ⋮   │  │
+│  │  ←   book the train                      ⋮   │  │
+│  └──────────────────────────────────────────────┘  │
+├────────────────────────────────────────────────────┤
+│  [ Add a task for tomorrow…                     ]  │
+└────────────────────────────────────────────────────┘
+```
+
+**Structure.** Même squelette que la vue Jour : `AdwToolbarView`, en-tête,
+deux listes empilées dans un `GtkScrolledWindow`, barre de saisie en pied.
+Le titre est `Tomorrow`, **sans date** : Demain n'est pas une date (§2.5).
+L'en-tête ne porte aucun bouton : ni copie texte (§3.12), ni annulation de
+suppression (§2.7.9), ni verrou, Demain n'en a pas.
+
+**Récurrentes dues.** Le bloc du haut liste les récurrentes dues à la date
+de référence plus un jour, dans l'ordre d'injection (§2.5). Lecture seule :
+texte seul, sans numéro, sans bouton, sans menu, sans glissement. Ni cible
+de dépôt, ni réordonnables. La liste vient de `core`, l'interface ne calcule
+ni jour ni parité. Un bloc vide n'est pas affiché, comme en §3.2.
+
+**Tâches préparées.** Le bloc du bas, dans l'ordre de la liste `tomorrow`.
+Une ligne :
+
+- `←` à gauche, renvoyer en réserve (§2.5), même bouton et même infobulle
+  qu'en §3.2. Présent sur toutes les lignes : une tâche préparée n'est
+  jamais rayée ni issue d'une récurrente. Le dépôt de la ligne sur l'entrée
+  Reserve du panneau latéral appelle **la même méthode de la fenêtre** que
+  le bouton, comme en §3.2. La cible l'accepte toujours
+- **aucun numéro** et **aucun bouton de rature** (§2.4, §2.5)
+- l'icône de priorité dans sa colonne, puis le menu de ligne, comme en §3.2
+
+**Menu de ligne** : Rename, `Mark as priority` ou `Remove priority`,
+`Move to today`, puis Delete. Le renommage est en place, comme en §3.2.
+Delete est **définitif**, sans journal ni annulation (§2.7.9).
+
+**Ramener dans la journée.** L'entrée `Move to today`, ou le dépôt de la
+ligne sur l'entrée Day du panneau latéral, appellent **la même méthode de la
+fenêtre**. La tâche entre en fin de journée avec le numéro suivant (§2.5).
+Quand la liste du jour est figée, l'entrée de menu est insensible, et la
+cible refuse le dépôt et ne s'illumine pas, comme pour un élément de réserve
+(§3.3).
+
+**Réordonner.** Glisser-déposer à l'intérieur du bloc des tâches préparées,
+mêmes règles qu'en §3.2 et §3.3 : moitié haute, devant la ligne visée ;
+moitié basse, devant la suivante ou en fin de liste. Toujours disponible.
+
+**Ajouter.** `Add a task for tomorrow…` (§3.8). Mêmes règles que la vue
+Jour : Entrée ajoute en fin de liste, la zone se vide, **garde le focus**,
+et la liste défile jusqu'à la nouvelle tâche. Maj+Entrée ajoute
+normalement : on ne raye pas dans Demain. Un texte vide après suppression
+des espaces n'ajoute rien. Jamais insensible, figer la journée ne concerne
+pas Demain.
+
+**Annulation.** `Ctrl+Z` garde son effet de §3.11 depuis cette vue : il
+restaure la dernière suppression de la journée, dans la journée. Il ne
+restaure jamais une tâche supprimée dans Demain, qui n'a pas de journal.
+
+**Vue vide.** Un `AdwStatusPage` sans icône, texte `Nothing is prepared.`
+(§3.8), quand il n'y a ni tâche préparée ni récurrente due. Il remplace les
+deux blocs, jamais la barre de saisie.
+
+**Ce que la vue ne montre pas.** Aucune date, aucun compteur, aucune
+indication sur ce que deviendra la liste. Rien n'annonce son entrée dans la
+journée au passage du jour : la bannière de §3.1 reste inchangée.
