@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the main menu button also gain a tooltip ("More options", "Main
   menu").
 
+### Changed
+
+- An open Statistics window now updates when a new day starts: the day
+  just archived appears at the top and the totals follow, with nothing
+  highlighted and no jump in the scroll position.
+
 ## [1.8.0] - 2026-10-25
 
 The Tomorrow view, chantier 7.3. The data file moves to format version

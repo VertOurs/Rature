@@ -1272,6 +1272,18 @@ l'utilisateur, ne notifie jamais, ne se rouvre pas seule, et n'apparaît
 dans aucune autre vue. §2.6 : un chiffre qu'on va chercher est une
 consultation ; poussé, il devient un commentaire.
 
+**Rafraîchissement.** Ajouté au chantier 8. Une fenêtre Statistiques
+ouverte se reconstruit quand le passage du jour archive une journée,
+détecté par la minuterie de §3.1 : la nouvelle ligne apparaît en tête et
+la ligne de total suit. Une fenêtre qui affichait `No archived days.`
+passe au tableau. C'est le seul événement qui change les archives pendant
+que l'application tourne : rayer, dérayer, ajouter ou supprimer une tâche
+ne touche que la journée en cours, que la fenêtre ne montre pas (§2.6).
+Rien n'attire l'attention sur le changement : ni mise en évidence de la
+nouvelle ligne, ni animation, ni retour en haut du défilement, ni
+fenêtre ramenée au premier plan. La fenêtre reste exacte, elle ne
+signale rien, conformément au paragraphe ci-dessus.
+
 Côté `core`, une fonction pure `day_counts(day)` rend les quatre nombres
 d'une journée (un petit dataclass de compteurs). `App.statistics()` les
 expose à l'interface sous la forme d'une liste `(date, compteurs)` du plus

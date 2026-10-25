@@ -365,6 +365,10 @@ codée avant que la spec ne la décrive.
 
 - [ ] Fenêtre Statistiques rafraîchie pendant qu'elle est ouverte, sans
       avoir à la refermer
+- [ ] Fenêtre Archives rafraîchie de la même façon : ouverte pendant le
+      passage du jour, elle ne montre pas la journée qui vient d'être
+      archivée. Relevé au cadrage de 8.3 le 25 octobre 2026, à traiter
+      après 8.4, hors critère de fin
 - [ ] Catalogues `es`, `de`, `pt_BR`, `ru`, `eo`
 - [x] Job CI de traduction :
       `msgfmt --check --check-format --check-header`. Déjà couvert par

@@ -18,12 +18,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `es`, `de`, `pt_BR`, `ru`, `eo`, traduits par Claude, marqués
   « machine translation » dans l'en-tête, une PR par langue. Tests
   d'interface sous `gtk4-broadwayd` reportés après `2.0.0` : hors critère
-  de fin, pas d'outillage CI nouveau. **8.2 en cours** sur
-  `feat/accessible-names` : spec §3.8 « Noms accessibles », nom accessible
-  égal à l'infobulle sur les 14 boutons à icône (deux posés depuis Python
-  car ils changent d'état), `Main menu` et `More options` nouveaux,
-  `fr.po` 104/104, deux tests de câblage. Libellés validés par VertOurs.
-  Prévu pour `1.9.0`, groupé avec 8.3. **À réévaluer vers le
+  de fin, pas d'outillage CI nouveau. **8.2 fusionnée** (PR #170, squash `0b37c77`) :
+  nom accessible égal à l'infobulle sur les 14 boutons à icône, `Main
+  menu` et `More options`, deux tests de câblage, contrôle visuel OK.
+  **8.3 en cours** sur `feat/statistics-refresh` : spec §3.14
+  « Rafraîchissement », `StatisticsWindow.refresh()` appelée par la
+  minuterie de la fenêtre principale sur chaque fenêtre Statistiques
+  ouverte, au seul tick qui archive une journée ; défilement conservé
+  (`list_helpers.keeping_place`). Fenêtre Archives notée au chantier 8 de
+  la roadmap, même défaut, après 8.4. 8.2 et 8.3 sortiront dans `1.9.0`. **À réévaluer vers le
   8 novembre 2026** : report automatique vers Demain (ADR 0008).
 - **`1.8.0` est publiée** (25 octobre 2026, sur `//51`) : vue Demain,
   chantier 7.3 (PR #160 à #165), format version 4, release PR #166
