@@ -333,9 +333,9 @@ ne connaît aujourd'hui qu'une seule journée active, et `CLAUDE.md` pose
       volontairement »
 - [x] ADR documentant la décision et son articulation avec §2.5 :
       `docs/adr/0008-preparer-le-lendemain.md`, le 12 octobre 2026
-- [ ] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après :
-      points de détail à trancher d'abord (raccourcis, place dans le
-      panneau, suppression et annulation dans Demain, format)
+- [x] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après :
+      seize points de détail validés le 12 octobre 2026, reportés le
+      25 octobre 2026 (§2.5 bloc Demain et étape 7, §2.7.9, §3.16)
 - [ ] `core` : liste Demain (ajout, renommage, réordonnancement,
       suppression, priorité, tirage depuis la réserve), décalage d'une
       tâche du jour vers Demain et retour de Demain vers le jour, étape 7
