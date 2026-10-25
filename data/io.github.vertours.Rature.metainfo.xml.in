@@ -65,6 +65,15 @@
   </screenshots>
 
   <releases>
+    <release version="1.9.0" date="2026-10-25">
+      <description>
+        <p>
+          Every icon-only button now has an accessible name, so screen
+          readers announce what it does. An open Statistics window updates
+          when a new day starts. No change to the data format.
+        </p>
+      </description>
+    </release>
     <release version="1.8.0" date="2026-10-25">
       <description>
         <p>

@@ -21,12 +21,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   de fin, pas d'outillage CI nouveau. **8.2 fusionnée** (PR #170, squash `0b37c77`) :
   nom accessible égal à l'infobulle sur les 14 boutons à icône, `Main
   menu` et `More options`, deux tests de câblage, contrôle visuel OK.
-  **8.3 en cours** sur `feat/statistics-refresh` : spec §3.14
-  « Rafraîchissement », `StatisticsWindow.refresh()` appelée par la
-  minuterie de la fenêtre principale sur chaque fenêtre Statistiques
-  ouverte, au seul tick qui archive une journée ; défilement conservé
-  (`list_helpers.keeping_place`). Fenêtre Archives notée au chantier 8 de
-  la roadmap, même défaut, après 8.4. 8.2 et 8.3 sortiront dans `1.9.0`. **À réévaluer vers le
+  **8.3 fusionnée** (PR #171, squash `9c467c3`) :
+  `StatisticsWindow.refresh()` au seul tick qui archive une journée,
+  défilement conservé, contrôle visuel OK avec une horloge qui saute d'un
+  jour. Fenêtre Archives notée au chantier 8 de la roadmap, après 8.4.
+  8.2 et 8.3 livrés dans `1.9.0`. Suivante : 8.4, une langue par PR. **À réévaluer vers le
   8 novembre 2026** : report automatique vers Demain (ADR 0008).
 - **`1.8.0` est publiée** (25 octobre 2026, sur `//51`) : vue Demain,
   chantier 7.3 (PR #160 à #165), format version 4, release PR #166
@@ -110,7 +109,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `1.8.0` | Vue Demain (7.3) et format version 4. Coupée le 25 octobre 2026 |
+| Version du projet | `1.9.0` | Noms accessibles (8.2) et Statistiques rafraîchies (8.3), sans changement de format. Coupée le 25 octobre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -172,6 +171,10 @@ Corrective : aucune fonctionnalité, aucun changement de format.
 #165), et le format de données version 4. Mineure pour la même raison
 que `1.6.0`. Un fichier écrit en version 4 n'est plus lisible par
 `1.7.1` et antérieures. Clôt le chantier 7.
+
+`1.9.0` (25 octobre 2026) publie les noms accessibles (PR #170) et la
+fenêtre Statistiques rafraîchie au passage du jour (PR #171). Mineure,
+aucun changement de format.
 
 **Bump vers GNOME 51** : avancé au 12 octobre 2026 par décision de
 VertOurs, initialement prévu pas avant le 16 octobre. Touche le
