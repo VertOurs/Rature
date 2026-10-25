@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-25 18:57+0100\n"
+"POT-Creation-Date: 2026-10-25 19:01+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -496,31 +496,35 @@ msgstr "Navigation"
 msgid "Show the Day view"
 msgstr "Afficher la vue Jour"
 
-#: data/ui/shortcuts.ui:41
+#: data/ui/shortcuts.ui:42
+msgid "Show the Tomorrow view"
+msgstr "Afficher la vue Demain"
+
+#: data/ui/shortcuts.ui:49
 msgid "Show the Reserve view"
 msgstr "Afficher la vue Réserve"
 
-#: data/ui/shortcuts.ui:48
+#: data/ui/shortcuts.ui:56
 msgid "Show the Recurring view"
 msgstr "Afficher la vue Récurrentes"
 
-#: data/ui/shortcuts.ui:57
+#: data/ui/shortcuts.ui:65
 msgid "Tasks"
 msgstr "Tâches"
 
-#: data/ui/shortcuts.ui:60
+#: data/ui/shortcuts.ui:68
 msgid "Add a task"
 msgstr "Ajouter une tâche"
 
-#: data/ui/shortcuts.ui:66
+#: data/ui/shortcuts.ui:74
 msgid "Add a task already struck"
 msgstr "Ajouter une tâche déjà rayée"
 
-#: data/ui/shortcuts.ui:72
+#: data/ui/shortcuts.ui:80
 msgid "Undo the last deletion"
 msgstr "Annuler la dernière suppression"
 
-#: data/ui/shortcuts.ui:79
+#: data/ui/shortcuts.ui:87
 msgid "Cancel an edit"
 msgstr "Annuler une modification"
 
@@ -573,21 +577,21 @@ msgstr "Annuler la rature"
 msgid "Strike through"
 msgstr "Rayer"
 
-#: src/rature/ui/window.py:313
+#: src/rature/ui/window.py:337
 msgid "Changes could not be saved to disk."
 msgstr "Les modifications n'ont pas pu être enregistrées sur le disque."
 
-#: src/rature/ui/window.py:321
+#: src/rature/ui/window.py:345
 #, python-format
 msgid "The data file could not be read. It was moved aside as %s."
 msgstr ""
 "Le fichier de données n'a pas pu être lu. Il a été mis de côté sous le nom "
 "%s."
 
-#: src/rature/ui/window.py:324 src/rature/ui/window.py:330
+#: src/rature/ui/window.py:348 src/rature/ui/window.py:354
 msgid "Dismiss"
 msgstr "Ignorer"
 
-#: src/rature/ui/window.py:328
+#: src/rature/ui/window.py:352
 msgid "A new day has started. The previous one has been archived."
 msgstr "Une nouvelle journée a commencé. La précédente a été archivée."

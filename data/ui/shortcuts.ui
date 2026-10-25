@@ -36,18 +36,26 @@
             <property name="accelerator">&lt;Control&gt;1</property>
           </object>
         </child>
+        <!-- SPECIFICATION.md §3.11: the digits follow the sidebar order. -->
+        <child>
+          <object class="AdwShortcutsItem">
+            <property name="title" translatable="yes">Show the Tomorrow view</property>
+            <property name="action-name">win.view-tomorrow</property>
+            <property name="accelerator">&lt;Control&gt;2</property>
+          </object>
+        </child>
         <child>
           <object class="AdwShortcutsItem">
             <property name="title" translatable="yes">Show the Reserve view</property>
             <property name="action-name">win.view-reserve</property>
-            <property name="accelerator">&lt;Control&gt;2</property>
+            <property name="accelerator">&lt;Control&gt;3</property>
           </object>
         </child>
         <child>
           <object class="AdwShortcutsItem">
             <property name="title" translatable="yes">Show the Recurring view</property>
             <property name="action-name">win.view-recurring</property>
-            <property name="accelerator">&lt;Control&gt;3</property>
+            <property name="accelerator">&lt;Control&gt;4</property>
           </object>
         </child>
       </object>

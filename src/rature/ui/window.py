@@ -148,6 +148,7 @@ class RatureWindow(Adw.ApplicationWindow):
 
         rows = {
             "view-day": self.day_sidebar_row,
+            "view-tomorrow": self.tomorrow_sidebar_row,
             "view-reserve": self.reserve_sidebar_row,
             "view-recurring": self.recurring_sidebar_row,
         }
@@ -170,9 +171,11 @@ class RatureWindow(Adw.ApplicationWindow):
         self.add_action(help_action)
 
         app = self.get_application()
+        # SPECIFICATION.md §3.11: the digits follow the sidebar order.
         app.set_accels_for_action("win.view-day", ["<Control>1"])
-        app.set_accels_for_action("win.view-reserve", ["<Control>2"])
-        app.set_accels_for_action("win.view-recurring", ["<Control>3"])
+        app.set_accels_for_action("win.view-tomorrow", ["<Control>2"])
+        app.set_accels_for_action("win.view-reserve", ["<Control>3"])
+        app.set_accels_for_action("win.view-recurring", ["<Control>4"])
         app.set_accels_for_action("win.undo-delete", ["<Control>z"])
         app.set_accels_for_action("win.show-help-overlay", ["<Control>question", "F1"])
 
