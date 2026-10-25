@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 VertOurs
-"""The day rollover: the 04:00 boundary, the six steps, multi-day, midnight, DST."""
+"""The day rollover: the 04:00 boundary, the seven steps, multi-day, midnight, DST."""
 
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -238,6 +238,85 @@ def test_recurring_are_injected_for_the_new_days_weekday() -> None:
     session.roll_over(NEXT_MORNING)
     assert [task.text for task in session.day.tasks] == ["is due"]
     assert session.day.tasks[0].origin == Origin.RECURRING
+
+
+# Step 7: the prepared list enters the new day.
+
+
+def test_prepared_tasks_enter_after_the_recurring_ones_in_their_order() -> None:
+    session = session_on(D24)
+    session.add_recurring("water plants", [D25.weekday()])
+    first = session.add_to_tomorrow("book the train")
+    second = session.add_to_tomorrow("call the insurance")
+    session.move_tomorrow_before(second.id, first.id)
+    session.roll_over(NEXT_MORNING)
+    assert [(t.num, t.text) for t in session.day.tasks] == [
+        (1, "water plants"),
+        (2, "call the insurance"),
+        (3, "book the train"),
+    ]
+    assert session.day.counter == 4
+    assert session.tomorrow == []
+
+
+def test_a_prepared_task_keeps_its_id_origin_link_and_priority() -> None:
+    session = session_on(D24)
+    item = session.add_to_reserve("someday", today=date(2026, 8, 20))
+    prepared = session.move_reserve_to_tomorrow(item.id)
+    session.set_tomorrow_priority(prepared.id, True)
+    session.roll_over(NEXT_MORNING)
+    (task,) = session.day.tasks
+    assert (task.id, task.origin, task.source_id, task.source_created) == (
+        prepared.id,
+        Origin.RESERVE,
+        item.id,
+        date(2026, 8, 20),
+    )
+    assert task.priority
+    assert not task.done
+
+
+def test_prepared_tasks_never_reach_the_old_days_steps() -> None:
+    session = session_on(D24)
+    session.add("same text")
+    session.add_to_tomorrow("same text")
+    old = session.roll_over(NEXT_MORNING)
+    # Step 3 sent the day task to the reserve; the prepared one, identical,
+    # entered the new day instead of being dropped as a duplicate.
+    assert [item.text for item in session.reserve] == ["same text"]
+    assert [task.text for task in session.day.tasks] == ["same text"]
+    assert [task.text for task in old.tasks] == ["same text"]
+    assert "tomorrow" not in old.to_dict()
+
+
+def test_a_prepared_reserve_task_left_undone_returns_at_the_next_rollover() -> None:
+    session = session_on(D24)
+    item = session.add_to_reserve("someday", today=date(2026, 8, 20))
+    session.move_reserve_to_tomorrow(item.id)
+    session.roll_over(NEXT_MORNING)
+    assert session.reserve == []
+    session.roll_over(datetime(2026, 8, 26, 9, 0))
+    assert [(i.id, i.created) for i in session.reserve] == [
+        (item.id, date(2026, 8, 20))
+    ]
+
+
+def test_a_frozen_day_does_not_stop_the_prepared_list() -> None:
+    session = session_on(D24)
+    session.add_to_tomorrow("prepared")
+    session.lock()
+    session.roll_over(NEXT_MORNING)
+    assert [task.text for task in session.day.tasks] == ["prepared"]
+    assert not session.day.locked
+
+
+def test_multi_day_lands_the_prepared_list_once_on_the_opening_day() -> None:
+    session = session_on(D24)
+    session.add_to_tomorrow("prepared")
+    session.roll_over(datetime(2026, 8, 29, 9, 0))
+    assert session.day.date == date(2026, 8, 29)
+    assert [(t.num, t.text) for t in session.day.tasks] == [(1, "prepared")]
+    assert session.tomorrow == []
 
 
 def test_multi_day_runs_once_and_lands_on_the_reference_date() -> None:

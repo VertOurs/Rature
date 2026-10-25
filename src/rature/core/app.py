@@ -463,6 +463,10 @@ class App:
         """
         return recurrence.cadence_on(item, reference_date(self.clock()))
 
+    def recurring_due_tomorrow(self) -> list[RecurringItem]:
+        """Templates due the day after the reference date (§3.16)."""
+        return self.session.recurring_due_tomorrow(reference_date(self.clock()))
+
     def delete_recurring(self, item_id: str) -> None:
         self.session.delete_recurring(item_id)
         self._save()

@@ -381,6 +381,16 @@ class Session:
         if self.day.locked:
             raise LockedError("the list is frozen")
         prepared = self._prepared(task_id)
+        task = self._enter_day(prepared)
+        self.tomorrow.remove(prepared)
+        return task
+
+    def _enter_day(self, prepared: PreparedTask) -> Task:
+        """Append ``prepared`` to the day with the next number.
+
+        Shared by move_to_today and the rollover's step 7: same id, origin,
+        reserve link and priority. Leaves Tomorrow to the caller.
+        """
         task = Task(
             id=prepared.id,
             num=self.day.counter,
@@ -392,7 +402,6 @@ class Session:
         )
         self.day.counter += 1
         self.day.tasks.append(task)
-        self.tomorrow.remove(prepared)
         return task
 
     def send_tomorrow_to_reserve(self, task_id: str, *, today: date) -> ReserveItem:
@@ -468,11 +477,20 @@ class Session:
             created.append(task)
         return created
 
+    def recurring_due_tomorrow(self, today: date) -> list[RecurringItem]:
+        """The templates due the day after ``today``, in injection order.
+
+        What the Tomorrow view shows, read-only (SPECIFICATION.md §2.5,
+        §3.16). An indication only: after several days unopened, the
+        rollover injects the templates of the day that actually opens.
+        """
+        return due_on(today + timedelta(days=1), self.recurring)
+
     def rollover_due(self, now: datetime) -> bool:
         return reference_date(now) > self.day.date
 
     def roll_over(self, now: datetime) -> Day:
-        """Run the SPECIFICATION.md §2.5 rollover and return the old day.
+        """Run the SPECIFICATION.md §2.5 rollover, seven steps, return the old day.
 
         Archiving it and saving the new one is the caller's job; App.ensure_day
         is where that full sequence lives.
@@ -511,6 +529,11 @@ class Session:
                 seen[key] = item
         self.day = Day(date=new_date)
         self.inject_recurring(new_date)
+        # Step 7: the prepared list enters the new day after the recurring
+        # tasks, as if dictated first thing. Numbers are given here (§2.4).
+        for prepared in self.tomorrow:
+            self._enter_day(prepared)
+        self.tomorrow = []
         return old
 
 
