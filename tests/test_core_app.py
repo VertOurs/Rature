@@ -517,6 +517,23 @@ def test_mutation_wrappers_persist_through_a_full_walkthrough(tmp_path: Path) ->
     assert load(data_dir=tmp_path).into_session().recurring == []
 
 
+def test_tomorrow_wrappers_persist(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    app = App.open(tmp_path, clock=clock_at(now))
+
+    first = app.add_to_tomorrow("draft")
+    second = app.add_to_tomorrow("second")
+    app.rename_tomorrow(first.id, "final")
+    app.set_tomorrow_priority(first.id, True)
+    app.move_tomorrow_before(second.id, first.id)
+    reloaded = load(data_dir=tmp_path).into_session()
+    assert [t.text for t in reloaded.tomorrow] == ["second", "final"]
+    assert [t.priority for t in reloaded.tomorrow] == [False, True]
+
+    app.delete_from_tomorrow(first.id)
+    assert load(data_dir=tmp_path).into_session().tomorrow == [second]
+
+
 def test_add_on_a_locked_list_raises_and_is_not_saved(tmp_path: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(tmp_path, clock=clock_at(now))

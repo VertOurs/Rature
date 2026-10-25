@@ -309,6 +309,41 @@ class Session:
         self.reserve.append(item)
         return item
 
+    # The Tomorrow list, SPECIFICATION.md §2.5. Nothing here checks
+    # day.locked: freezing the day stops its composition, and Tomorrow is
+    # not the day.
+
+    def _prepared(self, task_id: str) -> PreparedTask:
+        for task in self.tomorrow:
+            if task.id == task_id:
+                return task
+        raise KeyError(task_id)
+
+    def add_to_tomorrow(self, text: str) -> PreparedTask:
+        # SPECIFICATION.md §2.5: never de-duplicated, an explicit gesture.
+        task = PreparedTask(text=text, origin=Origin.DAY)
+        self.tomorrow.append(task)
+        return task
+
+    def rename_tomorrow(self, task_id: str, text: str) -> None:
+        self._prepared(task_id).text = text
+
+    def set_tomorrow_priority(self, task_id: str, priority: bool) -> None:
+        """Mark or unmark a prepared task; never moves it (§2.5)."""
+        self._prepared(task_id).priority = priority
+
+    def delete_from_tomorrow(self, task_id: str) -> None:
+        """Remove a prepared task for good, SPECIFICATION.md §2.7.9.
+
+        No journal entry and no undo: the journal belongs to the day. A task
+        drawn from the reserve takes its original item with it (§2.7.3).
+        """
+        self.tomorrow.remove(self._prepared(task_id))
+
+    def move_tomorrow_before(self, task_id: str, target_id: str | None) -> None:
+        """Reorder Tomorrow with move_before's rule (SPECIFICATION.md §3.16)."""
+        self.tomorrow = _moved_before(self.tomorrow, task_id, target_id)
+
     def _recurring_item(self, item_id: str) -> RecurringItem:
         for item in self.recurring:
             if item.id == item_id:
@@ -420,12 +455,13 @@ class Session:
         return old
 
 
-def _moved_before[T: (Task, ReserveItem)](
+def _moved_before[T: (Task, ReserveItem, PreparedTask)](
     items: list[T], item_id: str, target_id: str | None
 ) -> list[T]:
     """items with item_id moved right before target_id, or to the end on None.
 
-    The one rule behind Session.move_before and move_reserve_before.
+    The one rule behind Session.move_before, move_reserve_before and
+    move_tomorrow_before.
     item_id == target_id returns the list unchanged: a drag-and-drop that
     drops a row back where it was picked up. Unknown ids raise KeyError.
     """
