@@ -29,6 +29,9 @@
                 <property name="icon-name">document-revert-symbolic</property>
                 <property name="valign">center</property>
                 <property name="tooltip-text" translatable="yes">Undo delete</property>
+                <accessibility>
+                  <property name="label" translatable="yes">Undo delete</property>
+                </accessibility>
                 <property name="action-name">win.undo-delete</property>
                 <style>
                   <class name="flat"/>
@@ -41,6 +44,9 @@
                 <property name="icon-name">edit-copy-symbolic</property>
                 <property name="valign">center</property>
                 <property name="tooltip-text" translatable="yes">Copy as text</property>
+                <accessibility>
+                  <property name="label" translatable="yes">Copy as text</property>
+                </accessibility>
                 <style>
                   <class name="flat"/>
                 </style>

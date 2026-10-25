@@ -108,6 +108,64 @@ def test_visible_properties_are_marked_translatable() -> None:
     assert not violations, violations
 
 
+# SPECIFICATION.md §3.8, "Noms accessibles": GTK exposes a tooltip as the
+# accessible description, not the name, so an icon-only button needs a
+# label of its own or a screen reader announces it by role only.
+BUTTON_CLASSES = {"GtkButton", "GtkMenuButton", "GtkToggleButton"}
+
+# Icon set from Python with a state-dependent tooltip: the name is set
+# there too, with update_property (checked below), not in the .ui.
+NAMED_FROM_PYTHON = {
+    ("day_view.ui", "lock_button"): "day_view.py",
+    ("task_row.ui", "strike_button"): "task_row.py",
+}
+
+# Never shown (set_child_visible(False)), never focusable or targetable:
+# it only holds the width of the send-back button.
+ACCESSIBLE_NAME_EXCEPTIONS = {("tomorrow_recurring_row.ui", "spacer")}
+
+
+def _accessible_label(node: ET.Element) -> str | None:
+    accessibility = node.find("accessibility")
+    if accessibility is None:
+        return None
+    label = accessibility.find("property[@name='label']")
+    return None if label is None else label.text
+
+
+def test_icon_only_buttons_have_an_accessible_name() -> None:
+    violations = []
+    for ui_path in _ui_files():
+        for node in ET.parse(ui_path).iter("object"):
+            if node.get("class") not in BUTTON_CLASSES:
+                continue
+            key = (ui_path.name, node.get("id"))
+            props = {prop.get("name") for prop in node.findall("property")}
+            if key in ACCESSIBLE_NAME_EXCEPTIONS or "label" in props:
+                continue
+            if key in NAMED_FROM_PYTHON:
+                source = (UI_SRC / NAMED_FROM_PYTHON[key]).read_text()
+                if f"self.{key[1]}.update_property(" not in source:
+                    violations.append(f"{key}: no update_property in Python")
+                continue
+            if "icon-name" in props and not _accessible_label(node):
+                violations.append(f"{key}: icon-only button without a name")
+    assert not violations, violations
+
+
+def test_the_accessible_name_matches_the_tooltip() -> None:
+    mismatches = []
+    for ui_path in _ui_files():
+        for node in ET.parse(ui_path).iter("object"):
+            if node.get("class") not in BUTTON_CLASSES:
+                continue
+            tooltip = node.find("property[@name='tooltip-text']")
+            name = _accessible_label(node)
+            if tooltip is not None and name is not None and tooltip.text != name:
+                mismatches.append((ui_path.name, node.get("id"), tooltip.text, name))
+    assert not mismatches, mismatches
+
+
 # AdwActionRow, AdwBanner and AdwExpanderRow interpret Pango markup in
 # their title by default. Several titles in this app come from data the
 # user (or a file name on disk) controls, so every one of them

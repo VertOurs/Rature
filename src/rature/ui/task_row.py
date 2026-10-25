@@ -73,10 +73,16 @@ class TaskRow(Gtk.ListBoxRow):
         if task.done:
             self.text_label.add_css_class("rature-struck")
             self.strike_button.set_icon_name("edit-undo-symbolic")
-            self.strike_button.set_tooltip_text(_("Undo the strike"))
+            strike_text = _("Undo the strike")
         else:
             self.strike_button.set_icon_name("object-select-symbolic")
-            self.strike_button.set_tooltip_text(_("Strike through"))
+            strike_text = _("Strike through")
+        # SPECIFICATION.md §3.8: the accessible name follows the tooltip;
+        # GTK exposes a tooltip as the description, not the name.
+        self.strike_button.set_tooltip_text(strike_text)
+        self.strike_button.update_property(
+            [Gtk.AccessibleProperty.LABEL], [strike_text]
+        )
 
         # SPECIFICATION.md §3.2: hidden, not insensitive, on a struck or a
         # recurring task, since no state will ever make it usable there.

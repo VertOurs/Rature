@@ -966,6 +966,8 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Infobulle de renvoi | `Send back to the reserve` |
 | Infobulle de verrou | `Freeze the list`, `Unfreeze the list` |
 | Infobulle d'ajout de récurrente | `Add a recurring task` |
+| Menu principal, nom accessible et infobulle | `Main menu` |
+| Menu de ligne, nom accessible et infobulle | `More options` |
 | Formulaire récurrent | `Recurring task`, `Task text`, `Days`, `Every two weeks`, `This week`, `Next week`, `Cancel`, `Save` |
 | Sous-titre de récurrente une semaine sur deux | `every two weeks`, `this week`, `next week` |
 | Vue Jour vide | `The list is empty.` |
@@ -984,6 +986,15 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
+
+**Noms accessibles.** Ajouté au chantier 8. Chaque bouton à icône seule
+porte un nom accessible, lu par un lecteur d'écran : le texte de son
+infobulle, ci-dessus. GTK expose l'infobulle comme description, pas comme
+nom ; sans nom, le bouton n'est annoncé que par son rôle. Quand l'infobulle
+change avec l'état du bouton (rature, verrou), le nom change avec elle. Le
+bouton de menu de chaque ligne et celui du menu principal, qui n'avaient
+aucun texte, reçoivent la même chaîne en infobulle et en nom. Aucune autre
+chaîne n'est créée pour l'accessibilité.
 
 Les noms de jours, dans le sous-titre des lignes récurrentes et sur les
 bascules du formulaire, ne figurent pas dans cette liste : ils sont dérivés
