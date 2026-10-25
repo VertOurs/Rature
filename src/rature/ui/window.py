@@ -22,9 +22,11 @@ from rature.core.app import (  # noqa: E402
 )
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
+from rature.ui.prepared_row import PreparedRow  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
 from rature.ui.reserve_view import ReserveView  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
+from rature.ui.tomorrow_view import TomorrowView  # noqa: E402
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
 _ENSURE_DAY_INTERVAL_SECONDS = 60
@@ -32,16 +34,18 @@ _ENSURE_DAY_INTERVAL_SECONDS = 60
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/window.ui")
 class RatureWindow(Adw.ApplicationWindow):
-    """Owns the App instance and mounts the Day, Reserve and Recurring views."""
+    """Owns the App instance and mounts the Day, Tomorrow, Reserve, Recurring views."""
 
     __gtype_name__ = "RatureWindow"
 
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()
     sidebar_list: Gtk.ListBox = Gtk.Template.Child()
     day_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
+    tomorrow_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     reserve_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     recurring_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
     day_page: Adw.NavigationPage = Gtk.Template.Child()
+    tomorrow_page: Adw.NavigationPage = Gtk.Template.Child()
     reserve_page: Adw.NavigationPage = Gtk.Template.Child()
     recurring_page: Adw.NavigationPage = Gtk.Template.Child()
 
@@ -55,6 +59,14 @@ class RatureWindow(Adw.ApplicationWindow):
             send_to_reserve=self.send_to_reserve,
         )
         self.day_page.set_child(self.day_view)
+        self.tomorrow_view = TomorrowView(
+            app=app,
+            run_action=self._run_app_action,
+            perform=self._perform,
+            send_to_reserve=self.send_tomorrow_to_reserve,
+            move_to_today=self.move_to_today,
+        )
+        self.tomorrow_page.set_child(self.tomorrow_view)
         self.reserve_view = ReserveView(
             app=app,
             run_action=self._run_app_action,
@@ -68,6 +80,7 @@ class RatureWindow(Adw.ApplicationWindow):
         # Each sidebar row carries the content page it selects, so
         # _on_row_selected never depends on the row order in window.ui.
         self.day_sidebar_row.page = self.day_page
+        self.tomorrow_sidebar_row.page = self.tomorrow_page
         self.reserve_sidebar_row.page = self.reserve_page
         self.recurring_sidebar_row.page = self.recurring_page
 
@@ -80,7 +93,11 @@ class RatureWindow(Adw.ApplicationWindow):
         # entry draws it into the day. COPY, not MOVE: the source row
         # leaves the reserve as a business consequence of draw_from_reserve,
         # refreshed away by _refresh_all, never by a widget removal here.
-        drop_target = Gtk.DropTarget.new(GObject.TYPE_STRING, Gdk.DragAction.COPY)
+        # SPECIFICATION.md §3.16: a Tomorrow row dropped there moves to
+        # today. One target for both payloads, told apart in drop: MOVE is
+        # the action that row's drag source offers, as for TaskRow.
+        drop_target = Gtk.DropTarget(actions=Gdk.DragAction.COPY | Gdk.DragAction.MOVE)
+        drop_target.set_gtypes([GObject.TYPE_STRING, PreparedRow.__gtype__])
         drop_target.connect("accept", self._on_sidebar_drop_accept)
         drop_target.connect("drop", self._on_sidebar_drop)
         self.day_sidebar_row.add_controller(drop_target)
@@ -88,8 +105,10 @@ class RatureWindow(Adw.ApplicationWindow):
         # SPECIFICATION.md §3.2: a day task row dragged onto the Reserve
         # sidebar entry sends it back. MOVE, the action the row's drag
         # source already offers for a reorder; the row leaves the day by
-        # _refresh_all, never by a widget removal here, as above.
-        send_back_target = Gtk.DropTarget.new(TaskRow.__gtype__, Gdk.DragAction.MOVE)
+        # _refresh_all, never by a widget removal here, as above. §3.16:
+        # a Tomorrow row goes back the same way, through the same target.
+        send_back_target = Gtk.DropTarget(actions=Gdk.DragAction.MOVE)
+        send_back_target.set_gtypes([TaskRow.__gtype__, PreparedRow.__gtype__])
         send_back_target.connect("accept", self._on_send_back_drop_accept)
         send_back_target.connect("drop", self._on_send_back_drop)
         self.reserve_sidebar_row.add_controller(send_back_target)
@@ -129,6 +148,7 @@ class RatureWindow(Adw.ApplicationWindow):
 
         rows = {
             "view-day": self.day_sidebar_row,
+            "view-tomorrow": self.tomorrow_sidebar_row,
             "view-reserve": self.reserve_sidebar_row,
             "view-recurring": self.recurring_sidebar_row,
         }
@@ -151,9 +171,11 @@ class RatureWindow(Adw.ApplicationWindow):
         self.add_action(help_action)
 
         app = self.get_application()
+        # SPECIFICATION.md §3.11: the digits follow the sidebar order.
         app.set_accels_for_action("win.view-day", ["<Control>1"])
-        app.set_accels_for_action("win.view-reserve", ["<Control>2"])
-        app.set_accels_for_action("win.view-recurring", ["<Control>3"])
+        app.set_accels_for_action("win.view-tomorrow", ["<Control>2"])
+        app.set_accels_for_action("win.view-reserve", ["<Control>3"])
+        app.set_accels_for_action("win.view-recurring", ["<Control>4"])
         app.set_accels_for_action("win.undo-delete", ["<Control>z"])
         app.set_accels_for_action("win.show-help-overlay", ["<Control>question", "F1"])
 
@@ -187,6 +209,7 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _refresh_all(self) -> None:
         self.day_view.refresh()
+        self.tomorrow_view.refresh()
         self.reserve_view.refresh()
         self.recurring_view.refresh()
         # SPECIFICATION.md §3.2: the undo control, header button and
@@ -208,13 +231,17 @@ class RatureWindow(Adw.ApplicationWindow):
         # in drop. The lock is read live every attempt: the list can be
         # frozen while the app runs. GdkDrop has not read the payload yet
         # at this point, so this may only look at the lock and the type
-        # (the type is already filtered by the DropTarget's gtype).
+        # (the type is already filtered by the DropTarget's gtype). The
+        # same lock refuses Move to today (§3.16), so one test covers both.
         return not self.app.session.day.locked
 
     def _on_sidebar_drop(
-        self, _target: Gtk.DropTarget, value: str, _x: float, _y: float
+        self, _target: Gtk.DropTarget, value: str | PreparedRow, _x: float, _y: float
     ) -> bool:
-        self.send_to_day(value)
+        if isinstance(value, PreparedRow):
+            self.move_to_today(value.task.id)
+        else:
+            self.send_to_day(value)
         return True
 
     def send_to_reserve(self, task_id: str) -> None:
@@ -229,15 +256,35 @@ class RatureWindow(Adw.ApplicationWindow):
         # SPECIFICATION.md §3.2: refused, and never highlighted, wherever
         # the button is hidden (struck or recurring task). The payload is
         # not read yet in accept, hence the shared dragged row. A frozen
-        # list still accepts, like the button.
+        # list still accepts, like the button. A Tomorrow row is always
+        # accepted (§3.16): its ← button is on every row.
+        if PreparedRow.dragged() is not None:
+            return True
         row = TaskRow.dragged()
         return row is not None and row.task.can_go_back_to_reserve
 
     def _on_send_back_drop(
-        self, _target: Gtk.DropTarget, value: TaskRow, _x: float, _y: float
+        self,
+        _target: Gtk.DropTarget,
+        value: TaskRow | PreparedRow,
+        _x: float,
+        _y: float,
     ) -> bool:
-        self.send_to_reserve(value.task.id)
+        if isinstance(value, PreparedRow):
+            self.send_tomorrow_to_reserve(value.task.id)
+        else:
+            self.send_to_reserve(value.task.id)
         return True
+
+    def move_to_today(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.16: the row menu entry; the Day sidebar
+        # entry's drop calls it too. Same KeyError swallowing as above.
+        self._run_app_action(lambda: self.app.move_to_today(task_id))
+
+    def send_tomorrow_to_reserve(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.16: a prepared row's ← button; the Reserve
+        # sidebar entry's drop calls it too.
+        self._run_app_action(lambda: self.app.send_tomorrow_to_reserve(task_id))
 
     def _perform(self, action, *, clear_banner_on_success: bool = True) -> bool:
         # SPECIFICATION.md §3.6 point 3: the one place that catches OSError,

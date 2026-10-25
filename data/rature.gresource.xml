@@ -6,6 +6,9 @@
     <file preprocess="xml-stripblanks">ui/window.ui</file>
     <file preprocess="xml-stripblanks">ui/task_row.ui</file>
     <file preprocess="xml-stripblanks">ui/day_view.ui</file>
+    <file preprocess="xml-stripblanks">ui/prepared_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/tomorrow_recurring_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/tomorrow_view.ui</file>
     <file preprocess="xml-stripblanks">ui/reserve_row.ui</file>
     <file preprocess="xml-stripblanks">ui/reserve_view.ui</file>
     <file preprocess="xml-stripblanks">ui/recurring_row.ui</file>

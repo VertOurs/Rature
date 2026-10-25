@@ -66,6 +66,22 @@
                         </property>
                       </object>
                     </child>
+                    <!-- SPECIFICATION.md §3.1: Tomorrow second, right after
+                         Day. -->
+                    <child>
+                      <object class="GtkListBoxRow" id="tomorrow_sidebar_row">
+                        <property name="child">
+                          <object class="GtkLabel">
+                            <property name="label" translatable="yes">Tomorrow</property>
+                            <property name="xalign">0</property>
+                            <property name="margin-start">6</property>
+                            <property name="margin-end">6</property>
+                            <property name="margin-top">6</property>
+                            <property name="margin-bottom">6</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
                     <child>
                       <object class="GtkListBoxRow" id="reserve_sidebar_row">
                         <property name="child">
@@ -122,6 +138,9 @@
          RatureWindow.__init__ once the views have their App. Kept inside
          the template so Gtk.Template.Child resolves them by contract, not
          by the builder happening to parse the whole file. -->
+    <object class="AdwNavigationPage" id="tomorrow_page">
+      <property name="title" translatable="yes">Tomorrow</property>
+    </object>
     <object class="AdwNavigationPage" id="reserve_page">
       <property name="title" translatable="yes">Reserve</property>
     </object>

@@ -6,6 +6,9 @@ data/io.github.vertours.Rature.metainfo.xml.in
 data/ui/window.ui
 data/ui/task_row.ui
 data/ui/day_view.ui
+data/ui/prepared_row.ui
+data/ui/tomorrow_recurring_row.ui
+data/ui/tomorrow_view.ui
 data/ui/reserve_row.ui
 data/ui/reserve_view.ui
 data/ui/recurring_row.ui
@@ -19,6 +22,7 @@ data/ui/statistics_window.ui
 data/ui/shortcuts.ui
 src/rature/ui/application.py
 src/rature/ui/day_view.py
+src/rature/ui/prepared_row.py
 src/rature/ui/recurring_row.py
 src/rature/ui/reserve_row.py
 src/rature/ui/task_row.py

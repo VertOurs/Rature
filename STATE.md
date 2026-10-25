@@ -76,11 +76,21 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `delete_from_tomorrow`, `move_tomorrow_before`, `move_to_tomorrow`,
   `move_reserve_to_tomorrow`, `move_to_today`,
   `send_tomorrow_to_reserve`), docstring de `stats.day_counts` corrigée.
-  **B2 en cours** sur `feat/tomorrow-rollover` : étape 7 du passage du
-  jour (construction de la tâche partagée avec `move_to_today` par
-  `Session._enter_day`), `recurring_due_tomorrow` dans `Session` et
-  `App` (date de référence plus un jour, bascule de 04:00 comprise).
-  Suivante : C, l'interface, puis `1.8.0`.
+  **B2 fusionnée** (PR #163, squash `ca9ec9c`) :
+  étape 7 du passage du jour (`Session._enter_day`, partagée avec
+  `move_to_today`), `recurring_due_tomorrow` dans `Session` et `App`.
+  **C découpée en deux PR** le 25 octobre 2026 : C1, la vue Demain
+  elle-même ; C2, les entrées « Move to tomorrow » des menus Jour et
+  Réserve et le dépôt sur l'entrée Tomorrow. **C1 en cours** sur
+  `feat/tomorrow-view` : vue (`tomorrow_view`, `prepared_row`,
+  `tomorrow_recurring_row`, ce dernier avec un emplacement vide de la
+  largeur de `←` pour aligner les textes), Maj+Entrée traité comme un
+  ajout normal, dépôt d'une ligne de Demain sur les entrées Day et
+  Reserve (cibles existantes élargies à un second type plutôt que deux
+  `DropTarget` par entrée), `Ctrl+1` à `Ctrl+4`, `fr.po` 100/100. Widgets
+  et gestionnaires de dépôt exercés par script sur des données jetables ;
+  glisser-déposer réel et rendu **à contrôler par VertOurs**
+  (`CLAUDE.md` §6). Suivante : C2, puis `1.8.0`.
   Sauvegarde du dossier `data/rature` réel à faire par VertOurs avant la
   mise à jour vers `1.8.0`.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par
