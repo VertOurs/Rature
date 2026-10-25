@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-25
+
+Accessibility and a live Statistics window, chantier 8.2 and 8.3. No
+change to the data format.
+
 ### Added
 
 - Every icon-only button now has an accessible name, so a screen reader
@@ -480,7 +485,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/VertOurs/Rature/releases/tag/v1.9.0
 [1.8.0]: https://github.com/VertOurs/Rature/releases/tag/v1.8.0
 [1.7.1]: https://github.com/VertOurs/Rature/releases/tag/v1.7.1
 [1.7.0]: https://github.com/VertOurs/Rature/releases/tag/v1.7.0
