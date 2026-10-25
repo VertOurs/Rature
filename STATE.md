@@ -7,7 +7,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : chantier 7 (capture et réserve), lancé le
-  22 septembre 2026. **7.1 (boîte de dépôt) retirée** le
+  22 septembre 2026, clos dans le code le 25 octobre 2026. **7.1 (boîte de dépôt) retirée** le
   28 septembre 2026 sur décision de VertOurs, après une semaine d'usage :
   le dépôt d'un fichier texte ne convient pas, la synchronisation avec le
   téléphone est repoussée sans date. PR #135 (squash `ab05045`) : code, clé GSettings, bannières,
@@ -88,14 +88,14 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   Demain sur les entrées Day et Reserve (cibles existantes élargies à un
   second type plutôt que deux `DropTarget` par entrée), `Ctrl+1` à
   `Ctrl+4`. Contrôle visuel fait par VertOurs le 25 octobre 2026 sur le
-  build local, glisser-déposer réel compris : OK. **C2 en cours** sur
-  `feat/move-to-tomorrow` : « Move to tomorrow » (« Déplacer à demain »)
-  avant Delete dans les menus Jour et Réserve, absent sur une rayée ou une
-  récurrente, dépôt d'une tâche du jour ou d'un item de réserve sur
-  l'entrée Tomorrow, `fr.po` 101/101. Menus et dépôts exercés par script ;
-  contrôle visuel de C2 **à faire par VertOurs**. Suivante : `1.8.0`,
-  avec sauvegarde du dossier `data/rature` réel avant la mise à jour
-  (migration 3 → 4).
+  build local, glisser-déposer réel compris : OK. **C2 fusionnée** (PR #165, squash `0d1d588`) :
+  « Move to tomorrow » (« Déplacer à demain ») avant Delete dans les menus
+  Jour et Réserve, absent sur une rayée ou une récurrente, dépôt d'une
+  tâche du jour ou d'un item de réserve sur l'entrée Tomorrow, `fr.po`
+  101/101. Contrôle visuel fait par VertOurs le 25 octobre 2026 : OK.
+  **7.3 terminé dans le code, donc chantier 7 clos**, sous réserve de la
+  migration 3 → 4 confirmée sur les vraies données après `1.8.0`, avec
+  sauvegarde du dossier `data/rature` réel avant la mise à jour.
   Sauvegarde du dossier `data/rature` réel à faire par VertOurs avant la
   mise à jour vers `1.8.0`.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par

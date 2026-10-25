@@ -336,16 +336,19 @@ ne connaît aujourd'hui qu'une seule journée active, et `CLAUDE.md` pose
 - [x] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après :
       seize points de détail validés le 12 octobre 2026, reportés le
       25 octobre 2026 (§2.5 bloc Demain et étape 7, §2.7.9, §3.16)
-- [ ] `core` : liste Demain (ajout, renommage, réordonnancement,
+- [x] `core` : liste Demain (ajout, renommage, réordonnancement,
       suppression, priorité, tirage depuis la réserve), décalage d'une
       tâche du jour vers Demain et retour de Demain vers le jour, étape 7
-      du passage du jour, récurrentes dues affichées
-- [ ] Format de données version 4, migration 3 → 4 testée sur des
-      fichiers v3 principal et archive, et chaîne depuis v1
-- [ ] Vue Demain dans le panneau latéral, entrées de menu et
+      du passage du jour, récurrentes dues affichées. PR #162 et #163, le
+      25 octobre 2026
+- [x] Format de données version 4, migration 3 → 4 testée sur des
+      fichiers v3 principal et archive, et chaîne depuis v1. PR #161, le
+      25 octobre 2026
+- [x] Vue Demain dans le panneau latéral, entrées de menu et
       glisser-déposer « Move to tomorrow » (jour et réserve) et « Move to
       today », raccourcis `Ctrl+1` à `Ctrl+4` dans l'ordre du panneau,
-      chaînes traduites
+      chaînes traduites. PR #164 et #165, contrôlées visuellement par
+      VertOurs le 25 octobre 2026
 
 **Critère de fin** : une liste préparée devient la liste du jour au
 passage suivant, après les récurrentes et dans son ordre, même après
