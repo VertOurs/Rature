@@ -81,16 +81,21 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `move_to_today`), `recurring_due_tomorrow` dans `Session` et `App`.
   **C découpée en deux PR** le 25 octobre 2026 : C1, la vue Demain
   elle-même ; C2, les entrées « Move to tomorrow » des menus Jour et
-  Réserve et le dépôt sur l'entrée Tomorrow. **C1 en cours** sur
-  `feat/tomorrow-view` : vue (`tomorrow_view`, `prepared_row`,
-  `tomorrow_recurring_row`, ce dernier avec un emplacement vide de la
-  largeur de `←` pour aligner les textes), Maj+Entrée traité comme un
-  ajout normal, dépôt d'une ligne de Demain sur les entrées Day et
-  Reserve (cibles existantes élargies à un second type plutôt que deux
-  `DropTarget` par entrée), `Ctrl+1` à `Ctrl+4`, `fr.po` 100/100. Widgets
-  et gestionnaires de dépôt exercés par script sur des données jetables ;
-  glisser-déposer réel et rendu **à contrôler par VertOurs**
-  (`CLAUDE.md` §6). Suivante : C2, puis `1.8.0`.
+  Réserve et le dépôt sur l'entrée Tomorrow. **C1 fusionnée** (PR #164, squash `0466218`) :
+  vue (`tomorrow_view`, `prepared_row`, `tomorrow_recurring_row`, ce
+  dernier avec un emplacement vide de la largeur de `←` pour aligner les
+  textes), Maj+Entrée traité comme un ajout normal, dépôt d'une ligne de
+  Demain sur les entrées Day et Reserve (cibles existantes élargies à un
+  second type plutôt que deux `DropTarget` par entrée), `Ctrl+1` à
+  `Ctrl+4`. Contrôle visuel fait par VertOurs le 25 octobre 2026 sur le
+  build local, glisser-déposer réel compris : OK. **C2 en cours** sur
+  `feat/move-to-tomorrow` : « Move to tomorrow » (« Déplacer à demain »)
+  avant Delete dans les menus Jour et Réserve, absent sur une rayée ou une
+  récurrente, dépôt d'une tâche du jour ou d'un item de réserve sur
+  l'entrée Tomorrow, `fr.po` 101/101. Menus et dépôts exercés par script ;
+  contrôle visuel de C2 **à faire par VertOurs**. Suivante : `1.8.0`,
+  avec sauvegarde du dossier `data/rature` réel avant la mise à jour
+  (migration 3 → 4).
   Sauvegarde du dossier `data/rature` réel à faire par VertOurs avant la
   mise à jour vers `1.8.0`.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par

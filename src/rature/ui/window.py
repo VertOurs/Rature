@@ -24,6 +24,7 @@ from rature.ui import APP_ID  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
 from rature.ui.prepared_row import PreparedRow  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
+from rature.ui.reserve_row import ReserveRow  # noqa: E402
 from rature.ui.reserve_view import ReserveView  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
 from rature.ui.tomorrow_view import TomorrowView  # noqa: E402
@@ -57,6 +58,7 @@ class RatureWindow(Adw.ApplicationWindow):
             run_action=self._run_app_action,
             perform=self._perform,
             send_to_reserve=self.send_to_reserve,
+            move_to_tomorrow=self.move_to_tomorrow,
         )
         self.day_page.set_child(self.day_view)
         self.tomorrow_view = TomorrowView(
@@ -72,6 +74,7 @@ class RatureWindow(Adw.ApplicationWindow):
             run_action=self._run_app_action,
             perform=self._perform,
             send_to_day=self.send_to_day,
+            move_to_tomorrow=self.move_reserve_to_tomorrow,
         )
         self.reserve_page.set_child(self.reserve_view)
         self.recurring_view = RecurringView(app=app, run_action=self._run_app_action)
@@ -112,6 +115,17 @@ class RatureWindow(Adw.ApplicationWindow):
         send_back_target.connect("accept", self._on_send_back_drop_accept)
         send_back_target.connect("drop", self._on_send_back_drop)
         self.reserve_sidebar_row.add_controller(send_back_target)
+
+        # SPECIFICATION.md §3.2 and §3.3: a day task row (MOVE, its reorder
+        # action) or a reserve row (COPY, its item id) dropped on the
+        # Tomorrow sidebar entry moves there, as its menu entry does.
+        tomorrow_target = Gtk.DropTarget(
+            actions=Gdk.DragAction.COPY | Gdk.DragAction.MOVE
+        )
+        tomorrow_target.set_gtypes([GObject.TYPE_STRING, TaskRow.__gtype__])
+        tomorrow_target.connect("accept", self._on_tomorrow_drop_accept)
+        tomorrow_target.connect("drop", self._on_tomorrow_drop)
+        self.tomorrow_sidebar_row.add_controller(tomorrow_target)
 
         self._settings = Gio.Settings.new(APP_ID)
         self._restore_geometry()
@@ -274,6 +288,36 @@ class RatureWindow(Adw.ApplicationWindow):
             self.send_tomorrow_to_reserve(value.task.id)
         else:
             self.send_to_reserve(value.task.id)
+        return True
+
+    def move_to_tomorrow(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.2: a day row's menu entry; the Tomorrow
+        # sidebar entry's drop calls it too.
+        self._run_app_action(lambda: self.app.move_to_tomorrow(task_id))
+
+    def move_reserve_to_tomorrow(self, item_id: str) -> None:
+        # SPECIFICATION.md §3.3: a reserve row's menu entry; the Tomorrow
+        # sidebar entry's drop calls it too.
+        self._run_app_action(lambda: self.app.move_reserve_to_tomorrow(item_id))
+
+    def _on_tomorrow_drop_accept(
+        self, _target: Gtk.DropTarget, _drop: Gdk.Drop
+    ) -> bool:
+        # Refused, and never highlighted, where the menu entry is absent
+        # (struck or recurring task). Accepted on a frozen day: Tomorrow
+        # has no lock. The payload is not read yet, hence the dragged rows.
+        row = TaskRow.dragged()
+        if row is not None:
+            return row.task.can_go_back_to_reserve
+        return ReserveRow.dragged() is not None
+
+    def _on_tomorrow_drop(
+        self, _target: Gtk.DropTarget, value: str | TaskRow, _x: float, _y: float
+    ) -> bool:
+        if isinstance(value, TaskRow):
+            self.move_to_tomorrow(value.task.id)
+        else:
+            self.move_reserve_to_tomorrow(value)
         return True
 
     def move_to_today(self, task_id: str) -> None:
