@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 
 from rature.core.models import Origin
+from rature.core.recurrence import Cadence
 from rature.core.session import Day, LockedError, Session
 
 PARIS = timezone(timedelta(hours=2))
@@ -313,3 +314,44 @@ def test_send_tomorrow_to_reserve_is_allowed_on_a_frozen_day() -> None:
 def test_send_tomorrow_to_reserve_unknown_task_raises_key_error() -> None:
     with pytest.raises(KeyError):
         make_session().send_tomorrow_to_reserve("nope", today=TODAY)
+
+
+# Recurring tasks due tomorrow, shown read-only.
+
+SUNDAY = date(2026, 8, 30)
+
+
+def test_recurring_due_tomorrow_reads_the_next_weekday_in_list_order() -> None:
+    session = make_session()
+    later = session.add_recurring("weekly backup", [0])
+    session.add_recurring("only on sunday", [6])
+    first = session.add_recurring("water plants", [0, 3])
+    assert session.recurring_due_tomorrow(SUNDAY) == [later, first]
+
+
+def test_recurring_due_tomorrow_is_empty_without_a_match() -> None:
+    session = make_session()
+    session.add_recurring("only on sunday", [6])
+    assert session.recurring_due_tomorrow(SUNDAY) == []
+
+
+def test_recurring_due_tomorrow_follows_the_parity_across_a_week_change() -> None:
+    session = make_session()
+    # Active from the week of 2026-08-24: due Monday 24, not Monday 31.
+    this_week = session.add_recurring(
+        "swim", [0], cadence=Cadence.EVERY_OTHER_FROM_THIS_WEEK, today=TODAY
+    )
+    next_week = session.add_recurring(
+        "run", [0], cadence=Cadence.EVERY_OTHER_FROM_NEXT_WEEK, today=TODAY
+    )
+    assert session.recurring_due_tomorrow(SUNDAY) == [next_week]
+    assert session.recurring_due_tomorrow(date(2026, 8, 23)) == [this_week]
+
+
+def test_recurring_due_tomorrow_changes_nothing() -> None:
+    session = make_session()
+    session.add_recurring("weekly backup", [0])
+    session.recurring_due_tomorrow(SUNDAY)
+    assert session.day.tasks == []
+    assert session.tomorrow == []
+    assert session.day.counter == 1

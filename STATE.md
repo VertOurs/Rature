@@ -70,13 +70,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   interface. **A fusionnée** (PR #161, squash `9fecc28`, pied
   `BREAKING CHANGE`) : `PreparedTask`, format v4, migration 3 → 4 testée
   sur des fichiers v3 principal et archive fabriqués et sur la chaîne
-  depuis v1. **B1 en cours** sur `feat/tomorrow-operations` : édition de
-  Demain (`add_to_tomorrow`, `rename_tomorrow`, `set_tomorrow_priority`,
-  `delete_from_tomorrow`, `move_tomorrow_before`), gestes
-  (`move_to_tomorrow`, `move_reserve_to_tomorrow`, `move_to_today`,
-  `send_tomorrow_to_reserve`) dans `Session` et `App`, construction de
-  l'item de réserve partagée avec `send_to_reserve` (`_returning_item`),
-  docstring de `stats.day_counts` corrigée. Suivante : B2.
+  depuis v1. **B1 fusionnée** (PR #162, squash `5d8de04`) :
+  édition de Demain et gestes entre les listes dans `Session` et `App`
+  (`add_to_tomorrow`, `rename_tomorrow`, `set_tomorrow_priority`,
+  `delete_from_tomorrow`, `move_tomorrow_before`, `move_to_tomorrow`,
+  `move_reserve_to_tomorrow`, `move_to_today`,
+  `send_tomorrow_to_reserve`), docstring de `stats.day_counts` corrigée.
+  **B2 en cours** sur `feat/tomorrow-rollover` : étape 7 du passage du
+  jour (construction de la tâche partagée avec `move_to_today` par
+  `Session._enter_day`), `recurring_due_tomorrow` dans `Session` et
+  `App` (date de référence plus un jour, bascule de 04:00 comprise).
+  Suivante : C, l'interface, puis `1.8.0`.
   Sauvegarde du dossier `data/rature` réel à faire par VertOurs avant la
   mise à jour vers `1.8.0`.
   **Récurrente une semaine sur deux**, hors cases prévues, décidée par

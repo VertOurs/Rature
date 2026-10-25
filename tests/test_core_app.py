@@ -203,6 +203,18 @@ def test_ensure_day_saves_the_prepared_list_in_the_new_day(tmp_path: Path) -> No
     assert archived.tasks == []
 
 
+def test_recurring_due_tomorrow_starts_from_the_reference_date(
+    tmp_path: Path,
+) -> None:
+    # Tuesday 2026-08-25 at 02:00 still belongs to Monday: tomorrow is
+    # Tuesday, not Wednesday.
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, 20, 0, tzinfo=PARIS)))
+    tuesday = app.add_recurring("tuesday thing", [1])
+    app.add_recurring("wednesday thing", [2])
+    app.clock = clock_at(datetime(2026, 8, 25, 2, 0, tzinfo=PARIS))
+    assert app.recurring_due_tomorrow() == [tuesday]
+
+
 def _raise_oserror(*_args, **_kwargs):
     raise OSError("disk full")
 

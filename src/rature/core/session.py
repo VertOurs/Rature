@@ -477,6 +477,15 @@ class Session:
             created.append(task)
         return created
 
+    def recurring_due_tomorrow(self, today: date) -> list[RecurringItem]:
+        """The templates due the day after ``today``, in injection order.
+
+        What the Tomorrow view shows, read-only (SPECIFICATION.md §2.5,
+        §3.16). An indication only: after several days unopened, the
+        rollover injects the templates of the day that actually opens.
+        """
+        return due_on(today + timedelta(days=1), self.recurring)
+
     def rollover_due(self, now: datetime) -> bool:
         return reference_date(now) > self.day.date
 
