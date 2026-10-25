@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-25
+
+The Tomorrow view, chantier 7.3. The data file moves to format version
+4. Chantier 7 is closed: chantier 8 remains before `2.0.0`
+(`docs/internal/ROADMAP.md`).
+
 ### Added
 
 - A Tomorrow view, second in the sidebar, to prepare the next day's
@@ -461,7 +467,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/VertOurs/Rature/releases/tag/v1.8.0
 [1.7.1]: https://github.com/VertOurs/Rature/releases/tag/v1.7.1
 [1.7.0]: https://github.com/VertOurs/Rature/releases/tag/v1.7.0
 [1.6.0]: https://github.com/VertOurs/Rature/releases/tag/v1.6.0
