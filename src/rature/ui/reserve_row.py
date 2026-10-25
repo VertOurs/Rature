@@ -131,6 +131,11 @@ class ReserveRow(Gtk.ListBoxRow):
         ReserveRow._dragged = None
         self.remove_css_class("rature-drag-source")
 
+    @classmethod
+    def dragged(cls) -> ReserveRow | None:
+        """The row being dragged right now, or None outside a drag."""
+        return cls._dragged
+
     def _dragged_peer(self) -> ReserveRow | None:
         """The row being dragged, or None if it may not drop on this one.
 
