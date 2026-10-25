@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - A Tomorrow view, second in the sidebar, to prepare the next day's
-  list. It shows the recurring tasks due tomorrow, read only, above the
-  prepared tasks. Prepared tasks have no number and cannot be struck;
+  list. A day task or a reserve item moves there from its row menu
+  ("Move to tomorrow") or by dropping it on the Tomorrow entry, even on
+  a frozen day. The view shows the recurring tasks due tomorrow, read
+  only, above the prepared tasks. Prepared tasks have no number and cannot be struck;
   they can be added, renamed, marked as priority, reordered, deleted for
   good, sent back to the reserve, or moved to today from their row menu
   ("Move to today") or by dropping them on the Day entry. At the next
