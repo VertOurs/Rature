@@ -61,11 +61,17 @@ The method it reproduces:
 
 - **Day view** — add, strike, unstrike, rename in place, delete, reorder by
   drag-and-drop, freeze the list. `Shift+Enter` logs a task already struck.
-- **Reserve** — an undated list you draw from in the morning; unfinished
-  day tasks return to it at the day rollover, or right away with the arrow
-  at the start of a Day view row.
-- **Recurring** — task templates tied to weekdays, injected automatically
-  each new day.
+- **Tomorrow** — prepare the next day's list the evening before. Day tasks
+  and reserve items move there from their row menu or by drag-and-drop;
+  the list enters the day when the next day starts, after the recurring
+  tasks. Prepared tasks get their numbers only then.
+- **Reserve** — an undated list you draw from in the morning, reordered by
+  drag-and-drop; unfinished day tasks return to it at the day rollover, or
+  right away with the arrow at the start of a Day view row.
+- **Recurring** — task templates tied to weekdays, every week or every two
+  weeks, injected automatically each new day.
+- **Priority** — a single marker on a task or a reserve item. It never
+  changes the order or the numbers.
 - **Archives window** — every past day, read-only, with a search over task
   text.
 - **Statistics window** — a plain table of counts per archived day, no
