@@ -201,7 +201,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `1.7.1` | Runtime GNOME 51, sans changement fonctionnel ni de format. Coupée le 12 octobre 2026 |
+| Version du projet | `1.8.0` | Vue Demain (7.3) et format version 4. Coupée le 25 octobre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -258,6 +258,11 @@ raison que `1.6.0`. Un fichier écrit en version 3 n'est plus lisible par
 
 `1.7.1` (12 octobre 2026) passe le runtime à GNOME 51 (PR #156).
 Corrective : aucune fonctionnalité, aucun changement de format.
+
+`1.8.0` (25 octobre 2026) publie la vue Demain, chantier 7.3 (PR #160 à
+#165), et le format de données version 4. Mineure pour la même raison
+que `1.6.0`. Un fichier écrit en version 4 n'est plus lisible par
+`1.7.1` et antérieures. Clôt le chantier 7.
 
 **Bump vers GNOME 51** : avancé au 12 octobre 2026 par décision de
 VertOurs, initialement prévu pas avant le 16 octobre. Touche le

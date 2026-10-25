@@ -65,6 +65,18 @@
   </screenshots>
 
   <releases>
+    <release version="1.8.0" date="2026-10-25">
+      <description>
+        <p>
+          A Tomorrow view prepares the next day's list. Tasks and reserve
+          items move there from their row menu or by drag and drop, and
+          enter the day when the next day starts, after the recurring
+          tasks. Ctrl+2 now shows Tomorrow; Reserve and Recurring move to
+          Ctrl+3 and Ctrl+4. Existing data is migrated on first launch;
+          earlier versions of Rature can no longer open it afterwards.
+        </p>
+      </description>
+    </release>
     <release version="1.7.1" date="2026-10-12">
       <description>
         <p>
