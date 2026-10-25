@@ -117,19 +117,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   migration ; `1.6.0` confirmée sur ses données le 12 octobre 2026.
   Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
   « Chantiers terminés ».
-- **`1.7.1` est publiée** (12 octobre 2026, sur `//51`) : runtime
-  GNOME 51 (PR #156, squash `f9d8537`), version corrective (PR #157,
-  squash `ffa0b88`). Tag `v1.7.1` annoté et signé, poussé, `release.yml`
-  vert (run `38277336124`, build et deploy), `rature.flatpak` joint à la
-  release (72 960 octets), `https://vertours.github.io/Rature/` répond
-  200. PKGBUILD et `.SRCINFO` recalés sur l'archive du tag (`sha256sum`
-  identique sur deux téléchargements) dans un commit de suivi.
-  Reconstruction du paquet AUR en conteneur non tentée. `1.7.0` et
-  antérieures restent taguées. `flatpak update` vers `1.7.1` lancé par
-  l'agent le 12 octobre 2026 (`flatpak info` : `1.7.1`, runtime
-  `org.gnome.Platform/x86_64/51`). Application installée relancée et
-  vérifiée sous `//51` par VertOurs le 12 octobre 2026, page GitHub Pages
-  contrôlée le même jour : rien ne reste à sa charge pour `1.7.1`.
+- **`1.8.0` est publiée** (25 octobre 2026, sur `//51`) : vue Demain,
+  chantier 7.3 (PR #160 à #165), format version 4, release PR #166
+  (squash `3116013`). Tag `v1.8.0` annoté et signé, poussé, `release.yml`
+  vert (run `40221765519`, build et deploy), `rature.flatpak` joint à la
+  release (77 096 octets), `https://vertours.github.io/Rature/` répond
+  200 et le dépôt sert un commit « Built from 3116013 ». PKGBUILD et
+  `.SRCINFO` recalés sur l'archive du tag (`sha256sum` identique sur deux
+  téléchargements) dans un commit de suivi. Reconstruction du paquet AUR
+  en conteneur non tentée. **Reste à la charge de VertOurs** : sauvegarde
+  du dossier `data/rature` réel, `flatpak update`, puis confirmation de la
+  migration 3 → 4 sur ses vraies données.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026

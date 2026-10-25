@@ -11,7 +11,7 @@ makedepends=('meson' 'ninja' 'gettext')
 checkdepends=('python-pytest')
 _pkgname=Rature
 source=("$pkgname-$pkgver.tar.gz::https://github.com/VertOurs/$_pkgname/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('b0b73ede6d17242198f5a98a24085dc91504c12d98e10a4ca985970518c9186c')
+sha256sums=('a2bc405845229a3d02c3defe450218c8c01de3c26541de320fe1b5e5f00cde43')
 
 build() {
   arch-meson "$_pkgname-$pkgver" build
