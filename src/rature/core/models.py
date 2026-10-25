@@ -96,6 +96,60 @@ class Task:
 
 
 @dataclass(kw_only=True)
+class PreparedTask:
+    """One entry in the Tomorrow list, SPECIFICATION.md §2.5.
+
+    No number and no strike: a number is only given when the task enters
+    a day (§2.4), and nothing is struck in Tomorrow.
+    """
+
+    text: str
+    origin: Origin
+    id: str = field(default_factory=_new_id)
+    source_id: str | None = None
+    source_created: date | None = None
+    priority: bool = False
+
+    def __post_init__(self) -> None:
+        if self.origin == Origin.RECURRING:
+            # A recurring task never moves to Tomorrow; Tomorrow only shows
+            # the templates due, read-only.
+            raise ValueError("a prepared task cannot come from a recurring template")
+        if self.origin == Origin.RESERVE and (
+            self.source_id is None or self.source_created is None
+        ):
+            raise ValueError(
+                "a reserve-origin task needs both source_id and source_created"
+            )
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "text": self.text,
+            "origin": self.origin.value,
+            "source_id": self.source_id,
+            "source_created": (
+                self.source_created.isoformat() if self.source_created else None
+            ),
+            "priority": self.priority,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> PreparedTask:
+        source_created = data["source_created"]
+        return cls(
+            id=data["id"],
+            text=data["text"],
+            origin=Origin(data["origin"]),
+            source_id=data["source_id"],
+            source_created=(
+                date.fromisoformat(source_created) if source_created else None
+            ),
+            priority=data["priority"],
+        )
+
+
+@dataclass(kw_only=True)
 class ReserveItem:
     """One entry in the reserve, the undated mother list."""
 

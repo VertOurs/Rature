@@ -109,8 +109,10 @@ templates; the base existed from day one, because adding it later, over
 real data, is far riskier. Version 2 adds `every_other_week_from` to each
 recurring template, `null` for all of them on migration. Version 3 adds
 `priority` to each task, deletion entry and reserve item, `false` for all of
-them. Archive files go through the same chain; they carry no `recurring` or
-`reserve` key, so only their tasks and deletion entries change.
+them. Version 4 adds the `tomorrow` list to the main file, empty on
+migration. Archive files go through the same chain; they carry no
+`recurring`, `reserve` or `tomorrow` key, so only their tasks and deletion
+entries change, and version 4 only bumps their number.
 
 ### `core/app.py`
 `App` coordinates a `Session` with `storage` behind a single injectable
@@ -185,7 +187,7 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
 
 ```json
 {
-  "version": 3,
+  "version": 4,
   "date": "2026-08-24",
   "counter": 12,
   "locked": false,
@@ -198,6 +200,10 @@ One versioned file, in `$XDG_DATA_HOME/rature/`.
   ],
   "reserve": [
     {"id": "uuid", "text": "...", "created": "2026-08-20", "priority": false}
+  ],
+  "tomorrow": [
+    {"id": "uuid", "text": "...", "origin": "day|reserve",
+     "source_id": null, "source_created": null, "priority": false}
   ],
   "recurring": [
     {"id": "uuid", "text": "...", "weekdays": [0,1,2,3,4],
@@ -233,6 +239,14 @@ A `deletions` entry adds two fields to the task fields of the same name
 |---|---|
 | `index` | the task's position in `day.tasks` when it was deleted, to reinsert it in the same place on undo |
 | `done`, `done_at`, `priority` | state at deletion time, to restore the task as it was |
+
+A `tomorrow` entry is a task prepared for the next day that starts, see
+`SPECIFICATION.md` §2.5. It keeps the task fields of the same name (`id`,
+`text`, `origin`, `source_id`, `source_created`, `priority`, same
+constraints) and has no `num`, `done`, `done_at` or `template_id`: a number
+is given only when the task enters a day, nothing is struck in Tomorrow,
+and a recurring task never goes there, so `origin` is never `recurring`.
+The list lives in the main file only, never in an archive.
 
 `weekdays` is never empty, see `SPECIFICATION.md` §2.7.2. Monday is 0;
 "every day" is `[0,1,2,3,4,5,6]`.

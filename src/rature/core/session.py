@@ -8,7 +8,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
-from rature.core.models import Deletion, Origin, RecurringItem, ReserveItem, Task
+from rature.core.models import (
+    Deletion,
+    Origin,
+    PreparedTask,
+    RecurringItem,
+    ReserveItem,
+    Task,
+)
 from rature.core.recurrence import Cadence, due_on, start_monday
 
 
@@ -70,10 +77,12 @@ class Session:
         day: Day,
         *,
         reserve: list[ReserveItem] | None = None,
+        tomorrow: list[PreparedTask] | None = None,
         recurring: list[RecurringItem] | None = None,
     ) -> None:
         self.day = day
         self.reserve = reserve if reserve is not None else []
+        self.tomorrow = tomorrow if tomorrow is not None else []
         self.recurring = recurring if recurring is not None else []
 
     @property

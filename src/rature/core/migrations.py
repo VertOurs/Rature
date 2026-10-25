@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 
-CURRENT_VERSION = 3
+CURRENT_VERSION = 4
 _logger = logging.getLogger(__name__)
 
 
@@ -65,6 +65,20 @@ def _priority(data: dict) -> dict:
     for key in ("tasks", "deletions", "reserve"):
         if key in data:
             migrated[key] = [{**entry, "priority": False} for entry in data[key]]
+    return migrated
+
+
+@_migration(3)
+def _tomorrow(data: dict) -> dict:
+    """Version 4: the main file gains an empty "tomorrow" list.
+
+    SPECIFICATION.md §2.5: the Tomorrow list lives in the main file only.
+    Archive files carry no "reserve" key and get the version bump alone.
+    A new dict, like the steps above.
+    """
+    migrated = {**data, "version": 4}
+    if "reserve" in data:
+        migrated["tomorrow"] = []
     return migrated
 
 

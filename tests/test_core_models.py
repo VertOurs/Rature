@@ -6,7 +6,14 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-from rature.core.models import Deletion, Origin, RecurringItem, ReserveItem, Task
+from rature.core.models import (
+    Deletion,
+    Origin,
+    PreparedTask,
+    RecurringItem,
+    ReserveItem,
+    Task,
+)
 
 PARIS = timezone(timedelta(hours=2))
 STAMP = datetime(2026, 8, 24, 14, 32, 7, tzinfo=PARIS)
@@ -86,6 +93,45 @@ def test_source_created_round_trips() -> None:
     restored = Task.from_dict(task.to_dict())
     assert restored.source_created == date(2026, 8, 20)
     assert restored == task
+
+
+def test_prepared_task_round_trips() -> None:
+    task = PreparedTask(text="book the train", origin=Origin.DAY)
+    assert PreparedTask.from_dict(task.to_dict()) == task
+
+
+def test_prepared_task_from_the_reserve_round_trips_with_its_priority() -> None:
+    task = PreparedTask(
+        text="call the insurance",
+        origin=Origin.RESERVE,
+        source_id="r1",
+        source_created=date(2026, 8, 20),
+        priority=True,
+    )
+    data = task.to_dict()
+    assert data["origin"] == "reserve"
+    assert data["source_created"] == "2026-08-20"
+    assert PreparedTask.from_dict(data) == task
+
+
+def test_prepared_task_has_no_number_and_no_strike() -> None:
+    data = PreparedTask(text="x", origin=Origin.DAY).to_dict()
+    assert {"num", "done", "done_at"}.isdisjoint(data)
+
+
+def test_prepared_task_rejects_a_recurring_origin() -> None:
+    with pytest.raises(ValueError):
+        PreparedTask(text="x", origin=Origin.RECURRING)
+
+
+def test_prepared_reserve_task_rejects_a_missing_source_id() -> None:
+    with pytest.raises(ValueError):
+        PreparedTask(text="x", origin=Origin.RESERVE, source_created=date(2026, 8, 20))
+
+
+def test_prepared_reserve_task_rejects_a_missing_source_created() -> None:
+    with pytest.raises(ValueError):
+        PreparedTask(text="x", origin=Origin.RESERVE, source_id="abc")
 
 
 def test_reserve_item_round_trips_with_a_plain_date() -> None:
