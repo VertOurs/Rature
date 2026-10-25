@@ -7,10 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A Tomorrow view, second in the sidebar, to prepare the next day's
+  list. It shows the recurring tasks due tomorrow, read only, above the
+  prepared tasks. Prepared tasks have no number and cannot be struck;
+  they can be added, renamed, marked as priority, reordered, deleted for
+  good, sent back to the reserve, or moved to today from their row menu
+  ("Move to today") or by dropping them on the Day entry. At the next
+  day's start, they enter the day after the recurring tasks, in their
+  order, even after several days unopened.
+
 ### Changed
 
+- Ctrl+2 now shows the Tomorrow view; the Reserve view moves to Ctrl+3
+  and the Recurring view to Ctrl+4, following the sidebar order.
 - The data file moves to format version 4, which adds the list prepared
-  for the next day (chantier 7.3, not yet visible). Version 1 to 3
+  for the next day. Version 1 to 3
   files, archives included, are migrated on open with no loss: the list
   starts empty. Once a file has been written in version 4, earlier
   Rature versions refuse to open it.
