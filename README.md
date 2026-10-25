@@ -95,16 +95,20 @@ submitted. Flathub is deliberately not a target
 
 Built from a written specification. Version 1 (`1.0.0`) is complete and
 installable from the self-hosted Flatpak repository above: the business
-logic, the three views, the Archives and Statistics windows, keyboard
-shortcuts, plain-text export, a full French translation, and self-updating
-publication.
+logic, the Day, Reserve and Recurring views, the Archives and Statistics
+windows, keyboard shortcuts, plain-text export, a full French
+translation, and self-updating publication.
 
 Version 2 is under way. Milestone 6 (`1.1.0`) is done: structured
 logging, native packaging prepared for AUR/COPR/Mageia (submission still
 pending), and this refreshed README and project page. Milestone 7
-(capture and reserve) is under way: sending a task back to the reserve
-shipped in `1.4.0`; reordering the reserve and priority markers are next. Capture from a synced folder shipped in `1.2.0` and was
-withdrawn in `1.3.0`; phone sync is postponed indefinitely.
+(capture and reserve) is done: sending a task back to the reserve
+(`1.4.0`), reordering the reserve (`1.5.0`), recurring tasks every two
+weeks (`1.6.0`), priority markers (`1.7.0`), and a Tomorrow view to
+prepare the next day's list (`1.8.0`). Capture from a synced folder
+shipped in `1.2.0` and was withdrawn in `1.3.0`; phone sync is postponed
+indefinitely. Milestone 8 (more translations, accessibility, interface
+tests) is next and closes version 2.
 
 Built with AI assistance (Claude Code); I write the specification,
 review every change, and merge it.
