@@ -366,18 +366,17 @@ codée avant que la spec ne la décrive.
 - [ ] Fenêtre Statistiques rafraîchie pendant qu'elle est ouverte, sans
       avoir à la refermer
 - [ ] Catalogues `es`, `de`, `pt_BR`, `ru`, `eo`
-- [ ] Job CI de traduction :
-      `msgfmt --check --check-format --check-header`
+- [x] Job CI de traduction :
+      `msgfmt --check --check-format --check-header`. Déjà couvert par
+      `tests/test_translations.py`, lancé en CI dans le job `test` sur
+      chaque catalogue de `po/LINGUAS` : `--check` inclut les deux autres
+      options. Constaté le 25 octobre 2026, aucun job séparé
 - [ ] Les traductions produites par machine sont signalées comme telles dans
       l'en-tête du `.po` concerné. Transparence sur l'origine, pas de
       traducteur humain attribué à tort
 - [ ] Nom accessible (`accessibility` / `label`) sur chaque bouton à icône
       seule des lignes et des en-têtes : aujourd'hui seule l'infobulle les
       décrit. Relevé à la revue de code du 5 octobre 2026
-- [ ] Tests d'interface réels sous `gtk4-broadwayd` en CI, à la place des
-      gardes-fous qui lisent le source (`test_place_kept_on_rebuild.py`,
-      `test_focus_kept_on_add.py`). Demande une validation : nouvel
-      outillage de CI (`CLAUDE.md` §4 règle 6)
 
 **Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
 traduite pour chaque catalogue livré, le job CI de traduction est vert, et
@@ -419,6 +418,11 @@ Noté ici pour ne pas y penser pendant les chantiers.
   des tâches datées sont la planification que `CLAUDE.md` §1 exclut, et
   montrent des retards par construction. La vue Demain couvre le besoin
   exprimé ; à revoir seulement si elle ne suffit pas.
+- **Tests d'interface réels sous `gtk4-broadwayd` en CI**, à la place des
+  gardes-fous qui lisent le source (`test_place_kept_on_rebuild.py`,
+  `test_focus_kept_on_add.py`). Retiré du chantier 8 et repoussé après
+  `2.0.0` le 25 octobre 2026 : hors critère de fin, et nouvel outillage
+  de CI (`CLAUDE.md` §4 règle 6).
 - **Paramètre de report automatique des tâches non rayées vers Demain.**
   À réévaluer après deux semaines d'usage de la vue Demain, décision du
   12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`). D'ici là, le

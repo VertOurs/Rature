@@ -6,116 +6,20 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : chantier 7 (capture et réserve), lancé le
-  22 septembre 2026, clos dans le code le 25 octobre 2026. **7.1 (boîte de dépôt) retirée** le
-  28 septembre 2026 sur décision de VertOurs, après une semaine d'usage :
-  le dépôt d'un fichier texte ne convient pas, la synchronisation avec le
-  téléphone est repoussée sans date. PR #135 (squash `ab05045`) : code, clé GSettings, bannières,
-  `SPECIFICATION.md` §2.8/§3.15 retirés, ADR 0007 passé en
-  « abandonnée » avec une section « Retrait », `ROADMAP.md` à jour. Les
-  correctifs de la revue de 7.1 sans lien avec la boîte de dépôt restent
-  (#128 Pango, #129 permissions, #130 CI). Le retrait corrige aussi une
-  régression de `1.2.0` : le menu « ⋯ » des tâches n'avait plus d'effet,
-  le retour de focus déclenché par son ouverture reconstruisait les
-  lignes (cause déduite du code, **contrôle manuel par VertOurs requis**,
-  `CLAUDE.md` §6). `fr.po` : 78/78, y compris la note de version
-  `1.2.0` du metainfo, jamais fusionnée jusque-là.
-  **7.2 commencé** le 5 octobre 2026 : renvoi manuel d'une tâche du
-  jour vers la réserve (`Session.send_to_reserve`, bouton `←` en tête de
-  ligne, spec §2.5 et §3.2), PR #139. Précédé de la PR #138 (squash
-  `2473631`) : focus et défilement conservés à la reconstruction des
-  vues Jour et Réserve. Les deux contrôlées visuellement par VertOurs
-  le 5 octobre 2026 sur le build local. Livrés dans `1.4.0`.
-  Renvoi par glisser-déposer sur l'entrée Reserve (spec §3.2, même
-  méthode `window.send_to_reserve` que le bouton), PR #144 (squash
-  `0b0bf93`), contrôlé par VertOurs. Réordonnancement de la réserve par
-  glisser-déposer (spec §2.5 et §3.3, `Session.move_reserve_before`,
-  règle partagée `_moved_before` avec `move_before`), PR #145 (squash
-  `b72bcce`), contrôlé par VertOurs sur des données jetables. Ordre
-  porté par la liste JSON, aucune migration. Les deux livrés dans
-  `1.5.0`. **Priorité**, dernière case de 7.2, le 12 octobre 2026
-  (spec §2.1, §2.5, §2.7.8, §3.2, §3.3, §3.8, §3.9) : PR #152 (squash
-  `9fc8f6d`, pied `BREAKING CHANGE`), livrée dans `1.7.0`. `priority` sur `Task`,
-  `ReserveItem` et `Deletion`, aucun effet sur l'ordre ni les numéros
-  (testé), suit la tâche au tirage, au renvoi, au passage du jour et à
-  l'annulation ; un doublon marqué écarté au passage du jour marque
-  l'item existant (§2.7.8). Format version 3, migration 2 → 3 testée sur
-  des fichiers v2 principal et archive fabriqués, et chaîne 1 → 3.
-  Entrée de menu et icône `starred-symbolic` (accent) dans les vues Jour
-  et Réserve, colonne conservée par `set_child_visible` ; widgets
-  exercés par script, contrôlés visuellement par VertOurs le
-  12 octobre 2026. 7.2 est complète. **7.3** (préparer le lendemain) :
-  cadrage tenu avec VertOurs le 12 octobre 2026, décision dans
-  `docs/adr/0008-preparer-le-lendemain.md` (vue Demain, liste séparée qui
-  devient la liste du prochain jour qui démarre, après les récurrentes ;
-  décalage explicite depuis le jour ; ni agenda ni report automatique).
-  Seize points de détail validés par VertOurs le même jour (raccourcis
-  `Ctrl+1` à `Ctrl+4` dans l'ordre du panneau, « Move to tomorrow » et
-  « Move to today », barre « Add a task for tomorrow… », format v4…).
-  Points reportés dans `SPECIFICATION.md` le 25 octobre 2026 (bloc
-  Demain et étape 7 en §2.5, §2.7.9 suppression définitive, §3.16 vue
-  Demain, §3.15 laissé vacant), plus cinq précisions validées le même
-  jour : entrées de menu avant Delete, « Move to tomorrow » absent sur une
-  rayée ou une récurrente, page vide seulement sans récurrente due,
-  `Ctrl+Z` limité au jour, dépôt d'une tâche de Demain sur l'entrée
-  Reserve. §3.14 corrigé : Added n'est plus égal à `counter - 1` depuis
-  7.2 ; la docstring de `core/stats.py` reste à corriger dans la PR de
-  code. **Découpage validé le 25 octobre 2026**, une PR par lettre, aucune
-  version coupée avant C, puis `1.8.0` (mineure, `ROADMAP.md` prévaut) :
-  **A** format v4 (`PreparedTask`, clé `tomorrow`, migration 3 → 4) ;
-  **B1** opérations sur la liste Demain (ajout, renommage,
-  réordonnancement, suppression, priorité, « Move to tomorrow », « Move
-  to today », renvoi en réserve) et docstring de `stats.py` ; **B2**
-  étape 7 du passage du jour et récurrentes dues demain ; **C**
-  interface. **A fusionnée** (PR #161, squash `9fecc28`, pied
-  `BREAKING CHANGE`) : `PreparedTask`, format v4, migration 3 → 4 testée
-  sur des fichiers v3 principal et archive fabriqués et sur la chaîne
-  depuis v1. **B1 fusionnée** (PR #162, squash `5d8de04`) :
-  édition de Demain et gestes entre les listes dans `Session` et `App`
-  (`add_to_tomorrow`, `rename_tomorrow`, `set_tomorrow_priority`,
-  `delete_from_tomorrow`, `move_tomorrow_before`, `move_to_tomorrow`,
-  `move_reserve_to_tomorrow`, `move_to_today`,
-  `send_tomorrow_to_reserve`), docstring de `stats.day_counts` corrigée.
-  **B2 fusionnée** (PR #163, squash `ca9ec9c`) :
-  étape 7 du passage du jour (`Session._enter_day`, partagée avec
-  `move_to_today`), `recurring_due_tomorrow` dans `Session` et `App`.
-  **C découpée en deux PR** le 25 octobre 2026 : C1, la vue Demain
-  elle-même ; C2, les entrées « Move to tomorrow » des menus Jour et
-  Réserve et le dépôt sur l'entrée Tomorrow. **C1 fusionnée** (PR #164, squash `0466218`) :
-  vue (`tomorrow_view`, `prepared_row`, `tomorrow_recurring_row`, ce
-  dernier avec un emplacement vide de la largeur de `←` pour aligner les
-  textes), Maj+Entrée traité comme un ajout normal, dépôt d'une ligne de
-  Demain sur les entrées Day et Reserve (cibles existantes élargies à un
-  second type plutôt que deux `DropTarget` par entrée), `Ctrl+1` à
-  `Ctrl+4`. Contrôle visuel fait par VertOurs le 25 octobre 2026 sur le
-  build local, glisser-déposer réel compris : OK. **C2 fusionnée** (PR #165, squash `0d1d588`) :
-  « Move to tomorrow » (« Déplacer à demain ») avant Delete dans les menus
-  Jour et Réserve, absent sur une rayée ou une récurrente, dépôt d'une
-  tâche du jour ou d'un item de réserve sur l'entrée Tomorrow, `fr.po`
-  101/101. Contrôle visuel fait par VertOurs le 25 octobre 2026 : OK.
-  **Chantier 7 clos** le 25 octobre 2026 : 7.3 livré dans `1.8.0`,
-  migration 3 → 4 confirmée par VertOurs sur ses vraies données le même
-  jour (fichier en version 4, données intactes, entrée Tomorrow
-  présente), après sauvegarde dans `~/rature-backup-1.7.1`.
-  **Récurrente une semaine sur deux**, hors cases prévues, décidée par
-  VertOurs le 12 octobre 2026 (spec §2.5, §2.7.7, §3.4 ; ROADMAP,
-  section dédiée du chantier 7) : PR #148 (squash `6dda0d2`, pied
-  `BREAKING CHANGE`), livrée dans `1.6.0`. `RecurringItem` gagne
-  `every_other_week_from` (lundi d'une semaine active, `null` = chaque
-  semaine), parité comptée depuis ce lundi dans `recurrence.py`, jamais
-  par semaine ISO. L'interface transmet un `Cadence` à trois valeurs,
-  `App` calcule le lundi depuis la date de référence et conserve le lundi
-  stocké si la semaine choisie est déjà active. **Première migration
-  réelle** : format version 2, 1 → 2 testée sur un fichier principal et
-  une archive v1 fabriqués dans les tests, et vue tourner sur un
-  lancement réel (données jetables, bus D-Bus isolé pour ne pas croiser
-  l'instance Flatpak ouverte). Formulaire et sous-titres exercés par
-  script sur les vrais widgets, contrôlés visuellement par VertOurs le
-  12 octobre 2026 ; libellé « every two weeks » retenu à ce contrôle.
-  Sauvegarde du dossier `data/rature` réel faite par VertOurs avant la
-  migration ; `1.6.0` confirmée sur ses données le 12 octobre 2026.
-  Chantiers 0 à 6 terminés (`docs/internal/ROADMAP.md`), détail dans
-  « Chantiers terminés ».
+- **Chantier en cours** : chantier 8 (confort et langues), lancé le
+  25 octobre 2026, dernier avant `2.0.0`. Découpage validé le même jour :
+  **8.1** job CI de traduction, déjà couvert par
+  `tests/test_translations.py` (`msgfmt --check` inclut `--check-format`
+  et `--check-header`, lancé en CI dans le job `test`), case cochée sans
+  code ; **8.2** nom accessible sur les boutons à icône seule, repris de
+  l'infobulle ; **8.3** fenêtre Statistiques rafraîchie au passage du jour
+  seulement, puisqu'elle ne lit que les archives (§2.6, §3.14,
+  `App.statistics`), spec à compléter avant le code ; **8.4** catalogues
+  `es`, `de`, `pt_BR`, `ru`, `eo`, traduits par Claude, marqués
+  « machine translation » dans l'en-tête, une PR par langue. Tests
+  d'interface sous `gtk4-broadwayd` reportés après `2.0.0` : hors critère
+  de fin, pas d'outillage CI nouveau. **À réévaluer vers le
+  8 novembre 2026** : report automatique vers Demain (ADR 0008).
 - **`1.8.0` est publiée** (25 octobre 2026, sur `//51`) : vue Demain,
   chantier 7.3 (PR #160 à #165), format version 4, release PR #166
   (squash `3116013`). Tag `v1.8.0` annoté et signé, poussé, `release.yml`
@@ -364,6 +268,14 @@ version taguée après le bump.
   logo abandonné, `FUNDING.yml` ajouté. Alertes de sécurité Dependabot
   activées. Critère de fin atteint le 15 septembre 2026. Clôturé par
   `1.1.0`, coupée le même jour.
+
+- **Chantier 7**, 22 septembre au 25 octobre 2026, versions `1.2.0` à
+  `1.8.0` : 7.1 boîte de dépôt livrée puis retirée (ADR 0007, PR #135) ;
+  7.2 renvoi en réserve, réordonnancement de la réserve, priorité ; hors
+  cases, récurrente une semaine sur deux ; 7.3 vue Demain (ADR 0008,
+  PR #160 à #165). Trois migrations réelles (1 → 2, 2 → 3, 3 → 4), chacune
+  testée sur des fichiers fabriqués puis confirmée sur les vraies données
+  de VertOurs après sauvegarde.
 
 ## Documents
 
