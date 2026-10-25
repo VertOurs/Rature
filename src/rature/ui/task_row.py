@@ -45,6 +45,7 @@ class TaskRow(Gtk.ListBoxRow):
     row_popover: Gtk.Popover = Gtk.Template.Child()
     rename_button: Gtk.Button = Gtk.Template.Child()
     priority_button: Gtk.Button = Gtk.Template.Child()
+    move_to_tomorrow_button: Gtk.Button = Gtk.Template.Child()
     delete_button: Gtk.Button = Gtk.Template.Child()
     priority_icon: Gtk.Image = Gtk.Template.Child()
 
@@ -56,6 +57,7 @@ class TaskRow(Gtk.ListBoxRow):
         run_action: Callable[[Callable[[], None]], bool],
         perform: Callable[[Callable[[], None]], bool],
         send_to_reserve: Callable[[str], None],
+        move_to_tomorrow: Callable[[str], None],
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -64,6 +66,7 @@ class TaskRow(Gtk.ListBoxRow):
         self.run_action = run_action
         self.perform = perform
         self.send_to_reserve = send_to_reserve
+        self.move_to_tomorrow = move_to_tomorrow
 
         self.num_label.set_label(str(task.num))
         self.text_label.set_label(task.text)
@@ -82,6 +85,9 @@ class TaskRow(Gtk.ListBoxRow):
         # nor focusable, but keeps its width, so the number and text
         # columns line up with the rows that do show it.
         self.send_back_button.set_child_visible(task.can_go_back_to_reserve)
+        # SPECIFICATION.md §3.2: Move to tomorrow exists where ← does,
+        # absent rather than insensitive elsewhere, active on a frozen list.
+        self.move_to_tomorrow_button.set_visible(task.can_go_back_to_reserve)
         # SPECIFICATION.md §3.2: same trick for the priority column, so
         # an unmarked row keeps the slot and nothing shifts.
         self.priority_icon.set_child_visible(task.priority)
@@ -93,6 +99,9 @@ class TaskRow(Gtk.ListBoxRow):
         self.strike_button.connect("clicked", self._on_strike_clicked)
         self.rename_button.connect("clicked", self._on_rename_clicked)
         self.priority_button.connect("clicked", self._on_priority_clicked)
+        self.move_to_tomorrow_button.connect(
+            "clicked", self._on_move_to_tomorrow_clicked
+        )
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
         self._rename = InlineRename(
@@ -180,6 +189,10 @@ class TaskRow(Gtk.ListBoxRow):
             self.run_action(lambda: self.app.unstrike(self.task.id))
         else:
             self.run_action(lambda: self.app.strike(self.task.id))
+
+    def _on_move_to_tomorrow_clicked(self, _button: Gtk.Button) -> None:
+        self.row_popover.popdown()
+        self.move_to_tomorrow(self.task.id)
 
     def _on_delete_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()

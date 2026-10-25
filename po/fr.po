@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-25 19:01+0100\n"
+"POT-Creation-Date: 2026-10-25 19:17+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -354,7 +354,11 @@ msgstr "Prioritaire"
 msgid "Rename"
 msgstr "Renommer"
 
-#: data/ui/task_row.ui:104 data/ui/prepared_row.ui:97 data/ui/reserve_row.ui:87
+#: data/ui/task_row.ui:104 data/ui/reserve_row.ui:87
+msgid "Move to tomorrow"
+msgstr "Déplacer à demain"
+
+#: data/ui/task_row.ui:113 data/ui/prepared_row.ui:97 data/ui/reserve_row.ui:96
 #: data/ui/recurring_row.ui:40
 msgid "Delete"
 msgstr "Supprimer"
@@ -539,21 +543,21 @@ msgstr ""
 "L'ouvrir pourrait écraser des données. Mettez Rature à jour pour ouvrir ce "
 "fichier : %s"
 
-#: src/rature/ui/day_view.py:103
+#: src/rature/ui/day_view.py:105
 msgid "Unfreeze the list"
 msgstr "Libérer la liste"
 
-#: src/rature/ui/day_view.py:106
+#: src/rature/ui/day_view.py:108
 msgid "Freeze the list"
 msgstr "Figer la liste"
 
-#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:77
-#: src/rature/ui/task_row.py:89
+#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:80
+#: src/rature/ui/task_row.py:95
 msgid "Remove priority"
 msgstr "Retirer la priorité"
 
-#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:77
-#: src/rature/ui/task_row.py:89
+#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:80
+#: src/rature/ui/task_row.py:95
 msgid "Mark as priority"
 msgstr "Marquer comme prioritaire"
 
@@ -569,29 +573,29 @@ msgstr "la semaine prochaine"
 msgid "every two weeks"
 msgstr "une semaine sur deux"
 
-#: src/rature/ui/task_row.py:73
+#: src/rature/ui/task_row.py:76
 msgid "Undo the strike"
 msgstr "Annuler la rature"
 
-#: src/rature/ui/task_row.py:76
+#: src/rature/ui/task_row.py:79
 msgid "Strike through"
 msgstr "Rayer"
 
-#: src/rature/ui/window.py:337
+#: src/rature/ui/window.py:349
 msgid "Changes could not be saved to disk."
 msgstr "Les modifications n'ont pas pu être enregistrées sur le disque."
 
-#: src/rature/ui/window.py:345
+#: src/rature/ui/window.py:357
 #, python-format
 msgid "The data file could not be read. It was moved aside as %s."
 msgstr ""
 "Le fichier de données n'a pas pu être lu. Il a été mis de côté sous le nom "
 "%s."
 
-#: src/rature/ui/window.py:348 src/rature/ui/window.py:354
+#: src/rature/ui/window.py:360 src/rature/ui/window.py:366
 msgid "Dismiss"
 msgstr "Ignorer"
 
-#: src/rature/ui/window.py:352
+#: src/rature/ui/window.py:364
 msgid "A new day has started. The previous one has been archived."
 msgstr "Une nouvelle journée a commencé. La précédente a été archivée."

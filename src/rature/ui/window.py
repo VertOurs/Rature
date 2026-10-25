@@ -57,6 +57,7 @@ class RatureWindow(Adw.ApplicationWindow):
             run_action=self._run_app_action,
             perform=self._perform,
             send_to_reserve=self.send_to_reserve,
+            move_to_tomorrow=self.move_to_tomorrow,
         )
         self.day_page.set_child(self.day_view)
         self.tomorrow_view = TomorrowView(
@@ -72,6 +73,7 @@ class RatureWindow(Adw.ApplicationWindow):
             run_action=self._run_app_action,
             perform=self._perform,
             send_to_day=self.send_to_day,
+            move_to_tomorrow=self.move_reserve_to_tomorrow,
         )
         self.reserve_page.set_child(self.reserve_view)
         self.recurring_view = RecurringView(app=app, run_action=self._run_app_action)
@@ -275,6 +277,16 @@ class RatureWindow(Adw.ApplicationWindow):
         else:
             self.send_to_reserve(value.task.id)
         return True
+
+    def move_to_tomorrow(self, task_id: str) -> None:
+        # SPECIFICATION.md §3.2: a day row's menu entry; the Tomorrow
+        # sidebar entry's drop calls it too.
+        self._run_app_action(lambda: self.app.move_to_tomorrow(task_id))
+
+    def move_reserve_to_tomorrow(self, item_id: str) -> None:
+        # SPECIFICATION.md §3.3: a reserve row's menu entry; the Tomorrow
+        # sidebar entry's drop calls it too.
+        self._run_app_action(lambda: self.app.move_reserve_to_tomorrow(item_id))
 
     def move_to_today(self, task_id: str) -> None:
         # SPECIFICATION.md §3.16: the row menu entry; the Day sidebar

@@ -45,6 +45,7 @@ class ReserveRow(Gtk.ListBoxRow):
     row_popover: Gtk.Popover = Gtk.Template.Child()
     rename_button: Gtk.Button = Gtk.Template.Child()
     priority_button: Gtk.Button = Gtk.Template.Child()
+    move_to_tomorrow_button: Gtk.Button = Gtk.Template.Child()
     delete_button: Gtk.Button = Gtk.Template.Child()
     priority_icon: Gtk.Image = Gtk.Template.Child()
 
@@ -56,6 +57,7 @@ class ReserveRow(Gtk.ListBoxRow):
         run_action: Callable[[Callable[[], None]], bool],
         perform: Callable[[Callable[[], None]], bool],
         send_to_day: Callable[[str], None],
+        move_to_tomorrow: Callable[[str], None],
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -64,6 +66,7 @@ class ReserveRow(Gtk.ListBoxRow):
         self.run_action = run_action
         self.perform = perform
         self.send_to_day = send_to_day
+        self.move_to_tomorrow = move_to_tomorrow
 
         self.text_label.set_label(item.text)
         # SPECIFICATION.md §3.3: the send button is insensitive while the
@@ -80,6 +83,10 @@ class ReserveRow(Gtk.ListBoxRow):
         self.send_button.connect("clicked", self._on_send_clicked)
         self.rename_button.connect("clicked", self._on_rename_clicked)
         self.priority_button.connect("clicked", self._on_priority_clicked)
+        # SPECIFICATION.md §3.3: always available, a frozen day included.
+        self.move_to_tomorrow_button.connect(
+            "clicked", self._on_move_to_tomorrow_clicked
+        )
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
         self._rename = InlineRename(
@@ -157,6 +164,10 @@ class ReserveRow(Gtk.ListBoxRow):
         # (chantier 3 step 7) call the same window method, never two
         # parallel paths.
         self.send_to_day(self.item.id)
+
+    def _on_move_to_tomorrow_clicked(self, _button: Gtk.Button) -> None:
+        self.row_popover.popdown()
+        self.move_to_tomorrow(self.item.id)
 
     def _on_delete_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()

@@ -53,6 +53,7 @@ class DayView(Adw.Bin):
         run_action: Callable[[Callable[[], None]], bool],
         perform: Callable[[Callable[[], None]], bool],
         send_to_reserve: Callable[[str], None],
+        move_to_tomorrow: Callable[[str], None],
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -62,6 +63,7 @@ class DayView(Adw.Bin):
         self.run_action = run_action
         self.perform = perform
         self.send_to_reserve = send_to_reserve
+        self.move_to_tomorrow = move_to_tomorrow
         self.entry.connect("activate", self._on_entry_activate)
         # SPECIFICATION.md §3.2: Shift+Enter adds the task already struck.
         # A capture-phase controller sees Return before the entry turns it
@@ -168,5 +170,6 @@ class DayView(Adw.Bin):
                     run_action=self.run_action,
                     perform=self.perform,
                     send_to_reserve=self.send_to_reserve,
+                    move_to_tomorrow=self.move_to_tomorrow,
                 )
             )
