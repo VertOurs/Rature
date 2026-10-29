@@ -145,9 +145,9 @@ class ArchivesWindow(Adw.Window):
         return self._match_cache[day_date]
 
     def _show_day(self, day_date: date) -> None:
-        # SPECIFICATION.md §3.2's header format, reused as-is: same
-        # weekday-day-month long form as the Day view's title. The widget
-        # lives in the .ui; only its text changes as the selection moves.
+        # The Day view title's long date, from the catalogue
+        # (SPECIFICATION.md §3.8). The widget lives in the .ui; only its
+        # text changes as the selection moves.
         self.title.set_title(long_date(day_date))
         list_helpers.clear(self.struck_list)
         list_helpers.clear(self.active_list)
