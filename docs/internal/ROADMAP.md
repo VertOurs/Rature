@@ -398,6 +398,12 @@ la fenêtre Statistiques se met à jour sans être refermée.
 - Suivre les fins de vie de runtime, une migration par an environ
 - Publier les correctifs avec un tag et une entrée de CHANGELOG
 - Traiter les issues, ou les fermer honnêtement si hors périmètre
+- Seuil de couverture CI étendu à tous les modules sans `gi`, pas
+  seulement `core/` (liste dans `pyproject.toml`). Relevé le 29 octobre
+  2026, après `2.0.0`
+- Test des formats `strftime` de chaque catalogue : `msgfmt --check` ne
+  les connaît pas, une faute comme `%-D` passerait. Relevé le 29 octobre
+  2026, après `2.0.0`
 
 ---
 
