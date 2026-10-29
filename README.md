@@ -78,7 +78,8 @@ The method it reproduces:
   chart and no judgement.
 - **Undo the last deletion**, **copy a day as plain text**, keyboard
   shortcuts with a help window, a full French translation, and
-  Spanish, German, Brazilian Portuguese and Russian machine translations.
+  Spanish, German, Brazilian Portuguese, Russian and Esperanto machine
+  translations.
 
 ## Installing
 

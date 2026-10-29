@@ -38,11 +38,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (PR #176, squash `a84d3be`) : « Hoje » pour la vue Jour, « Histórico » pour
   Archives (« arquivo » veut aussi dire fichier), date `%A, %-d de %B`
   (« quinta, 29 de outubro » : la glibc 2.43 abrège le jour en `pt_BR`),
-  contrôle visuel OK le 29 octobre 2026. **`ru` sur `feat/po-ru`** :
+  contrôle visuel OK le 29 octobre 2026. **`ru` fusionné** (PR #177, squash
+  `c86b8b3`) :
   « Сегодня » pour la vue Jour, « Архив », date `%A, %-d %B` (mois au
   génitif par la glibc, « Четверг, 29 октября »), aucune chaîne au
-  pluriel, contrôle visuel OK le 29 octobre 2026. Reste `eo`, puis `2.0.0` sans
-  passer par `1.10.0` (recommandation du 29 octobre 2026). Après un changement de `po/LINGUAS`,
+  pluriel, contrôle visuel OK le 29 octobre 2026. **`eo` sur
+  `feat/po-eo`**, dernier catalogue : « Hodiaŭ » pour la vue Jour,
+  « Arkivo », date `%A, la %-d-a de %B` (« ĵaŭdo, la 29-a de Oktobro » :
+  la glibc met une majuscule au mois, impossible à corriger depuis le
+  catalogue), contrôle visuel OK le 29 octobre 2026. Une fois fusionné, le critère de
+  fin du chantier 8 est atteint : release `2.0.0` directement, sans
+  `1.10.0` (recommandation du 29 octobre 2026). Après un changement de `po/LINGUAS`,
   `meson setup --reconfigure build` : Meson ne suit pas ce fichier. Le
   runtime Flatpak n'embarque que les locales du système : contrôle visuel
   d'une autre langue sur une build hôte. **À réévaluer vers le
