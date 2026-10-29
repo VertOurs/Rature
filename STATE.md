@@ -32,10 +32,13 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   correctifs sortis du contrôle visuel : date longue traduisible
   (`core/dates.py`), contexte `statistics column` sur l'en-tête Day des
   Statistiques, import de Gtk avant l'alignement de `LC_TIME` (bug depuis
-  la PR #75). **`de` sur `feat/po-de`** : 107 messages, « Heute » pour la
+  la PR #75). **`de` fusionné** (PR #175, squash `3f13c9e`) : 107 messages, « Heute » pour la
   vue Jour (« Morgen » se lit aussi « matin »), « Archiv », date
-  `%A, %-d. %B`, contrôle visuel OK le 29 octobre 2026. Restent
-  `pt_BR`, `ru`, `eo`. Après un changement de `po/LINGUAS`,
+  `%A, %-d. %B`, contrôle visuel OK le 29 octobre 2026. **`pt_BR` sur
+  `feat/po-pt-br`** : « Hoje » pour la vue Jour, « Histórico » pour
+  Archives (« arquivo » veut aussi dire fichier), date `%A, %-d de %B`
+  (« quinta, 29 de outubro » : la glibc 2.43 abrège le jour en `pt_BR`),
+  contrôle visuel OK le 29 octobre 2026. Restent `ru`, `eo`. Après un changement de `po/LINGUAS`,
   `meson setup --reconfigure build` : Meson ne suit pas ce fichier. Le
   runtime Flatpak n'embarque que les locales du système : contrôle visuel
   d'une autre langue sur une build hôte. **À réévaluer vers le
