@@ -18,8 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The long date (Day view and Archives titles, the Statistics Day column,
   the copied text) takes its format from the translation, so each
-  language can order the weekday, day and month its own way. In French,
-  a single-digit day loses its leading zero ("jeudi 5 novembre").
+  language can order the weekday, day and month its own way. A
+  single-digit day loses its leading zero ("Thursday 5 November",
+  "jeudi 5 novembre").
+- The dates in the Archives sidebar follow the translation the same way
+  ("5 de octubre de 2026" in Spanish) and lose their leading zero too.
 
 ### Fixed
 

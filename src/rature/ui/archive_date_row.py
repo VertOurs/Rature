@@ -14,6 +14,8 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.core.dates import date_with_year  # noqa: E402
+
 
 @Gtk.Template(resource_path="/io/github/vertours/Rature/ui/archive_date_row.ui")
 class ArchiveDateRow(Adw.ActionRow):
@@ -25,5 +27,6 @@ class ArchiveDateRow(Adw.ActionRow):
         super().__init__(**kwargs)
         self.day_date = day_date
         # SPECIFICATION.md §3.5: no count, no preview, no summary next to
-        # a date, so the title is the formatted date and nothing else.
-        self.set_title(day_date.strftime("%d %B %Y"))
+        # a date, so the title is the formatted date and nothing else, in
+        # the catalogue's format (§3.8).
+        self.set_title(date_with_year(day_date))

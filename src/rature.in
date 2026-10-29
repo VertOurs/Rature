@@ -15,6 +15,7 @@ PKGDATADIR = "@PKGDATADIR@"
 sys.path.insert(1, PKGDATADIR)
 
 from rature.config import LOCALEDIR  # noqa: E402
+from rature.core.dates import use_catalogue_format  # noqa: E402
 from rature.i18n import align_time_locale  # noqa: E402
 from rature.logging_setup import configure as configure_logging  # noqa: E402
 
@@ -43,8 +44,10 @@ except locale.Error:
 
 # setlocale(LC_ALL, "") follows LC_TIME/LANG but ignores LANGUAGE, so the
 # dates could stay in a different language than the interface. Realign
-# LC_TIME with the message language (SPECIFICATION.md §3.8).
-align_time_locale(environ=os.environ)
+# LC_TIME with the message language (SPECIFICATION.md §3.8). When no
+# matching locale is installed, the dates keep the source format rather
+# than mix the catalogue's words with names in another language.
+use_catalogue_format(align_time_locale(environ=os.environ) is not None)
 
 # Two text domains to bind, not one. gettext's own bindtextdomain/
 # textdomain back gettext.gettext, which every module reaches through

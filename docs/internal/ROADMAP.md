@@ -370,10 +370,11 @@ codée avant que la spec ne la décrive.
       archivée. Relevé au cadrage de 8.3 le 25 octobre 2026, à traiter
       après 8.4, hors critère de fin
 - [ ] Catalogues `es`, `de`, `pt_BR`, `ru`, `eo`
-- [ ] Date de la barre latérale des Archives traduisible comme la date
+- [x] Date de la barre latérale des Archives traduisible comme la date
       longue : `%d %B %Y` donne « 05 octubre 2026 » en espagnol, au
       lieu de « 5 de octubre de 2026 ». Relevé au contrôle visuel de
-      `es` le 29 octobre 2026, hors critère de fin
+      `es` le 29 octobre 2026, hors critère de fin. Fait avant `2.0.0`,
+      à la revue de code du 29 octobre 2026
 - [x] Job CI de traduction :
       `msgfmt --check --check-format --check-header`. Déjà couvert par
       `tests/test_translations.py`, lancé en CI dans le job `test` sur
