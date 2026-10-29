@@ -984,7 +984,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
-| Format de la date longue (titres de la vue Jour et de la fenêtre d'archives, colonne Day des Statistiques, copie texte) | `%A %d %B` |
+| Format de la date longue (titres de la vue Jour et de la fenêtre d'archives, colonne Day des Statistiques, copie texte) | `%A %-d %B` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-29 13:48+0100\n"
+"POT-Creation-Date: 2026-10-29 17:01+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -578,12 +578,12 @@ msgid "Cancel an edit"
 msgstr "Annuler une modification"
 
 #. Translators: a strftime format for a long date with its weekday,
-#. e.g. "Thursday 29 October". %A is the weekday, %d the day of the
-#. month, %B the month; the names come out in your language. Reorder
-#. them and add words as your language needs; %-d drops the leading
-#. zero. Do not translate the codes themselves.
-#: src/rature/core/dates.py:29
-msgid "%A %d %B"
+#. e.g. "Thursday 5 November". %A is the weekday, %-d the day of the
+#. month without a leading zero, %B the month; the names come out in
+#. your language. Reorder them and add words as your language needs.
+#. Do not translate the codes themselves.
+#: src/rature/core/dates.py:46
+msgid "%A %-d %B"
 msgstr "%A %-d %B"
 
 #: src/rature/ui/application.py:82

@@ -39,8 +39,8 @@ def use_catalogue_format(enabled: bool) -> None:
 def long_date(day: date) -> str:
     """The date with its weekday, in the interface language's own order."""
     # Translators: a strftime format for a long date with its weekday,
-    # e.g. "Thursday 29 October". %A is the weekday, %d the day of the
-    # month, %B the month; the names come out in your language. Reorder
-    # them and add words as your language needs; %-d drops the leading
-    # zero. Do not translate the codes themselves.
-    return day.strftime(_("%A %d %B") if _use_catalogue else "%A %d %B")
+    # e.g. "Thursday 5 November". %A is the weekday, %-d the day of the
+    # month without a leading zero, %B the month; the names come out in
+    # your language. Reorder them and add words as your language needs.
+    # Do not translate the codes themselves.
+    return day.strftime(_("%A %-d %B") if _use_catalogue else "%A %-d %B")

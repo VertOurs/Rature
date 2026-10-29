@@ -16,7 +16,7 @@ def make_session() -> Session:
 
 def test_an_empty_day_is_the_date_alone() -> None:
     text = day_text(make_session())
-    assert text == date(2026, 8, 31).strftime("%A %d %B")
+    assert text == date(2026, 8, 31).strftime("%A %-d %B")
     assert "\n" not in text
 
 
@@ -24,7 +24,7 @@ def test_the_body_follows_the_date_after_a_blank_line() -> None:
     session = make_session()
     session.add("only one")
     lines = day_text(session).split("\n")
-    assert lines[0] == date(2026, 8, 31).strftime("%A %d %B")
+    assert lines[0] == date(2026, 8, 31).strftime("%A %-d %B")
     assert lines[1] == ""
     assert lines[2] == "[ ] 1  only one"
 

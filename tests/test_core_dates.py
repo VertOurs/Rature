@@ -11,7 +11,7 @@ from rature.core.dates import long_date
 
 
 def test_without_a_catalogue_the_format_is_weekday_day_month() -> None:
-    assert long_date(date(2026, 10, 29)) == date(2026, 10, 29).strftime("%A %d %B")
+    assert long_date(date(2026, 10, 29)) == date(2026, 10, 29).strftime("%A %-d %B")
 
 
 def test_a_translated_format_reorders_the_parts_and_adds_words(
@@ -41,6 +41,6 @@ def test_without_a_matching_time_locale_the_source_format_is_kept(
     monkeypatch.setattr(dates, "_", lambda message: "%A, %-d de %B")
     monkeypatch.setattr(dates, "_use_catalogue", True)
     dates.use_catalogue_format(False)
-    assert long_date(date(2026, 10, 29)) == date(2026, 10, 29).strftime("%A %d %B")
+    assert long_date(date(2026, 10, 29)) == date(2026, 10, 29).strftime("%A %-d %B")
     dates.use_catalogue_format(True)
     assert long_date(date(2026, 10, 29)) == "Thursday, 29 de October"
