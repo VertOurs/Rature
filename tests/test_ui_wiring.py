@@ -423,21 +423,23 @@ def test_launcher_imports_gtk_before_aligning_the_time_locale() -> None:
     # resets LC_TIME to LANG. Aligned before that import, the dates showed
     # in the LANG language under a LANGUAGE-translated interface.
     tree = ast.parse((REPO / "src" / "rature.in").read_text(encoding="utf-8"))
-    gtk_import = min(
+    gtk_imports = [
         node.lineno
         for node in ast.walk(tree)
         if isinstance(node, ast.ImportFrom)
         and node.module == "gi.repository"
         and any(alias.name == "Gtk" for alias in node.names)
-    )
-    align_call = min(
+    ]
+    locale_calls = [
         node.lineno
         for node in ast.walk(tree)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id == "align_time_locale"
-    )
-    assert gtk_import < align_call
+        and ast.unparse(node.func) in {"locale.setlocale", "align_time_locale"}
+    ]
+    assert gtk_imports, "src/rature.in no longer imports Gtk itself"
+    assert locale_calls, "src/rature.in no longer sets the locale"
+    # Both setlocale(LC_ALL, "") and the LC_TIME alignment must come after.
+    assert min(gtk_imports) < min(locale_calls)
 
 
 def test_launcher_turns_the_catalogue_date_format_off_without_a_time_locale() -> None:

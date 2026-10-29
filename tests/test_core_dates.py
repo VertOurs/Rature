@@ -2,12 +2,24 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The long-form date takes its format from the catalogue (SPECIFICATION.md §3.8)."""
 
+import locale
+from collections.abc import Iterator
 from datetime import date
 
 import pytest
 
 from rature.core import dates
 from rature.core.dates import long_date
+
+
+@pytest.fixture(autouse=True)
+def c_time_locale() -> Iterator[None]:
+    # The expected names below are English: pin LC_TIME to C, so a test or
+    # plugin that ran setlocale(LC_ALL, "") earlier cannot turn them French.
+    previous = locale.setlocale(locale.LC_TIME)
+    locale.setlocale(locale.LC_TIME, "C")
+    yield
+    locale.setlocale(locale.LC_TIME, previous)
 
 
 def test_without_a_catalogue_the_format_is_weekday_day_month() -> None:
