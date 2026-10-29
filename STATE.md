@@ -9,8 +9,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Chantier en cours** : aucun. Chantier 8 terminé le 29 octobre 2026,
   critère de fin atteint, `2.0.0` publiée (ci-dessous). Suites notées, hors critère : fenêtre
   Archives rafraîchie au passage du jour (roadmap chantier 8), tests
-  d'interface sous `gtk4-broadwayd` (repoussés). **À réévaluer vers le
-  8 novembre 2026** : report automatique vers Demain (ADR 0008).
+  d'interface sous `gtk4-broadwayd` (repoussés). Report automatique vers
+  Demain abandonné le 29 octobre 2026 (ADR 0008, addendum).
 - **Pour toute nouvelle langue** : l'ajouter à `po/LINGUAS`, créer le
   `.po` (`msginit`) avant `meson setup --reconfigure build`, Meson ne
   suivant pas ce fichier. Traduire les deux formats de date

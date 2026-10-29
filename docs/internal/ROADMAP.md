@@ -439,10 +439,10 @@ Noté ici pour ne pas y penser pendant les chantiers.
   `2.0.0` le 25 octobre 2026 : hors critère de fin, et nouvel outillage
   de CI (`CLAUDE.md` §4 règle 6).
 - **Paramètre de report automatique des tâches non rayées vers Demain.**
-  À réévaluer après deux semaines d'usage de la vue Demain, décision du
-  12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`). D'ici là, le
-  report reste un geste explicite ; une tâche non rayée suit toujours le
-  passage du jour de `SPECIFICATION.md` §2.5.
+  Abandonné le 29 octobre 2026, par décision de VertOurs, sans attendre la
+  réévaluation prévue le 12 octobre (`docs/adr/0008-preparer-le-lendemain.md`,
+  addendum). Le report reste un geste explicite ; une tâche non rayée suit
+  toujours le passage du jour de `SPECIFICATION.md` §2.5.
 - **Statistiques de suivi sur les récurrentes.** Abandonnée le
   8 septembre 2026, le temps de voir si le besoin persiste ; candidate
   pour la v3 sinon. Si le besoin ressurgit, attention : un suivi de
