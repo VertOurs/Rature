@@ -20,6 +20,7 @@ data/ui/archives_window.ui
 data/ui/statistics_row.ui
 data/ui/statistics_window.ui
 data/ui/shortcuts.ui
+src/rature/core/dates.py
 src/rature/ui/application.py
 src/rature/ui/day_view.py
 src/rature/ui/prepared_row.py

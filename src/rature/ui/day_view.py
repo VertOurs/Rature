@@ -15,6 +15,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gdk, Gtk  # noqa: E402
 
+from rature.core.dates import long_date  # noqa: E402
 from rature.ui import list_helpers  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
 
@@ -85,7 +86,7 @@ class DayView(Adw.Bin):
         # SPECIFICATION.md §2.5: the reference date, never the calendar
         # date; between midnight and 04:00 they disagree. The widget lives
         # in the .ui; refresh only rewrites its text.
-        self.title.set_title(session.day.date.strftime("%A %d %B"))
+        self.title.set_title(long_date(session.day.date))
         with list_helpers.keeping_place(
             self.scrolled_window, self.struck_list, self.active_list
         ):

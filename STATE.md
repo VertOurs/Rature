@@ -25,7 +25,20 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `StatisticsWindow.refresh()` au seul tick qui archive une journée,
   défilement conservé, contrôle visuel OK avec une horloge qui saute d'un
   jour. Fenêtre Archives notée au chantier 8 de la roadmap, après 8.4.
-  8.2 et 8.3 livrés dans `1.9.0`. Suivante : 8.4, une langue par PR. **À réévaluer vers le
+  8.2 et 8.3 livrés dans `1.9.0`. 8.4 en cours, une langue par PR :
+  **`es` sur `feat/po-es`**, 4 commits plus celui-ci, contrôle visuel OK
+  le 29 octobre 2026 : 107 messages, traduction machine signalée dans
+  l'en-tête, « Historial » pour la fenêtre Archives (« archivo » veut aussi
+  dire fichier), « Hoy » pour la vue Jour (« Mañana » se lit aussi
+  « matin »). Trois correctifs sortis du contrôle visuel : format de la
+  date longue traduisible (`core/dates.py`, français en `%A %-d %B`),
+  contexte `statistics column` sur l'en-tête Day des Statistiques, et
+  import de Gtk avant l'alignement de `LC_TIME` dans le lanceur (GTK
+  réinitialisait la locale, bug présent depuis la PR #75). Restent `de`,
+  `pt_BR`, `ru`, `eo`. Après un changement de `po/LINGUAS`,
+  `meson setup --reconfigure build` : Meson ne suit pas ce fichier. Le
+  runtime Flatpak n'embarque que les locales du système : contrôle visuel
+  d'une autre langue sur une build hôte. **À réévaluer vers le
   8 novembre 2026** : report automatique vers Demain (ADR 0008).
 - **`1.9.0` est publiée** (25 octobre 2026, sur `//51`) : noms accessibles
   (PR #170) et Statistiques rafraîchies au passage du jour (PR #171),

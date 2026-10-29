@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Spanish translation. It is a machine translation, not yet reviewed by a
+  native speaker, and says so in its catalogue header.
+
+### Changed
+
+- The long date (Day view and Archives titles, the Statistics Day column,
+  the copied text) takes its format from the translation, so each
+  language can order the weekday, day and month its own way. In French,
+  a single-digit day loses its leading zero ("jeudi 5 novembre").
+
+### Fixed
+
+- Dates follow the interface language again when it differs from the
+  system locale (for example `LANGUAGE=es` on a French system): GTK's
+  start-up reset the date language to the system's.
+
 ## [1.9.0] - 2026-10-25
 
 Accessibility and a live Statistics window, chantier 8.2 and 8.3. No

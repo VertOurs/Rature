@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from rature.core.dates import long_date
+
 if TYPE_CHECKING:
     from rature.core.session import Session
 
@@ -22,7 +24,7 @@ def day_text(session: Session) -> str:
     ``deletions`` journal never appear. An empty day is the date alone; no
     trailing newline.
     """
-    date_line = session.day.date.strftime("%A %d %B")
+    date_line = long_date(session.day.date)
     lines = [
         f"[{'x' if task.done else ' '}] {task.num}  {task.text}"
         for task in session.view()

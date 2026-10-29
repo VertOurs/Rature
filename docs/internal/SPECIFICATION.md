@@ -977,13 +977,14 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Archives vides | `No archived days.` |
 | Archives sans correspondance | `No matching days.` |
 | Archive illisible | `This archive cannot be read.` |
-| Fenêtre Statistiques, en-têtes de colonne | `Day`, `Added`, `Struck`, `Deleted`, `To reserve` |
+| Fenêtre Statistiques, en-têtes de colonne | `Day` (contexte `statistics column`, distinct du `Day` de la navigation), `Added`, `Struck`, `Deleted`, `To reserve` |
 | Fenêtre Statistiques, ligne de total | `Total` |
 | Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |
 | Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
+| Format de la date longue (titres de la vue Jour et de la fenêtre d'archives, colonne Day des Statistiques, copie texte) | `%A %d %B` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
 
@@ -1000,6 +1001,13 @@ Les noms de jours, dans le sous-titre des lignes récurrentes et sur les
 bascules du formulaire, ne figurent pas dans cette liste : ils sont dérivés
 de la locale par `strftime` (§3.4), n'entrent jamais au catalogue et sont
 donc corrects dans toutes les langues sans traduction à écrire.
+
+**Date longue.** Son format `strftime` passe en revanche par le catalogue,
+avec un commentaire pour les traducteurs : `strftime` fournit les noms de
+jour et de mois, mais l'ordre et les mots de liaison varient d'une langue à
+l'autre (« jueves, 29 de octubre » en espagnol, `%A, %-d de %B`) ; le
+français utilise `%A %-d %B`, sans zéro initial (« jeudi 5 novembre »). Ajouté au
+chantier 8.4. Un seul format, partagé par toutes les dates longues.
 
 **Cohérence de langue.** Les noms de jours et les dates longues (titre de la
 vue Jour, de la fenêtre d'archives, colonne Day des Statistiques) suivent la
@@ -1230,7 +1238,7 @@ ancien, exactement l'ordre d'`App.archives()`. Cinq colonnes, en-têtes en
 ```
 
 - **Day** : la date de la journée en format long local avec le jour de la
-  semaine (`%A %d %B`), comme les titres d'en-tête de la vue Jour et de la
+  semaine (format traduisible, §3.8), comme les titres d'en-tête de la vue Jour et de la
   fenêtre d'archives.
 - **Added** : `len(day.tasks) + len(day.deletions)`, c'est à dire toute
   tâche ayant reçu un numéro ce jour-là et restée dans la journée,
