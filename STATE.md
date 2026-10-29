@@ -7,8 +7,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 ## Avancement
 
 - **Chantier en cours** : aucun. Chantier 8 terminé le 29 octobre 2026,
-  critère de fin atteint ; `2.0.0` en cours de publication (release PR,
-  puis tag `v2.0.0` et PKGBUILD). Suites notées, hors critère : fenêtre
+  critère de fin atteint, `2.0.0` publiée (ci-dessous). Suites notées, hors critère : fenêtre
   Archives rafraîchie au passage du jour (roadmap chantier 8), tests
   d'interface sous `gtk4-broadwayd` (repoussés). **À réévaluer vers le
   8 novembre 2026** : report automatique vers Demain (ADR 0008).
@@ -18,16 +17,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (`core/dates.py`) et le contexte `statistics column`. Le runtime
   Flatpak n'embarque que les locales du système : contrôle visuel sur une
   build hôte.
-- **`1.9.0` est publiée** (25 octobre 2026, sur `//51`) : noms accessibles
-  (PR #170) et Statistiques rafraîchies au passage du jour (PR #171),
-  release PR #172 (squash `ef49ffe`). Tag `v1.9.0` annoté et signé,
-  poussé, `release.yml` vert (run `40226573062`, build et deploy),
-  `rature.flatpak` joint à la release (78 224 octets),
-  `https://vertours.github.io/Rature/` répond 200 et le dépôt sert un
-  commit « Built from ef49ffe ». PKGBUILD et `.SRCINFO` recalés sur
-  l'archive du tag (`sha256sum` identique sur deux téléchargements) dans un
-  commit de suivi. Aucune migration. **Reste à la charge de VertOurs** :
-  `flatpak update`.
+- **`2.0.0` est publiée** (29 octobre 2026, sur `//51`) : cinq langues en
+  traduction machine (PR #174 à #178), correctifs de dates (PR #179),
+  release PR #180 (squash `c3a04bc`). Tag `v2.0.0` annoté et signé,
+  poussé, `release.yml` vert (run `40909905054`, build et deploy),
+  `rature.flatpak` joint à la release (109 600 octets), metainfo du bundle
+  en `2.0.0`, le dépôt sert un commit « Built from c3a04bc ». PKGBUILD et
+  `.SRCINFO` recalés sur l'archive du tag (`sha256sum` identique sur deux
+  téléchargements) dans un commit de suivi. Aucune migration. **Reste à
+  la charge de VertOurs** : `flatpak update`. Ensuite, petite PR `test:`
+  convenue le 29 octobre 2026 : seuil de couverture CI étendu aux modules
+  sans GTK hors `core/`, test des formats `strftime` de chaque catalogue.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026

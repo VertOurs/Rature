@@ -1,6 +1,6 @@
 pkgbase = rature
 	pkgdesc = Your day, one line at a time: a daily-list desktop app for GNOME
-	pkgver = 1.9.0
+	pkgver = 2.0.0
 	pkgrel = 1
 	url = https://github.com/VertOurs/Rature
 	arch = any
@@ -14,7 +14,7 @@ pkgbase = rature
 	depends = gtk4
 	depends = libadwaita
 	depends = glib2
-	source = rature-1.9.0.tar.gz::https://github.com/VertOurs/Rature/archive/refs/tags/v1.9.0.tar.gz
-	sha256sums = 934a52117aeebe9161771923901831de9e7444b8e9ab39870515f2e4cb6005ef
+	source = rature-2.0.0.tar.gz::https://github.com/VertOurs/Rature/archive/refs/tags/v2.0.0.tar.gz
+	sha256sums = d6e70b8b05e01abf32200fffd7bf8c5966dddc4af803c1991801e06428377c1e
 
 pkgname = rature
