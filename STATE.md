@@ -34,11 +34,15 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   Statistiques, import de Gtk avant l'alignement de `LC_TIME` (bug depuis
   la PR #75). **`de` fusionné** (PR #175, squash `3f13c9e`) : 107 messages, « Heute » pour la
   vue Jour (« Morgen » se lit aussi « matin »), « Archiv », date
-  `%A, %-d. %B`, contrôle visuel OK le 29 octobre 2026. **`pt_BR` sur
-  `feat/po-pt-br`** : « Hoje » pour la vue Jour, « Histórico » pour
+  `%A, %-d. %B`, contrôle visuel OK le 29 octobre 2026. **`pt_BR` fusionné**
+  (PR #176, squash `a84d3be`) : « Hoje » pour la vue Jour, « Histórico » pour
   Archives (« arquivo » veut aussi dire fichier), date `%A, %-d de %B`
   (« quinta, 29 de outubro » : la glibc 2.43 abrège le jour en `pt_BR`),
-  contrôle visuel OK le 29 octobre 2026. Restent `ru`, `eo`. Après un changement de `po/LINGUAS`,
+  contrôle visuel OK le 29 octobre 2026. **`ru` sur `feat/po-ru`** :
+  « Сегодня » pour la vue Jour, « Архив », date `%A, %-d %B` (mois au
+  génitif par la glibc, « Четверг, 29 октября »), aucune chaîne au
+  pluriel, contrôle visuel OK le 29 octobre 2026. Reste `eo`, puis `2.0.0` sans
+  passer par `1.10.0` (recommandation du 29 octobre 2026). Après un changement de `po/LINGUAS`,
   `meson setup --reconfigure build` : Meson ne suit pas ce fichier. Le
   runtime Flatpak n'embarque que les locales du système : contrôle visuel
   d'une autre langue sur une build hôte. **À réévaluer vers le
