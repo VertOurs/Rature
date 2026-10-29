@@ -25,15 +25,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   en `2.0.0`, le dépôt sert un commit « Built from c3a04bc ». PKGBUILD et
   `.SRCINFO` recalés sur l'archive du tag (`sha256sum` identique sur deux
   téléchargements) dans un commit de suivi. Aucune migration. **Reste à
-  la charge de VertOurs** : `flatpak update`. Ensuite, petite PR `test:`
-  convenue le 29 octobre 2026 : seuil de couverture CI étendu aux modules
-  sans GTK hors `core/`, test des formats `strftime` de chaque catalogue.
+  la charge de VertOurs** : rien. Suivie de la PR `test/coverage-gate` :
+  seuil de couverture CI étendu aux modules sans `gi` hors `core/` (liste
+  dans `pyproject.toml`, commande devenue `pytest --cov`), test des formats
+  `strftime` de chaque catalogue.
 - **Mise à jour confirmée** : `flatpak update` de `0.10.1` vers `1.0.0`
   testé le 8 septembre 2026, sans souci, via le dépôt auto-hébergé.
   `1.0.0` → `1.1.0` : mise à jour lancée par l'agent le 15 septembre 2026
   (catalogue français vérifié au niveau fichier, 69 messages, valide),
   rendu de l'interface en français confirmé par VertOurs le même jour
-  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour. `1.7.0` → `1.7.1` : `flatpak update` lancé par l'agent le 12 octobre 2026, passage au runtime `//51`, sans migration, confirmé par VertOurs le même jour. `1.7.1` → `1.8.0` : `flatpak update` par VertOurs le 25 octobre 2026 après sauvegarde, migration 3 → 4 confirmée sur ses vraies données le même jour.
+  (`CLAUDE.md` §6). `1.2.0` → `1.3.0` : `flatpak update` par VertOurs le 28 septembre 2026, `flatpak info` affiche `1.3.0`. `1.3.0` → `1.4.0` : `flatpak update` par VertOurs le 5 octobre 2026, fonctionnalité confirmée sur la version installée. `1.5.0` → `1.6.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 1 → 2 confirmée par VertOurs sur ses vraies données le même jour. `1.6.0` → `1.7.0` : `flatpak update` lancé par l'agent le 12 octobre 2026, migration 2 → 3 confirmée par VertOurs sur ses vraies données le même jour. `1.7.0` → `1.7.1` : `flatpak update` lancé par l'agent le 12 octobre 2026, passage au runtime `//51`, sans migration, confirmé par VertOurs le même jour. `1.7.1` → `1.8.0` : `flatpak update` par VertOurs le 25 octobre 2026 après sauvegarde, migration 3 → 4 confirmée sur ses vraies données le même jour. `1.9.0` → `2.0.0` : `flatpak update` par VertOurs le 29 octobre 2026, `flatpak info` affiche `2.0.0`, commit `337b5907` identique au bundle publié, sans migration.
 - **Bump runtime `//50` → `//51`** : PR #156 (squash `f9d8537`), livré dans `1.7.1`, avancé au
   12 octobre 2026 par décision de VertOurs (GNOME 51 sorti le
   16 septembre, image CI `gnome-51` publiée). Manifeste et image CI

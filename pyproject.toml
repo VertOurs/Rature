@@ -45,3 +45,21 @@ minversion = "8.0"
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-ra"
+# The coverage gate (CI and CONTRIBUTING.md run `pytest --cov`): every
+# module that imports no gi, so the whole of core/ plus the gi-free helpers
+# beside it. ui/ modules that import GTK are left to the wiring tests
+# (ADR 0002).
+[tool.coverage.run]
+source = [
+    "rature.core",
+    "rature.i18n",
+    "rature.logging_setup",
+    "rature.ui.reorder",
+    "rature.ui.weekdays",
+]
+branch = true
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+skip_covered = true
