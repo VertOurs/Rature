@@ -985,6 +985,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 | Format de la date longue (titres de la vue Jour et de la fenêtre d'archives, colonne Day des Statistiques, copie texte) | `%A %-d %B` |
+| Format de la date avec année (barre latérale de la fenêtre d'archives) | `%-d %B %Y` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
 
@@ -1007,7 +1008,9 @@ avec un commentaire pour les traducteurs : `strftime` fournit les noms de
 jour et de mois, mais l'ordre et les mots de liaison varient d'une langue à
 l'autre (« jueves, 29 de octubre » en espagnol, `%A, %-d de %B`) ; le
 français utilise `%A %-d %B`, sans zéro initial (« jeudi 5 novembre »). Ajouté au
-chantier 8.4. Un seul format, partagé par toutes les dates longues. Si la
+chantier 8.4. Un seul format, partagé par toutes les dates longues ; la
+barre latérale des archives a le sien, avec l'année et sans le jour de la
+semaine (« 5 de octubre de 2026 »). Si la
 locale de la langue de l'interface n'est pas installée, le format du
 catalogue n'est pas appliqué : les noms resteraient dans une autre langue
 (« Thursday, 29 de October »). La date garde alors le format source, sans

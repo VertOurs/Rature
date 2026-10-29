@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-29 17:01+0100\n"
+"POT-Creation-Date: 2026-10-29 17:03+0100\n"
 "PO-Revision-Date: 2026-10-29 19:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Russian\n"
@@ -575,9 +575,18 @@ msgstr "Отменить правку"
 #. month without a leading zero, %B the month; the names come out in
 #. your language. Reorder them and add words as your language needs.
 #. Do not translate the codes themselves.
-#: src/rature/core/dates.py:46
+#: src/rature/core/dates.py:47
 msgid "%A %-d %B"
 msgstr "%A, %-d %B"
+
+#. Translators: a strftime format for a date with its year, e.g.
+#. "5 November 2026", in the Archives sidebar. %-d is the day of the
+#. month without a leading zero, %B the month, %Y the year. Reorder
+#. them and add words as your language needs. Do not translate the
+#. codes themselves.
+#: src/rature/core/dates.py:57
+msgid "%-d %B %Y"
+msgstr "%-d %B %Y"
 
 #: src/rature/ui/application.py:82
 msgid "This file was saved by a newer version of Rature."
