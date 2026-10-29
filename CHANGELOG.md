@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Spanish translation. It is a machine translation, not yet reviewed by a
   native speaker, and says so in its catalogue header.
+- German translation, a machine translation too, marked the same way.
 
 ### Changed
 
