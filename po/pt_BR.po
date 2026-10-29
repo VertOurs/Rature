@@ -1,0 +1,652 @@
+# Brazilian Portuguese translation for Rature.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 VertOurs
+#
+# Machine translation, produced by Claude (Anthropic) and not reviewed by
+# a native speaker. Corrections are welcome as an issue or a pull request.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: rature\n"
+"Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
+"POT-Creation-Date: 2026-10-29 16:26+0100\n"
+"PO-Revision-Date: 2026-10-29 18:00+0100\n"
+"Last-Translator: Machine translation\n"
+"Language-Team: Brazilian Portuguese\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: data/io.github.vertours.Rature.desktop.in:2
+#: data/io.github.vertours.Rature.metainfo.xml.in:9
+msgid "Rature"
+msgstr "Rature"
+
+#: data/io.github.vertours.Rature.desktop.in:3
+#: data/io.github.vertours.Rature.metainfo.xml.in:10
+msgid "Your day, one line at a time"
+msgstr "Seu dia, uma linha de cada vez"
+
+#: data/io.github.vertours.Rature.desktop.in:9
+msgid "todo;list;tasks;daily;"
+msgstr "tarefas;lista;afazeres;diário;dia;todo;"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:13
+msgid ""
+"Rature keeps one numbered list for the day. You add tasks one by one, in no "
+"particular order, and strike them through as the day goes. Struck tasks stay "
+"visible in a block at the top: there is no planning, no categories, no "
+"scoring, no encouragement."
+msgstr ""
+"O Rature mantém uma única lista numerada para o dia. As tarefas são "
+"adicionadas uma a uma, sem ordem definida, e riscadas ao longo do dia. As "
+"tarefas riscadas continuam visíveis em um bloco no topo: sem planejamento, "
+"sem categorias, sem pontuação, sem incentivos."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:19
+msgid ""
+"Striking is not deleting: a struck task stays visible as a trace of what got "
+"done, a deleted one leaves without a shown trace. Beside the day list, an "
+"undated reserve holds what is not scheduled, and recurring templates come "
+"back on their weekdays. Past days are kept, searchable and read-only."
+msgstr ""
+"Riscar não é excluir: uma tarefa riscada continua visível como registro do "
+"que foi feito, uma excluída sai sem deixar registro visível. Ao lado da "
+"lista do dia, uma reserva sem data guarda o que não está planejado, e os "
+"modelos recorrentes voltam nos seus dias da semana. Os dias passados são "
+"mantidos, pesquisáveis e somente leitura."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:37
+msgid "VertOurs"
+msgstr "VertOurs"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:51
+msgid "The Day view: struck tasks on top, active tasks below, stable numbers"
+msgstr ""
+"A visão Hoje: tarefas riscadas no topo, tarefas em andamento abaixo, números "
+"estáveis"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:55
+msgid "Recurring templates and the form to add one"
+msgstr "Os modelos recorrentes e o formulário para adicionar um"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:59
+msgid "The Archives window: a past day, read-only, with search"
+msgstr "A janela Histórico: um dia passado, somente leitura, com busca"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:63
+msgid "The Statistics window: counts per archived day"
+msgstr "A janela Estatísticas: contagens por dia arquivado"
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:70
+msgid ""
+"Every icon-only button now has an accessible name, so screen readers "
+"announce what it does. An open Statistics window updates when a new day "
+"starts. No change to the data format."
+msgstr ""
+"Todo botão que mostra apenas um ícone agora tem um nome acessível, para que "
+"os leitores de tela anunciem o que ele faz. Uma janela Estatísticas aberta "
+"se atualiza quando um novo dia começa. Nenhuma mudança no formato dos dados."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:79
+msgid ""
+"A Tomorrow view prepares the next day's list. Tasks and reserve items move "
+"there from their row menu or by drag and drop, and enter the day when the "
+"next day starts, after the recurring tasks. Ctrl+2 now shows Tomorrow; "
+"Reserve and Recurring move to Ctrl+3 and Ctrl+4. Existing data is migrated "
+"on first launch; earlier versions of Rature can no longer open it afterwards."
+msgstr ""
+"Uma visão Amanhã prepara a lista do dia seguinte. As tarefas e os itens da "
+"reserva vão para ela pelo menu da sua linha ou arrastando e soltando, e "
+"entram no dia quando o dia seguinte começa, depois das tarefas recorrentes. "
+"Ctrl+2 agora mostra Amanhã; Reserva e Recorrentes passam para Ctrl+3 e "
+"Ctrl+4. Os dados existentes são migrados na primeira execução; versões "
+"anteriores do Rature não conseguem mais abri-los depois."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:91
+msgid ""
+"Rature now runs on the GNOME 51 runtime. No new feature and no change to the "
+"data format."
+msgstr ""
+"O Rature agora roda no runtime do GNOME 51. Nenhum recurso novo e nenhuma "
+"mudança no formato dos dados."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:99
+msgid ""
+"Tasks and reserve items can be marked as priority from their row menu. The "
+"marker never changes the order or the numbers. Existing data is migrated on "
+"first launch; earlier versions of Rature can no longer open it afterwards."
+msgstr ""
+"Tarefas e itens da reserva podem ser marcados como prioritários pelo menu da "
+"sua linha. A marcação nunca muda a ordem nem os números. Os dados existentes "
+"são migrados na primeira execução; versões anteriores do Rature não "
+"conseguem mais abri-los depois."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:109
+msgid ""
+"A recurring task can apply every two weeks, starting this week or next week. "
+"Existing data is migrated on first launch; earlier versions of Rature can no "
+"longer open it afterwards."
+msgstr ""
+"Uma tarefa recorrente pode valer a cada duas semanas, a partir desta semana "
+"ou da próxima. Os dados existentes são migrados na primeira execução; "
+"versões anteriores do Rature não conseguem mais abri-los depois."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:118
+msgid ""
+"A Day view task can be sent back to the reserve by dragging it onto the "
+"Reserve entry of the sidebar. Reserve items can be reordered by drag-and-"
+"drop."
+msgstr ""
+"Uma tarefa da visão Hoje pode ser devolvida à reserva arrastando-a para a "
+"entrada Reserva da barra lateral. Os itens da reserva podem ser reordenados "
+"arrastando e soltando."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:127
+msgid ""
+"In the Day view, struck and recurring tasks line up with the other rows "
+"again."
+msgstr ""
+"Na visão Hoje, as tarefas riscadas e recorrentes voltam a se alinhar com as "
+"demais linhas."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:135
+msgid ""
+"A Day view task can be sent back to the reserve with the arrow at the start "
+"of its row. Sending a reserve item to the day no longer scrolls the list "
+"back to the top."
+msgstr ""
+"Uma tarefa da visão Hoje pode ser devolvida à reserva com a seta no início "
+"da sua linha. Enviar um item da reserva para hoje não rola mais a lista de "
+"volta ao topo."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:144
+msgid ""
+"Capture from a synced folder is removed: it did not fit daily use. Tasks it "
+"already imported stay in the reserve. Also fixes the task menu in the Day "
+"view, where Rename and Delete had stopped working."
+msgstr ""
+"A captura a partir de uma pasta sincronizada foi removida: ela não se "
+"encaixava no uso diário. As tarefas já importadas continuam na reserva. "
+"Também corrige o menu de tarefas da visão Hoje, onde Renomear e Excluir "
+"tinham parado de funcionar."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:154
+msgid ""
+"Capture tasks from a folder synced from your phone (a text file named inbox-"
+"*.txt, one task per line): read at startup and whenever the window regains "
+"focus, never continuously. Also fixes two issues in previously released "
+"code: a recurring item's title or a banner could show raw markup instead of "
+"plain text, and the data file, its archives and their directory are now "
+"written readable to their owner only."
+msgstr ""
+"Captura de tarefas a partir de uma pasta sincronizada com seu celular (um "
+"arquivo de texto chamado inbox-*.txt, uma tarefa por linha): lida na "
+"inicialização e sempre que a janela recupera o foco, nunca continuamente. "
+"Também corrige dois problemas em código já publicado: o título de uma "
+"recorrente ou um aviso podia mostrar marcação bruta em vez de texto simples, "
+"e o arquivo de dados, seus dias arquivados e a pasta deles agora são "
+"gravados legíveis apenas pelo seu dono."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:167
+msgid ""
+"Structured logging: startup, the data directory, a day rolling over, an "
+"archive being written and a write failure now show up in the system journal, "
+"with no task or reserve text logged at the default level."
+msgstr ""
+"Registro estruturado: a inicialização, a pasta de dados, a virada do dia, a "
+"gravação de um dia arquivado e uma falha de gravação agora aparecem no "
+"diário do sistema, sem registrar nenhum texto de tarefa ou da reserva no "
+"nível padrão."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:177
+msgid ""
+"Rature 1.0. The application installs and updates itself from the self-hosted "
+"Flatpak repository, verified end to end on a clean machine. No functional "
+"change since 0.10.1."
+msgstr ""
+"Rature 1.0. O aplicativo se instala e se atualiza a partir do repositório "
+"Flatpak auto-hospedado, verificado de ponta a ponta em uma máquina limpa. "
+"Nenhuma mudança funcional desde a 0.10.1."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:186
+msgid ""
+"Rature is now installable from a self-hosted Flatpak repository, with "
+"automatic updates, and as a standalone bundle attached to each release. This "
+"release also fixes the interface staying in English on a translated system "
+"when run as a Flatpak."
+msgstr ""
+"O Rature agora pode ser instalado a partir de um repositório Flatpak auto-"
+"hospedado, com atualizações automáticas, e como pacote independente anexado "
+"a cada versão. Esta versão também corrige a interface que ficava em inglês "
+"em um sistema traduzido quando executada como Flatpak."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:196
+msgid ""
+"The comfort features and the translation. You can undo the last deletion, "
+"add a task already struck in one gesture, copy a day to the clipboard as "
+"plain text, and reach every action with a keyboard shortcut listed in a help "
+"window. The Archives window gains a search over task text, a read-only "
+"Statistics window shows plain counts per archived day, and the interface is "
+"fully translated to French."
+msgstr ""
+"Os recursos de conforto e a tradução. Você pode desfazer a última exclusão, "
+"adicionar uma tarefa já riscada em um só gesto, copiar um dia para a área de "
+"transferência como texto simples e chegar a cada ação por um atalho de "
+"teclado listado em uma janela de ajuda. A janela Histórico ganha uma busca "
+"no texto das tarefas, uma janela Estatísticas somente leitura mostra "
+"contagens simples por dia arquivado, e a interface está totalmente traduzida "
+"para o francês."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:209
+msgid ""
+"The main window adapts to narrow widths: under 500 units, the sidebar "
+"becomes its own page with a back button, and the Day view keeps its entry "
+"bar and full task text. This completes the interface rebuild."
+msgstr ""
+"A janela principal se adapta a larguras estreitas: abaixo de 500 unidades, a "
+"barra lateral vira uma página própria com um botão de voltar, e a visão Hoje "
+"mantém sua barra de entrada e o texto completo das tarefas. Isso conclui a "
+"reconstrução da interface."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:219
+msgid ""
+"A read-only Archives window, opened from the main menu: a sidebar of every "
+"archived date, most recent first, and the matching day on the right, laid "
+"out like the Day view. An archive that fails to load shows a neutral message "
+"instead of blocking the others."
+msgstr ""
+"Uma janela Histórico somente leitura, aberta pelo menu principal: uma barra "
+"lateral com cada data arquivada, da mais recente para a mais antiga, e o dia "
+"correspondente à direita, disposto como a visão Hoje. Um dia arquivado que "
+"não carrega mostra uma mensagem neutra em vez de bloquear os demais."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:230
+msgid ""
+"The Recurring view: create, edit and delete task templates and pick the "
+"weekdays they run on. A reserve row can now be dragged onto the Day entry in "
+"the sidebar. Day and month names follow the system language. This completes "
+"the interface rebuild."
+msgstr ""
+"A visão Recorrentes: criar, editar e excluir modelos de tarefas e escolher "
+"os dias da semana em que valem. Uma linha da reserva agora pode ser "
+"arrastada para a entrada Hoje da barra lateral. Os nomes de dias e meses "
+"seguem o idioma do sistema. Isso conclui a reconstrução da interface."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:240
+msgid ""
+"The Reserve view: add entries, rename them in place, delete them, and send "
+"one into the day. The Recurring view and the archive window are still to "
+"come."
+msgstr ""
+"A visão Reserva: adicionar entradas, renomeá-las no próprio lugar, excluí-"
+"las e enviar uma para hoje. A visão Recorrentes e a janela Histórico ainda "
+"estão por vir."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:249
+msgid ""
+"Day view tasks can be reordered by dragging a row within its own block. The "
+"Reserve and Recurring views and the archive window are still to come."
+msgstr ""
+"As tarefas da visão Hoje podem ser reordenadas arrastando uma linha dentro "
+"do seu próprio bloco. As visões Reserva e Recorrentes e a janela Histórico "
+"ainda estão por vir."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:258
+msgid ""
+"The Day view works: add, strike, unstrike, rename in place, delete and "
+"freeze the list. Drag-and-drop reordering, the Reserve and Recurring views, "
+"and the archive window are still to come."
+msgstr ""
+"A visão Hoje funciona: adicionar, riscar, desfazer o risco, renomear no "
+"próprio lugar, excluir e congelar a lista. A reordenação arrastando e "
+"soltando, as visões Reserva e Recorrentes e a janela Histórico ainda estão "
+"por vir."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:267
+msgid ""
+"The first visible feature: a main window with sidebar navigation between the "
+"Day, Reserve and Recurring views (still placeholders), window size "
+"persisted, an About dialog. Reading the daily list back is still not "
+"possible."
+msgstr ""
+"O primeiro recurso visível: uma janela principal com navegação lateral entre "
+"as visões Hoje, Reserva e Recorrentes (ainda provisórias), o tamanho da "
+"janela preservado, uma caixa de diálogo Sobre. Ainda não é possível ler de "
+"volta a lista do dia."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:277
+msgid ""
+"Complete core business logic and the App coordination layer: the day list "
+"and its operations, the reserve, recurring templates, the day rollover, "
+"atomic JSON storage. Still no graphical interface."
+msgstr ""
+"Lógica de negócio completa e camada de coordenação App: a lista do dia e "
+"suas operações, a reserva, os modelos recorrentes, a virada do dia, o "
+"armazenamento JSON atômico. Ainda sem interface gráfica."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:286
+msgid "Project foundations. Not a functional release."
+msgstr "Fundações do projeto. Não é uma versão funcional."
+
+#: data/ui/window.ui:10 data/ui/archives_window.ui:14
+#: data/ui/archives_window.ui:77
+msgid "Archives"
+msgstr "Histórico"
+
+#: data/ui/window.ui:14 data/ui/statistics_window.ui:8
+msgid "Statistics"
+msgstr "Estatísticas"
+
+#: data/ui/window.ui:20 data/ui/shortcuts.ui:22
+msgid "Keyboard Shortcuts"
+msgstr "Atalhos de teclado"
+
+#: data/ui/window.ui:24
+msgid "About Rature"
+msgstr "Sobre o Rature"
+
+#: data/ui/window.ui:43 data/ui/window.ui:45
+msgid "Main menu"
+msgstr "Menu principal"
+
+#: data/ui/window.ui:63 data/ui/window.ui:125
+msgid "Day"
+msgstr "Hoje"
+
+#: data/ui/window.ui:79 data/ui/window.ui:146
+msgid "Tomorrow"
+msgstr "Amanhã"
+
+#: data/ui/window.ui:93 data/ui/window.ui:149
+msgid "Reserve"
+msgstr "Reserva"
+
+#: data/ui/window.ui:107 data/ui/window.ui:152
+msgid "Recurring"
+msgstr "Recorrentes"
+
+#: data/ui/task_row.ui:18 data/ui/task_row.ui:20 data/ui/prepared_row.ui:18
+#: data/ui/prepared_row.ui:20
+msgid "Send back to the reserve"
+msgstr "Devolver à reserva"
+
+#: data/ui/task_row.ui:63 data/ui/task_row.ui:65 data/ui/prepared_row.ui:47
+#: data/ui/prepared_row.ui:49 data/ui/reserve_row.ui:46
+#: data/ui/reserve_row.ui:48
+msgid "Priority"
+msgstr "Prioritária"
+
+#: data/ui/task_row.ui:75 data/ui/task_row.ui:77 data/ui/prepared_row.ui:59
+#: data/ui/prepared_row.ui:61 data/ui/reserve_row.ui:58
+#: data/ui/reserve_row.ui:60 data/ui/recurring_row.ui:16
+#: data/ui/recurring_row.ui:18
+msgid "More options"
+msgstr "Mais opções"
+
+#: data/ui/task_row.ui:94 data/ui/prepared_row.ui:78 data/ui/reserve_row.ui:77
+msgid "Rename"
+msgstr "Renomear"
+
+#: data/ui/task_row.ui:111 data/ui/reserve_row.ui:94
+msgid "Move to tomorrow"
+msgstr "Passar para amanhã"
+
+#: data/ui/task_row.ui:120 data/ui/prepared_row.ui:104
+#: data/ui/reserve_row.ui:103 data/ui/recurring_row.ui:44
+msgid "Delete"
+msgstr "Excluir"
+
+#: data/ui/day_view.ui:31 data/ui/day_view.ui:33
+msgid "Undo delete"
+msgstr "Desfazer a exclusão"
+
+#: data/ui/day_view.ui:46 data/ui/day_view.ui:48 data/ui/archives_window.ui:91
+#: data/ui/archives_window.ui:93
+msgid "Copy as text"
+msgstr "Copiar como texto"
+
+#: data/ui/day_view.ui:59
+msgid "Add a task…"
+msgstr "Adicionar uma tarefa…"
+
+#: data/ui/day_view.ui:122 data/ui/archives_window.ui:146
+msgid "The list is empty."
+msgstr "A lista está vazia."
+
+#: data/ui/prepared_row.ui:95
+msgid "Move to today"
+msgstr "Passar para hoje"
+
+#: data/ui/tomorrow_view.ui:17
+msgid "Add a task for tomorrow…"
+msgstr "Adicionar uma tarefa para amanhã…"
+
+#: data/ui/tomorrow_view.ui:68
+msgid "Nothing is prepared."
+msgstr "Nada foi preparado."
+
+#: data/ui/reserve_row.ui:32 data/ui/reserve_row.ui:34
+msgid "Send to the day"
+msgstr "Enviar para hoje"
+
+#: data/ui/reserve_view.ui:15
+msgid "Add to the reserve…"
+msgstr "Adicionar à reserva…"
+
+#: data/ui/reserve_view.ui:57
+msgid "The reserve is empty."
+msgstr "A reserva está vazia."
+
+#: data/ui/recurring_row.ui:35
+msgid "Edit"
+msgstr "Editar"
+
+#: data/ui/recurring_form.ui:17
+msgid "Recurring task"
+msgstr "Tarefa recorrente"
+
+#: data/ui/recurring_form.ui:22
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: data/ui/recurring_form.ui:27
+msgid "Save"
+msgstr "Salvar"
+
+#: data/ui/recurring_form.ui:46
+msgid "Task text"
+msgstr "Texto da tarefa"
+
+#: data/ui/recurring_form.ui:51
+msgid "Days"
+msgstr "Dias"
+
+#: data/ui/recurring_form.ui:71
+msgid "Every two weeks"
+msgstr "A cada duas semanas"
+
+#: data/ui/recurring_form.ui:82
+msgid "This week"
+msgstr "Esta semana"
+
+#: data/ui/recurring_form.ui:88
+msgid "Next week"
+msgstr "Próxima semana"
+
+#: data/ui/recurring_view.ui:15 data/ui/recurring_view.ui:17
+msgid "Add a recurring task"
+msgstr "Adicionar uma tarefa recorrente"
+
+#: data/ui/recurring_view.ui:62
+msgid "No recurring tasks."
+msgstr "Nenhuma tarefa recorrente."
+
+#: data/ui/archives_window.ui:22
+msgid "Search the archives…"
+msgstr "Buscar no histórico…"
+
+#: data/ui/archives_window.ui:54 data/ui/archives_window.ui:166
+#: data/ui/statistics_window.ui:165
+msgid "No archived days."
+msgstr "Nenhum dia arquivado."
+
+#: data/ui/archives_window.ui:64 data/ui/archives_window.ui:176
+msgid "No matching days."
+msgstr "Nenhum dia corresponde."
+
+#: data/ui/archives_window.ui:156
+msgid "This archive cannot be read."
+msgstr "Este dia arquivado não pode ser lido."
+
+#: data/ui/statistics_window.ui:33
+msgctxt "statistics column"
+msgid "Day"
+msgstr "Dia"
+
+#: data/ui/statistics_window.ui:43
+msgid "Added"
+msgstr "Adicionadas"
+
+#: data/ui/statistics_window.ui:53
+msgid "Struck"
+msgstr "Riscadas"
+
+#: data/ui/statistics_window.ui:63
+msgid "Deleted"
+msgstr "Excluídas"
+
+#: data/ui/statistics_window.ui:73
+msgid "To reserve"
+msgstr "Para a reserva"
+
+#: data/ui/statistics_window.ui:110
+msgid "Total"
+msgstr "Total"
+
+#: data/ui/shortcuts.ui:12
+msgid "General"
+msgstr "Geral"
+
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:87
+msgid "Quit"
+msgstr "Sair"
+
+#: data/ui/shortcuts.ui:31
+msgid "Navigation"
+msgstr "Navegação"
+
+#: data/ui/shortcuts.ui:34
+msgid "Show the Day view"
+msgstr "Mostrar a visão Hoje"
+
+#: data/ui/shortcuts.ui:42
+msgid "Show the Tomorrow view"
+msgstr "Mostrar a visão Amanhã"
+
+#: data/ui/shortcuts.ui:49
+msgid "Show the Reserve view"
+msgstr "Mostrar a visão Reserva"
+
+#: data/ui/shortcuts.ui:56
+msgid "Show the Recurring view"
+msgstr "Mostrar a visão Recorrentes"
+
+#: data/ui/shortcuts.ui:65
+msgid "Tasks"
+msgstr "Tarefas"
+
+#: data/ui/shortcuts.ui:68
+msgid "Add a task"
+msgstr "Adicionar uma tarefa"
+
+#: data/ui/shortcuts.ui:74
+msgid "Add a task already struck"
+msgstr "Adicionar uma tarefa já riscada"
+
+#: data/ui/shortcuts.ui:80
+msgid "Undo the last deletion"
+msgstr "Desfazer a última exclusão"
+
+#: data/ui/shortcuts.ui:87
+msgid "Cancel an edit"
+msgstr "Cancelar uma edição"
+
+#. Translators: a strftime format for a long date with its weekday,
+#. e.g. "Thursday 29 October". %A is the weekday, %d the day of the
+#. month, %B the month; the names come out in your language. Reorder
+#. them and add words as your language needs; %-d drops the leading
+#. zero. Do not translate the codes themselves.
+#: src/rature/core/dates.py:29
+msgid "%A %d %B"
+msgstr "%A, %-d de %B"
+
+#: src/rature/ui/application.py:82
+msgid "This file was saved by a newer version of Rature."
+msgstr "Este arquivo foi salvo por uma versão mais recente do Rature."
+
+#: src/rature/ui/application.py:84
+#, python-format
+msgid "Opening it could overwrite data. Update Rature to open this file: %s"
+msgstr ""
+"Abri-lo poderia sobrescrever dados. Atualize o Rature para abrir este "
+"arquivo: %s"
+
+#: src/rature/ui/day_view.py:106
+msgid "Unfreeze the list"
+msgstr "Descongelar a lista"
+
+#: src/rature/ui/day_view.py:109
+msgid "Freeze the list"
+msgstr "Congelar a lista"
+
+#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:80
+#: src/rature/ui/task_row.py:101
+msgid "Remove priority"
+msgstr "Remover a prioridade"
+
+#: src/rature/ui/prepared_row.py:73 src/rature/ui/reserve_row.py:80
+#: src/rature/ui/task_row.py:101
+msgid "Mark as priority"
+msgstr "Marcar como prioritária"
+
+#: src/rature/ui/recurring_row.py:67
+msgid "this week"
+msgstr "esta semana"
+
+#: src/rature/ui/recurring_row.py:69
+msgid "next week"
+msgstr "próxima semana"
+
+#: src/rature/ui/recurring_row.py:70
+msgid "every two weeks"
+msgstr "a cada duas semanas"
+
+#: src/rature/ui/task_row.py:76
+msgid "Undo the strike"
+msgstr "Desfazer o risco"
+
+#: src/rature/ui/task_row.py:79
+msgid "Strike through"
+msgstr "Riscar"
+
+#: src/rature/ui/window.py:400
+msgid "Changes could not be saved to disk."
+msgstr "Não foi possível salvar as alterações no disco."
+
+#: src/rature/ui/window.py:408
+#, python-format
+msgid "The data file could not be read. It was moved aside as %s."
+msgstr ""
+"Não foi possível ler o arquivo de dados. Ele foi colocado de lado com o nome "
+"%s."
+
+#: src/rature/ui/window.py:411 src/rature/ui/window.py:417
+msgid "Dismiss"
+msgstr "Dispensar"
+
+#: src/rature/ui/window.py:415
+msgid "A new day has started. The previous one has been archived."
+msgstr "Um novo dia começou. O anterior foi arquivado."
