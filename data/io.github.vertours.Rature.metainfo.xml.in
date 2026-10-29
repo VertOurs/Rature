@@ -65,6 +65,17 @@
   </screenshots>
 
   <releases>
+    <release version="2.0.0" date="2026-10-29">
+      <description>
+        <p>
+          Rature 2.0. The interface is now also available in Spanish,
+          German, Brazilian Portuguese, Russian and Esperanto, as machine
+          translations marked as such. Dates follow each language's own
+          format, and stay in a single language when the matching locale
+          is missing. No change to the data format.
+        </p>
+      </description>
+    </release>
     <release version="1.9.0" date="2026-10-25">
       <description>
         <p>

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-29
+
+Version 2: chantier 8 closes with five more interface languages, after
+chantiers 6 (observability and native packaging) and 7 (capture and
+reserve). No change to the data format.
+
 ### Added
 
 - Spanish translation. It is a machine translation, not yet reviewed by a
@@ -508,7 +514,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/VertOurs/Rature/releases/tag/v2.0.0
 [1.9.0]: https://github.com/VertOurs/Rature/releases/tag/v1.9.0
 [1.8.0]: https://github.com/VertOurs/Rature/releases/tag/v1.8.0
 [1.7.1]: https://github.com/VertOurs/Rature/releases/tag/v1.7.1
