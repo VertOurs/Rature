@@ -1007,7 +1007,11 @@ avec un commentaire pour les traducteurs : `strftime` fournit les noms de
 jour et de mois, mais l'ordre et les mots de liaison varient d'une langue à
 l'autre (« jueves, 29 de octubre » en espagnol, `%A, %-d de %B`) ; le
 français utilise `%A %-d %B`, sans zéro initial (« jeudi 5 novembre »). Ajouté au
-chantier 8.4. Un seul format, partagé par toutes les dates longues.
+chantier 8.4. Un seul format, partagé par toutes les dates longues. Si la
+locale de la langue de l'interface n'est pas installée, le format du
+catalogue n'est pas appliqué : les noms resteraient dans une autre langue
+(« Thursday, 29 de October »). La date garde alors le format source, sans
+mots de liaison, dans une seule langue.
 
 **Cohérence de langue.** Les noms de jours et les dates longues (titre de la
 vue Jour, de la fenêtre d'archives, colonne Day des Statistiques) suivent la

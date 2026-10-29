@@ -31,3 +31,16 @@ def test_a_single_digit_day_drops_its_leading_zero(
     monkeypatch.setattr(dates, "_", lambda message: "%A %-d %B")
     assert long_date(date(2026, 11, 5)) == "Thursday 5 November"
     assert long_date(date(2026, 10, 29)) == "Thursday 29 October"
+
+
+def test_without_a_matching_time_locale_the_source_format_is_kept(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # A Spanish catalogue over English names would read "Thursday, 29 de
+    # October": the launcher turns the catalogue format off instead.
+    monkeypatch.setattr(dates, "_", lambda message: "%A, %-d de %B")
+    monkeypatch.setattr(dates, "_use_catalogue", True)
+    dates.use_catalogue_format(False)
+    assert long_date(date(2026, 10, 29)) == date(2026, 10, 29).strftime("%A %d %B")
+    dates.use_catalogue_format(True)
+    assert long_date(date(2026, 10, 29)) == "Thursday, 29 de October"

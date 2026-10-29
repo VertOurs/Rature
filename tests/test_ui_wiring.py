@@ -438,3 +438,19 @@ def test_launcher_imports_gtk_before_aligning_the_time_locale() -> None:
         and node.func.id == "align_time_locale"
     )
     assert gtk_import < align_call
+
+
+def test_launcher_turns_the_catalogue_date_format_off_without_a_time_locale() -> None:
+    # core.dates falls back to the source format only if the launcher tells
+    # it whether LC_TIME could follow the interface language.
+    tree = ast.parse((REPO / "src" / "rature.in").read_text(encoding="utf-8"))
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "use_catalogue_format"
+    ]
+    assert len(calls) == 1
+    (argument,) = calls[0].args
+    assert "align_time_locale" in ast.unparse(argument)

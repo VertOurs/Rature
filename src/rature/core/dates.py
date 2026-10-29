@@ -18,6 +18,23 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
 
+# The catalogue's format only reads right when strftime's names are in the
+# same language. Without a matching locale installed (common in a Flatpak,
+# which ships the system's languages only), "%A, %-d de %B" would wrap
+# English names: "Thursday, 29 de October". The source format has no
+# connecting words, so it stays in one language whatever LC_TIME is.
+_use_catalogue = True
+
+
+def use_catalogue_format(enabled: bool) -> None:
+    """Whether dates take their format from the catalogue.
+
+    The launcher passes whether LC_TIME could follow the interface
+    language (rature.i18n.align_time_locale).
+    """
+    global _use_catalogue
+    _use_catalogue = enabled
+
 
 def long_date(day: date) -> str:
     """The date with its weekday, in the interface language's own order."""
@@ -26,4 +43,4 @@ def long_date(day: date) -> str:
     # month, %B the month; the names come out in your language. Reorder
     # them and add words as your language needs; %-d drops the leading
     # zero. Do not translate the codes themselves.
-    return day.strftime(_("%A %d %B"))
+    return day.strftime(_("%A %d %B") if _use_catalogue else "%A %d %B")
