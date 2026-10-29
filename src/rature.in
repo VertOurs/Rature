@@ -24,6 +24,14 @@ configure_logging(environ=os.environ)
 # inside the GTK main loop.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+# PyGObject initialises GTK when Gtk is first imported, and gtk_init calls
+# setlocale(LC_ALL, "") itself: imported any later, it would silently undo
+# the LC_TIME alignment below and leave the dates in the LANG language.
+import gi  # noqa: E402
+
+gi.require_version("Gtk", "4.0")
+from gi.repository import Gtk  # noqa: E402, F401
+
 # Adopt the environment's locale so strftime and GLib format dates and
 # names in the user's language: without this the C locale wins and every
 # strftime stays English. A broken LC_* in the environment must not stop

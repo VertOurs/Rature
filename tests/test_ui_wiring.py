@@ -416,3 +416,25 @@ def test_launcher_configures_logging() -> None:
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     assert "configure_logging" in called
+
+
+def test_launcher_imports_gtk_before_aligning_the_time_locale() -> None:
+    # Importing Gtk runs gtk_init, which calls setlocale(LC_ALL, "") and
+    # resets LC_TIME to LANG. Aligned before that import, the dates showed
+    # in the LANG language under a LANGUAGE-translated interface.
+    tree = ast.parse((REPO / "src" / "rature.in").read_text(encoding="utf-8"))
+    gtk_import = min(
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        and node.module == "gi.repository"
+        and any(alias.name == "Gtk" for alias in node.names)
+    )
+    align_call = min(
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "align_time_locale"
+    )
+    assert gtk_import < align_call
