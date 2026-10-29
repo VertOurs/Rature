@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   system locale (for example `LANGUAGE=es` on a French system): GTK's
   start-up reset the date language to the system's.
 
+### Changed
+
+- The long date (Day view and Archives titles, the Statistics Day column,
+  the copied text) takes its format from the translation, so each
+  language can order the weekday, day and month its own way. In French,
+  a single-digit day loses its leading zero ("jeudi 5 novembre").
+
 ## [1.9.0] - 2026-10-25
 
 Accessibility and a live Statistics window, chantier 8.2 and 8.3. No

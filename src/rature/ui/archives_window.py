@@ -14,6 +14,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gdk, Gtk  # noqa: E402
 
+from rature.core.dates import long_date  # noqa: E402
 from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import list_helpers  # noqa: E402
 from rature.ui.archive_date_row import ArchiveDateRow  # noqa: E402
@@ -147,7 +148,7 @@ class ArchivesWindow(Adw.Window):
         # SPECIFICATION.md §3.2's header format, reused as-is: same
         # weekday-day-month long form as the Day view's title. The widget
         # lives in the .ui; only its text changes as the selection moves.
-        self.title.set_title(day_date.strftime("%A %d %B"))
+        self.title.set_title(long_date(day_date))
         list_helpers.clear(self.struck_list)
         list_helpers.clear(self.active_list)
         day = self._archived_day(day_date)

@@ -14,6 +14,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gtk  # noqa: E402
 
+from rature.core.dates import long_date  # noqa: E402
 from rature.ui import list_helpers  # noqa: E402
 from rature.ui.statistics_row import StatisticsRow  # noqa: E402
 
@@ -74,7 +75,7 @@ class StatisticsWindow(Adw.Window):
         for day_date, counts in stats:
             self.rows.append(
                 StatisticsRow(
-                    date_text=day_date.strftime("%A %d %B"),
+                    date_text=long_date(day_date),
                     added=counts.added,
                     struck=counts.struck,
                     deleted=counts.deleted,
