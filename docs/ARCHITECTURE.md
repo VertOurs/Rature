@@ -343,7 +343,8 @@ exclusive destination.
 
 Simplicity decisions, not to be revisited without a strong reason.
 
-- No due dates, priorities or tags
+- No due dates, tags or priority levels: priority is a single marker that
+  never changes the order or the numbers, see `SPECIFICATION.md` §2.5
 - No sub-tasks
 - No database; one JSON file is enough at this scale. See
   [`docs/adr/0003-fichier-json-unique.md`](adr/0003-fichier-json-unique.md)

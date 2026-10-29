@@ -107,3 +107,10 @@ passage du jour.
   annulation dans Demain, récurrentes affichées, format) sont tranchés dans
   `docs/internal/SPECIFICATION.md` avant tout code, conformément à
   `docs/internal/ROADMAP.md`
+
+## Addendum (2026-10-29)
+
+Le paramètre de report automatique, écarté « pour l'instant » ci-dessus,
+est abandonné : décision de VertOurs le 29 octobre 2026, sans attendre les
+deux semaines d'usage prévues. Le report vers Demain reste un geste
+explicite, et une tâche non rayée suit toujours §2.5.
