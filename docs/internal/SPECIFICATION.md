@@ -977,7 +977,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Archives vides | `No archived days.` |
 | Archives sans correspondance | `No matching days.` |
 | Archive illisible | `This archive cannot be read.` |
-| Fenêtre Statistiques, en-têtes de colonne | `Day`, `Added`, `Struck`, `Deleted`, `To reserve` |
+| Fenêtre Statistiques, en-têtes de colonne | `Day` (contexte `statistics column`, distinct du `Day` de la navigation), `Added`, `Struck`, `Deleted`, `To reserve` |
 | Fenêtre Statistiques, ligne de total | `Total` |
 | Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |

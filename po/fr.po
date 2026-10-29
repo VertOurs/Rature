@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-29 13:38+0100\n"
+"POT-Creation-Date: 2026-10-29 13:48+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -355,7 +355,7 @@ msgstr "À propos de Rature"
 msgid "Main menu"
 msgstr "Menu principal"
 
-#: data/ui/window.ui:63 data/ui/window.ui:125 data/ui/statistics_window.ui:33
+#: data/ui/window.ui:63 data/ui/window.ui:125
 msgid "Day"
 msgstr "Jour"
 
@@ -503,6 +503,11 @@ msgstr "Aucune journée correspondante."
 #: data/ui/archives_window.ui:156
 msgid "This archive cannot be read."
 msgstr "Cette archive est illisible."
+
+#: data/ui/statistics_window.ui:33
+msgctxt "statistics column"
+msgid "Day"
+msgstr "Jour"
 
 #: data/ui/statistics_window.ui:43
 msgid "Added"
