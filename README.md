@@ -77,8 +77,8 @@ The method it reproduces:
 - **Statistics window** — a plain table of counts per archived day, no
   chart and no judgement.
 - **Undo the last deletion**, **copy a day as plain text**, keyboard
-  shortcuts with a help window, a full French translation, and a
-  Spanish machine translation.
+  shortcuts with a help window, a full French translation, and
+  Spanish and German machine translations.
 
 ## Installing
 
