@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-29 17:03+0100\n"
+"POT-Creation-Date: 2026-10-29 17:09+0100\n"
 "PO-Revision-Date: 2026-10-29 18:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -82,6 +82,19 @@ msgstr "A janela Estatísticas: contagens por dia arquivado"
 
 #: data/io.github.vertours.Rature.metainfo.xml.in:70
 msgid ""
+"Rature 2.0. The interface is now also available in Spanish, German, "
+"Brazilian Portuguese, Russian and Esperanto, as machine translations marked "
+"as such. Dates follow each language's own format, and stay in a single "
+"language when the matching locale is missing. No change to the data format."
+msgstr ""
+"Rature 2.0. A interface agora também está disponível em espanhol, alemão, "
+"português do Brasil, russo e esperanto, como traduções automáticas "
+"sinalizadas como tais. As datas seguem o formato próprio de cada idioma e "
+"permanecem em um único idioma quando falta a localidade correspondente. "
+"Nenhuma mudança no formato dos dados."
+
+#: data/io.github.vertours.Rature.metainfo.xml.in:81
+msgid ""
 "Every icon-only button now has an accessible name, so screen readers "
 "announce what it does. An open Statistics window updates when a new day "
 "starts. No change to the data format."
@@ -90,7 +103,7 @@ msgstr ""
 "os leitores de tela anunciem o que ele faz. Uma janela Estatísticas aberta "
 "se atualiza quando um novo dia começa. Nenhuma mudança no formato dos dados."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:79
+#: data/io.github.vertours.Rature.metainfo.xml.in:90
 msgid ""
 "A Tomorrow view prepares the next day's list. Tasks and reserve items move "
 "there from their row menu or by drag and drop, and enter the day when the "
@@ -105,7 +118,7 @@ msgstr ""
 "Ctrl+4. Os dados existentes são migrados na primeira execução; versões "
 "anteriores do Rature não conseguem mais abri-los depois."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:91
+#: data/io.github.vertours.Rature.metainfo.xml.in:102
 msgid ""
 "Rature now runs on the GNOME 51 runtime. No new feature and no change to the "
 "data format."
@@ -113,7 +126,7 @@ msgstr ""
 "O Rature agora roda no runtime do GNOME 51. Nenhum recurso novo e nenhuma "
 "mudança no formato dos dados."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:99
+#: data/io.github.vertours.Rature.metainfo.xml.in:110
 msgid ""
 "Tasks and reserve items can be marked as priority from their row menu. The "
 "marker never changes the order or the numbers. Existing data is migrated on "
@@ -124,7 +137,7 @@ msgstr ""
 "são migrados na primeira execução; versões anteriores do Rature não "
 "conseguem mais abri-los depois."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:109
+#: data/io.github.vertours.Rature.metainfo.xml.in:120
 msgid ""
 "A recurring task can apply every two weeks, starting this week or next week. "
 "Existing data is migrated on first launch; earlier versions of Rature can no "
@@ -134,7 +147,7 @@ msgstr ""
 "ou da próxima. Os dados existentes são migrados na primeira execução; "
 "versões anteriores do Rature não conseguem mais abri-los depois."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:118
+#: data/io.github.vertours.Rature.metainfo.xml.in:129
 msgid ""
 "A Day view task can be sent back to the reserve by dragging it onto the "
 "Reserve entry of the sidebar. Reserve items can be reordered by drag-and-"
@@ -144,7 +157,7 @@ msgstr ""
 "entrada Reserva da barra lateral. Os itens da reserva podem ser reordenados "
 "arrastando e soltando."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:127
+#: data/io.github.vertours.Rature.metainfo.xml.in:138
 msgid ""
 "In the Day view, struck and recurring tasks line up with the other rows "
 "again."
@@ -152,7 +165,7 @@ msgstr ""
 "Na visão Hoje, as tarefas riscadas e recorrentes voltam a se alinhar com as "
 "demais linhas."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:135
+#: data/io.github.vertours.Rature.metainfo.xml.in:146
 msgid ""
 "A Day view task can be sent back to the reserve with the arrow at the start "
 "of its row. Sending a reserve item to the day no longer scrolls the list "
@@ -162,7 +175,7 @@ msgstr ""
 "da sua linha. Enviar um item da reserva para hoje não rola mais a lista de "
 "volta ao topo."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:144
+#: data/io.github.vertours.Rature.metainfo.xml.in:155
 msgid ""
 "Capture from a synced folder is removed: it did not fit daily use. Tasks it "
 "already imported stay in the reserve. Also fixes the task menu in the Day "
@@ -173,7 +186,7 @@ msgstr ""
 "Também corrige o menu de tarefas da visão Hoje, onde Renomear e Excluir "
 "tinham parado de funcionar."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:154
+#: data/io.github.vertours.Rature.metainfo.xml.in:165
 msgid ""
 "Capture tasks from a folder synced from your phone (a text file named inbox-"
 "*.txt, one task per line): read at startup and whenever the window regains "
@@ -190,7 +203,7 @@ msgstr ""
 "e o arquivo de dados, seus dias arquivados e a pasta deles agora são "
 "gravados legíveis apenas pelo seu dono."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:167
+#: data/io.github.vertours.Rature.metainfo.xml.in:178
 msgid ""
 "Structured logging: startup, the data directory, a day rolling over, an "
 "archive being written and a write failure now show up in the system journal, "
@@ -201,7 +214,7 @@ msgstr ""
 "diário do sistema, sem registrar nenhum texto de tarefa ou da reserva no "
 "nível padrão."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:177
+#: data/io.github.vertours.Rature.metainfo.xml.in:188
 msgid ""
 "Rature 1.0. The application installs and updates itself from the self-hosted "
 "Flatpak repository, verified end to end on a clean machine. No functional "
@@ -211,7 +224,7 @@ msgstr ""
 "Flatpak auto-hospedado, verificado de ponta a ponta em uma máquina limpa. "
 "Nenhuma mudança funcional desde a 0.10.1."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:186
+#: data/io.github.vertours.Rature.metainfo.xml.in:197
 msgid ""
 "Rature is now installable from a self-hosted Flatpak repository, with "
 "automatic updates, and as a standalone bundle attached to each release. This "
@@ -223,7 +236,7 @@ msgstr ""
 "a cada versão. Esta versão também corrige a interface que ficava em inglês "
 "em um sistema traduzido quando executada como Flatpak."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:196
+#: data/io.github.vertours.Rature.metainfo.xml.in:207
 msgid ""
 "The comfort features and the translation. You can undo the last deletion, "
 "add a task already struck in one gesture, copy a day to the clipboard as "
@@ -240,7 +253,7 @@ msgstr ""
 "contagens simples por dia arquivado, e a interface está totalmente traduzida "
 "para o francês."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:209
+#: data/io.github.vertours.Rature.metainfo.xml.in:220
 msgid ""
 "The main window adapts to narrow widths: under 500 units, the sidebar "
 "becomes its own page with a back button, and the Day view keeps its entry "
@@ -251,7 +264,7 @@ msgstr ""
 "mantém sua barra de entrada e o texto completo das tarefas. Isso conclui a "
 "reconstrução da interface."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:219
+#: data/io.github.vertours.Rature.metainfo.xml.in:230
 msgid ""
 "A read-only Archives window, opened from the main menu: a sidebar of every "
 "archived date, most recent first, and the matching day on the right, laid "
@@ -263,7 +276,7 @@ msgstr ""
 "correspondente à direita, disposto como a visão Hoje. Um dia arquivado que "
 "não carrega mostra uma mensagem neutra em vez de bloquear os demais."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:230
+#: data/io.github.vertours.Rature.metainfo.xml.in:241
 msgid ""
 "The Recurring view: create, edit and delete task templates and pick the "
 "weekdays they run on. A reserve row can now be dragged onto the Day entry in "
@@ -275,7 +288,7 @@ msgstr ""
 "arrastada para a entrada Hoje da barra lateral. Os nomes de dias e meses "
 "seguem o idioma do sistema. Isso conclui a reconstrução da interface."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:240
+#: data/io.github.vertours.Rature.metainfo.xml.in:251
 msgid ""
 "The Reserve view: add entries, rename them in place, delete them, and send "
 "one into the day. The Recurring view and the archive window are still to "
@@ -285,7 +298,7 @@ msgstr ""
 "las e enviar uma para hoje. A visão Recorrentes e a janela Histórico ainda "
 "estão por vir."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:249
+#: data/io.github.vertours.Rature.metainfo.xml.in:260
 msgid ""
 "Day view tasks can be reordered by dragging a row within its own block. The "
 "Reserve and Recurring views and the archive window are still to come."
@@ -294,7 +307,7 @@ msgstr ""
 "do seu próprio bloco. As visões Reserva e Recorrentes e a janela Histórico "
 "ainda estão por vir."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:258
+#: data/io.github.vertours.Rature.metainfo.xml.in:269
 msgid ""
 "The Day view works: add, strike, unstrike, rename in place, delete and "
 "freeze the list. Drag-and-drop reordering, the Reserve and Recurring views, "
@@ -305,7 +318,7 @@ msgstr ""
 "soltando, as visões Reserva e Recorrentes e a janela Histórico ainda estão "
 "por vir."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:267
+#: data/io.github.vertours.Rature.metainfo.xml.in:278
 msgid ""
 "The first visible feature: a main window with sidebar navigation between the "
 "Day, Reserve and Recurring views (still placeholders), window size "
@@ -317,7 +330,7 @@ msgstr ""
 "janela preservado, uma caixa de diálogo Sobre. Ainda não é possível ler de "
 "volta a lista do dia."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:277
+#: data/io.github.vertours.Rature.metainfo.xml.in:288
 msgid ""
 "Complete core business logic and the App coordination layer: the day list "
 "and its operations, the reserve, recurring templates, the day rollover, "
@@ -327,7 +340,7 @@ msgstr ""
 "suas operações, a reserva, os modelos recorrentes, a virada do dia, o "
 "armazenamento JSON atômico. Ainda sem interface gráfica."
 
-#: data/io.github.vertours.Rature.metainfo.xml.in:286
+#: data/io.github.vertours.Rature.metainfo.xml.in:297
 msgid "Project foundations. Not a functional release."
 msgstr "Fundações do projeto. Não é uma versão funcional."
 

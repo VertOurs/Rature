@@ -107,17 +107,18 @@ logic, the Day, Reserve and Recurring views, the Archives and Statistics
 windows, keyboard shortcuts, plain-text export, a full French
 translation, and self-updating publication.
 
-Version 2 is under way. Milestone 6 (`1.1.0`) is done: structured
+Version 2 (`2.0.0`) is complete. Milestone 6 (`1.1.0`): structured
 logging, native packaging prepared for AUR/COPR/Mageia (submission still
 pending), and this refreshed README and project page. Milestone 7
-(capture and reserve) is done: sending a task back to the reserve
+(capture and reserve): sending a task back to the reserve
 (`1.4.0`), reordering the reserve (`1.5.0`), recurring tasks every two
 weeks (`1.6.0`), priority markers (`1.7.0`), and a Tomorrow view to
 prepare the next day's list (`1.8.0`). Capture from a synced folder
 shipped in `1.2.0` and was withdrawn in `1.3.0`; phone sync is postponed
-indefinitely. Milestone 8 is under way: accessible names on icon-only
-buttons and a Statistics window that follows the day rollover
-(`1.9.0`); more translations are next and close version 2.
+indefinitely. Milestone 8 (comfort and languages): accessible names on
+icon-only buttons and a Statistics window that follows the day rollover
+(`1.9.0`), then Spanish, German, Brazilian Portuguese, Russian and
+Esperanto machine translations (`2.0.0`).
 
 Built with AI assistance (Claude Code); I write the specification,
 review every change, and merge it.

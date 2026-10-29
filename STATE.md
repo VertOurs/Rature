@@ -6,53 +6,18 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : chantier 8 (confort et langues), lancé le
-  25 octobre 2026, dernier avant `2.0.0`. Découpage validé le même jour :
-  **8.1** job CI de traduction, déjà couvert par
-  `tests/test_translations.py` (`msgfmt --check` inclut `--check-format`
-  et `--check-header`, lancé en CI dans le job `test`), case cochée sans
-  code ; **8.2** nom accessible sur les boutons à icône seule, repris de
-  l'infobulle ; **8.3** fenêtre Statistiques rafraîchie au passage du jour
-  seulement, puisqu'elle ne lit que les archives (§2.6, §3.14,
-  `App.statistics`), spec à compléter avant le code ; **8.4** catalogues
-  `es`, `de`, `pt_BR`, `ru`, `eo`, traduits par Claude, marqués
-  « machine translation » dans l'en-tête, une PR par langue. Tests
-  d'interface sous `gtk4-broadwayd` reportés après `2.0.0` : hors critère
-  de fin, pas d'outillage CI nouveau. **8.2 fusionnée** (PR #170, squash `0b37c77`) :
-  nom accessible égal à l'infobulle sur les 14 boutons à icône, `Main
-  menu` et `More options`, deux tests de câblage, contrôle visuel OK.
-  **8.3 fusionnée** (PR #171, squash `9c467c3`) :
-  `StatisticsWindow.refresh()` au seul tick qui archive une journée,
-  défilement conservé, contrôle visuel OK avec une horloge qui saute d'un
-  jour. Fenêtre Archives notée au chantier 8 de la roadmap, après 8.4.
-  8.2 et 8.3 livrés dans `1.9.0`. 8.4 en cours, une langue par PR :
-  **`es` fusionné** (PR #174, squash `88d715b`), contrôle visuel OK le
-  29 octobre 2026 : traduction machine signalée dans l'en-tête,
-  « Historial » pour la fenêtre Archives, « Hoy » pour la vue Jour. Trois
-  correctifs sortis du contrôle visuel : date longue traduisible
-  (`core/dates.py`), contexte `statistics column` sur l'en-tête Day des
-  Statistiques, import de Gtk avant l'alignement de `LC_TIME` (bug depuis
-  la PR #75). **`de` fusionné** (PR #175, squash `3f13c9e`) : 107 messages, « Heute » pour la
-  vue Jour (« Morgen » se lit aussi « matin »), « Archiv », date
-  `%A, %-d. %B`, contrôle visuel OK le 29 octobre 2026. **`pt_BR` fusionné**
-  (PR #176, squash `a84d3be`) : « Hoje » pour la vue Jour, « Histórico » pour
-  Archives (« arquivo » veut aussi dire fichier), date `%A, %-d de %B`
-  (« quinta, 29 de outubro » : la glibc 2.43 abrège le jour en `pt_BR`),
-  contrôle visuel OK le 29 octobre 2026. **`ru` fusionné** (PR #177, squash
-  `c86b8b3`) :
-  « Сегодня » pour la vue Jour, « Архив », date `%A, %-d %B` (mois au
-  génitif par la glibc, « Четверг, 29 октября »), aucune chaîne au
-  pluriel, contrôle visuel OK le 29 octobre 2026. **`eo` sur
-  `feat/po-eo`**, dernier catalogue : « Hodiaŭ » pour la vue Jour,
-  « Arkivo », date `%A, la %-d-a de %B` (« ĵaŭdo, la 29-a de Oktobro » :
-  la glibc met une majuscule au mois, impossible à corriger depuis le
-  catalogue), contrôle visuel OK le 29 octobre 2026. Une fois fusionné, le critère de
-  fin du chantier 8 est atteint : release `2.0.0` directement, sans
-  `1.10.0` (recommandation du 29 octobre 2026). Après un changement de `po/LINGUAS`,
-  `meson setup --reconfigure build` : Meson ne suit pas ce fichier. Le
-  runtime Flatpak n'embarque que les locales du système : contrôle visuel
-  d'une autre langue sur une build hôte. **À réévaluer vers le
+- **Chantier en cours** : aucun. Chantier 8 terminé le 29 octobre 2026,
+  critère de fin atteint ; `2.0.0` en cours de publication (release PR,
+  puis tag `v2.0.0` et PKGBUILD). Suites notées, hors critère : fenêtre
+  Archives rafraîchie au passage du jour (roadmap chantier 8), tests
+  d'interface sous `gtk4-broadwayd` (repoussés). **À réévaluer vers le
   8 novembre 2026** : report automatique vers Demain (ADR 0008).
+- **Pour toute nouvelle langue** : l'ajouter à `po/LINGUAS`, créer le
+  `.po` (`msginit`) avant `meson setup --reconfigure build`, Meson ne
+  suivant pas ce fichier. Traduire les deux formats de date
+  (`core/dates.py`) et le contexte `statistics column`. Le runtime
+  Flatpak n'embarque que les locales du système : contrôle visuel sur une
+  build hôte.
 - **`1.9.0` est publiée** (25 octobre 2026, sur `//51`) : noms accessibles
   (PR #170) et Statistiques rafraîchies au passage du jour (PR #171),
   release PR #172 (squash `ef49ffe`). Tag `v1.9.0` annoté et signé,
@@ -312,6 +277,11 @@ version taguée après le bump.
   PR #160 à #165). Trois migrations réelles (1 → 2, 2 → 3, 3 → 4), chacune
   testée sur des fichiers fabriqués puis confirmée sur les vraies données
   de VertOurs après sauvegarde.
+- **Chantier 8**, 25 au 29 octobre 2026, versions `1.9.0` et `2.0.0` :
+  noms accessibles (PR #170), Statistiques rafraîchies au passage du jour
+  (PR #171), catalogues `es`, `de`, `pt_BR`, `ru`, `eo` en traduction
+  machine signalée (PR #174 à #178), formats de date pris au catalogue
+  avec repli sans locale, correctifs de la revue de code (PR #179).
 
 ## Documents
 
