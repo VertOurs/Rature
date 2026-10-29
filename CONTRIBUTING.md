@@ -192,9 +192,10 @@ msgfmt --statistics po/fr.po -o /dev/null
 Beyond the setup and pre-PR checks above:
 
 ```bash
-# core/ coverage gate, enforced from milestone 1 on (see docs/internal/ROADMAP.md)
-# 100% with branch coverage since milestone 2's hardening PRs.
-pytest --cov=rature.core --cov-branch --cov-fail-under=100
+# Coverage gate: 100% with branch coverage on every module that imports no
+# gi (core/ plus the gi-free helpers), listed in pyproject.toml's
+# [tool.coverage.run]. Enforced in CI.
+pytest --cov
 
 # Metadata (appstreamcli reads the source; desktop-file-validate needs the
 # merged .desktop, present after `meson compile`)

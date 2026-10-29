@@ -46,7 +46,8 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install --yes gettext
       - run: python -m pip install --upgrade pip
       - run: pip install --group dev
-      - run: pytest --cov=rature.core --cov-branch --cov-fail-under=100
+      # Modules, branch coverage and the 100% floor: pyproject.toml.
+      - run: pytest --cov
 
   # The ruleset on main requires a check named exactly "test"; a matrix
   # reports "test-python (3.13)" and "test-python (3.14)" instead. This
