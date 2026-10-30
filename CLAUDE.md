@@ -65,6 +65,7 @@ Discutées et tranchées. **Ne pas les rouvrir** sans demande explicite.
 | Langue de l'interface | Anglais |
 | Langue du code, des noms et des commentaires | Anglais |
 | Langue des documents internes | Français, assumé |
+| Langue des ADR | Anglais, comme les documents publics. Tranché au chantier 9, le 30 octobre 2026 |
 | Traductions | gettext, dossier `po/`, français en priorité |
 | Système de build | Meson |
 | Licence | GPL-3.0-or-later |

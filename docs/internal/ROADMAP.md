@@ -470,8 +470,8 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       `core`, écritures atomiques avec `fsync`, format versionné et
       migrations testées, dépôt Flatpak signé, CI épinglée, commits
       signés, lien vers les ADR) ; `pytest --cov` dans « Run the checks »
-- [ ] Langue des ADR : à trancher avec VertOurs en ouverture de chantier
-      (traduire en anglais, ou l'assumer dans le README)
+- [x] Langue des ADR : traduites en anglais, fichiers renommés, décision
+      de VertOurs le 30 octobre 2026
 - [ ] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
       (`CLAUDE.md`, `CONTRIBUTING.md`, `ROADMAP.md`)
 - [ ] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
