@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Each GitHub release carries `rature-aur.tar.gz`: the AUR `PKGBUILD` and
+  `.SRCINFO` with the checksum of that release's source archive, computed
+  by the release workflow. The copies in the repository keep `SKIP`, since
+  a tag's archive cannot hold its own checksum.
+
 ## [2.1.0] - 2026-10-30
 
 First release of chantier 9 (cleanup and hardening): your data is kept

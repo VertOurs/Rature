@@ -138,3 +138,40 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+
+  # The tag's archive contains PKGBUILD and .SRCINFO, so the copies in the
+  # repository carry SKIP. The completed copies go to the release instead
+  # of a follow-up commit (build-aux/aur/fill_checksum.py). A tag cut
+  # before 2.2.0 has no script and no SKIP: re-publishing it skips this.
+  aur:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          sparse-checkout: build-aux/aur
+
+      - name: Fill the checksum of the tag's archive
+        if: hashFiles('build-aux/aur/fill_checksum.py') != ''
+        run: |
+          url="https://github.com/$GH_REPO/archive/refs/tags/$RELEASE_TAG.tar.gz"
+          # Two downloads must agree: a checksum of an unstable archive
+          # would break every AUR build.
+          curl -fsSL --retry 3 -o first.tar.gz "$url"
+          curl -fsSL --retry 3 -o second.tar.gz "$url"
+          cmp first.tar.gz second.tar.gz
+          python3 build-aux/aur/fill_checksum.py \
+            "${RELEASE_TAG#v}" first.tar.gz aur
+          tar -czf rature-aur.tar.gz -C aur PKGBUILD .SRCINFO
+        env:
+          GH_REPO: ${{ github.repository }}
+
+      - name: Attach the AUR files to the release
+        if: hashFiles('build-aux/aur/fill_checksum.py') != ''
+        run: gh release upload "$RELEASE_TAG" rature-aur.tar.gz --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}

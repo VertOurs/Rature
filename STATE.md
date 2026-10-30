@@ -15,7 +15,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   pas un tag `vX.Y.Z` existant, dépendances de développement en versions
   exactes suivies par Dependabot `pip`, `SECURITY.md` (signalement privé
   GitHub, accusé de réception sous sept jours, dernière version seule)
-  (30 octobre 2026). Sauvegarde avant migration livrée
+  (30 octobre 2026). `sha256` AUR calculé par `release.yml` (job `aur`,
+  `build-aux/aur/fill_checksum.py`) : les fichiers du dépôt gardent
+  `SKIP`, les copies remplies sont jointes à la release dans
+  `rature-aur.tar.gz`. Non encore exercé sur un vrai tag : à vérifier
+  au prochain (`2.2.0`), un tag antérieur saute le job. Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
@@ -185,7 +189,8 @@ passage réel de `check-tag`), `rature.flatpak` joint (113 032 octets), le
 dépôt sert « Built from e9009d9 ». `flatpak update` par VertOurs le
 30 octobre 2026, `flatpak info` affiche `2.1.0`, sans migration.
 PKGBUILD et `.SRCINFO` recalés sur l'archive du tag (`sha256sum`
-identique sur deux téléchargements) dans un commit de suivi.
+identique sur deux téléchargements) dans un commit de suivi (PR #199),
+le dernier : la somme est désormais calculée par `release.yml`.
 
 `1.9.0` (25 octobre 2026) publie les noms accessibles (PR #170) et la
 fenêtre Statistiques rafraîchie au passage du jour (PR #171). Mineure,
