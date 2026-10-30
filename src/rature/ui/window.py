@@ -3,8 +3,7 @@
 
 """The main window. Its layout lives in data/ui/window.ui."""
 
-import sys
-import traceback
+import logging
 from gettext import gettext as _
 
 import gi
@@ -29,6 +28,8 @@ from rature.ui.reserve_view import ReserveView  # noqa: E402
 from rature.ui.statistics_window import StatisticsWindow  # noqa: E402
 from rature.ui.task_row import TaskRow  # noqa: E402
 from rature.ui.tomorrow_view import TomorrowView  # noqa: E402
+
+_logger = logging.getLogger(__name__)
 
 # SPECIFICATION.md §3.1: the day may roll over while the app stays open.
 _ENSURE_DAY_INTERVAL_SECONDS = 60
@@ -366,7 +367,7 @@ class RatureWindow(Adw.ApplicationWindow):
             self._write_failure_active = True
             success = False
         except (LockedError, KeyError, ValueError):
-            traceback.print_exc(file=sys.stderr)
+            _logger.exception("refused business command")
             success = False
         else:
             if clear_banner_on_success:

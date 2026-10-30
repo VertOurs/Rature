@@ -224,8 +224,8 @@ class Deletion:
     """A journal entry for a deleted task. Never shown, see ADR 0005.
 
     Carries enough of the task's state (done, done_at, source_created,
-    template_id, priority, index) to restore it exactly, as milestone
-    4's undo will need to.
+    template_id, priority, index) to restore it exactly when the deletion
+    is undone.
     """
 
     id: str

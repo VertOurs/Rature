@@ -442,11 +442,11 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 - [ ] Provenance réserve regroupée en un seul champ optionnel dans `Task`
       et `PreparedTask`. Sérialisation inchangée, donc aucune migration
 - [ ] `mypy --strict` sur `rature.core` en CI, vert
-- [ ] Renvois « ADR 0007 addendum » corrigés en ADR 0003 (`storage.py`
+- [x] Renvois « ADR 0007 addendum » corrigés en ADR 0003 (`storage.py`
       trois fois, `app.py` une fois)
-- [ ] Commentaires périmés : `models.py` (« milestone 4's undo »),
+- [x] Commentaires périmés : `models.py` (« milestone 4's undo »),
       manifeste Flatpak (« one translation »)
-- [ ] `window._perform` : `_logger.exception` au lieu de
+- [x] `window._perform` : `_logger.exception` au lieu de
       `traceback.print_exc`
 - [ ] Booléens positionnels passés en paramètres nommés (`set_priority`
       et voisins)
