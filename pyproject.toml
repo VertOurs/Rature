@@ -63,6 +63,9 @@ minversion = "8.0"
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-ra"
+# PyGObject 3.58's own asyncio integration (gi/events.py) calls APIs that
+# Python 3.16 removes; not our code, only seen by the UI tests.
+filterwarnings = ["ignore::DeprecationWarning:gi.events"]
 # The coverage gate (CI and CONTRIBUTING.md run `pytest --cov`): every
 # module that imports no gi, so the whole of core/ plus the gi-free helpers
 # beside it. ui/ modules that import GTK are left to the wiring tests

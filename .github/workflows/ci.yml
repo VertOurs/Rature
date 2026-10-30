@@ -104,3 +104,25 @@ jobs:
       # Flathub-submission-only rules (build-aux/flatpak/repo_lint.py).
       - name: Lint the built Flatpak repo
         run: python3 build-aux/flatpak/repo_lint.py repo
+
+  # Real widgets under gtk4-broadwayd, inside the GNOME SDK the Flatpak
+  # ships on (build-aux/ui-tests.sh, tests/ui/).
+  ui:
+    runs-on: ubuntu-latest
+    container:
+      # Same image as the flatpak job, pinned by digest (STATE.md).
+      image: ghcr.io/flathub-infra/flatpak-github-actions@sha256:78d969b18225ae107ca29497bf09c4a3f791e5f1838a9a912a529d0024fb6210
+      options: --privileged
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install the GNOME SDK
+        run: |
+          flatpak remote-add --if-not-exists flathub \
+            https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --noninteractive --or-update flathub org.gnome.Sdk//51
+      # The container has no session bus; flatpak run needs one.
+      - name: Run the UI tests
+        run: >
+          dbus-run-session --
+          flatpak run --share=network --filesystem="$PWD" --cwd="$PWD"
+          --command=bash org.gnome.Sdk//51 build-aux/ui-tests.sh

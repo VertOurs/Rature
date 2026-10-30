@@ -57,7 +57,8 @@ rature/
 │   ├── *.metainfo.xml.in
 │   └── *.gschema.xml           Window geometry settings
 ├── po/                         LINGUAS, POTFILES.in, fr.po
-├── tests/                      pytest: core/, launcher wiring, packaging
+├── tests/                      pytest: core/, launcher wiring, packaging;
+│                               ui/ drives real widgets under gtk4-broadwayd
 ├── build-aux/
 │   ├── flatpak/                 Flatpak manifest, repo signing, landing page
 │   ├── aur/                     PKGBUILD, .SRCINFO, checksum filler
