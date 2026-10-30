@@ -147,7 +147,7 @@ class App:
         try:
             storage.restrict_data_dir_permissions(data_dir=resolved_dir)
         except OSError:
-            # Self-healing, not a startup requirement (ADR 0007
+            # Self-healing, not a startup requirement (ADR 0003
             # addendum): the data directory already existed by now in
             # every branch above, so this never blocks a launch over a
             # permission narrowing it would be nice, not essential, to

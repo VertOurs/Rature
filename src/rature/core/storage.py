@@ -80,7 +80,7 @@ class Store:
 
 
 def _open_private(path: str, flags: int) -> int:
-    # ADR 0007 addendum: 0o600 has no group/other bit for the umask to
+    # ADR 0003 addendum: 0o600 has no group/other bit for the umask to
     # remove, so this is the actual mode on every platform, not just
     # ones with a permissive default umask.
     return os.open(path, flags, 0o600)
@@ -125,7 +125,7 @@ def load(*, data_dir: Path | None = None) -> Store:
 def save(store: Store, *, data_dir: Path | None = None) -> None:
     target = data_dir or xdg_data_dir()
     # Explicit 0o700, not the umask-masked default: same reasoning as
-    # _open_private (ADR 0007 addendum).
+    # _open_private (ADR 0003 addendum).
     target.mkdir(parents=True, exist_ok=True, mode=0o700)
     _atomic_write_json(target / _MAIN_FILE, store.to_dict())
 
@@ -133,7 +133,7 @@ def save(store: Store, *, data_dir: Path | None = None) -> None:
 def restrict_data_dir_permissions(*, data_dir: Path | None = None) -> None:
     """Narrow the data directory itself to owner-only access (0o700).
 
-    Called once per App.open (ADR 0007 addendum), not on every write: a
+    Called once per App.open (ADR 0003 addendum), not on every write: a
     directory at 0o700 already denies access to everything inside it,
     whatever each individual file's own mode is, so this alone also
     covers a data directory or archives created before this restriction
