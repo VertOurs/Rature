@@ -4,6 +4,7 @@
 """The main window. Its layout lives in data/ui/window.ui."""
 
 import logging
+from datetime import date
 from gettext import gettext as _
 
 import gi
@@ -20,6 +21,7 @@ from rature.core.app import (  # noqa: E402
     StartupOutcome,
 )
 from rature.ui import APP_ID  # noqa: E402
+from rature.ui.archives_window import ArchivesWindow  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
 from rature.ui.prepared_row import PreparedRow  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
@@ -207,15 +209,15 @@ class RatureWindow(Adw.ApplicationWindow):
     def _on_ensure_day_tick(self) -> bool:
         # Set only on the tick that archives a day; the new-day banner
         # flag stays set until dismissed, so it cannot serve here.
-        archived_now = False
+        archived_date = None
 
         def tick() -> None:
-            nonlocal archived_now
+            nonlocal archived_date
             outcome, archived = self.app.ensure_day()
             if archived is not None:
                 # The archive file is written before the save, so it is
                 # there even when the save then fails.
-                archived_now = True
+                archived_date = archived.date
                 self._new_day_pending = True
                 self._new_day_dismissed = False
             # SPECIFICATION.md §3.6: the write-failure banner clears only
@@ -229,16 +231,18 @@ class RatureWindow(Adw.ApplicationWindow):
 
         self._perform(tick, clear_banner_on_success=False)
         self._refresh_all()
-        if archived_now:
-            self._refresh_statistics_windows()
+        if archived_date is not None:
+            self._refresh_archive_windows(archived_date)
         return GLib.SOURCE_CONTINUE
 
-    def _refresh_statistics_windows(self) -> None:
-        # SPECIFICATION.md §3.14: a day was just archived, the only event
-        # that changes what an open Statistics window shows. Every open
-        # one is rebuilt; none is raised.
+    def _refresh_archive_windows(self, archived_date: date) -> None:
+        # SPECIFICATION.md §3.5 and §3.14: a day was just archived, the only
+        # event that changes what an open Archives or Statistics window
+        # shows. Every open one is updated; none is raised.
         for window in self.get_application().get_windows():
-            if isinstance(window, StatisticsWindow):
+            if isinstance(window, ArchivesWindow):
+                window.refresh(archived_date)
+            elif isinstance(window, StatisticsWindow):
                 window.refresh()
 
     def _refresh_all(self) -> None:

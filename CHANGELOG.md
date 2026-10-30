@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   by the release workflow. The copies in the repository keep `SKIP`, since
   a tag's archive cannot hold its own checksum.
 
+### Fixed
+
+- An Archives window left open overnight now lists the day that was just
+  archived. The day you are reading stays selected, and a search in
+  progress is kept.
+
 ## [2.1.0] - 2026-10-30
 
 First release of chantier 9 (cleanup and hardening): your data is kept

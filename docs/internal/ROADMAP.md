@@ -423,9 +423,10 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 - [x] `OSError` au démarrage (permission, disque plein, quarantaine
       impossible) : `Gtk.AlertDialog` puis fermeture, sur le modèle de
       `FutureVersionError`. Quatrième cas ajouté à `SPECIFICATION.md` §3.6
-- [ ] Fenêtre Archives rafraîchie au passage du jour : ouverte pendant le
+- [x] Fenêtre Archives rafraîchie au passage du jour : ouverte pendant le
       passage, elle ne montre pas la journée qui vient d'être archivée.
-      Reste du chantier 8
+      Reste du chantier 8. `SPECIFICATION.md` §3.5 mis à jour, le
+      30 octobre 2026
 
 ### Sécurité
 
