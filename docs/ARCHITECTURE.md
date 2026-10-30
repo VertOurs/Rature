@@ -43,6 +43,8 @@ rature/
 │   │   ├── archive_task_row.py Read-only task row of the Archives window
 │   │   ├── statistics_window.py Statistics window, §3.14
 │   │   ├── statistics_row.py   One table row of the Statistics window
+│   │   ├── editable_row.py     Base of the Day, Reserve and Tomorrow rows:
+│   │   │                       rename, priority, delete, drag-and-drop
 │   │   ├── inline_rename.py    In-place rename, shared by the list views
 │   │   ├── list_helpers.py     GtkListBox plumbing shared by the views
 │   │   ├── reorder.py          Where a drag-and-drop reorder lands (no gi)

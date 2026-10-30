@@ -23,6 +23,7 @@ data/ui/shortcuts.ui
 src/rature/core/dates.py
 src/rature/ui/application.py
 src/rature/ui/day_view.py
+src/rature/ui/editable_row.py
 src/rature/ui/prepared_row.py
 src/rature/ui/recurring_row.py
 src/rature/ui/reserve_row.py

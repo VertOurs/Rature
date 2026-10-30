@@ -468,10 +468,12 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       dérayer, renommer et le glisser-déposer (jour et réserve) le même
       jour : broadway ne synthétise pas de geste de pointeur, le test joue
       le `drag-begin` puis émet le vrai signal `drop` de la ligne cible
-- [ ] Ensuite seulement : base commune aux lignes `task_row`,
+- [x] Ensuite seulement : base commune aux lignes `task_row`,
       `reserve_row` et `prepared_row` (glisser-déposer, renommage,
       priorité, suppression). Les différences voulues (`COPY` pour la
-      réserve) restent explicites
+      réserve) restent explicites. `EditableRow` (`editable_row.py`), le
+      30 octobre 2026 ; 27 tests d'interface, dont les dépôts sur le
+      panneau latéral
 - [x] `sha256` du `PKGBUILD` et du `.SRCINFO` calculée dans `release.yml`
       après le tag : plus de commit de rattrapage. Les copies du dépôt
       gardent `SKIP` (l'archive d'un tag ne peut contenir sa propre

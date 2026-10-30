@@ -3,7 +3,7 @@
 <!-- SPDX-FileCopyrightText: 2026 VertOurs -->
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="RatureReserveRow" parent="GtkListBoxRow">
+  <template class="RatureReserveRow" parent="RatureEditableRow">
     <property name="child">
       <object class="GtkBox">
         <property name="orientation">horizontal</property>

@@ -2,8 +2,7 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The Reserve view, driven through its real widgets (SPECIFICATION.md §3.3)."""
 
-from gi.repository import GObject
-from ui_helpers import drop, type_into
+from ui_helpers import drop_on_half, process_events, type_into
 
 from rature.core.app import App
 from rature.ui import list_helpers
@@ -28,9 +27,7 @@ def _add(window: RatureWindow, *texts: str) -> None:
 
 
 def _drop(source: ReserveRow, target: ReserveRow, *, upper_half: bool) -> bool:
-    # The reserve drags the item id as a string (reserve_row.py).
-    value = GObject.Value(GObject.TYPE_STRING, source.item.id)
-    return drop(ReserveRow, source, target, value, upper_half=upper_half)
+    return drop_on_half(ReserveRow, source, target, upper_half=upper_half)
 
 
 def test_enter_in_the_entry_adds_an_item(window: RatureWindow, app: App) -> None:
@@ -59,3 +56,41 @@ def test_an_item_dropped_on_itself_is_refused(window: RatureWindow, app: App) ->
     assert not _drop(first, first, upper_half=True)
 
     assert [item.text for item in app.session.reserve] == ["x", "y"]
+
+
+def test_rename_from_the_row_menu_commits_on_enter(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "learn the cello")
+    row = _rows(window)[0]
+
+    row.rename_button.emit("clicked")
+    process_events()
+    type_into(row.rename_entry, "learn the viola")
+
+    assert app.session.reserve[0].text == "learn the viola"
+    assert row.text_label.get_label() == "learn the viola"
+
+
+def test_priority_from_the_row_menu_marks_the_item(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "learn the cello")
+
+    _rows(window)[0].priority_button.emit("clicked")
+    process_events()
+
+    assert app.session.reserve[0].priority
+    assert _rows(window)[0].priority_icon.get_child_visible()
+
+
+def test_delete_from_the_row_menu_removes_the_item(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "x", "y")
+
+    _rows(window)[0].delete_button.emit("clicked")
+    process_events()
+
+    assert [item.text for item in app.session.reserve] == ["y"]
+    assert _texts(window) == ["y"]
