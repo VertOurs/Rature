@@ -28,6 +28,8 @@ jobs:
       - run: pip install --group dev
       - run: ruff check .
       - run: ruff format --check .
+      # Strict, on core/ only: pyproject.toml's [tool.mypy].
+      - run: mypy
 
   # The floor (3.13, Mageia 10) and the runtime (3.14, GNOME 51): ruff's
   # py313 target blocks 3.14-only syntax, not a 3.14-only stdlib call.

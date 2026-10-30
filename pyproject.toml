@@ -20,6 +20,7 @@ authors = [{ name = "VertOurs", email = "vertours.dev@gmail.com" }]
 [dependency-groups]
 dev = [
     "ruff==0.17.3",
+    "mypy==2.4.1",
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
 ]
@@ -48,6 +49,14 @@ select = [
 # pytest asserts by design; the tests parse the repository's own XML and
 # run msgfmt with fixed arguments, so neither input is untrusted.
 "tests/*" = ["S101", "S314", "S603", "S607"]
+
+# Strict typing on core/ only: it is pure Python (ADR 0002), so every type
+# is checkable. ui/ goes through PyGObject's dynamic bindings, which mypy
+# cannot see without stubs. Checked against the floor version (3.13).
+[tool.mypy]
+files = ["src/rature/core"]
+python_version = "3.13"
+strict = true
 
 [tool.pytest.ini_options]
 minversion = "8.0"

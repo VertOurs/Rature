@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
+from typing import Any
 
 CURRENT_VERSION = 4
 _logger = logging.getLogger(__name__)
@@ -23,11 +24,13 @@ class FutureVersionError(Exception):
 
 # One entry per version step, keyed by the version it upgrades from. Each
 # function returns the data with "version" bumped.
-_MIGRATIONS: dict[int, Callable[[dict], dict]] = {}
+type Migration = Callable[[dict[str, Any]], dict[str, Any]]
+
+_MIGRATIONS: dict[int, Migration] = {}
 
 
-def _migration(from_version: int) -> Callable[[Callable[[dict], dict]], Callable]:
-    def register(func: Callable[[dict], dict]) -> Callable[[dict], dict]:
+def _migration(from_version: int) -> Callable[[Migration], Migration]:
+    def register(func: Migration) -> Migration:
         _MIGRATIONS[from_version] = func
         return func
 
@@ -35,7 +38,7 @@ def _migration(from_version: int) -> Callable[[Callable[[dict], dict]], Callable
 
 
 @_migration(1)
-def _every_other_week(data: dict) -> dict:
+def _every_other_week(data: dict[str, Any]) -> dict[str, Any]:
     """Version 2: every recurring template gains every_other_week_from.
 
     null means every week, what every version 1 template was. Archive
@@ -53,7 +56,7 @@ def _every_other_week(data: dict) -> dict:
 
 
 @_migration(2)
-def _priority(data: dict) -> dict:
+def _priority(data: dict[str, Any]) -> dict[str, Any]:
     """Version 3: tasks, deletion entries and reserve items gain priority.
 
     false for all of them, what every version 2 entry was. Archive files
@@ -69,7 +72,7 @@ def _priority(data: dict) -> dict:
 
 
 @_migration(3)
-def _tomorrow(data: dict) -> dict:
+def _tomorrow(data: dict[str, Any]) -> dict[str, Any]:
     """Version 4: the main file gains an empty "tomorrow" list.
 
     SPECIFICATION.md §2.5: the Tomorrow list lives in the main file only.
@@ -83,11 +86,11 @@ def _tomorrow(data: dict) -> dict:
 
 
 def migrate(
-    data: dict,
+    data: dict[str, Any],
     *,
     target: int = CURRENT_VERSION,
-    registry: dict[int, Callable[[dict], dict]] | None = None,
-) -> dict:
+    registry: dict[int, Migration] | None = None,
+) -> dict[str, Any]:
     """Bring a raw data dict up to ``target``, or raise if it cannot."""
     steps = _MIGRATIONS if registry is None else registry
     if not isinstance(data, dict):

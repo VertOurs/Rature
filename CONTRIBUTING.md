@@ -71,6 +71,7 @@ XDG_DATA_DIRS="$PWD/build/install/share:$XDG_DATA_DIRS" ./build/install/bin/ratu
 ```
 ruff check .
 ruff format --check .
+mypy
 pytest
 ```
 

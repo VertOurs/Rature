@@ -26,7 +26,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   contrôlée visuellement par VertOurs le 30 octobre 2026. Provenance
   réserve regroupée dans `ReserveSource` (`Task`, `PreparedTask`,
   `Deletion`) : fichier réécrit identique à l'octet près à celui de
-  `main`, aucune migration. Sauvegarde avant migration livrée
+  `main`, aucune migration. `mypy --strict` sur `rature.core` dans le
+  job `lint` (mypy `2.4.1`, épinglé, suivi par Dependabot `pip`). Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le

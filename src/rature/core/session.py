@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from typing import Any
 
 from rature.core.models import (
     Deletion,
@@ -50,7 +51,7 @@ class Day:
     tasks: list[Task] = field(default_factory=list)
     deletions: list[Deletion] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "date": self.date.isoformat(),
             "counter": self.counter,
@@ -60,7 +61,7 @@ class Day:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> Day:
+    def from_dict(cls, data: dict[str, Any]) -> Day:
         return cls(
             date=date.fromisoformat(data["date"]),
             counter=data["counter"],
@@ -566,10 +567,13 @@ def _moved_before[T: (Task, ReserveItem, PreparedTask)](
     moving = by_id[item_id]
     if item_id == target_id:
         return items
-    rest = [item for item in items if item.id != item_id]
-    if target_id is None:
-        return [*rest, moving]
-    if target_id not in by_id:
+    if target_id is not None and target_id not in by_id:
         raise KeyError(target_id)
-    index = [item.id for item in rest].index(target_id)
-    return [*rest[:index], moving, *rest[index:]]
+    moved = [item for item in items if item.id != item_id]
+    index = (
+        len(moved)
+        if target_id is None
+        else [item.id for item in moved].index(target_id)
+    )
+    moved.insert(index, moving)
+    return moved
