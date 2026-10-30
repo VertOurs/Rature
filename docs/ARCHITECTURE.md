@@ -100,6 +100,14 @@ damaged archive (a name shaped like a date but impossible, such as
 `2026-02-30.json`, is skipped). `load_archive` reads, migrates and returns
 a `Day`, letting the error propagate if the file is unreadable.
 
+When `load` migrates the main file, it first keeps the file as it was on
+disk, byte for byte, as `data.json.v<N>.bak`, `N` being the version read.
+The copy goes through a temporary file and `os.link`, which never
+overwrites: an existing backup is kept, and an interrupted copy leaves no
+truncated one. A failed copy raises `OSError`, so no migrated data is
+written without a backup. Archives are migrated in memory only and never
+rewritten, so they need none.
+
 ### `core/migrations.py`
 One function per version jump, each with its own test over a sample of the
 previous version's data.

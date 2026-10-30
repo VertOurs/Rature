@@ -416,7 +416,7 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 
 ### Données
 
-- [ ] Sauvegarde avant migration : quand le chargement applique au moins
+- [x] Sauvegarde avant migration : quand le chargement applique au moins
       une migration, copier `data.json` en `data.json.v<N>.bak` avant la
       première écriture, une seule fois. `SPECIFICATION.md` mis à jour
       avant le code

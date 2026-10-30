@@ -5,6 +5,8 @@
 import copy
 import json
 import logging
+import os
+import stat
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -413,3 +415,119 @@ def test_a_version_1_file_is_migrated_and_injects_as_before(tmp_path: Path) -> N
     assert on_disk["tomorrow"] == []
     assert on_disk["recurring"][0]["every_other_week_from"] is None
     assert not any(item["priority"] for item in on_disk["reserve"])
+
+
+# SPECIFICATION.md §2.7.10: a load that migrates first keeps the file as
+# it was on disk, byte for byte, in data.json.v<N>.bak.
+
+
+def _write_raw(tmp_path: Path, data: dict) -> bytes:
+    # Indented and non-ASCII on purpose: the backup must match these bytes,
+    # not a re-serialisation of the loaded data.
+    raw = json.dumps(data, ensure_ascii=False, indent=4).encode("utf-8")
+    (tmp_path / "data.json").write_bytes(raw)
+    return raw
+
+
+@pytest.mark.parametrize(
+    ("data", "version"), [(V1_MAIN, 1), (V2_MAIN, 2), (V3_MAIN, 3)]
+)
+def test_a_migrating_load_backs_up_the_file_byte_for_byte(
+    tmp_path: Path, data: dict, version: int
+) -> None:
+    raw = _write_raw(
+        tmp_path, {**data, "reserve": [{**data["reserve"][0], "text": "vélo"}]}
+    )
+    load(data_dir=tmp_path)
+    backup = tmp_path / f"data.json.v{version}.bak"
+    assert backup.read_bytes() == raw
+    assert (tmp_path / "data.json").read_bytes() == raw
+    assert stat.S_IMODE(backup.stat().st_mode) == 0o600
+
+
+def test_a_current_version_load_makes_no_backup(tmp_path: Path) -> None:
+    save(Store(day=Day(date=date(2026, 8, 24))), data_dir=tmp_path)
+    load(data_dir=tmp_path)
+    assert [p.name for p in tmp_path.iterdir()] == ["data.json"]
+
+
+def test_an_existing_backup_is_kept_and_not_doubled(tmp_path: Path) -> None:
+    _write_raw(tmp_path, V1_MAIN)
+    backup = tmp_path / "data.json.v1.bak"
+    backup.write_bytes(b"the true original")
+    load(data_dir=tmp_path)
+    assert backup.read_bytes() == b"the true original"
+    assert sorted(p.name for p in tmp_path.iterdir()) == [
+        "data.json",
+        "data.json.v1.bak",
+    ]
+
+
+def test_an_unreadable_old_file_is_not_backed_up(tmp_path: Path) -> None:
+    # Version 1, but no date: the load fails and the file goes to quarantine.
+    _write_raw(tmp_path, {key: v for key, v in V1_MAIN.items() if key != "date"})
+    with pytest.raises((KeyError, ValueError)):
+        load(data_dir=tmp_path)
+    assert [p.name for p in tmp_path.iterdir()] == ["data.json"]
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores permissions")
+def test_a_failed_backup_raises_and_leaves_nothing_behind(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    raw = _write_raw(tmp_path, V1_MAIN)
+    tmp_path.chmod(0o500)
+    try:
+        with (
+            caplog.at_level(logging.ERROR, logger="rature.core.storage"),
+            pytest.raises(OSError),
+        ):
+            load(data_dir=tmp_path)
+    finally:
+        tmp_path.chmod(0o700)
+    assert [p.name for p in tmp_path.iterdir()] == ["data.json"]
+    assert (tmp_path / "data.json").read_bytes() == raw
+    assert str(tmp_path / "data.json") in caplog.text
+
+
+def test_a_backup_link_lost_to_a_race_keeps_the_winner(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Another process creates the backup between the exists() check and
+    # the link: os.link refuses to overwrite it, and the load still succeeds.
+    _write_raw(tmp_path, V1_MAIN)
+    backup = tmp_path / "data.json.v1.bak"
+    real_link = os.link
+
+    def racing_link(src: str, dst: str) -> None:
+        backup.write_bytes(b"the winner")
+        real_link(src, dst)
+
+    monkeypatch.setattr(os, "link", racing_link)
+    load(data_dir=tmp_path)
+    assert backup.read_bytes() == b"the winner"
+    assert sorted(p.name for p in tmp_path.iterdir()) == [
+        "data.json",
+        "data.json.v1.bak",
+    ]
+
+
+def test_the_backup_is_logged_with_its_path_only(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    _write_raw(tmp_path, V1_MAIN)
+    with caplog.at_level(logging.INFO, logger="rature.core.storage"):
+        load(data_dir=tmp_path)
+    assert str(tmp_path / "data.json.v1.bak") in caplog.text
+    assert "call the bank" not in caplog.text
+
+
+def test_opening_an_old_file_keeps_the_original_beside_the_rewritten_one(
+    tmp_path: Path,
+) -> None:
+    raw = _write_raw(tmp_path, V1_MAIN)
+    app = App.open(tmp_path, clock=lambda: datetime(2026, 8, 24, 18, 0, tzinfo=PARIS))
+    app.add("one more")
+    assert (tmp_path / "data.json.v1.bak").read_bytes() == raw
+    on_disk = json.loads((tmp_path / "data.json").read_text(encoding="utf-8"))
+    assert on_disk["version"] == CURRENT_VERSION
