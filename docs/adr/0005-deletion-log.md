@@ -49,7 +49,7 @@ trace in the interface.
   intended
 - Undoing a deletion must maintain the log, otherwise the count drifts.
   To be covered by a test in milestone 4
-- Lifted before milestone 3 (hardening PR for `core/`, see `STATE.md`):
+- Lifted before milestone 3 (hardening PR for `core/`, see `docs/internal/STATE.md`):
   `Deletion` now carries `id`, `num`, `text`, `origin`, `source_id`,
   `source_created`, `template_id`, `done`, `done_at`, `index` and
   `deleted_at`, everything needed to restore a struck task or a task

@@ -50,7 +50,7 @@ jobs:
     environment: release
     container:
       # gnome-51, pinned by digest, per manifest index (§4 rule 8: Dependabot
-      # does not track this reference, see STATE.md for the manual bump).
+      # does not track this reference, see docs/internal/STATE.md for the manual bump).
       image: ghcr.io/flathub-infra/flatpak-github-actions@sha256:78d969b18225ae107ca29497bf09c4a3f791e5f1838a9a912a529d0024fb6210
       options: --privileged
     steps:

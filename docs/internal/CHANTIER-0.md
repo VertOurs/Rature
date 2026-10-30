@@ -5,7 +5,7 @@ qui ne fait rien. Aucune fonctionnalité ici, c'est volontaire.
 
 Durée réaliste : deux à trois sessions courtes.
 
-> **L'avancement réel vit dans `STATE.md`.** Les cases de ce document
+> **L'avancement réel vit dans `docs/internal/STATE.md`.** Les cases de ce document
 > décrivent le périmètre, pas l'état.
 
 ---
