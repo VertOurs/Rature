@@ -87,7 +87,7 @@ def _open_private(path: str, flags: int) -> int:
 
 
 def _atomic_write_json(path: Path, obj: dict) -> None:
-    # docs/adr/0003-fichier-json-unique.md: temp file in the same directory,
+    # docs/adr/0003-single-json-file.md: temp file in the same directory,
     # flush, fsync the file, replace, then fsync the directory.
     tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:

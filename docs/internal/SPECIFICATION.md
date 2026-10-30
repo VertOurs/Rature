@@ -180,7 +180,7 @@ décision de VertOurs.
 Demain n'est pas une date : après plusieurs jours sans ouverture, la liste
 préparée devient quand même la liste du jour qui s'ouvre (point 7
 ci-dessous). Décision et alternatives écartées :
-`docs/adr/0008-preparer-le-lendemain.md`. Ajouté au chantier 7.3.
+`docs/adr/0008-prepare-tomorrow.md`. Ajouté au chantier 7.3.
 
 - **Une tâche préparée** porte un identifiant, un texte, une origine, la
   trace de son item de réserve (`source_id`, `source_created`) et sa

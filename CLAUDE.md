@@ -35,7 +35,7 @@ aussi pour l'historique git, les messages de commit, les tests, la CI, le
 README et la lisibilité de l'ensemble. Un dépôt se juge autant sur sa forme
 que sur ce qu'il fait.
 
-**Le POC est abandonné.** Voir `docs/adr/0004-abandon-du-poc.md`. La
+**Le POC est abandonné.** Voir `docs/adr/0004-abandon-the-prototype.md`. La
 construction repart de la spécification (`docs/internal/SPECIFICATION.md`).
 Aucune urgence fonctionnelle, aucune donnée à préserver : l'auteur continue
 d'utiliser ses conversations Claude au quotidien en attendant.
@@ -88,7 +88,7 @@ installation du paquet sous `datadir` (0006).
 ## 4. Règles absolues
 
 1. **`core/` n'importe jamais `gi`, GTK, Adw ou Gdk.** Aucune exception. Le
-   pourquoi : `docs/adr/0002-separation-core-ui.md`.
+   pourquoi : `docs/adr/0002-core-ui-separation.md`.
 2. **Toute chaîne affichée passe par `_()`.** Jamais de texte en dur dans le
    code ou dans un `.ui` non marqué comme traduisible.
 3. **Anglais partout dans le dépôt** : variables, fonctions, noms de
@@ -98,7 +98,7 @@ installation du paquet sous `datadir` (0006).
    un chantier ultérieur, même si elle est facile. La noter dans la roadmap
    et passer à autre chose.
 5. **Ni Flathub, ni GNOME Circle.** Écarté définitivement, voir
-   `docs/adr/0001-rejet-de-flathub.md`. Ne pas reproposer, ne pas contourner,
+   `docs/adr/0001-reject-flathub.md`. Ne pas reproposer, ne pas contourner,
    ne pas commenter à chaque session.
 6. **Pas de nouvelle dépendance sans validation explicite.** Trois
    catégories, à ne pas confondre :

@@ -9,7 +9,7 @@ Where things live, and why. Updated whenever the structure changes.
 **`core/` knows nothing about the graphical interface.** No file under
 `core/` imports `gi`, GTK, Adw or Gdk. If a function needs GTK, it does not
 belong in `core/`. The reasoning and its consequences are in
-[`docs/adr/0002-separation-core-ui.md`](adr/0002-separation-core-ui.md).
+[`docs/adr/0002-core-ui-separation.md`](adr/0002-core-ui-separation.md).
 
 ---
 
@@ -92,7 +92,7 @@ that needs the time takes `now`/`today` as a parameter.
 ### `core/storage.py`
 XDG paths, reading, atomic writing, archiving. The atomic-write procedure,
 directory `fsync` included, is in
-[`docs/adr/0003-fichier-json-unique.md`](adr/0003-fichier-json-unique.md).
+[`docs/adr/0003-single-json-file.md`](adr/0003-single-json-file.md).
 
 `list_archives` returns the dates present in `archive/`, most recent first,
 by reading file names only: it opens no content and cannot fail on a
@@ -347,7 +347,7 @@ Simplicity decisions, not to be revisited without a strong reason.
   never changes the order or the numbers, see `SPECIFICATION.md` §2.5
 - No sub-tasks
 - No database; one JSON file is enough at this scale. See
-  [`docs/adr/0003-fichier-json-unique.md`](adr/0003-fichier-json-unique.md)
+  [`docs/adr/0003-single-json-file.md`](adr/0003-single-json-file.md)
 - No network sync, mobile client or external capture file. See
   `docs/internal/ROADMAP.md`, "Repoussé volontairement"
 - No runtime dependency beyond the GNOME runtime and the Python standard

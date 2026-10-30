@@ -19,7 +19,7 @@ before writing code.
 - Business logic never lives in `ui/`. A condition that decides product
   behaviour belongs in `core/`.
 
-The rule and its rationale: `docs/adr/0002-separation-core-ui.md`.
+The rule and its rationale: `docs/adr/0002-core-ui-separation.md`.
 
 ## Development setup
 

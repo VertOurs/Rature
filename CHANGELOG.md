@@ -195,7 +195,7 @@ closed: 7.2 and 7.3 have not started (`docs/internal/ROADMAP.md`).
 - Capture from a synced folder, added in `1.2.0`: the Capture Folder…
   menu entry, the `capture-folder` setting and its two banners are gone.
   Dropping a text file turned out not to fit daily use, and phone sync
-  is postponed indefinitely (`docs/adr/0007-boite-de-depot-texte.md`,
+  is postponed indefinitely (`docs/adr/0007-text-inbox.md`,
   "Retrait"). Nothing already imported is touched: items stay in the
   reserve, files stay in `processed/`.
 
@@ -211,14 +211,14 @@ closed: 7.2 and 7.3 have not started (`docs/internal/ROADMAP.md`).
 
 Chantier 7.1 (capture depuis une boîte de dépôt) ships for the first
 time. Its own code went through a targeted bug/security review before
-this release (`docs/adr/0007-boite-de-depot-texte.md`'s addendum), and
+this release (`docs/adr/0007-text-inbox.md`'s addendum), and
 two of its findings turned out to affect code already published in
 `1.1.0` as well, fixed here too. Chantier 7 is not closed: 7.2 and 7.3
 have not started (`docs/internal/ROADMAP.md`).
 
 ### Added
 
-- Capture from a synced folder (ROADMAP milestone 7.1, `docs/adr/0007-boite-de-depot-texte.md`):
+- Capture from a synced folder (ROADMAP milestone 7.1, `docs/adr/0007-text-inbox.md`):
   a folder chosen through the file portal (Capture Folder… in the main
   menu) is read at startup and on window focus, never continuously. A
   text file named `inbox-*.txt` becomes one reserve entry per non-empty
