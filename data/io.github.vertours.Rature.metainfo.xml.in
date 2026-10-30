@@ -73,6 +73,16 @@
   </screenshots>
 
   <releases>
+    <release version="2.1.1" date="2026-10-30">
+      <description>
+        <p>
+          Rature 2.1.1. An Archives window left open overnight now shows the
+          day that was just archived, keeping the day you are reading and
+          your search. Screenshots of the Tomorrow and Reserve views. No
+          change to the data format.
+        </p>
+      </description>
+    </release>
     <release version="2.1.0" date="2026-10-30">
       <description>
         <p>
