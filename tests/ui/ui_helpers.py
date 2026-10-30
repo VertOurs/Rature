@@ -34,36 +34,51 @@ def type_into(entry: Gtk.Entry, text: str) -> None:
     process_events()
 
 
-def drop(
-    row_class: Any,
-    source: Gtk.Widget,
-    target: Gtk.Widget,
-    value: GObject.Value,
-    *,
-    upper_half: bool,
-) -> bool:
-    """Drop ``source`` on the upper or lower half of ``target``.
+def _controller(widget: Gtk.Widget, kind: type) -> Any:
+    controllers = widget.observe_controllers()
+    return next(
+        controller
+        for index in range(controllers.get_n_items())
+        if isinstance(controller := controllers.get_item(index), kind)
+    )
+
+
+def _payload(source: Any) -> GObject.Value:
+    """What ``source`` carries when dragged, from its real drag source.
+
+    Emits the row's GtkDragSource::prepare and checks the type it offers.
+    PyGObject cannot read a GValue back out of a GdkContentProvider, so the
+    value itself comes from _drag_value, the method prepare wraps.
+    """
+    provider = _controller(source, Gtk.DragSource).emit("prepare", 0.0, 0.0)
+    offered = provider.ref_formats().get_gtypes()
+    assert offered == [source._drag_gtype()], offered
+    return GObject.Value(offered[0], source._drag_value())
+
+
+def drop(row_class: Any, source: Any, target: Gtk.Widget, *, y: float) -> bool:
+    """Drop ``source`` on ``target`` at height ``y`` inside it.
 
     Broadway cannot synthesise a pointer drag. So this plays the part of
     the source's drag-begin, the one piece of state it sets (the row
-    class's dragged row), then emits the target row's real
-    GtkDropTarget::drop, which runs the production handler unchanged.
-    Returns whether the drop was accepted.
+    class's dragged row), then emits the target's real GtkDropTarget::drop
+    with the source's real payload, which runs the production handler
+    unchanged. Returns whether the drop was accepted.
     """
-    controllers = target.observe_controllers()
-    drop_target = next(
-        controller
-        for index in range(controllers.get_n_items())
-        if isinstance(controller := controllers.get_item(index), Gtk.DropTarget)
-    )
-    wait_for_layout(target)
-    height = target.get_height()
+    value = _payload(source)
     row_class._dragged = source
     try:
-        accepted = drop_target.emit(
-            "drop", value, 0.0, height * (0.25 if upper_half else 0.75)
-        )
+        accepted = _controller(target, Gtk.DropTarget).emit("drop", value, 0.0, y)
     finally:
         row_class._dragged = None
     process_events()
     return bool(accepted)
+
+
+def drop_on_half(
+    row_class: Any, source: Any, target: Gtk.Widget, *, upper_half: bool
+) -> bool:
+    """Drop ``source`` on the upper or lower half of the row ``target``."""
+    wait_for_layout(target)
+    y = target.get_height() * (0.25 if upper_half else 0.75)
+    return drop(row_class, source, target, y=y)

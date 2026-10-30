@@ -2,8 +2,7 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The Day view, driven through its real widgets (SPECIFICATION.md §3.2)."""
 
-from gi.repository import GObject
-from ui_helpers import drop, process_events, type_into
+from ui_helpers import drop_on_half, process_events, type_into
 
 from rature.core.app import App
 from rature.ui import list_helpers
@@ -33,8 +32,7 @@ def _add(window: RatureWindow, *texts: str) -> None:
 
 
 def _drop(source: TaskRow, target: TaskRow, *, upper_half: bool) -> bool:
-    value = GObject.Value(TaskRow.__gtype__, source)
-    return drop(TaskRow, source, target, value, upper_half=upper_half)
+    return drop_on_half(TaskRow, source, target, upper_half=upper_half)
 
 
 def test_enter_in_the_entry_adds_a_task(window: RatureWindow, app: App) -> None:
@@ -134,3 +132,28 @@ def test_a_drop_onto_the_other_block_is_refused(window: RatureWindow, app: App) 
     assert not _drop(_active(window)[0], _struck(window)[0], upper_half=True)
 
     assert [task.text for task in app.session.day.tasks] == ["a", "b"]
+
+
+def test_priority_from_the_row_menu_marks_the_task(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread")
+
+    _active(window)[0].priority_button.emit("clicked")
+    process_events()
+
+    assert app.session.day.tasks[0].priority
+    assert _active(window)[0].priority_icon.get_child_visible()
+
+
+def test_delete_from_the_row_menu_removes_the_task_and_can_be_undone(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread", "call the dentist")
+
+    _active(window)[0].delete_button.emit("clicked")
+    process_events()
+
+    assert _texts(_active(window)) == ["call the dentist"]
+    # SPECIFICATION.md §2.2: Delete goes to the journal, so Undo exists.
+    assert [entry.text for entry in app.session.day.deletions] == ["buy bread"]

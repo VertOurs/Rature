@@ -34,7 +34,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   GNOME 51 sous `gtk4-broadwayd` (application installée, GSettings en
   mémoire, `G_DEBUG=fatal-criticals`), job CI `ui`. Sautés par `pytest`
   hors SDK. Job `ui` exigé par le ruleset `main` depuis le
-  30 octobre 2026, après deux passages verts. Sauvegarde avant migration livrée
+  30 octobre 2026, après deux passages verts. Base commune aux lignes
+  `EditableRow` (`editable_row.py`) : les trois templates la nomment
+  comme parent (`RatureEditableRow`). 27 tests d'interface. Contrôle
+  visuel du glisser-déposer validé par VertOurs avant fusion. Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
