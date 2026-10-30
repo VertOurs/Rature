@@ -11,7 +11,10 @@ makedepends=('meson' 'ninja' 'gettext')
 checkdepends=('python-pytest')
 _pkgname=Rature
 source=("$pkgname-$pkgver.tar.gz::https://github.com/VertOurs/$_pkgname/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('38366b1fe588ec3c49bf40c257bc4a211e959a739126452aee4f22add496272f')
+# In the git repository the checksum is SKIP: a tag's archive contains this
+# file, so it cannot hold its own checksum. The copy attached to each
+# GitHub release carries the real one (build-aux/aur/fill_checksum.py).
+sha256sums=('SKIP')
 
 build() {
   arch-meson "$_pkgname-$pkgver" build

@@ -60,7 +60,7 @@ rature/
 ├── tests/                      pytest: core/, launcher wiring, packaging
 ├── build-aux/
 │   ├── flatpak/                 Flatpak manifest, repo signing, landing page
-│   ├── aur/                     PKGBUILD, .SRCINFO
+│   ├── aur/                     PKGBUILD, .SRCINFO, checksum filler
 │   ├── copr/                    Fedora .spec
 │   └── mageia/                  Mageia .spec
 ├── docs/

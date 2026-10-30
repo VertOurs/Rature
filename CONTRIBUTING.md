@@ -171,6 +171,11 @@ One tag per version, one CHANGELOG entry in the Keep a Changelog format,
 never a release without green CI. Tag form: `v` followed by the version,
 e.g. `v0.2.0`, matching the tag a GitHub release publishes under.
 
+The AUR files in `build-aux/aur/` keep `sha256sums` at `SKIP`: a tag's
+archive contains them, so they cannot hold its checksum. The release
+workflow attaches completed copies to the release (`rature-aur.tar.gz`).
+Bump `pkgver` in both files with the version, never the checksum.
+
 ## Interface
 
 Follow the GNOME Human Interface Guidelines and keyboard accessibility. Every

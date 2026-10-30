@@ -460,8 +460,11 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       `reserve_row` et `prepared_row` (glisser-déposer, renommage,
       priorité, suppression). Les différences voulues (`COPY` pour la
       réserve) restent explicites
-- [ ] `sha256` du `PKGBUILD` et du `.SRCINFO` calculée dans `release.yml`
-      après le tag : plus de commit de rattrapage
+- [x] `sha256` du `PKGBUILD` et du `.SRCINFO` calculée dans `release.yml`
+      après le tag : plus de commit de rattrapage. Les copies du dépôt
+      gardent `SKIP` (l'archive d'un tag ne peut contenir sa propre
+      somme), les copies remplies sont jointes à la release
+      (`rature-aur.tar.gz`). Le 30 octobre 2026
 
 ### Vitrine
 
