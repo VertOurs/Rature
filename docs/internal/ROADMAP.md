@@ -434,7 +434,7 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 - [ ] `SECURITY.md` : contact, délai de réponse, versions supportées
 - [ ] Dépendances de développement en versions exactes, écosystème `pip`
       dans `dependabot.yml`
-- [ ] Règles ruff `S` (bandit) activées ; l'`assert` de
+- [x] Règles ruff `S` (bandit) activées ; l'`assert` de
       `recurring_form.py` devient un `if`/`raise`
 
 ### Propreté
