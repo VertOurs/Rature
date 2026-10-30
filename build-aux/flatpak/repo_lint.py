@@ -29,8 +29,9 @@ def unexpected_errors(report: dict, exceptions: dict[str, str]) -> list[str]:
 
 def main(repo: str) -> int:
     exceptions = json.loads(EXCEPTIONS_FILE.read_text(encoding="utf-8"))
-    result = subprocess.run(
-        ["flatpak-builder-lint", "repo", repo],
+    # Fixed argv, no shell; the CI image provides the linter on PATH.
+    result = subprocess.run(  # noqa: S603
+        ["flatpak-builder-lint", "repo", repo],  # noqa: S607
         capture_output=True,
         text=True,
         check=False,
