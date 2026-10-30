@@ -12,7 +12,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gdk, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, GLib, Gtk  # noqa: E402
 
 from rature.core.dates import long_date  # noqa: E402
 from rature.core.migrations import FutureVersionError  # noqa: E402
@@ -31,15 +31,16 @@ if TYPE_CHECKING:
 class ArchivesWindow(Adw.Window):
     """A sidebar of archived dates, most recent first, and one day's content.
 
-    Built fresh every time the menu action opens it, so the sidebar always
-    reflects the current archive/ directory rather than a stale snapshot
-    from an earlier open.
+    Built fresh every time the menu action opens it, and updated by
+    refresh() when the day rollover archives a day while it is open
+    (SPECIFICATION.md §3.5), so the sidebar never shows a stale snapshot.
     """
 
     __gtype_name__ = "RatureArchivesWindow"
 
     sidebar_stack: Gtk.Stack = Gtk.Template.Child()
     search_entry: Gtk.SearchEntry = Gtk.Template.Child()
+    date_scroll: Gtk.ScrolledWindow = Gtk.Template.Child()
     date_list: Gtk.ListBox = Gtk.Template.Child()
     header: Adw.HeaderBar = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
@@ -77,6 +78,38 @@ class ArchivesWindow(Adw.Window):
         # before __init__ returns. Archives are small single-day files and
         # the window is not shown yet, so the blocking read is fine.
         self._apply_filter()
+
+    def refresh(self, archived_date: date) -> None:
+        """Add the date the rollover just archived, keeping the user's place.
+
+        SPECIFICATION.md §3.5: the shown date stays selected and its content
+        untouched, a search in progress is kept, nothing is highlighted and
+        the date list does not jump back to the top.
+        """
+        # A fresh archive, never in the cache unless that date was archived
+        # before and is now overwritten (§2.5); either way, read it anew.
+        self._match_cache.pop(archived_date, None)
+        self._dates = self.app.archives()
+        if not self._dates:
+            return
+        self.search_entry.set_sensitive(True)
+        adjustment = self.date_scroll.get_vadjustment()
+        offset = adjustment.get_value()
+        focus = self.get_focus()
+        focus_in_dates = focus is not None and focus.is_ancestor(self.date_list)
+        # Reselects the shown date when it survives the filter, so
+        # _on_row_selected sees the same date and leaves the content alone.
+        self._apply_filter()
+        if focus_in_dates and (row := self.date_list.get_selected_row()):
+            # The focused row was destroyed with the old list; without this
+            # GtkWindow would hand focus to the search entry.
+            row.grab_focus()
+
+        def restore_offset() -> bool:
+            adjustment.set_value(offset)
+            return GLib.SOURCE_REMOVE
+
+        GLib.idle_add(restore_offset)
 
     def _on_row_selected(
         self, _list_box: Gtk.ListBox, row: Gtk.ListBoxRow | None

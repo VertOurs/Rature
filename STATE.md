@@ -19,7 +19,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `build-aux/aur/fill_checksum.py`) : les fichiers du dépôt gardent
   `SKIP`, les copies remplies sont jointes à la release dans
   `rature-aur.tar.gz`. Non encore exercé sur un vrai tag : à vérifier
-  au prochain (`2.2.0`), un tag antérieur saute le job. Sauvegarde avant migration livrée
+  au prochain (`2.2.0`), un tag antérieur saute le job. Fenêtre Archives
+  rafraîchie au passage du jour (§3.5) : date affichée et recherche
+  conservées, vérifiée par un script qui pilote la vraie fenêtre sous
+  horloge simulée (17 contrôles, 10 en échec sans le correctif),
+  contrôlée visuellement par VertOurs le 30 octobre 2026. Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le

@@ -899,6 +899,18 @@ Fenêtre distincte, ouverte depuis le menu principal, en lecture seule.
   empêcher de consulter les autres dates.
 - Aucune archive : `AdwStatusPage`, texte en §3.8.
 
+**Rafraîchissement.** Ajouté au chantier 9. Une fenêtre d'archives
+ouverte se met à jour quand le passage du jour archive une journée,
+détecté par la minuterie de §3.1, comme la fenêtre Statistiques (§3.14) :
+la nouvelle date apparaît en tête de la liste. La date affichée reste
+sélectionnée et son contenu ne bouge pas. Une recherche en cours est
+conservée : la nouvelle date n'apparaît que si elle y répond (§3.13). Une
+fenêtre qui affichait `No archived days.` passe à la liste, la nouvelle
+date sélectionnée, et le champ de recherche devient utilisable. Rien
+n'attire l'attention sur le changement : ni mise en évidence de la
+nouvelle date, ni sélection déplacée, ni retour en haut du défilement, ni
+fenêtre ramenée au premier plan.
+
 La recherche dans les archives est spécifiée en §3.13.
 
 ---
