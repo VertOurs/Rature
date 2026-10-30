@@ -432,7 +432,7 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 - [x] `release.yml` : refuser, avant le build, toute entrée qui n'est pas
       un tag existant au format `vX.Y.Z`
 - [ ] `SECURITY.md` : contact, délai de réponse, versions supportées
-- [ ] Dépendances de développement en versions exactes, écosystème `pip`
+- [x] Dépendances de développement en versions exactes, écosystème `pip`
       dans `dependabot.yml`
 - [x] Règles ruff `S` (bandit) activées ; l'`assert` de
       `recurring_form.py` devient un `if`/`raise`
