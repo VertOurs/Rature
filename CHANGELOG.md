@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Before its data format is migrated, the data file is kept as it was in
+  `data.json.v<N>.bak`, next to it in the data folder, `N` being its old
+  version. An existing backup is never overwritten, and Rature never
+  deletes it.
+
 ## [2.0.0] - 2026-10-29
 
 Version 2: chantier 8 closes with five more interface languages, after
