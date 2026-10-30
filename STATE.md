@@ -13,7 +13,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   au logger, booléens de priorité et de date en paramètres nommés
   (règle ruff `FBT` activée), règles ruff `S` activées, `release.yml` refuse toute entrée qui n'est
   pas un tag `vX.Y.Z` existant, dépendances de développement en versions
-  exactes suivies par Dependabot `pip` (30 octobre 2026).
+  exactes suivies par Dependabot `pip`, `SECURITY.md` (signalement privé
+  GitHub, accusé de réception sous sept jours, dernière version seule)
+  (30 octobre 2026).
   **Contrôle visuel en attente** (PR #187) : marquer puis démarquer une
   tâche prioritaire dans Jour, Demain et Réserve, avant la prochaine
   version. `mypy` et `gtk4-broadwayd` validés comme
