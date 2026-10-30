@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-30
+
+First release of chantier 9 (cleanup and hardening): your data is kept
+before a format migration, and an unusable data folder is reported
+instead of failing silently. No change to the data format.
+
 ### Added
 
 - Before its data format is migrated, the data file is kept as it was in
@@ -16,6 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When the data folder cannot be used at startup (no permission, full or
   read-only disk), Rature shows an alert with the folder's path and quits,
   instead of failing without a word. Translated in every language.
+
+### Security
+
+- A security policy (`SECURITY.md`): report vulnerabilities privately
+  through GitHub, with an acknowledgement within seven days. Only the
+  latest release is supported.
+- The release workflow only builds and signs an existing `vX.Y.Z` tag,
+  never a branch or a bare commit.
 
 ## [2.0.0] - 2026-10-29
 
@@ -524,7 +538,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/VertOurs/Rature/releases/tag/v2.1.0
 [2.0.0]: https://github.com/VertOurs/Rature/releases/tag/v2.0.0
 [1.9.0]: https://github.com/VertOurs/Rature/releases/tag/v1.9.0
 [1.8.0]: https://github.com/VertOurs/Rature/releases/tag/v1.8.0

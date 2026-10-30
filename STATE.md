@@ -20,9 +20,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
   30 octobre 2026. Les deux cases ensemble donnent `2.1.0`.
-  **Contrôle visuel en attente** (PR #187) : marquer puis démarquer une
-  tâche prioritaire dans Jour, Demain et Réserve, avant la prochaine
-  version. `mypy` et `gtk4-broadwayd` validés comme
+  Priorité (PR #187) contrôlée visuellement par VertOurs dans Jour,
+  Demain et Réserve le 30 octobre 2026. `mypy` et `gtk4-broadwayd` validés comme
   outils de CI (`CLAUDE.md` §4 règle 6). Chantier 8 terminé le
   29 octobre 2026, `2.0.0` publiée (ci-dessous).
 - **Pour toute nouvelle langue** : l'ajouter à `po/LINGUAS`, créer le
@@ -114,7 +113,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `2.0.0` | Clôture de la v2 (chantiers 6 à 8) : cinq catalogues en traduction machine et correctifs de dates, sans changement de format. Coupée le 29 octobre 2026 |
+| Version du projet | `2.1.0` | Première version du chantier 9 : sauvegarde avant migration et alerte sur dossier de données inutilisable, sans changement de format. Préparée le 30 octobre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -176,6 +175,12 @@ Corrective : aucune fonctionnalité, aucun changement de format.
 #165), et le format de données version 4. Mineure pour la même raison
 que `1.6.0`. Un fichier écrit en version 4 n'est plus lisible par
 `1.7.1` et antérieures. Clôt le chantier 7.
+
+`2.1.0` (30 octobre 2026) publie la sauvegarde avant migration (PR #196)
+et l'alerte sur dossier de données inutilisable au démarrage (PR #197),
+plus la politique de sécurité et la garde de `release.yml`. Mineure,
+aucun changement de format. Tag, run `release.yml` et suivi PKGBUILD à
+venir après fusion de la PR de release.
 
 `1.9.0` (25 octobre 2026) publie les noms accessibles (PR #170) et la
 fenêtre Statistiques rafraîchie au passage du jour (PR #171). Mineure,
