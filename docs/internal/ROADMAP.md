@@ -491,8 +491,10 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       de VertOurs le 30 octobre 2026
 - [x] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
       (`CLAUDE.md`, `CONTRIBUTING.md`, `ROADMAP.md`). Le 30 octobre 2026 ;
-      `CONTRIBUTING.md` n'y renvoyait pas, mais les workflows, l'icône,
-      l'ADR 0005 et `CHANTIER-0.md` si
+      `CONTRIBUTING.md` n'y renvoyait pas, mais les workflows, l'ADR 0005
+      et `CHANTIER-0.md` si. Le commentaire de l'icône SVG perd son renvoi :
+      allongé, il faisait échouer `appstreamcli compose`
+      (`icon-file-read-error`), cause exacte non élucidée
 - [x] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
       majeures pilotées par la roadmap). Le 30 octobre 2026
 - [ ] Captures d'écran Demain et Réserve (VertOurs)
