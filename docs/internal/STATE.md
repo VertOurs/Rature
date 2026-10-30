@@ -19,7 +19,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `build-aux/aur/fill_checksum.py`) : les fichiers du dépôt gardent
   `SKIP`, les copies remplies sont jointes à la release dans
   `rature-aur.tar.gz`. Non encore exercé sur un vrai tag : à vérifier
-  au prochain (`2.2.0`), un tag antérieur saute le job. Fenêtre Archives
+  au prochain (`2.1.1`), un tag antérieur saute le job. Fenêtre Archives
   rafraîchie au passage du jour (§3.5) : date affichée et recherche
   conservées, vérifiée par un script qui pilote la vraie fenêtre sous
   horloge simulée (17 contrôles, 10 en échec sans le correctif),
@@ -42,7 +42,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `pytest --cov`), `STATE.md` déplacé ici, en-tête du CHANGELOG aligné
   sur `CONTRIBUTING.md`. Captures Demain et Réserve ajoutées (README,
   page de présentation, metainfo, légendes dans les six catalogues).
-  Chantier 9 : toutes les cases cochées, `2.2.0` à couper. Sauvegarde avant migration livrée
+  Chantier 9 : toutes les cases cochées, clos par `2.1.1` (corrective :
+  un seul `fix` depuis `2.1.0`, aucun `feat`). Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
