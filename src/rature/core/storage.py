@@ -118,8 +118,44 @@ def main_file_path(*, data_dir: Path | None = None) -> Path:
 
 def load(*, data_dir: Path | None = None) -> Store:
     path = main_file_path(data_dir=data_dir)
-    raw = migrate(json.loads(path.read_text(encoding="utf-8")))
-    return Store.from_dict(raw)
+    original = path.read_bytes()
+    raw = json.loads(original.decode("utf-8"))
+    store = Store.from_dict(migrate(raw))
+    # migrate has validated raw: a dict with an int version.
+    if raw["version"] < CURRENT_VERSION:
+        _back_up_before_migration(path, original, raw["version"])
+    return store
+
+
+def _back_up_before_migration(path: Path, original: bytes, version: int) -> None:
+    """Copy the on-disk file to data.json.v<N>.bak, SPECIFICATION.md §2.7.10.
+
+    os.link never overwrites: an existing backup, the true original, is
+    kept, and an interrupted copy leaves no truncated backup behind.
+    """
+    backup = path.with_name(f"{path.name}.v{version}.bak")
+    if backup.exists():
+        return
+    tmp = path.with_name(f".{backup.name}.{os.getpid()}.tmp")
+    try:
+        with open(tmp, "wb", opener=_open_private) as handle:
+            handle.write(original)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.link(tmp, backup)
+    except FileExistsError:
+        return
+    except OSError:
+        _logger.error("failed to back up %s before migration", path)
+        raise
+    finally:
+        tmp.unlink(missing_ok=True)
+    dir_fd = os.open(path.parent, os.O_RDONLY)
+    try:
+        os.fsync(dir_fd)
+    finally:
+        os.close(dir_fd)
+    _logger.info("backed up the data file before migration: %s", backup)
 
 
 def save(store: Store, *, data_dir: Path | None = None) -> None:
