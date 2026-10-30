@@ -12,6 +12,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
+from typing import Any
 
 from rature.core.migrations import CURRENT_VERSION, migrate
 from rature.core.models import PreparedTask, RecurringItem, ReserveItem
@@ -39,7 +40,7 @@ class Store:
     tomorrow: list[PreparedTask] = field(default_factory=list)
     recurring: list[RecurringItem] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "version": FILE_VERSION,
             **self.day.to_dict(),
@@ -49,7 +50,7 @@ class Store:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> Store:
+    def from_dict(cls, data: dict[str, Any]) -> Store:
         return cls(
             day=Day.from_dict(data),
             reserve=[ReserveItem.from_dict(item) for item in data.get("reserve", [])],
@@ -86,7 +87,7 @@ def _open_private(path: str, flags: int) -> int:
     return os.open(path, flags, 0o600)
 
 
-def _atomic_write_json(path: Path, obj: dict) -> None:
+def _atomic_write_json(path: Path, obj: dict[str, Any]) -> None:
     # docs/adr/0003-single-json-file.md: temp file in the same directory,
     # flush, fsync the file, replace, then fsync the directory.
     tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")

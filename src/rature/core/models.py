@@ -8,6 +8,7 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from typing import Any
 from uuid import uuid4
 
 
@@ -35,7 +36,7 @@ class ReserveSource:
     created: date
 
 
-def _source_to_dict(source: ReserveSource | None) -> dict:
+def _source_to_dict(source: ReserveSource | None) -> dict[str, Any]:
     # Serialised as two flat keys, the format since version 1: grouping the
     # fields in memory changes nothing on disk, so no migration.
     return {
@@ -44,7 +45,7 @@ def _source_to_dict(source: ReserveSource | None) -> dict:
     }
 
 
-def _source_from_dict(data: dict) -> ReserveSource | None:
+def _source_from_dict(data: dict[str, Any]) -> ReserveSource | None:
     source_id, created = data["source_id"], data["source_created"]
     if source_id is None and created is None:
         return None
@@ -90,7 +91,7 @@ class Task:
         """
         return not self.done and self.origin != Origin.RECURRING
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "num": self.num,
@@ -104,7 +105,7 @@ class Task:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> Task:
+    def from_dict(cls, data: dict[str, Any]) -> Task:
         done_at = data["done_at"]
         return cls(
             id=data["id"],
@@ -140,7 +141,7 @@ class PreparedTask:
             raise ValueError("a prepared task cannot come from a recurring template")
         _check_source(self.origin, self.source)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "text": self.text,
@@ -150,7 +151,7 @@ class PreparedTask:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> PreparedTask:
+    def from_dict(cls, data: dict[str, Any]) -> PreparedTask:
         return cls(
             id=data["id"],
             text=data["text"],
@@ -169,7 +170,7 @@ class ReserveItem:
     id: str = field(default_factory=_new_id)
     priority: bool = False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "text": self.text,
@@ -178,7 +179,7 @@ class ReserveItem:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> ReserveItem:
+    def from_dict(cls, data: dict[str, Any]) -> ReserveItem:
         return cls(
             id=data["id"],
             text=data["text"],
@@ -210,7 +211,7 @@ class RecurringItem:
         if start is not None and start.weekday() != 0:
             raise ValueError("every_other_week_from must be a Monday")
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         start = self.every_other_week_from
         return {
             "id": self.id,
@@ -220,7 +221,7 @@ class RecurringItem:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> RecurringItem:
+    def from_dict(cls, data: dict[str, Any]) -> RecurringItem:
         start = data["every_other_week_from"]
         return cls(
             id=data["id"],
@@ -257,7 +258,7 @@ class Deletion:
         if self.done != (self.done_at is not None):
             raise ValueError("done and done_at must agree")
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "num": self.num,
@@ -273,7 +274,7 @@ class Deletion:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> Deletion:
+    def from_dict(cls, data: dict[str, Any]) -> Deletion:
         done_at = data["done_at"]
         return cls(
             id=data["id"],

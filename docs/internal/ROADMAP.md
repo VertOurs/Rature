@@ -446,7 +446,9 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       seulement si `origin` vaut `reserve` », déjà écrit dans
       `ARCHITECTURE.md`, est désormais vérifié dans les deux sens. Le
       30 octobre 2026
-- [ ] `mypy --strict` sur `rature.core` en CI, vert
+- [x] `mypy --strict` sur `rature.core` en CI, vert. mypy `2.4.1` épinglé,
+      lancé dans le job `lint`, configuration dans `pyproject.toml`. Le
+      30 octobre 2026
 - [x] Renvois « ADR 0007 addendum » corrigés en ADR 0003 (`storage.py`
       trois fois, `app.py` une fois)
 - [x] Commentaires périmés : `models.py` (« milestone 4's undo »),
