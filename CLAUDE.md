@@ -10,7 +10,7 @@ Document de cadrage à l'usage de Claude. Lu automatiquement en mode agent.
 
 1. ce fichier
 2. `docs/internal/SPECIFICATION.md`, la spécification produit
-3. `STATE.md`, l'état courant
+3. `docs/internal/STATE.md`, l'état courant
 
 ---
 
@@ -153,7 +153,7 @@ négociables.
    supposer. Ne jamais recréer un fichier qui existe.
 5. **Ne jamais toucher aux données de l'utilisateur** dans
    `~/.var/app/` ou `~/.local/share/` sans demande explicite.
-6. **Tenir `STATE.md` à jour** en fin de session.
+6. **Tenir `docs/internal/STATE.md` à jour** en fin de session.
 
 ---
 
@@ -257,4 +257,4 @@ lancement côté utilisateur : `README.md`.
 
 ## 12. État courant
 
-Voir `STATE.md`, mis à jour en fin de chaque session.
+Voir `docs/internal/STATE.md`, mis à jour en fin de chaque session.

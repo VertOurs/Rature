@@ -3,7 +3,11 @@
 All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
+with one exception: major versions close the project's milestones rather
+than follow every breaking change. A data format change that older
+versions cannot read therefore shipped as a minor release (`1.6.0` to
+`1.8.0`). See "Versioning" in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## [Unreleased]
 

@@ -37,7 +37,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   30 octobre 2026, après deux passages verts. Base commune aux lignes
   `EditableRow` (`editable_row.py`) : les trois templates la nomment
   comme parent (`RatureEditableRow`). 27 tests d'interface. Contrôle
-  visuel du glisser-déposer validé par VertOurs avant fusion. Sauvegarde avant migration livrée
+  visuel du glisser-déposer validé par VertOurs avant fusion. Vitrine :
+  README (« Status » en deux lignes, section « Engineering »,
+  `pytest --cov`), `STATE.md` déplacé ici, en-tête du CHANGELOG aligné
+  sur `CONTRIBUTING.md`. Restent les captures Demain et Réserve
+  (VertOurs). Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le

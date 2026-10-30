@@ -6,7 +6,7 @@ est abandonné, voir `docs/adr/0004-abandon-the-prototype.md`.
 Chaque chantier a un critère de fin. On ne passe pas au suivant tant qu'il
 n'est pas atteint.
 
-> **L'avancement réel vit dans `STATE.md`.** Les cases à cocher de ce
+> **L'avancement réel vit dans `docs/internal/STATE.md`.** Les cases à cocher de ce
 > document décrivent le périmètre de chaque chantier, pas son état.
 
 ---
@@ -489,10 +489,14 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       signés, lien vers les ADR) ; `pytest --cov` dans « Run the checks »
 - [x] Langue des ADR : traduites en anglais, fichiers renommés, décision
       de VertOurs le 30 octobre 2026
-- [ ] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
-      (`CLAUDE.md`, `CONTRIBUTING.md`, `ROADMAP.md`)
-- [ ] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
-      majeures pilotées par la roadmap)
+- [x] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
+      (`CLAUDE.md`, `CONTRIBUTING.md`, `ROADMAP.md`). Le 30 octobre 2026 ;
+      `CONTRIBUTING.md` n'y renvoyait pas, mais les workflows, l'ADR 0005
+      et `CHANTIER-0.md` si. Le commentaire de l'icône SVG perd son renvoi :
+      allongé, il faisait échouer `appstreamcli compose`
+      (`icon-file-read-error`), cause exacte non élucidée
+- [x] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
+      majeures pilotées par la roadmap). Le 30 octobre 2026
 - [ ] Captures d'écran Demain et Réserve (VertOurs)
 
 Au fil de l'eau, hors critère : élaguer les docstrings longues quand on

@@ -101,24 +101,30 @@ submitted. Flathub is deliberately not a target
 
 ## Status
 
-Built from a written specification. Version 1 (`1.0.0`) is complete and
-installable from the self-hosted Flatpak repository above: the business
-logic, the Day, Reserve and Recurring views, the Archives and Statistics
-windows, keyboard shortcuts, plain-text export, a full French
-translation, and self-updating publication.
+Version 2 is complete, in daily use, and updates itself from the repository
+above. Version 3 is under way; [CHANGELOG.md](CHANGELOG.md) lists every release.
 
-Version 2 (`2.0.0`) is complete. Milestone 6 (`1.1.0`): structured
-logging, native packaging prepared for AUR/COPR/Mageia (submission still
-pending), and this refreshed README and project page. Milestone 7
-(capture and reserve): sending a task back to the reserve
-(`1.4.0`), reordering the reserve (`1.5.0`), recurring tasks every two
-weeks (`1.6.0`), priority markers (`1.7.0`), and a Tomorrow view to
-prepare the next day's list (`1.8.0`). Capture from a synced folder
-shipped in `1.2.0` and was withdrawn in `1.3.0`; phone sync is postponed
-indefinitely. Milestone 8 (comfort and languages): accessible names on
-icon-only buttons and a Statistics window that follows the day rollover
-(`1.9.0`), then Spanish, German, Brazilian Portuguese, Russian and
-Esperanto machine translations (`2.0.0`).
+## Engineering
+
+- **Business logic apart from the interface.** `core/` never imports GTK,
+  and a test fails if it does
+  ([ADR 0002](docs/adr/0002-core-ui-separation.md)). It is type-checked
+  with `mypy --strict` and covered at 100%, branches included.
+- **Interface tested on real widgets.** The UI tests drive the installed
+  application under `gtk4-broadwayd`, inside the GNOME SDK it ships on,
+  with any GTK critical failing the run.
+- **Data that survives a crash.** One JSON file, written atomically: temp
+  file, `fsync`, rename, then `fsync` of the folder
+  ([ADR 0003](docs/adr/0003-single-json-file.md)).
+- **A versioned format.** Each migration is tested on crafted files, the
+  data file is backed up before one runs, and a file written by a newer
+  version is refused rather than overwritten.
+- **Signed releases.** The Flatpak repository and every release tag are
+  GPG-signed, and every commit on `main` since the first pull request
+  carries a verified signature.
+- **A pinned CI.** Actions by commit hash and development tools by exact
+  version, both bumped by Dependabot; the container image by digest,
+  bumped by hand.
 
 Built with AI assistance (Claude Code); I write the specification,
 review every change, and merge it.
@@ -142,7 +148,12 @@ Run the checks:
 
 ```
 meson test -C build
+pip install --group dev   # pip 25.1 or newer
+pytest --cov
 ```
+
+The full list, lint and UI tests included, is in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Flatpak
 
