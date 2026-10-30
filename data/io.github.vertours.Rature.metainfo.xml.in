@@ -65,6 +65,16 @@
   </screenshots>
 
   <releases>
+    <release version="2.1.0" date="2026-10-30">
+      <description>
+        <p>
+          Rature 2.1. Before a data format update, your data file is now
+          kept as it was, next to it in the data folder. If the data folder
+          cannot be used at startup, Rature says so and shows where it is,
+          instead of closing without a word. No change to the data format.
+        </p>
+      </description>
+    </release>
     <release version="2.0.0" date="2026-10-29">
       <description>
         <p>
