@@ -263,7 +263,7 @@ def test_a_prepared_task_keeps_its_id_origin_link_and_priority() -> None:
     session = session_on(D24)
     item = session.add_to_reserve("someday", today=date(2026, 8, 20))
     prepared = session.move_reserve_to_tomorrow(item.id)
-    session.set_tomorrow_priority(prepared.id, True)
+    session.set_tomorrow_priority(prepared.id, priority=True)
     session.roll_over(NEXT_MORNING)
     (task,) = session.day.tasks
     assert (task.id, task.origin, task.source_id, task.source_created) == (

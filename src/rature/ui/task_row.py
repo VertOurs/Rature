@@ -148,8 +148,12 @@ class TaskRow(Gtk.ListBoxRow):
         self.add_css_class("rature-drag-source")
         source.set_icon(Gtk.WidgetPaintable.new(self), 0, 0)
 
+    # GTK's drag-end signal passes delete_data positionally.
     def _on_drag_end(
-        self, _source: Gtk.DragSource, _drag: Gdk.Drag, _delete: bool
+        self,
+        _source: Gtk.DragSource,
+        _drag: Gdk.Drag,
+        _delete: bool,  # noqa: FBT001
     ) -> None:
         TaskRow._dragged = None
         self.remove_css_class("rature-drag-source")
@@ -209,7 +213,7 @@ class TaskRow(Gtk.ListBoxRow):
         # (SPECIFICATION.md §3.2).
         self.row_popover.popdown()
         self.run_action(
-            lambda: self.app.set_priority(self.task.id, not self.task.priority)
+            lambda: self.app.set_priority(self.task.id, priority=not self.task.priority)
         )
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:

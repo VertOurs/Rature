@@ -448,7 +448,7 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       manifeste Flatpak (« one translation »)
 - [x] `window._perform` : `_logger.exception` au lieu de
       `traceback.print_exc`
-- [ ] Booléens positionnels passés en paramètres nommés (`set_priority`
+- [x] Booléens positionnels passés en paramètres nommés (`set_priority`
       et voisins)
 
 ### Maintenabilité

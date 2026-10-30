@@ -548,7 +548,7 @@ def test_tomorrow_wrappers_persist(tmp_path: Path) -> None:
     first = app.add_to_tomorrow("draft")
     second = app.add_to_tomorrow("second")
     app.rename_tomorrow(first.id, "final")
-    app.set_tomorrow_priority(first.id, True)
+    app.set_tomorrow_priority(first.id, priority=True)
     app.move_tomorrow_before(second.id, first.id)
     reloaded = load(data_dir=tmp_path).into_session()
     assert [t.text for t in reloaded.tomorrow] == ["second", "final"]

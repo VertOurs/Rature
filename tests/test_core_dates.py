@@ -52,9 +52,9 @@ def test_without_a_matching_time_locale_the_source_format_is_kept(
     # October": the launcher turns the catalogue format off instead.
     monkeypatch.setattr(dates, "_", lambda message: "%A, %-d de %B")
     monkeypatch.setattr(dates, "_use_catalogue", True)
-    dates.use_catalogue_format(False)
+    dates.use_catalogue_format(enabled=False)
     assert long_date(date(2026, 10, 29)) == date(2026, 10, 29).strftime("%A %-d %B")
-    dates.use_catalogue_format(True)
+    dates.use_catalogue_format(enabled=True)
     assert long_date(date(2026, 10, 29)) == "Thursday, 29 de October"
 
 
@@ -68,5 +68,5 @@ def test_the_date_with_year_follows_the_catalogue_or_falls_back(
     monkeypatch.setattr(dates, "_", lambda message: "%-d de %B de %Y")
     monkeypatch.setattr(dates, "_use_catalogue", True)
     assert dates.date_with_year(date(2026, 10, 5)) == "5 de October de 2026"
-    dates.use_catalogue_format(False)
+    dates.use_catalogue_format(enabled=False)
     assert dates.date_with_year(date(2026, 10, 5)) == "5 October 2026"

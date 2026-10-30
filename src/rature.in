@@ -47,7 +47,7 @@ except locale.Error:
 # LC_TIME with the message language (SPECIFICATION.md §3.8). When no
 # matching locale is installed, the dates keep the source format rather
 # than mix the catalogue's words with names in another language.
-use_catalogue_format(align_time_locale(environ=os.environ) is not None)
+use_catalogue_format(enabled=align_time_locale(environ=os.environ) is not None)
 
 # Two text domains to bind, not one. gettext's own bindtextdomain/
 # textdomain back gettext.gettext, which every module reaches through

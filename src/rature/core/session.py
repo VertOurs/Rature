@@ -149,7 +149,7 @@ class Session:
     def rename(self, task_id: str, text: str) -> None:
         self._task(task_id).text = text
 
-    def set_priority(self, task_id: str, priority: bool) -> None:
+    def set_priority(self, task_id: str, *, priority: bool) -> None:
         """Mark or unmark a task. SPECIFICATION.md §2.5: a marker only.
 
         Never touches the order or the number. Allowed on a frozen list
@@ -247,7 +247,7 @@ class Session:
     def rename_reserve(self, item_id: str, text: str) -> None:
         self._reserve_item(item_id).text = text
 
-    def set_reserve_priority(self, item_id: str, priority: bool) -> None:
+    def set_reserve_priority(self, item_id: str, *, priority: bool) -> None:
         """Mark or unmark a reserve item; never moves it (§2.5)."""
         self._reserve_item(item_id).priority = priority
 
@@ -316,7 +316,7 @@ class Session:
     def rename_tomorrow(self, task_id: str, text: str) -> None:
         self._prepared(task_id).text = text
 
-    def set_tomorrow_priority(self, task_id: str, priority: bool) -> None:
+    def set_tomorrow_priority(self, task_id: str, *, priority: bool) -> None:
         """Mark or unmark a prepared task; never moves it (§2.5)."""
         self._prepared(task_id).priority = priority
 

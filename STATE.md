@@ -10,7 +10,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   30 octobre 2026 avec la planification de la v3 (chantiers 9, 10 et 11,
   `ROADMAP.md`). Fait : ADR traduites en anglais et renommées,
   renvois d'ADR et commentaires périmés corrigés, `window._perform` passé
-  au logger (30 octobre 2026). `mypy` et `gtk4-broadwayd` validés comme
+  au logger, booléens de priorité et de date en paramètres nommés
+  (30 octobre 2026). `mypy` et `gtk4-broadwayd` validés comme
   outils de CI (`CLAUDE.md` §4 règle 6). Chantier 8 terminé le
   29 octobre 2026, `2.0.0` publiée (ci-dessous).
 - **Pour toute nouvelle langue** : l'ajouter à `po/LINGUAS`, créer le

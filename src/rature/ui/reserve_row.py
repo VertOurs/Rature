@@ -125,8 +125,12 @@ class ReserveRow(Gtk.ListBoxRow):
         self.add_css_class("rature-drag-source")
         source.set_icon(Gtk.WidgetPaintable.new(self), 0, 0)
 
+    # GTK's drag-end signal passes delete_data positionally.
     def _on_drag_end(
-        self, _source: Gtk.DragSource, _drag: Gdk.Drag, _delete: bool
+        self,
+        _source: Gtk.DragSource,
+        _drag: Gdk.Drag,
+        _delete: bool,  # noqa: FBT001
     ) -> None:
         ReserveRow._dragged = None
         self.remove_css_class("rature-drag-source")
@@ -181,7 +185,9 @@ class ReserveRow(Gtk.ListBoxRow):
     def _on_priority_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
         self.run_action(
-            lambda: self.app.set_reserve_priority(self.item.id, not self.item.priority)
+            lambda: self.app.set_reserve_priority(
+                self.item.id, priority=not self.item.priority
+            )
         )
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:

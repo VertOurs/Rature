@@ -36,6 +36,7 @@ select = [
     "N",   # pep8-naming
     "UP",  # pyupgrade
     "B",   # flake8-bugbear
+    "FBT", # flake8-boolean-trap
     "SIM", # flake8-simplify
     "RUF", # ruff-specific rules
 ]
