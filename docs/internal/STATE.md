@@ -40,8 +40,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   visuel du glisser-déposer validé par VertOurs avant fusion. Vitrine :
   README (« Status » en deux lignes, section « Engineering »,
   `pytest --cov`), `STATE.md` déplacé ici, en-tête du CHANGELOG aligné
-  sur `CONTRIBUTING.md`. Restent les captures Demain et Réserve
-  (VertOurs). Sauvegarde avant migration livrée
+  sur `CONTRIBUTING.md`. Captures Demain et Réserve ajoutées (README,
+  page de présentation, metainfo, légendes dans les six catalogues).
+  Chantier 9 : toutes les cases cochées, `2.2.0` à couper. Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le

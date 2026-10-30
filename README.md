@@ -53,6 +53,8 @@ The method it reproduces:
 ## Screenshots
 
 ![The Day view](data/screenshots/day.png)
+![The Tomorrow view](data/screenshots/tomorrow.png)
+![The Reserve view](data/screenshots/reserve.png)
 ![The Recurring view](data/screenshots/recurring.png)
 ![The Archives window](data/screenshots/archives.png)
 ![The Statistics window](data/screenshots/statistics.png)
