@@ -203,6 +203,11 @@ Beyond the setup and pre-PR checks above:
 # [tool.coverage.run]. Enforced in CI.
 pytest --cov
 
+# UI tests (tests/ui/): real widgets under gtk4-broadwayd, inside the GNOME
+# SDK (flatpak install flathub org.gnome.Sdk//51). Skipped by plain pytest.
+flatpak run --share=network --filesystem="$PWD" --cwd="$PWD" \
+  --command=bash org.gnome.Sdk//51 build-aux/ui-tests.sh
+
 # Metadata (appstreamcli reads the source; desktop-file-validate needs the
 # merged .desktop, present after `meson compile`)
 appstreamcli validate data/io.github.vertours.Rature.metainfo.xml.in
