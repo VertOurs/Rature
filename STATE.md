@@ -28,8 +28,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `Deletion`) : fichier réécrit identique à l'octet près à celui de
   `main`, aucune migration. `mypy --strict` sur `rature.core` dans le
   job `lint` (mypy `2.4.1`, épinglé, suivi par Dependabot `pip`).
-  Tests d'interface : infrastructure et premier test (ajouter une tâche)
-  dans `tests/ui/`, lancés par `build-aux/ui-tests.sh` dans le SDK
+  Tests d'interface : dix tests dans `tests/ui/` (ajouter, rayer,
+  dérayer, renommer, glisser-déposer dans le jour et la réserve, refus
+  entre blocs et sur soi-même), lancés par `build-aux/ui-tests.sh` dans le SDK
   GNOME 51 sous `gtk4-broadwayd` (application installée, GSettings en
   mémoire, `G_DEBUG=fatal-criticals`), job CI `ui`. Sautés par `pytest`
   hors SDK. Le job `ui` n'est pas encore exigé par le ruleset `main`. Sauvegarde avant migration livrée

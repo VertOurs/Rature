@@ -460,12 +460,14 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 
 ### Maintenabilité
 
-- [ ] Tests d'interface réels sous `gtk4-broadwayd` en CI, sortis de
+- [x] Tests d'interface réels sous `gtk4-broadwayd` en CI, sortis de
       « Repoussé volontairement » : au moins ajouter, rayer, renommer, et
       le glisser-déposer dans le jour et la réserve. Infrastructure et
       premier test (ajouter) faits le 30 octobre 2026 : job CI `ui`,
-      `build-aux/ui-tests.sh` dans le SDK GNOME 51, `tests/ui/`. Restent
-      rayer, renommer et le glisser-déposer
+      `build-aux/ui-tests.sh` dans le SDK GNOME 51, `tests/ui/`. Rayer,
+      dérayer, renommer et le glisser-déposer (jour et réserve) le même
+      jour : broadway ne synthétise pas de geste de pointeur, le test joue
+      le `drag-begin` puis émet le vrai signal `drop` de la ligne cible
 - [ ] Ensuite seulement : base commune aux lignes `task_row`,
       `reserve_row` et `prepared_row` (glisser-déposer, renommage,
       priorité, suppression). Les différences voulues (`COPY` pour la
