@@ -16,8 +16,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   exactes suivies par Dependabot `pip`, `SECURITY.md` (signalement privé
   GitHub, accusé de réception sous sept jours, dernière version seule)
   (30 octobre 2026). Sauvegarde avant migration livrée
-  (`SPECIFICATION.md` §2.7.10, `storage.load`). Spécification écrite pour
-  l'`OSError` au démarrage (§3.6, situation 4), code à suivre.
+  (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
+  livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
+  Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
+  30 octobre 2026. Les deux cases ensemble donnent `2.1.0`.
   **Contrôle visuel en attente** (PR #187) : marquer puis démarquer une
   tâche prioritaire dans Jour, Demain et Réserve, avant la prochaine
   version. `mypy` et `gtk4-broadwayd` validés comme

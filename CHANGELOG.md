@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `data.json.v<N>.bak`, next to it in the data folder, `N` being its old
   version. An existing backup is never overwritten, and Rature never
   deletes it.
+- When the data folder cannot be used at startup (no permission, full or
+  read-only disk), Rature shows an alert with the folder's path and quits,
+  instead of failing without a word. Translated in every language.
 
 ## [2.0.0] - 2026-10-29
 
