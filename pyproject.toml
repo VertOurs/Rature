@@ -15,11 +15,13 @@ license = "GPL-3.0-or-later"
 authors = [{ name = "VertOurs", email = "vertours.dev@gmail.com" }]
 
 # PEP 735. Install with `pip install --group dev` (pip 25.1+).
+# Exact versions: CI and every contributor run the same linter and test
+# runner. Dependabot proposes the bumps (.github/dependabot.yml).
 [dependency-groups]
 dev = [
-    "ruff>=0.16",
-    "pytest>=8.0",
-    "pytest-cov>=6.0",
+    "ruff==0.17.3",
+    "pytest==9.2.0",
+    "pytest-cov==7.1.0",
 ]
 
 [tool.ruff]
