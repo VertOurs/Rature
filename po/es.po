@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-29 17:09+0100\n"
+"POT-Creation-Date: 2026-10-30 13:11+0100\n"
 "PO-Revision-Date: 2026-10-29 12:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Spanish\n"
@@ -545,7 +545,7 @@ msgstr "Total"
 msgid "General"
 msgstr "General"
 
-#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:87
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:105
 msgid "Quit"
 msgstr "Salir"
 
@@ -607,16 +607,27 @@ msgstr "%A, %-d de %B"
 msgid "%-d %B %Y"
 msgstr "%-d de %B de %Y"
 
-#: src/rature/ui/application.py:82
+#: src/rature/ui/application.py:69
 msgid "This file was saved by a newer version of Rature."
 msgstr "Este archivo fue guardado por una versión más reciente de Rature."
 
-#: src/rature/ui/application.py:84
+#: src/rature/ui/application.py:71
 #, python-format
 msgid "Opening it could overwrite data. Update Rature to open this file: %s"
 msgstr ""
 "Abrirlo podría sobrescribir datos. Actualice Rature para abrir este archivo: "
 "%s"
+
+#: src/rature/ui/application.py:82
+msgid "Rature could not use its data folder."
+msgstr "Rature no pudo usar su carpeta de datos."
+
+#: src/rature/ui/application.py:84
+#, python-format
+msgid ""
+"Check that this folder can be read and written, and that the disk is not "
+"full: %s"
+msgstr "Compruebe que esta carpeta se puede leer y escribir, y que el disco no está lleno: %s"
 
 #: src/rature/ui/day_view.py:106
 msgid "Unfreeze the list"
@@ -656,19 +667,19 @@ msgstr "Deshacer el tachado"
 msgid "Strike through"
 msgstr "Tachar"
 
-#: src/rature/ui/window.py:400
+#: src/rature/ui/window.py:401
 msgid "Changes could not be saved to disk."
 msgstr "No se pudieron guardar los cambios en el disco."
 
-#: src/rature/ui/window.py:408
+#: src/rature/ui/window.py:409
 #, python-format
 msgid "The data file could not be read. It was moved aside as %s."
 msgstr "No se pudo leer el archivo de datos. Se ha apartado con el nombre %s."
 
-#: src/rature/ui/window.py:411 src/rature/ui/window.py:417
+#: src/rature/ui/window.py:412 src/rature/ui/window.py:418
 msgid "Dismiss"
 msgstr "Descartar"
 
-#: src/rature/ui/window.py:415
+#: src/rature/ui/window.py:416
 msgid "A new day has started. The previous one has been archived."
 msgstr "Ha empezado un nuevo día. El anterior se ha archivado."
