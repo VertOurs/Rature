@@ -326,8 +326,8 @@ class App:
         self.session.rename(task_id, text)
         self._save()
 
-    def set_priority(self, task_id: str, priority: bool) -> None:
-        self.session.set_priority(task_id, priority)
+    def set_priority(self, task_id: str, *, priority: bool) -> None:
+        self.session.set_priority(task_id, priority=priority)
         self._save()
 
     def delete(self, task_id: str) -> None:
@@ -360,8 +360,8 @@ class App:
         self.session.rename_reserve(item_id, text)
         self._save()
 
-    def set_reserve_priority(self, item_id: str, priority: bool) -> None:
-        self.session.set_reserve_priority(item_id, priority)
+    def set_reserve_priority(self, item_id: str, *, priority: bool) -> None:
+        self.session.set_reserve_priority(item_id, priority=priority)
         self._save()
 
     def delete_from_reserve(self, item_id: str) -> None:
@@ -391,8 +391,8 @@ class App:
         self.session.rename_tomorrow(task_id, text)
         self._save()
 
-    def set_tomorrow_priority(self, task_id: str, priority: bool) -> None:
-        self.session.set_tomorrow_priority(task_id, priority)
+    def set_tomorrow_priority(self, task_id: str, *, priority: bool) -> None:
+        self.session.set_tomorrow_priority(task_id, priority=priority)
         self._save()
 
     def delete_from_tomorrow(self, task_id: str) -> None:

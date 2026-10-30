@@ -65,10 +65,10 @@ def test_set_tomorrow_priority_marks_and_unmarks_without_moving() -> None:
     session = make_session()
     first = session.add_to_tomorrow("first")
     second = session.add_to_tomorrow("second")
-    session.set_tomorrow_priority(second.id, True)
+    session.set_tomorrow_priority(second.id, priority=True)
     assert second.priority
     assert session.tomorrow == [first, second]
-    session.set_tomorrow_priority(second.id, False)
+    session.set_tomorrow_priority(second.id, priority=False)
     assert not second.priority
 
 
@@ -93,7 +93,7 @@ def test_move_tomorrow_before_reorders_with_move_before_rule() -> None:
     "operation",
     [
         lambda s, i: s.rename_tomorrow(i, "x"),
-        lambda s, i: s.set_tomorrow_priority(i, True),
+        lambda s, i: s.set_tomorrow_priority(i, priority=True),
         lambda s, i: s.delete_from_tomorrow(i),
         lambda s, i: s.move_tomorrow_before(i, None),
     ],
@@ -108,7 +108,7 @@ def test_editing_tomorrow_is_allowed_on_a_frozen_day() -> None:
     a = session.add_to_tomorrow("a")
     b = session.add_to_tomorrow("b")
     session.rename_tomorrow(a.id, "a, renamed")
-    session.set_tomorrow_priority(a.id, True)
+    session.set_tomorrow_priority(a.id, priority=True)
     session.move_tomorrow_before(b.id, a.id)
     session.delete_from_tomorrow(a.id)
     assert session.tomorrow == [b]
@@ -121,7 +121,7 @@ def test_move_to_tomorrow_keeps_the_task_but_not_its_number() -> None:
     session = make_session()
     session.add("stays")
     task = session.add("later")
-    session.set_priority(task.id, True)
+    session.set_priority(task.id, priority=True)
     prepared = session.move_to_tomorrow(task.id)
     assert session.tomorrow == [prepared]
     assert (prepared.id, prepared.text, prepared.origin) == (
@@ -194,7 +194,7 @@ def test_move_to_tomorrow_is_allowed_on_a_frozen_list() -> None:
 def test_move_reserve_to_tomorrow_is_a_move_with_a_link_back() -> None:
     session = make_session()
     item = session.add_to_reserve("someday", today=date(2026, 8, 20))
-    session.set_reserve_priority(item.id, True)
+    session.set_reserve_priority(item.id, priority=True)
     prepared = session.move_reserve_to_tomorrow(item.id)
     assert session.reserve == []
     assert session.tomorrow == [prepared]
@@ -226,7 +226,7 @@ def test_move_to_today_gives_the_next_number_at_the_end() -> None:
     session = make_session()
     session.add("first")
     prepared = session.add_to_tomorrow("prepared")
-    session.set_tomorrow_priority(prepared.id, True)
+    session.set_tomorrow_priority(prepared.id, priority=True)
     task = session.move_to_today(prepared.id)
     assert session.tomorrow == []
     assert session.day.tasks[-1] is task
@@ -282,7 +282,7 @@ def test_send_tomorrow_to_reserve_returns_a_drawn_item_as_it_was() -> None:
     item = session.add_to_reserve("someday", today=date(2026, 8, 20))
     prepared = session.move_reserve_to_tomorrow(item.id)
     session.rename_tomorrow(prepared.id, "someday, renamed")
-    session.set_tomorrow_priority(prepared.id, True)
+    session.set_tomorrow_priority(prepared.id, priority=True)
     back = session.send_tomorrow_to_reserve(prepared.id, today=TODAY)
     assert session.tomorrow == []
     assert session.reserve == [back]

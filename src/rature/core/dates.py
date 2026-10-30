@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 _use_catalogue = True
 
 
-def use_catalogue_format(enabled: bool) -> None:
+def use_catalogue_format(*, enabled: bool) -> None:
     """Whether dates take their format from the catalogue.
 
     The launcher passes whether LC_TIME could follow the interface

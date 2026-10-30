@@ -209,7 +209,7 @@ class TaskRow(Gtk.ListBoxRow):
         # (SPECIFICATION.md §3.2).
         self.row_popover.popdown()
         self.run_action(
-            lambda: self.app.set_priority(self.task.id, not self.task.priority)
+            lambda: self.app.set_priority(self.task.id, priority=not self.task.priority)
         )
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:

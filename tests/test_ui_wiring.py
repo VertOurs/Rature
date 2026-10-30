@@ -308,13 +308,13 @@ def test_template_classes_point_to_existing_ui_with_matching_children() -> None:
 def _bad_core_imports(tree: ast.Module) -> list[str]:
     bad: list[str] = []
 
-    def visit(node: ast.AST, guarded: bool) -> None:
+    def visit(node: ast.AST, *, guarded: bool) -> None:
         for child in ast.iter_child_nodes(node):
             if isinstance(child, ast.If) and _is_type_checking(child.test):
                 for stmt in child.body:
-                    visit(stmt, True)
+                    visit(stmt, guarded=True)
                 for stmt in child.orelse:
-                    visit(stmt, guarded)
+                    visit(stmt, guarded=guarded)
                 continue
             if isinstance(child, ast.Import):
                 for alias in child.names:
@@ -325,9 +325,9 @@ def _bad_core_imports(tree: ast.Module) -> list[str]:
                 if module in CORE_MODULES and not guarded:
                     bad.append(module)
             else:
-                visit(child, guarded)
+                visit(child, guarded=guarded)
 
-    visit(tree, False)
+    visit(tree, guarded=False)
     return bad
 
 
@@ -454,5 +454,6 @@ def test_launcher_turns_the_catalogue_date_format_off_without_a_time_locale() ->
         and node.func.id == "use_catalogue_format"
     ]
     assert len(calls) == 1
-    (argument,) = calls[0].args
-    assert "align_time_locale" in ast.unparse(argument)
+    (keyword,) = calls[0].keywords
+    assert keyword.arg == "enabled"
+    assert "align_time_locale" in ast.unparse(keyword.value)

@@ -181,7 +181,9 @@ class ReserveRow(Gtk.ListBoxRow):
     def _on_priority_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
         self.run_action(
-            lambda: self.app.set_reserve_priority(self.item.id, not self.item.priority)
+            lambda: self.app.set_reserve_priority(
+                self.item.id, priority=not self.item.priority
+            )
         )
 
     def _on_rename_clicked(self, _button: Gtk.Button) -> None:
