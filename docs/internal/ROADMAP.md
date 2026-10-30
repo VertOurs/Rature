@@ -420,7 +420,7 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       une migration, copier `data.json` en `data.json.v<N>.bak` avant la
       première écriture, une seule fois. `SPECIFICATION.md` mis à jour
       avant le code
-- [ ] `OSError` au démarrage (permission, disque plein, quarantaine
+- [x] `OSError` au démarrage (permission, disque plein, quarantaine
       impossible) : `Gtk.AlertDialog` puis fermeture, sur le modèle de
       `FutureVersionError`. Quatrième cas ajouté à `SPECIFICATION.md` §3.6
 - [ ] Fenêtre Archives rafraîchie au passage du jour : ouverte pendant le
