@@ -2,29 +2,135 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The Day view, driven through its real widgets (SPECIFICATION.md §3.2)."""
 
-from ui_helpers import process_events
+from gi.repository import GObject
+from ui_helpers import drop, process_events, type_into
 
 from rature.core.app import App
 from rature.ui import list_helpers
+from rature.ui.task_row import TaskRow
 from rature.ui.window import RatureWindow
 
 
-def _row_texts(window: RatureWindow) -> list[str]:
-    return [row.task.text for row in list_helpers.rows(window.day_view.active_list)]
+def _rows(list_box) -> list[TaskRow]:
+    return list(list_helpers.rows(list_box))
+
+
+def _active(window: RatureWindow) -> list[TaskRow]:
+    return _rows(window.day_view.active_list)
+
+
+def _struck(window: RatureWindow) -> list[TaskRow]:
+    return _rows(window.day_view.struck_list)
+
+
+def _texts(rows: list[TaskRow]) -> list[str]:
+    return [row.task.text for row in rows]
+
+
+def _add(window: RatureWindow, *texts: str) -> None:
+    for text in texts:
+        type_into(window.day_view.entry, text)
+
+
+def _drop(source: TaskRow, target: TaskRow, *, upper_half: bool) -> bool:
+    value = GObject.Value(TaskRow.__gtype__, source)
+    return drop(TaskRow, source, target, value, upper_half=upper_half)
 
 
 def test_enter_in_the_entry_adds_a_task(window: RatureWindow, app: App) -> None:
     entry = window.day_view.entry
 
-    entry.set_text("buy bread")
-    entry.emit("activate")
-    process_events()
+    _add(window, "buy bread")
 
     assert [task.text for task in app.session.day.tasks] == ["buy bread"]
-    assert _row_texts(window) == ["buy bread"]
+    assert _texts(_active(window)) == ["buy bread"]
     assert window.day_view.stack.get_visible_child_name() == "tasks"
     # SPECIFICATION.md §3.2: the entry empties and keeps focus, so the next
     # task can be dictated straight away.
     assert entry.get_text() == ""
     assert window.get_focus() is not None
     assert window.get_focus().is_ancestor(entry)
+
+
+def test_the_strike_button_moves_the_task_to_the_struck_block(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread", "call the dentist")
+
+    _active(window)[0].strike_button.emit("clicked")
+    process_events()
+
+    assert [task.done for task in app.session.day.tasks] == [True, False]
+    (struck,) = _struck(window)
+    assert struck.task.text == "buy bread"
+    assert struck.text_label.has_css_class("rature-struck")
+    assert _texts(_active(window)) == ["call the dentist"]
+
+
+def test_the_strike_button_on_a_struck_task_undoes_the_strike(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread")
+    _active(window)[0].strike_button.emit("clicked")
+    process_events()
+
+    _struck(window)[0].strike_button.emit("clicked")
+    process_events()
+
+    assert not app.session.day.tasks[0].done
+    assert _struck(window) == []
+    assert _texts(_active(window)) == ["buy bread"]
+
+
+def test_rename_from_the_row_menu_commits_on_enter(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread")
+    row = _active(window)[0]
+
+    row.rename_button.emit("clicked")
+    process_events()
+    assert row.rename_entry.get_visible()
+    assert row.rename_entry.get_text() == "buy bread"
+    type_into(row.rename_entry, "buy rye bread")
+
+    assert app.session.day.tasks[0].text == "buy rye bread"
+    assert not row.rename_entry.get_visible()
+    assert row.text_label.get_label() == "buy rye bread"
+    # SPECIFICATION.md §2.4: a rename keeps the number.
+    assert app.session.day.tasks[0].num == 1
+
+
+def test_dropping_on_the_upper_half_of_a_row_moves_before_it(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "a", "b", "c")
+    first, _, last = _active(window)
+
+    assert _drop(last, first, upper_half=True)
+
+    assert [task.text for task in app.session.day.tasks] == ["c", "a", "b"]
+    assert _texts(_active(window)) == ["c", "a", "b"]
+    # SPECIFICATION.md §2.4: numbers are labels, a reorder never renumbers.
+    assert [row.task.num for row in _active(window)] == [3, 1, 2]
+
+
+def test_dropping_on_the_lower_half_of_a_row_moves_after_it(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "a", "b", "c")
+    first, middle, _ = _active(window)
+
+    assert _drop(first, middle, upper_half=False)
+
+    assert _texts(_active(window)) == ["b", "a", "c"]
+
+
+def test_a_drop_onto_the_other_block_is_refused(window: RatureWindow, app: App) -> None:
+    _add(window, "a", "b")
+    _active(window)[0].strike_button.emit("clicked")
+    process_events()
+
+    assert not _drop(_active(window)[0], _struck(window)[0], upper_half=True)
+
+    assert [task.text for task in app.session.day.tasks] == ["a", "b"]
