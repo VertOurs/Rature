@@ -6,11 +6,12 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : aucun. Chantier 8 terminé le 29 octobre 2026,
-  critère de fin atteint, `2.0.0` publiée (ci-dessous). Suites notées, hors critère : fenêtre
-  Archives rafraîchie au passage du jour (roadmap chantier 8), tests
-  d'interface sous `gtk4-broadwayd` (repoussés). Report automatique vers
-  Demain abandonné le 29 octobre 2026 (ADR 0008, addendum).
+- **Chantier en cours** : 9, propreté et solidité, ouvert le
+  30 octobre 2026 avec la planification de la v3 (chantiers 9, 10 et 11,
+  `ROADMAP.md`). Aucune case commencée. Première étape : trancher avec
+  VertOurs la langue des ADR. `mypy` et `gtk4-broadwayd` validés comme
+  outils de CI (`CLAUDE.md` §4 règle 6). Chantier 8 terminé le
+  29 octobre 2026, `2.0.0` publiée (ci-dessous).
 - **Pour toute nouvelle langue** : l'ajouter à `po/LINGUAS`, créer le
   `.po` (`msginit`) avant `meson setup --reconfigure build`, Meson ne
   suivant pas ce fichier. Traduire les deux formats de date
@@ -100,7 +101,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `1.9.0` | Noms accessibles (8.2) et Statistiques rafraîchies (8.3), sans changement de format. Coupée le 25 octobre 2026 |
+| Version du projet | `2.0.0` | Clôture de la v2 (chantiers 6 à 8) : cinq catalogues en traduction machine et correctifs de dates, sans changement de format. Coupée le 29 octobre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -303,3 +304,8 @@ cohérence de langue en §3.8 ajoutées au chantier 4, terminé.
 langues), qui closent sur `2.0.0`. `CONTRIBUTING.md` mis à jour en
 conséquence : les versions majeures sont désormais pilotées par les
 jalons de `ROADMAP.md`, qui prévaut sur les règles d'incrément générales.
+
+`ROADMAP.md` étendue à la v3 le 30 octobre 2026 : chantiers 9 (propreté
+et solidité), 10 (synchronisation entre appareils) et 11 (compagnon
+Android, Jour et Réserve), qui closent sur `3.0.0`. Todoist abandonné ;
+version mobile complète toujours écartée.
