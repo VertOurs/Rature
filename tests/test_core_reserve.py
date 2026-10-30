@@ -71,8 +71,8 @@ def test_draw_moves_the_item_into_the_day() -> None:
     assert session.day.tasks == [task]
     assert task.text == "do this"
     assert task.origin == Origin.RESERVE
-    assert task.source_id == item.id
-    assert task.source_created == item.created
+    assert task.source.id == item.id
+    assert task.source.created == item.created
 
 
 def test_draw_assigns_the_next_number() -> None:
@@ -97,7 +97,7 @@ def test_a_drawn_then_deleted_task_journals_its_source() -> None:
     item = session.add_to_reserve("regret", today=TODAY)
     task = session.draw_from_reserve(item.id)
     session.delete(task.id, now=STAMP)
-    assert session.day.deletions[0].source_id == item.id
+    assert session.day.deletions[0].source.id == item.id
 
 
 def test_send_to_reserve_returns_a_drawn_task_as_its_original_item() -> None:

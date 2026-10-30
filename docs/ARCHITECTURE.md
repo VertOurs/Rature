@@ -83,8 +83,9 @@ add, strike, unstrike, rename, delete, reorder, lock, send to the reserve,
 draw from the reserve, roll over to the next day.
 
 Drawing from the reserve is a move, never a copy. The item leaves the
-reserve and its id is kept in the created task's `source_id`, so an
-unfinished task can be put back at the next rollover.
+reserve and the created task keeps a `ReserveSource` (the item's id and
+creation date, one optional field in memory), so an unfinished task can be
+put back at the next rollover.
 
 Reads and writes no file. Takes and returns objects, and every operation
 that needs the time takes `now`/`today` as a parameter.
@@ -237,7 +238,7 @@ Task fields:
 | `num` | display label, immutable, independent of order |
 | `done_at` | local ISO timestamp of the strike, `null` otherwise. A strike records what was done; when matters too |
 | `origin` | `day`, `reserve` or `recurring` |
-| `source_id` | uuid of the originating reserve item, `null` otherwise. It, not the text, drives the return to the reserve. Non-null if and only if `origin` is `reserve`: `core/models.py` rejects a `reserve` task built without `source_id` |
+| `source_id` | uuid of the originating reserve item, `null` otherwise. It, not the text, drives the return to the reserve. Non-null if and only if `origin` is `reserve`: `core/models.py` rejects a task that breaks this either way, and a file holding only one of the two `source_` fields. In memory both form a single `ReserveSource` field; the two flat keys are only the file format |
 | `source_created` | `created` date of the originating reserve item, copied at draw time, `null` otherwise. Read back at rollover to restore the item with its original date. Same constraint as `source_id` |
 | `template_id` | uuid of the originating recurring template, `null` otherwise |
 | `priority` | a visual marker only, never an order or a number. Reserve items carry it too, and it moves with the task through draws, send-backs and the rollover, see `SPECIFICATION.md` §2.5 and §2.7.8 |

@@ -23,6 +23,43 @@ def _new_id() -> str:
     return str(uuid4())
 
 
+@dataclass(frozen=True, kw_only=True)
+class ReserveSource:
+    """The reserve item a task was drawn from, SPECIFICATION.md §2.5.
+
+    Both halves travel together: the id brings the original item back to
+    the reserve, the creation date keeps its age (§2.7.1).
+    """
+
+    id: str
+    created: date
+
+
+def _source_to_dict(source: ReserveSource | None) -> dict:
+    # Serialised as two flat keys, the format since version 1: grouping the
+    # fields in memory changes nothing on disk, so no migration.
+    return {
+        "source_id": source.id if source else None,
+        "source_created": source.created.isoformat() if source else None,
+    }
+
+
+def _source_from_dict(data: dict) -> ReserveSource | None:
+    source_id, created = data["source_id"], data["source_created"]
+    if source_id is None and created is None:
+        return None
+    if source_id is None or created is None:
+        raise ValueError("source_id and source_created go together")
+    return ReserveSource(id=source_id, created=date.fromisoformat(created))
+
+
+def _check_source(origin: Origin, source: ReserveSource | None) -> None:
+    if (origin == Origin.RESERVE) != (source is not None):
+        raise ValueError(
+            "a task has a reserve source exactly when it comes from the reserve"
+        )
+
+
 @dataclass(kw_only=True)
 class Task:
     """One entry in the day's numbered list."""
@@ -33,8 +70,7 @@ class Task:
     id: str = field(default_factory=_new_id)
     done: bool = False
     done_at: datetime | None = None
-    source_id: str | None = None
-    source_created: date | None = None
+    source: ReserveSource | None = None
     template_id: str | None = None
     priority: bool = False
 
@@ -43,12 +79,7 @@ class Task:
             raise ValueError("done_at must carry a UTC offset")
         if self.done != (self.done_at is not None):
             raise ValueError("done and done_at must agree")
-        if self.origin == Origin.RESERVE and (
-            self.source_id is None or self.source_created is None
-        ):
-            raise ValueError(
-                "a reserve-origin task needs both source_id and source_created"
-            )
+        _check_source(self.origin, self.source)
 
     @property
     def can_go_back_to_reserve(self) -> bool:
@@ -67,10 +98,7 @@ class Task:
             "done": self.done,
             "done_at": self.done_at.isoformat() if self.done_at else None,
             "origin": self.origin.value,
-            "source_id": self.source_id,
-            "source_created": (
-                self.source_created.isoformat() if self.source_created else None
-            ),
+            **_source_to_dict(self.source),
             "template_id": self.template_id,
             "priority": self.priority,
         }
@@ -78,7 +106,6 @@ class Task:
     @classmethod
     def from_dict(cls, data: dict) -> Task:
         done_at = data["done_at"]
-        source_created = data["source_created"]
         return cls(
             id=data["id"],
             num=data["num"],
@@ -86,10 +113,7 @@ class Task:
             done=data["done"],
             done_at=datetime.fromisoformat(done_at) if done_at else None,
             origin=Origin(data["origin"]),
-            source_id=data["source_id"],
-            source_created=(
-                date.fromisoformat(source_created) if source_created else None
-            ),
+            source=_source_from_dict(data),
             template_id=data["template_id"],
             priority=data["priority"],
         )
@@ -106,8 +130,7 @@ class PreparedTask:
     text: str
     origin: Origin
     id: str = field(default_factory=_new_id)
-    source_id: str | None = None
-    source_created: date | None = None
+    source: ReserveSource | None = None
     priority: bool = False
 
     def __post_init__(self) -> None:
@@ -115,36 +138,24 @@ class PreparedTask:
             # A recurring task never moves to Tomorrow; Tomorrow only shows
             # the templates due, read-only.
             raise ValueError("a prepared task cannot come from a recurring template")
-        if self.origin == Origin.RESERVE and (
-            self.source_id is None or self.source_created is None
-        ):
-            raise ValueError(
-                "a reserve-origin task needs both source_id and source_created"
-            )
+        _check_source(self.origin, self.source)
 
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "text": self.text,
             "origin": self.origin.value,
-            "source_id": self.source_id,
-            "source_created": (
-                self.source_created.isoformat() if self.source_created else None
-            ),
+            **_source_to_dict(self.source),
             "priority": self.priority,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> PreparedTask:
-        source_created = data["source_created"]
         return cls(
             id=data["id"],
             text=data["text"],
             origin=Origin(data["origin"]),
-            source_id=data["source_id"],
-            source_created=(
-                date.fromisoformat(source_created) if source_created else None
-            ),
+            source=_source_from_dict(data),
             priority=data["priority"],
         )
 
@@ -223,8 +234,8 @@ class RecurringItem:
 class Deletion:
     """A journal entry for a deleted task. Never shown, see ADR 0005.
 
-    Carries enough of the task's state (done, done_at, source_created,
-    template_id, priority, index) to restore it exactly when the deletion
+    Carries enough of the task's state (done, done_at, source, template_id,
+    priority, index) to restore it exactly when the deletion
     is undone.
     """
 
@@ -234,8 +245,7 @@ class Deletion:
     origin: Origin
     deleted_at: datetime
     index: int
-    source_id: str | None = None
-    source_created: date | None = None
+    source: ReserveSource | None = None
     template_id: str | None = None
     done: bool = False
     done_at: datetime | None = None
@@ -253,10 +263,7 @@ class Deletion:
             "num": self.num,
             "text": self.text,
             "origin": self.origin.value,
-            "source_id": self.source_id,
-            "source_created": (
-                self.source_created.isoformat() if self.source_created else None
-            ),
+            **_source_to_dict(self.source),
             "template_id": self.template_id,
             "done": self.done,
             "done_at": self.done_at.isoformat() if self.done_at else None,
@@ -268,16 +275,12 @@ class Deletion:
     @classmethod
     def from_dict(cls, data: dict) -> Deletion:
         done_at = data["done_at"]
-        source_created = data["source_created"]
         return cls(
             id=data["id"],
             num=data["num"],
             text=data["text"],
             origin=Origin(data["origin"]),
-            source_id=data["source_id"],
-            source_created=(
-                date.fromisoformat(source_created) if source_created else None
-            ),
+            source=_source_from_dict(data),
             template_id=data["template_id"],
             done=data["done"],
             done_at=datetime.fromisoformat(done_at) if done_at else None,

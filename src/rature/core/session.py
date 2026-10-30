@@ -14,6 +14,7 @@ from rature.core.models import (
     PreparedTask,
     RecurringItem,
     ReserveItem,
+    ReserveSource,
     Task,
 )
 from rature.core.recurrence import Cadence, due_on, start_monday
@@ -166,8 +167,7 @@ class Session:
                 num=task.num,
                 text=task.text,
                 origin=task.origin,
-                source_id=task.source_id,
-                source_created=task.source_created,
+                source=task.source,
                 template_id=task.template_id,
                 done=task.done,
                 done_at=task.done_at,
@@ -198,8 +198,7 @@ class Session:
             origin=entry.origin,
             done=entry.done,
             done_at=entry.done_at,
-            source_id=entry.source_id,
-            source_created=entry.source_created,
+            source=entry.source,
             template_id=entry.template_id,
             priority=entry.priority,
         )
@@ -267,13 +266,12 @@ class Session:
         if self.day.locked:
             raise LockedError("the list is frozen")
         item = self._reserve_item(item_id)
-        # SPECIFICATION.md §2.5: a move, not a copy; source_id links back.
+        # SPECIFICATION.md §2.5: a move, not a copy; the source links back.
         task = Task(
             num=self.day.counter,
             text=item.text,
             origin=Origin.RESERVE,
-            source_id=item.id,
-            source_created=item.created,
+            source=ReserveSource(id=item.id, created=item.created),
             priority=item.priority,
         )
         self.day.counter += 1
@@ -346,8 +344,7 @@ class Session:
             id=task.id,
             text=task.text,
             origin=task.origin,
-            source_id=task.source_id,
-            source_created=task.source_created,
+            source=task.source,
             priority=task.priority,
         )
         self.day.tasks.remove(task)
@@ -357,15 +354,14 @@ class Session:
     def move_reserve_to_tomorrow(self, item_id: str) -> PreparedTask:
         """Move a reserve item to the end of Tomorrow, SPECIFICATION.md §2.5.
 
-        A move like draw_from_reserve, linked back by source_id, but allowed
+        A move like draw_from_reserve, linked back by its source, but allowed
         on a frozen day.
         """
         item = self._reserve_item(item_id)
         prepared = PreparedTask(
             text=item.text,
             origin=Origin.RESERVE,
-            source_id=item.id,
-            source_created=item.created,
+            source=ReserveSource(id=item.id, created=item.created),
             priority=item.priority,
         )
         self.reserve.remove(item)
@@ -396,8 +392,7 @@ class Session:
             num=self.day.counter,
             text=prepared.text,
             origin=prepared.origin,
-            source_id=prepared.source_id,
-            source_created=prepared.source_created,
+            source=prepared.source,
             priority=prepared.priority,
         )
         self.day.counter += 1
@@ -500,12 +495,12 @@ class Session:
         old = self.day
         new_date = reference_date(now)
         for task in old.tasks:
-            if not task.done and task.origin == Origin.RESERVE:
+            if not task.done and task.source is not None:
                 self.reserve.append(
                     ReserveItem(
-                        id=task.source_id,
+                        id=task.source.id,
                         text=task.text,
-                        created=task.source_created,
+                        created=task.source.created,
                         priority=task.priority,
                     )
                 )
@@ -542,13 +537,14 @@ def _returning_item(task: Task | PreparedTask, today: date) -> ReserveItem:
 
     Shared by send_to_reserve and send_tomorrow_to_reserve.
     """
-    if task.origin == Origin.RESERVE:
+    if task.source is not None:
         # Same as the rollover's point 2: the original item comes back,
-        # renamed text included (SPECIFICATION.md §2.7.1).
+        # renamed text included (SPECIFICATION.md §2.7.1). A source exists
+        # exactly for a reserve-origin task (models._check_source).
         return ReserveItem(
-            id=task.source_id,
+            id=task.source.id,
             text=task.text,
-            created=task.source_created,
+            created=task.source.created,
             priority=task.priority,
         )
     # SPECIFICATION.md §2.7.4: an explicit gesture, never de-duplicated,

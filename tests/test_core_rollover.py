@@ -115,7 +115,7 @@ def test_source_created_survives_reserve_day_reserve_day() -> None:
     session.draw_from_reserve(origin.id)
     session.roll_over(NEXT_MORNING)
     again = session.draw_from_reserve(session.reserve[0].id)
-    assert again.source_created == date(2026, 8, 10)
+    assert again.source.created == date(2026, 8, 10)
     session.roll_over(datetime(2026, 8, 26, 9, 0))
     assert session.reserve[0].created == date(2026, 8, 10)
 
@@ -266,7 +266,7 @@ def test_a_prepared_task_keeps_its_id_origin_link_and_priority() -> None:
     session.set_tomorrow_priority(prepared.id, priority=True)
     session.roll_over(NEXT_MORNING)
     (task,) = session.day.tasks
-    assert (task.id, task.origin, task.source_id, task.source_created) == (
+    assert (task.id, task.origin, task.source.id, task.source.created) == (
         prepared.id,
         Origin.RESERVE,
         item.id,
