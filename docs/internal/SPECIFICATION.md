@@ -471,6 +471,37 @@ définitivement l'item d'origine. La protection reste celle de §3.2 : la
 suppression est une entrée de menu, jamais un bouton de ligne, et §2.3
 interdit la confirmation.
 
+**2.7.10 Sauvegarde avant migration**
+
+Ajouté le 30 octobre 2026, au chantier 9. Quand le chargement du fichier
+principal applique au moins une migration, une copie du fichier d'origine
+est faite avant toute écriture du fichier principal.
+
+- **Nom** : `data.json.v<N>.bak`, dans le dossier de données, où `<N>` est
+  la version **lue sur le disque**, avant migration. Un fichier en version 4
+  migré vers 5 laisse `data.json.v4.bak`.
+- **Contenu** : copie octet pour octet du fichier tel qu'il était sur le
+  disque, jamais une réécriture du contenu chargé. Mêmes permissions que le
+  fichier principal (`0o600`, ADR 0003, addendum).
+- **Une seule fois** : tant que le fichier principal n'a pas été réécrit, il
+  reste dans son ancienne version et chaque lancement le migre de nouveau en
+  mémoire. Si `data.json.v<N>.bak` existe déjà, il n'est ni écrasé ni
+  doublé : la sauvegarde la plus ancienne est la vraie copie d'origine.
+- **Jamais supprimée** par l'application. Elle reste à la charge de
+  l'utilisateur, comme les fichiers mis en quarantaine.
+- **Échec de la copie** : aucune donnée migrée n'est écrite sans
+  sauvegarde. L'échec remonte de `App.open` comme une `OSError` au
+  démarrage et suit le traitement de §3.6.
+- **Rien dans l'interface** : ni bannière ni message. La sauvegarde est
+  journalisée au niveau `INFO`, avec son chemin et jamais son contenu.
+- **Archives non concernées** : un fichier d'archive est migré en mémoire à
+  la lecture et n'est jamais réécrit ensuite. Il reste sur le disque dans
+  sa version d'origine.
+
+Motif : une migration ratée détruit des données (`CLAUDE.md` §4 règle 7).
+Jusqu'ici, la sauvegarde avant une mise à jour dépendait de l'utilisateur ;
+elle devient automatique.
+
 ---
 
 ## 3. Spécification d'interface
