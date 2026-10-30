@@ -3,8 +3,8 @@
 
 """The Adw.Application subclass: process lifecycle, actions, shortcuts."""
 
+import logging
 from gettext import gettext as _
-from pathlib import Path
 
 import gi
 
@@ -21,6 +21,8 @@ from rature.ui import APP_ID  # noqa: E402
 from rature.ui.archives_window import ArchivesWindow  # noqa: E402
 from rature.ui.statistics_window import StatisticsWindow  # noqa: E402
 from rature.ui.window import RatureWindow  # noqa: E402
+
+_logger = logging.getLogger(__name__)
 
 
 class RatureApplication(Adw.Application):
@@ -62,8 +64,27 @@ class RatureApplication(Adw.Application):
             try:
                 self._app = App.open(data_dir)
             except FutureVersionError:
-                self._show_future_version_error_and_quit(
-                    storage.main_file_path(data_dir=data_dir)
+                # SPECIFICATION.md §3.6 situation 1.
+                self._show_startup_error_and_quit(
+                    _("This file was saved by a newer version of Rature."),
+                    _(
+                        "Opening it could overwrite data. "
+                        "Update Rature to open this file: %s"
+                    )
+                    % storage.main_file_path(data_dir=data_dir),
+                )
+                return
+            except OSError:
+                # SPECIFICATION.md §3.6 situation 4: the cause (rights, space,
+                # medium) is outside Rature, so nothing is retried or repaired.
+                _logger.exception("cannot use the data folder %s", data_dir)
+                self._show_startup_error_and_quit(
+                    _("Rature could not use its data folder."),
+                    _(
+                        "Check that this folder can be read and written, "
+                        "and that the disk is not full: %s"
+                    )
+                    % data_dir,
                 )
                 return
 
@@ -72,22 +93,19 @@ class RatureApplication(Adw.Application):
         )
         window.present()
 
-    def _show_future_version_error_and_quit(self, path: Path) -> None:
-        # SPECIFICATION.md §3.6 point 1: no window exists yet, so hold() is
-        # what keeps the process alive long enough for the alert to show;
-        # without it GApplication would shut down the moment do_activate
-        # returns, before the async dialog is even visible.
+    def _show_startup_error_and_quit(self, message: str, detail: str) -> None:
+        # SPECIFICATION.md §3.6 situations 1 and 4: no window exists yet, so
+        # hold() is what keeps the process alive long enough for the alert
+        # to show; without it GApplication would shut down the moment
+        # do_activate returns, before the async dialog is even visible.
         self.hold()
         dialog = Gtk.AlertDialog()
-        dialog.set_message(_("This file was saved by a newer version of Rature."))
-        dialog.set_detail(
-            _("Opening it could overwrite data. Update Rature to open this file: %s")
-            % path
-        )
+        dialog.set_message(message)
+        dialog.set_detail(detail)
         dialog.set_buttons([_("Quit")])
-        dialog.choose(None, None, self._on_future_version_dialog_response)
+        dialog.choose(None, None, self._on_startup_error_dialog_response)
 
-    def _on_future_version_dialog_response(self, dialog, result) -> None:
+    def _on_startup_error_dialog_response(self, dialog, result) -> None:
         dialog.choose_finish(result)
         self.release()
         self.quit()

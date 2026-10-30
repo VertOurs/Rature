@@ -3,6 +3,7 @@
 """App.open: first launch, loading, corruption recovery, the rollover catch-up."""
 
 import logging
+import os
 import stat
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -94,6 +95,69 @@ def test_open_propagates_a_future_version_and_builds_no_app(tmp_path: Path) -> N
     # Nothing written, nothing moved.
     assert (tmp_path / "data.json").read_text(encoding="utf-8") == '{"version": 99}'
     assert list(tmp_path.iterdir()) == [tmp_path / "data.json"]
+
+
+# SPECIFICATION.md §3.6 situation 4: every startup OSError leaves App.open
+# for the interface to alert and quit, and nothing is written meanwhile.
+
+_needs_permissions = pytest.mark.skipif(
+    os.geteuid() == 0, reason="root ignores permissions"
+)
+
+
+@_needs_permissions
+def test_open_propagates_an_unreadable_data_file(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    App.open(tmp_path, clock=clock_at(now))
+    path = tmp_path / "data.json"
+    before = path.read_bytes()
+    path.chmod(0o000)
+    try:
+        with pytest.raises(PermissionError):
+            App.open(tmp_path, clock=clock_at(now))
+    finally:
+        path.chmod(0o600)
+    assert path.read_bytes() == before
+    assert list(tmp_path.iterdir()) == [path]
+
+
+@_needs_permissions
+def test_open_propagates_a_first_launch_into_a_read_only_directory(
+    tmp_path: Path,
+) -> None:
+    tmp_path.chmod(0o500)
+    try:
+        with pytest.raises(OSError):
+            App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, tzinfo=PARIS)))
+    finally:
+        tmp_path.chmod(0o700)
+    assert list(tmp_path.iterdir()) == []
+
+
+@_needs_permissions
+def test_open_propagates_a_quarantine_it_cannot_perform(tmp_path: Path) -> None:
+    (tmp_path / "data.json").write_text("not json", encoding="utf-8")
+    tmp_path.chmod(0o500)
+    try:
+        with pytest.raises(OSError):
+            App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, tzinfo=PARIS)))
+    finally:
+        tmp_path.chmod(0o700)
+    assert (tmp_path / "data.json").read_text(encoding="utf-8") == "not json"
+
+
+def test_open_propagates_an_archive_it_cannot_write_at_rollover(
+    tmp_path: Path,
+) -> None:
+    # A plain file where archive/ should be: the rollover cannot archive,
+    # so nothing is saved and the next launch replays it.
+    monday = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    App.open(tmp_path, clock=clock_at(monday)).add("unfinished")
+    before = (tmp_path / "data.json").read_bytes()
+    (tmp_path / "archive").write_text("in the way", encoding="utf-8")
+    with pytest.raises(OSError):
+        App.open(tmp_path, clock=clock_at(monday + timedelta(days=1)))
+    assert (tmp_path / "data.json").read_bytes() == before
 
 
 def test_open_quarantines_invalid_json_and_starts_fresh(tmp_path: Path) -> None:

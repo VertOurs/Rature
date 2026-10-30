@@ -131,7 +131,10 @@ receive `now`/`today` as arguments and never read the time themselves.
 `App.open` loads the file or creates one on first launch, quarantines an
 unreadable file (`storage.quarantine`) and starts empty, and lets
 `migrations.FutureVersionError` pass through without building anything for a
-future version. Before returning it always runs `ensure_day`, the
+future version. It also lets any `OSError` pass through (unreadable file,
+folder or first write impossible, quarantine, backup or rollover archive
+impossible); the interface then alerts and quits, as for a future
+version (`SPECIFICATION.md` §3.6). Before returning it always runs `ensure_day`, the
 `roll_over` then `archive` then `save` sequence of `SPECIFICATION.md` §2.5:
 the caller always gets an `App` already up to date and never has to know or
 replay that sequence.
