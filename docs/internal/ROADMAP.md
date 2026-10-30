@@ -32,6 +32,14 @@ n'est pas atteint.
 | 7 | Capture et réserve | Oui, beaucoup |
 | 8 | Confort et langues | Oui |
 
+### Version 3
+
+| Chantier | Objet | Visible pour l'utilisateur |
+|---|---|---|
+| 9 | Propreté et solidité | Peu |
+| 10 | Synchronisation entre appareils | Oui |
+| 11 | Compagnon Android : Jour et Réserve | Oui, beaucoup |
+
 `0.9.x` correspond aux chantiers 0 à 4 terminés : fonctionnellement
 complet, non publié. `1.0.0` correspond aux chantiers 0 à 5 tous
 terminés : l'application est installable et se met à jour depuis le
@@ -40,6 +48,11 @@ dépôt auto-hébergé. C'est la clôture de la v1.
 `2.0.0` correspond aux chantiers 6, 7 et 8 tous terminés, chacun avec
 son critère de fin atteint. C'est la v2. Les versions `1.x`
 intermédiaires suivent les règles d'incrément de `CONTRIBUTING.md`.
+
+`3.0.0` correspond aux chantiers 9, 10 et 11 tous terminés, chacun avec
+son critère de fin atteint. C'est la v3. Planifiée avec VertOurs le
+30 octobre 2026. Les versions `2.x` intermédiaires suivent les mêmes
+règles.
 
 ---
 
@@ -363,13 +376,13 @@ codée avant que la spec ne la décrive.
 
 ## Chantier 8 : confort et langues
 
-- [ ] Fenêtre Statistiques rafraîchie pendant qu'elle est ouverte, sans
-      avoir à la refermer
-- [ ] Fenêtre Archives rafraîchie de la même façon : ouverte pendant le
-      passage du jour, elle ne montre pas la journée qui vient d'être
-      archivée. Relevé au cadrage de 8.3 le 25 octobre 2026, à traiter
-      après 8.4, hors critère de fin
-- [ ] Catalogues `es`, `de`, `pt_BR`, `ru`, `eo`
+- [x] Fenêtre Statistiques rafraîchie pendant qu'elle est ouverte, sans
+      avoir à la refermer. PR #171, le 25 octobre 2026
+- Fenêtre Archives rafraîchie de la même façon : relevée au cadrage de
+  8.3 le 25 octobre 2026, hors critère de fin. Passe au chantier 9 le
+  30 octobre 2026
+- [x] Catalogues `es`, `de`, `pt_BR`, `ru`, `eo`. PR #174 à #178, le
+      29 octobre 2026
 - [x] Date de la barre latérale des Archives traduisible comme la date
       longue : `%d %B %Y` donne « 05 octubre 2026 » en espagnol, au
       lieu de « 5 de octubre de 2026 ». Relevé au contrôle visuel de
@@ -380,16 +393,154 @@ codée avant que la spec ne la décrive.
       `tests/test_translations.py`, lancé en CI dans le job `test` sur
       chaque catalogue de `po/LINGUAS` : `--check` inclut les deux autres
       options. Constaté le 25 octobre 2026, aucun job séparé
-- [ ] Les traductions produites par machine sont signalées comme telles dans
+- [x] Les traductions produites par machine sont signalées comme telles dans
       l'en-tête du `.po` concerné. Transparence sur l'origine, pas de
-      traducteur humain attribué à tort
-- [ ] Nom accessible (`accessibility` / `label`) sur chaque bouton à icône
+      traducteur humain attribué à tort. Le 29 octobre 2026
+- [x] Nom accessible (`accessibility` / `label`) sur chaque bouton à icône
       seule des lignes et des en-têtes : aujourd'hui seule l'infobulle les
-      décrit. Relevé à la revue de code du 5 octobre 2026
+      décrit. Relevé à la revue de code du 5 octobre 2026. PR #170, le
+      25 octobre 2026
 
 **Critère de fin** : `msgfmt --statistics` ne signale aucune chaîne non
 traduite pour chaque catalogue livré, le job CI de traduction est vert, et
 la fenêtre Statistiques se met à jour sans être refermée.
+
+---
+
+## Chantier 9 : propreté et solidité
+
+Issu de la revue du 30 octobre 2026. Peu visible pour l'utilisateur :
+protéger ses données, durcir la chaîne de publication, préparer le code
+aux chantiers 10 et 11. Deux nouveaux outils de CI validés par VertOurs
+le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
+
+### Données
+
+- [ ] Sauvegarde avant migration : quand le chargement applique au moins
+      une migration, copier `data.json` en `data.json.v<N>.bak` avant la
+      première écriture, une seule fois. `SPECIFICATION.md` mis à jour
+      avant le code
+- [ ] `OSError` au démarrage (permission, disque plein, quarantaine
+      impossible) : `Gtk.AlertDialog` puis fermeture, sur le modèle de
+      `FutureVersionError`. Quatrième cas ajouté à `SPECIFICATION.md` §3.6
+- [ ] Fenêtre Archives rafraîchie au passage du jour : ouverte pendant le
+      passage, elle ne montre pas la journée qui vient d'être archivée.
+      Reste du chantier 8
+
+### Sécurité
+
+- [ ] `release.yml` : refuser, avant le build, toute entrée qui n'est pas
+      un tag existant au format `vX.Y.Z`
+- [ ] `SECURITY.md` : contact, délai de réponse, versions supportées
+- [ ] Dépendances de développement en versions exactes, écosystème `pip`
+      dans `dependabot.yml`
+- [ ] Règles ruff `S` (bandit) activées ; l'`assert` de
+      `recurring_form.py` devient un `if`/`raise`
+
+### Propreté
+
+- [ ] Provenance réserve regroupée en un seul champ optionnel dans `Task`
+      et `PreparedTask`. Sérialisation inchangée, donc aucune migration
+- [ ] `mypy --strict` sur `rature.core` en CI, vert
+- [ ] Renvois « ADR 0007 addendum » corrigés en ADR 0003 (`storage.py`
+      trois fois, `app.py` une fois)
+- [ ] Commentaires périmés : `models.py` (« milestone 4's undo »),
+      manifeste Flatpak (« one translation »)
+- [ ] `window._perform` : `_logger.exception` au lieu de
+      `traceback.print_exc`
+- [ ] Booléens positionnels passés en paramètres nommés (`set_priority`
+      et voisins)
+
+### Maintenabilité
+
+- [ ] Tests d'interface réels sous `gtk4-broadwayd` en CI, sortis de
+      « Repoussé volontairement » : au moins ajouter, rayer, renommer, et
+      le glisser-déposer dans le jour et la réserve
+- [ ] Ensuite seulement : base commune aux lignes `task_row`,
+      `reserve_row` et `prepared_row` (glisser-déposer, renommage,
+      priorité, suppression). Les différences voulues (`COPY` pour la
+      réserve) restent explicites
+- [ ] `sha256` du `PKGBUILD` et du `.SRCINFO` calculée dans `release.yml`
+      après le tag : plus de commit de rattrapage
+
+### Vitrine
+
+- [ ] README : « Status » en deux lignes ; nouvelle section
+      « Engineering » (séparation `core`/`ui` testée, couverture 100 % sur
+      `core`, écritures atomiques avec `fsync`, format versionné et
+      migrations testées, dépôt Flatpak signé, CI épinglée, commits
+      signés, lien vers les ADR) ; `pytest --cov` dans « Run the checks »
+- [ ] Langue des ADR : à trancher avec VertOurs en ouverture de chantier
+      (traduire en anglais, ou l'assumer dans le README)
+- [ ] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
+      (`CLAUDE.md`, `CONTRIBUTING.md`, `ROADMAP.md`)
+- [ ] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
+      majeures pilotées par la roadmap)
+- [ ] Captures d'écran Demain et Réserve (VertOurs)
+
+Au fil de l'eau, hors critère : élaguer les docstrings longues quand on
+touche un fichier ; découper `Session` si le chantier 10 la fait trop
+grossir.
+
+À la charge de VertOurs, hors dépôt : secret `FLATPAK_GPG_PRIVATE_KEY`
+dans l'environnement `release`, limité aux tags `v*` ; CodeQL en
+configuration par défaut.
+
+**Critère de fin** : un fichier migré laisse sa sauvegarde ; un dossier de
+données illisible au démarrage affiche une alerte au lieu de fermer
+l'application ; `mypy --strict` et les tests `gtk4-broadwayd` sont verts
+en CI ; la release suivante ne demande aucun commit de rattrapage.
+
+---
+
+## Chantier 10 : synchronisation entre appareils
+
+Décisions déjà prises le 30 octobre 2026 :
+
+- Pas de moteur de fusion, pas de verrou exclusif (un téléphone reste
+  ouvert en permanence)
+- Avant chaque écriture, relire le fichier ; s'il a changé, recharger puis
+  rejouer le geste sur les données fraîches
+- Le téléphone (chantier 11) est le cas de référence, pas un ajout tardif
+
+- [ ] Session de cadrage avec VertOurs avant tout code, puis ADR 0009.
+      Questions à trancher :
+      - outil de synchronisation (Syncthing pressenti) ;
+      - choix du dossier par le portail, sans nouvelle permission (retour
+        d'expérience de l'ADR 0007) ;
+      - fichiers de conflit de l'outil de synchronisation ;
+      - passage du jour à 04:00 sur deux appareils ;
+      - archives synchronisées ou non ;
+      - quarantaine dans un dossier synchronisé (ne jamais écrire une
+        journée vide par-dessus des données en cours de synchronisation) ;
+      - validation des types au chargement
+- [ ] `SPECIFICATION.md` mis à jour avant l'implémentation
+- [ ] Implémentation, découpée au cadrage
+
+**Critère de fin** : deux machines de bureau sur le même dossier, gestes
+alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
+perdu, aucune écriture sans relecture préalable, chaque conflit signalé.
+
+---
+
+## Chantier 11 : compagnon Android, Jour et Réserve
+
+- [ ] ADR 0010 : réouverture de « Application Android dédiée » et
+      « Version mobile » sous une forme limitée. Argument : le même
+      `rature.core` (Python pur, sans `gi`) plus une interface légère, pas
+      une deuxième base
+- [ ] Prototype jetable avant tout : un écran qui lit une copie de
+      `data.json`, ajoute et raye, en APK installé sur le téléphone de
+      VertOurs. Il valide `core` sur Android, les formats de date (`%-d`
+      est une extension GNU), l'outil (Flet ou BeeWare) et la taille de
+      l'APK
+- [ ] Périmètre : vues Jour et Réserve. Hors périmètre : Demain, édition
+      des récurrentes, archives, statistiques, glisser-déposer
+- [ ] Même dépôt que le bureau, `core` partagé sans duplication
+- [ ] APK joint aux releases
+
+**Critère de fin** : une semaine d'usage réel, téléphone et bureau sur les
+mêmes données, sans perte.
 
 ---
 
@@ -398,12 +549,6 @@ la fenêtre Statistiques se met à jour sans être refermée.
 - Suivre les fins de vie de runtime, une migration par an environ
 - Publier les correctifs avec un tag et une entrée de CHANGELOG
 - Traiter les issues, ou les fermer honnêtement si hors périmètre
-- Seuil de couverture CI étendu à tous les modules sans `gi`, pas
-  seulement `core/` (liste dans `pyproject.toml`). Relevé le 29 octobre
-  2026, après `2.0.0`
-- Test des formats `strftime` de chaque catalogue : `msgfmt --check` ne
-  les connaît pas, une faute comme `%-D` passerait. Relevé le 29 octobre
-  2026, après `2.0.0`
 
 ---
 
@@ -414,39 +559,28 @@ Noté ici pour ne pas y penser pendant les chantiers.
 - **Dictée vocale.** Écartée. Demanderait un moteur local, whisper.cpp ou
   vosk, et alourdirait fortement le paquet. Non utilisée en pratique par
   l'auteur. À réévaluer seulement si le manque se fait sentir à l'usage.
-- **Synchronisation de la journée en cours entre machines.** Repoussée
-  hors v2 : besoin réel reconfirmé le 8 septembre 2026, candidate pour la
-  v3. Elle imposerait un moteur de fusion dans `core/`, avec des conflits
-  sur le compteur de numéros, le verrouillage et le passage du jour. La
-  réserve, qui est la partie durable des données, est traitée au
-  chantier 7.
-- **Synchronisation avec Todoist ou un autre service tiers.** Repoussée
-  hors v2 : besoin réel reconfirmé le 8 septembre 2026, candidate pour la
-  v3.
+- **Synchronisation avec Todoist ou un autre service tiers.** Abandonnée
+  le 30 octobre 2026 : dépendance externe, et le besoin est couvert par le
+  compagnon Android du chantier 11.
 - **Étiquettes temporelles ou catégories** (« cet après-midi », « à faire
   après »). Abandonnée le 8 septembre 2026 : ce sont des catégories, que
   la méthode exclut par construction (`CLAUDE.md` §1) et que
   `SPECIFICATION.md` §2.3 interdit (« pas de tri automatique, pas de
   priorisation implicite »). À revoir seulement si le besoin ressurgit.
-- **Agenda à la semaine ou au mois.** Candidate pour la v3, écartée au
-  cadrage de 7.3 le 12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`) :
+- **Agenda à la semaine ou au mois.** Candidate, hors v3 (30 octobre
+  2026). Écartée au cadrage de 7.3 le 12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`) :
   des tâches datées sont la planification que `CLAUDE.md` §1 exclut, et
   montrent des retards par construction. La vue Demain couvre le besoin
   exprimé ; à revoir seulement si elle ne suffit pas.
-- **Tests d'interface réels sous `gtk4-broadwayd` en CI**, à la place des
-  gardes-fous qui lisent le source (`test_place_kept_on_rebuild.py`,
-  `test_focus_kept_on_add.py`). Retiré du chantier 8 et repoussé après
-  `2.0.0` le 25 octobre 2026 : hors critère de fin, et nouvel outillage
-  de CI (`CLAUDE.md` §4 règle 6).
 - **Paramètre de report automatique des tâches non rayées vers Demain.**
   Abandonné le 29 octobre 2026, par décision de VertOurs, sans attendre la
   réévaluation prévue le 12 octobre (`docs/adr/0008-preparer-le-lendemain.md`,
   addendum). Le report reste un geste explicite ; une tâche non rayée suit
   toujours le passage du jour de `SPECIFICATION.md` §2.5.
 - **Statistiques de suivi sur les récurrentes.** Abandonnée le
-  8 septembre 2026, le temps de voir si le besoin persiste ; candidate
-  pour la v3 sinon. Si le besoin ressurgit, attention : un suivi de
-  régularité frôle la série de jours consécutifs que `SPECIFICATION.md`
+  8 septembre 2026, le temps de voir si le besoin persiste ; sinon
+  candidate, hors v3 (30 octobre 2026). Si le besoin ressurgit,
+  attention : un suivi de régularité frôle la série de jours consécutifs que `SPECIFICATION.md`
   §2.3 interdit explicitement.
 - **Mettre une récurrente en pause sans la supprimer.** Candidate,
   relevée le 12 octobre 2026 : pendant les vacances scolaires, une
@@ -454,18 +588,13 @@ Noté ici pour ne pas y penser pendant les chantiers.
   la recréer, ou décocher tous ses jours, ce que `SPECIFICATION.md`
   §2.7.2 interdit ; le besoin rejoint le motif de ce cas tranché (une
   désactivation ne doit jamais passer par une liste de jours vide). Non
-  retenue au cadrage de la priorité (7.2) ; demanderait sa propre
-  migration de format 3 → 4. Rien de codé.
-- **Application Android dédiée.** Écartée. Le coût n'est pas dans le code
-  mais dans la maintenance de deux bases à vie, pour une personne seule.
-  Voir aussi « Capture depuis le téléphone » ci-dessous.
-- **Capture depuis le téléphone.** Repoussée sans date le
-  28 septembre 2026. La boîte de dépôt texte du chantier 7.1 a été livrée
-  dans `1.2.0` puis retirée : le geste ne convient pas à l'usage
-  (`docs/adr/0007-boite-de-depot-texte.md`, section « Retrait »). Aucune
-  autre approche n'est retenue pour l'instant.
-- **Version mobile de l'application.** Écartée le 24 août 2026. Le projet
-  reste une application de bureau.
+  retenue au cadrage de la priorité (7.2), ni en v3 (30 octobre 2026) ;
+  demanderait sa propre migration de format 4 → 5. Rien de codé.
+- **Version mobile complète de l'application.** Écartée le 24 août 2026,
+  confirmé le 30 octobre 2026 : le chantier 11 n'ouvre qu'un compagnon
+  limité aux vues Jour et Réserve, sur le même `core`. Le coût d'une
+  version complète est dans la maintenance de deux interfaces à vie, pour
+  une personne seule.
 - **Soumission effective des paquets AUR, COPR et Mageia.** Repoussée en
   v3/v4 le 15 septembre 2026 : chaque plateforme demande un compte
   personnel de VertOurs (AUR : compte et clé SSH ; COPR : compte Fedora ;
@@ -482,3 +611,11 @@ chantier 8 et sort donc de cette section. L'entrée « capture depuis le
 téléphone », entrée au chantier 7 le 24 août 2026 sous la forme d'une boîte
 de dépôt texte, y revient le 28 septembre 2026 après le retrait de
 celle-ci.
+
+Sorties le 30 octobre 2026, à la planification de la v3 :
+« Synchronisation de la journée en cours entre machines » entre au
+chantier 10 ; « Application Android dédiée », « Version mobile » et
+« Capture depuis le téléphone » entrent au chantier 11 sous la forme du
+compagnon (une version mobile complète reste écartée, ci-dessus) ;
+« Tests d'interface réels sous `gtk4-broadwayd` en CI » entrent au
+chantier 9.
