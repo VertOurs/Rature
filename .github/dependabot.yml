@@ -7,3 +7,10 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+
+  # The dev dependency group of pyproject.toml (PEP 735), pinned to exact
+  # versions; one pull request per bump, so a linter change stays isolated.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
