@@ -3,7 +3,7 @@
 """``rature.core`` must never reach for the GTK stack.
 
 This guards the rule stated in ``CLAUDE.md`` section 4 and
-``docs/adr/0002-separation-core-ui.md``: the business logic stays testable
+``docs/adr/0002-core-ui-separation.md``: the business logic stays testable
 without a display. The check is an AST scan, so it fires on a forbidden
 import even inside a function body.
 """

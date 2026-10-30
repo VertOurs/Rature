@@ -1,7 +1,7 @@
 # Roadmap
 
 Cette roadmap décrit la construction, à partir de la spécification. Le POC
-est abandonné, voir `docs/adr/0004-abandon-du-poc.md`.
+est abandonné, voir `docs/adr/0004-abandon-the-prototype.md`.
 
 Chaque chantier a un critère de fin. On ne passe pas au suivant tant qu'il
 n'est pas atteint.
@@ -165,7 +165,7 @@ fenêtre Statistiques n'affiche aucune appréciation, seulement des nombres.
 
 ## Chantier 5 : publication
 
-Flathub est écarté, voir `docs/adr/0001-rejet-de-flathub.md`. Les exigences
+Flathub est écarté, voir `docs/adr/0001-reject-flathub.md`. Les exigences
 de qualité qu'il imposait sont conservées : elles servaient la
 maintenabilité autant que la conformité.
 
@@ -284,7 +284,7 @@ inchangés.
 Livrée dans `1.2.0` le 24 septembre 2026, retirée le 28 septembre 2026 sur
 décision de VertOurs : le dépôt d'un fichier texte ne convient pas à
 l'usage réel. Motifs et périmètre du retrait :
-`docs/adr/0007-boite-de-depot-texte.md`, section « Retrait ». La
+`docs/adr/0007-text-inbox.md`, section « Withdrawal ». La
 synchronisation avec le téléphone passe dans « Repoussé volontairement ».
 
 ### 7.2 Réserve et priorité
@@ -345,7 +345,7 @@ ne connaît aujourd'hui qu'une seule journée active, et `CLAUDE.md` pose
       Paramètre de report automatique : non, voir « Repoussé
       volontairement »
 - [x] ADR documentant la décision et son articulation avec §2.5 :
-      `docs/adr/0008-preparer-le-lendemain.md`, le 12 octobre 2026
+      `docs/adr/0008-prepare-tomorrow.md`, le 12 octobre 2026
 - [x] `SPECIFICATION.md` mis à jour avant l'implémentation, pas après :
       seize points de détail validés le 12 octobre 2026, reportés le
       25 octobre 2026 (§2.5 bloc Demain et étape 7, §2.7.9, §3.16)
@@ -470,8 +470,8 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       `core`, écritures atomiques avec `fsync`, format versionné et
       migrations testées, dépôt Flatpak signé, CI épinglée, commits
       signés, lien vers les ADR) ; `pytest --cov` dans « Run the checks »
-- [ ] Langue des ADR : à trancher avec VertOurs en ouverture de chantier
-      (traduire en anglais, ou l'assumer dans le README)
+- [x] Langue des ADR : traduites en anglais, fichiers renommés, décision
+      de VertOurs le 30 octobre 2026
 - [ ] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
       (`CLAUDE.md`, `CONTRIBUTING.md`, `ROADMAP.md`)
 - [ ] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
@@ -568,13 +568,13 @@ Noté ici pour ne pas y penser pendant les chantiers.
   `SPECIFICATION.md` §2.3 interdit (« pas de tri automatique, pas de
   priorisation implicite »). À revoir seulement si le besoin ressurgit.
 - **Agenda à la semaine ou au mois.** Candidate, hors v3 (30 octobre
-  2026). Écartée au cadrage de 7.3 le 12 octobre 2026 (`docs/adr/0008-preparer-le-lendemain.md`) :
-  des tâches datées sont la planification que `CLAUDE.md` §1 exclut, et
+  2026). Écartée au cadrage de 7.3 le 12 octobre 2026
+  (`docs/adr/0008-prepare-tomorrow.md`) : des tâches datées sont la planification que `CLAUDE.md` §1 exclut, et
   montrent des retards par construction. La vue Demain couvre le besoin
   exprimé ; à revoir seulement si elle ne suffit pas.
 - **Paramètre de report automatique des tâches non rayées vers Demain.**
   Abandonné le 29 octobre 2026, par décision de VertOurs, sans attendre la
-  réévaluation prévue le 12 octobre (`docs/adr/0008-preparer-le-lendemain.md`,
+  réévaluation prévue le 12 octobre (`docs/adr/0008-prepare-tomorrow.md`,
   addendum). Le report reste un geste explicite ; une tâche non rayée suit
   toujours le passage du jour de `SPECIFICATION.md` §2.5.
 - **Statistiques de suivi sur les récurrentes.** Abandonnée le

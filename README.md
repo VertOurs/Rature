@@ -97,7 +97,7 @@ install without adding the repository.
 
 AUR, COPR and Mageia packages are prepared (`build-aux/`) but not yet
 submitted. Flathub is deliberately not a target
-([`docs/adr/0001-rejet-de-flathub.md`](docs/adr/0001-rejet-de-flathub.md)).
+([`docs/adr/0001-reject-flathub.md`](docs/adr/0001-reject-flathub.md)).
 
 ## Status
 
@@ -123,8 +123,9 @@ Esperanto machine translations (`2.0.0`).
 Built with AI assistance (Claude Code); I write the specification,
 review every change, and merge it.
 
-Design decisions and the roadmap live under `docs/internal/` (in French).
-The architecture is [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Design decisions are recorded in [`docs/adr/`](docs/adr/); the roadmap
+lives under `docs/internal/` (in French). The architecture is
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Building from source
 

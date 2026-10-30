@@ -4,5 +4,5 @@
 
 Nothing in this package may import ``gi``, GTK, Adw or Gdk. The rule is
 enforced by ``tests/test_core_has_no_gtk.py`` and explained in
-``docs/adr/0002-separation-core-ui.md``.
+``docs/adr/0002-core-ui-separation.md``.
 """
