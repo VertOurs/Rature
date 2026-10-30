@@ -33,7 +33,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   entre blocs et sur soi-même), lancés par `build-aux/ui-tests.sh` dans le SDK
   GNOME 51 sous `gtk4-broadwayd` (application installée, GSettings en
   mémoire, `G_DEBUG=fatal-criticals`), job CI `ui`. Sautés par `pytest`
-  hors SDK. Le job `ui` n'est pas encore exigé par le ruleset `main`. Sauvegarde avant migration livrée
+  hors SDK. Job `ui` exigé par le ruleset `main` depuis le
+  30 octobre 2026, après deux passages verts. Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
@@ -110,8 +111,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   publique déjà sur GitHub (le tag `v0.2.0` remonte `verified: true` côté
   API, vérifié le 31 août 2026).
 - « Require status checks » actif dans le ruleset `main` : `lint`, `test`,
-  `meson`, `flatpak`, mode strict, aucun contournement possible même par un
-  admin. Vérifié le 31 août 2026 via `gh api repos/.../rulesets`.
+  `meson`, `flatpak`, `ui`, mode strict, aucun contournement possible même
+  par un admin. `ui` ajouté le 30 octobre 2026 via
+  `gh api -X PUT repos/.../rulesets/21536671`, le reste du ruleset vérifié
+  identique avant et après.
 - Deuxième clé GPG, dédiée à la **signature du dépôt Flatpak** (jamais aux
   commits) : ed25519 `C2CBB256D91B01B920B0BE3898280657575FC9DA`, uid
   « Rature Flatpak repo signing », sans passphrase. Publique versionnée,
