@@ -40,6 +40,13 @@ def _pkgbuild_version() -> str:
     return match.group(1)
 
 
+def _srcinfo_version() -> str:
+    text = (REPO / "build-aux" / "aur" / ".SRCINFO").read_text(encoding="utf-8")
+    match = re.search(r"(?m)^\tpkgver = (\S+)$", text)
+    assert match, "no pkgver field in build-aux/aur/.SRCINFO"
+    return match.group(1)
+
+
 def _spec_version(relative_path: str) -> str:
     text = (REPO / relative_path).read_text(encoding="utf-8")
     match = re.search(r"(?m)^Version:\s*(\S+)$", text)
@@ -54,6 +61,7 @@ def test_version_sources_agree() -> None:
         "meson.build": _meson_version(),
         "metainfo latest release": _metainfo_latest_release(),
         "build-aux/aur/PKGBUILD": _pkgbuild_version(),
+        "build-aux/aur/.SRCINFO": _srcinfo_version(),
         "build-aux/copr/rature.spec": _spec_version("build-aux/copr/rature.spec"),
         "build-aux/mageia/rature.spec": _spec_version("build-aux/mageia/rature.spec"),
     }
