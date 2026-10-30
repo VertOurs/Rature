@@ -72,9 +72,11 @@ class RecurringForm(Adw.Dialog):
 
         # The loop above maps day box children to weekday indices 0..6 by
         # position; a changed .ui must not slide that mapping silently.
-        assert len(self._day_toggles) == 7, (
-            "recurring_form.ui: days_box must hold exactly seven toggles"
-        )
+        # Not an assert: python -O would strip it.
+        if len(self._day_toggles) != 7:
+            raise RuntimeError(
+                "recurring_form.ui: days_box must hold exactly seven toggles"
+            )
 
         if item is not None:
             self.text_entry.set_text(item.text)
