@@ -17,6 +17,9 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   `.SRCINFO` with the checksum of that release's source archive, computed
   by the release workflow. The copies in the repository keep `SKIP`, since
   a tag's archive cannot hold its own checksum.
+- Screenshots of the Tomorrow and Reserve views in the README, the
+  project page and the software centre listing, with captions in every
+  language.
 
 ### Fixed
 

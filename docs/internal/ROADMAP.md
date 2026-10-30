@@ -482,11 +482,12 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 
 ### Vitrine
 
-- [ ] README : « Status » en deux lignes ; nouvelle section
+- [x] README : « Status » en deux lignes ; nouvelle section
       « Engineering » (séparation `core`/`ui` testée, couverture 100 % sur
       `core`, écritures atomiques avec `fsync`, format versionné et
       migrations testées, dépôt Flatpak signé, CI épinglée, commits
-      signés, lien vers les ADR) ; `pytest --cov` dans « Run the checks »
+      signés, lien vers les ADR) ; `pytest --cov` dans « Run the checks ».
+      PR #208, le 30 octobre 2026
 - [x] Langue des ADR : traduites en anglais, fichiers renommés, décision
       de VertOurs le 30 octobre 2026
 - [x] `STATE.md` déplacé dans `docs/internal/`, renvois mis à jour
@@ -497,7 +498,9 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
       (`icon-file-read-error`), cause exacte non élucidée
 - [x] En-tête du CHANGELOG aligné sur `CONTRIBUTING.md` (versions
       majeures pilotées par la roadmap). Le 30 octobre 2026
-- [ ] Captures d'écran Demain et Réserve (VertOurs)
+- [x] Captures d'écran Demain et Réserve (VertOurs), le 30 octobre 2026.
+      Gardées avec le menu « ⋯ » ouvert, fond du bureau visible sur les
+      bords : choix de VertOurs
 
 Au fil de l'eau, hors critère : élaguer les docstrings longues quand on
 touche un fichier ; découper `Session` si le chantier 10 la fait trop
