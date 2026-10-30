@@ -23,7 +23,10 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   rafraîchie au passage du jour (§3.5) : date affichée et recherche
   conservées, vérifiée par un script qui pilote la vraie fenêtre sous
   horloge simulée (17 contrôles, 10 en échec sans le correctif),
-  contrôlée visuellement par VertOurs le 30 octobre 2026. Sauvegarde avant migration livrée
+  contrôlée visuellement par VertOurs le 30 octobre 2026. Provenance
+  réserve regroupée dans `ReserveSource` (`Task`, `PreparedTask`,
+  `Deletion`) : fichier réécrit identique à l'octet près à celui de
+  `main`, aucune migration. Sauvegarde avant migration livrée
   (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
   livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
   Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le

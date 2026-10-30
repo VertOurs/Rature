@@ -35,7 +35,7 @@ def test_add_to_tomorrow_appends_a_day_origin_task() -> None:
     second = session.add_to_tomorrow("call the insurance")
     assert session.tomorrow == [first, second]
     assert first.origin == Origin.DAY
-    assert first.source_id is None
+    assert first.source is None
     assert not first.priority
 
 
@@ -149,7 +149,7 @@ def test_move_to_tomorrow_keeps_the_reserve_link() -> None:
     task = session.draw_from_reserve(item.id)
     prepared = session.move_to_tomorrow(task.id)
     assert prepared.origin == Origin.RESERVE
-    assert (prepared.source_id, prepared.source_created) == (
+    assert (prepared.source.id, prepared.source.created) == (
         item.id,
         date(2026, 8, 20),
     )
@@ -199,7 +199,7 @@ def test_move_reserve_to_tomorrow_is_a_move_with_a_link_back() -> None:
     assert session.reserve == []
     assert session.tomorrow == [prepared]
     assert prepared.origin == Origin.RESERVE
-    assert (prepared.text, prepared.source_id, prepared.source_created) == (
+    assert (prepared.text, prepared.source.id, prepared.source.created) == (
         "someday",
         item.id,
         date(2026, 8, 20),
@@ -247,7 +247,7 @@ def test_move_to_today_keeps_the_reserve_link() -> None:
     prepared = session.move_reserve_to_tomorrow(item.id)
     task = session.move_to_today(prepared.id)
     assert task.origin == Origin.RESERVE
-    assert (task.source_id, task.source_created) == (item.id, date(2026, 8, 20))
+    assert (task.source.id, task.source.created) == (item.id, date(2026, 8, 20))
 
 
 def test_a_task_moved_to_tomorrow_by_mistake_comes_back_with_a_new_number() -> None:

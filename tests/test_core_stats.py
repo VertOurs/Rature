@@ -4,7 +4,7 @@
 
 from datetime import date, datetime, timedelta, timezone
 
-from rature.core.models import Deletion, Origin, Task
+from rature.core.models import Deletion, Origin, ReserveSource, Task
 from rature.core.session import Day
 from rature.core.stats import DayCounts, day_counts
 
@@ -20,8 +20,7 @@ def _task(num: int, *, done: bool = False, origin: Origin = Origin.DAY) -> Task:
         origin=origin,
         done=done,
         done_at=STAMP if done else None,
-        source_id="src" if reserve else None,
-        source_created=date(2026, 8, 1) if reserve else None,
+        source=(ReserveSource(id="src", created=date(2026, 8, 1)) if reserve else None),
     )
 
 

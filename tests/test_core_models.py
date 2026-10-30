@@ -12,6 +12,7 @@ from rature.core.models import (
     PreparedTask,
     RecurringItem,
     ReserveItem,
+    ReserveSource,
     Task,
 )
 
@@ -56,25 +57,43 @@ def test_origin_serialises_as_a_plain_string() -> None:
         num=7,
         text="from reserve",
         origin=Origin.RESERVE,
-        source_id="abc",
-        source_created=date(2026, 8, 20),
+        source=ReserveSource(id="abc", created=date(2026, 8, 20)),
     )
     assert task.to_dict()["origin"] == "reserve"
 
 
-def test_reserve_task_rejects_a_missing_source_id() -> None:
-    with pytest.raises(ValueError):
-        Task(
-            num=1,
-            text="x",
-            origin=Origin.RESERVE,
-            source_created=date(2026, 8, 20),
-        )
+SOURCE = ReserveSource(id="abc", created=date(2026, 8, 20))
 
 
-def test_reserve_task_rejects_a_missing_source_created() -> None:
+def test_reserve_task_rejects_a_missing_source() -> None:
     with pytest.raises(ValueError):
-        Task(num=1, text="x", origin=Origin.RESERVE, source_id="abc")
+        Task(num=1, text="x", origin=Origin.RESERVE)
+
+
+@pytest.mark.parametrize("origin", [Origin.DAY, Origin.RECURRING])
+def test_a_task_not_from_the_reserve_rejects_a_source(origin: Origin) -> None:
+    with pytest.raises(ValueError):
+        Task(num=1, text="x", origin=origin, source=SOURCE)
+
+
+def test_source_serialises_as_the_two_flat_keys_of_version_1() -> None:
+    data = Task(num=1, text="x", origin=Origin.RESERVE, source=SOURCE).to_dict()
+    assert (data["source_id"], data["source_created"]) == ("abc", "2026-08-20")
+    assert "source" not in data
+
+
+def test_no_source_serialises_as_two_nulls() -> None:
+    data = Task(num=1, text="x", origin=Origin.DAY).to_dict()
+    assert (data["source_id"], data["source_created"]) == (None, None)
+
+
+@pytest.mark.parametrize(
+    "half", [{"source_id": None}, {"source_created": None}], ids=["id", "created"]
+)
+def test_a_half_source_on_disk_is_refused(half: dict) -> None:
+    data = Task(num=1, text="x", origin=Origin.RESERVE, source=SOURCE).to_dict()
+    with pytest.raises(ValueError, match="go together"):
+        Task.from_dict(data | half)
 
 
 def test_cryptic_text_is_stored_verbatim() -> None:
@@ -87,11 +106,10 @@ def test_source_created_round_trips() -> None:
         num=3,
         text="drawn",
         origin=Origin.RESERVE,
-        source_id="r1",
-        source_created=date(2026, 8, 20),
+        source=ReserveSource(id="r1", created=date(2026, 8, 20)),
     )
     restored = Task.from_dict(task.to_dict())
-    assert restored.source_created == date(2026, 8, 20)
+    assert restored.source.created == date(2026, 8, 20)
     assert restored == task
 
 
@@ -104,8 +122,7 @@ def test_prepared_task_from_the_reserve_round_trips_with_its_priority() -> None:
     task = PreparedTask(
         text="call the insurance",
         origin=Origin.RESERVE,
-        source_id="r1",
-        source_created=date(2026, 8, 20),
+        source=ReserveSource(id="r1", created=date(2026, 8, 20)),
         priority=True,
     )
     data = task.to_dict()
@@ -124,14 +141,14 @@ def test_prepared_task_rejects_a_recurring_origin() -> None:
         PreparedTask(text="x", origin=Origin.RECURRING)
 
 
-def test_prepared_reserve_task_rejects_a_missing_source_id() -> None:
+def test_prepared_reserve_task_rejects_a_missing_source() -> None:
     with pytest.raises(ValueError):
-        PreparedTask(text="x", origin=Origin.RESERVE, source_created=date(2026, 8, 20))
+        PreparedTask(text="x", origin=Origin.RESERVE)
 
 
-def test_prepared_reserve_task_rejects_a_missing_source_created() -> None:
+def test_prepared_day_task_rejects_a_source() -> None:
     with pytest.raises(ValueError):
-        PreparedTask(text="x", origin=Origin.RESERVE, source_id="abc")
+        PreparedTask(text="x", origin=Origin.DAY, source=SOURCE)
 
 
 def test_reserve_item_round_trips_with_a_plain_date() -> None:
@@ -207,15 +224,14 @@ def test_deletion_round_trips_with_every_field_set() -> None:
         origin=Origin.RESERVE,
         deleted_at=STAMP,
         index=2,
-        source_id="r1",
-        source_created=date(2026, 8, 20),
+        source=ReserveSource(id="r1", created=date(2026, 8, 20)),
         template_id="tmpl-1",
         done=True,
         done_at=STAMP,
     )
     restored = Deletion.from_dict(entry.to_dict())
     assert restored == entry
-    assert restored.source_created == date(2026, 8, 20)
+    assert restored.source.created == date(2026, 8, 20)
     assert restored.done_at == STAMP
 
 
@@ -271,8 +287,7 @@ def test_only_an_active_non_recurring_task_can_go_back_to_reserve() -> None:
         num=2,
         text="t",
         origin=Origin.RESERVE,
-        source_id="r",
-        source_created=date(2026, 8, 1),
+        source=ReserveSource(id="r", created=date(2026, 8, 1)),
     )
     recurring = Task(num=3, text="t", origin=Origin.RECURRING, template_id="x")
     struck = Task(num=4, text="t", origin=Origin.DAY, done=True, done_at=STAMP)

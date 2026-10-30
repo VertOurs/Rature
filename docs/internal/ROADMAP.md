@@ -440,8 +440,12 @@ le 30 octobre 2026 (`CLAUDE.md` §4 règle 6) : `mypy` et `gtk4-broadwayd`.
 
 ### Propreté
 
-- [ ] Provenance réserve regroupée en un seul champ optionnel dans `Task`
-      et `PreparedTask`. Sérialisation inchangée, donc aucune migration
+- [x] Provenance réserve regroupée en un seul champ optionnel dans `Task`
+      et `PreparedTask`. Sérialisation inchangée, donc aucune migration.
+      `ReserveSource`, étendu à `Deletion` ; l'invariant « source si et
+      seulement si `origin` vaut `reserve` », déjà écrit dans
+      `ARCHITECTURE.md`, est désormais vérifié dans les deux sens. Le
+      30 octobre 2026
 - [ ] `mypy --strict` sur `rature.core` en CI, vert
 - [x] Renvois « ADR 0007 addendum » corrigés en ADR 0003 (`storage.py`
       trois fois, `app.py` une fois)

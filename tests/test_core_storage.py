@@ -18,6 +18,7 @@ from rature.core.models import (
     PreparedTask,
     RecurringItem,
     ReserveItem,
+    ReserveSource,
     Task,
 )
 from rature.core.session import Day, Session
@@ -55,8 +56,7 @@ def make_store() -> Store:
             PreparedTask(
                 text="call the insurance",
                 origin=Origin.RESERVE,
-                source_id="r1",
-                source_created=date(2026, 8, 19),
+                source=ReserveSource(id="r1", created=date(2026, 8, 19)),
                 priority=True,
             ),
         ],
@@ -408,7 +408,7 @@ def test_a_session_survives_save_from_session_then_into_session(tmp_path: Path) 
     drawn = session.draw_from_reserve(item.id)
     save(Store.from_session(session), data_dir=tmp_path)
     loaded = load(data_dir=tmp_path).into_session()
-    assert loaded.day.tasks[0].source_created == drawn.source_created
+    assert loaded.day.tasks[0].source.created == drawn.source.created
 
 
 def test_a_hand_written_task_round_trips(tmp_path: Path) -> None:
@@ -420,8 +420,7 @@ def test_a_hand_written_task_round_trips(tmp_path: Path) -> None:
                 num=1,
                 text="x",
                 origin=Origin.RESERVE,
-                source_id="abc",
-                source_created=date(2026, 8, 20),
+                source=ReserveSource(id="abc", created=date(2026, 8, 20)),
             )
         ],
     )

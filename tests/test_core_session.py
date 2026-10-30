@@ -259,8 +259,8 @@ def test_undo_restores_a_reserve_task_with_its_source() -> None:
     restored = session.undo_last_deletion()
 
     assert restored.origin == Origin.RESERVE
-    assert restored.source_id == item.id
-    assert restored.source_created == date(2026, 8, 20)
+    assert restored.source.id == item.id
+    assert restored.source.created == date(2026, 8, 20)
 
 
 def test_reorder_applies_a_permutation() -> None:
