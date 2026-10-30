@@ -24,7 +24,28 @@ env:
   RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
+  # Runs before anything touches the signing key: a manual run could
+  # otherwise build and sign a branch or a bare commit. Only an existing
+  # tag shaped vX.Y.Z goes through.
+  check-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse anything but an existing vX.Y.Z tag
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::the release tag is not shaped vX.Y.Z"
+            exit 1
+          fi
+          if ! gh api "repos/$GH_REPO/git/ref/tags/$RELEASE_TAG" >/dev/null; then
+            echo "::error::tag '$RELEASE_TAG' does not exist"
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
   build:
+    needs: check-tag
     runs-on: ubuntu-latest
     environment: release
     container:
@@ -35,7 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          # The tag namespace, so a branch with the same name never wins.
+          ref: refs/tags/${{ env.RELEASE_TAG }}
 
       # The repo descriptor, signing key, landing page and its screenshots
       # are distribution metadata, not versioned with the app. Take them

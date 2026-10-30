@@ -11,7 +11,8 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   `ROADMAP.md`). Fait : ADR traduites en anglais et renommées,
   renvois d'ADR et commentaires périmés corrigés, `window._perform` passé
   au logger, booléens de priorité et de date en paramètres nommés
-  (règle ruff `FBT` activée), règles ruff `S` activées (30 octobre 2026).
+  (règle ruff `FBT` activée), règles ruff `S` activées, `release.yml` refuse toute entrée qui n'est
+  pas un tag `vX.Y.Z` existant (30 octobre 2026).
   **Contrôle visuel en attente** (PR #187) : marquer puis démarquer une
   tâche prioritaire dans Jour, Demain et Réserve, avant la prochaine
   version. `mypy` et `gtk4-broadwayd` validés comme
