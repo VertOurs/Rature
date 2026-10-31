@@ -385,6 +385,7 @@ def test_an_older_archive_file_loads(tmp_path: Path, archive: dict) -> None:
         "tasks": [{"priority": False, **task} for task in archive["tasks"]],
         "deletions": [{"priority": False, **e} for e in archive["deletions"]],
     }
+    del expected["version"]
     assert Day.from_dict(expected) == day
     assert [task.id for task in day.tasks] == ["t1", "t2"]
     assert [entry.id for entry in day.deletions] == ["t3"]
@@ -531,3 +532,20 @@ def test_opening_an_old_file_keeps_the_original_beside_the_rewritten_one(
     assert (tmp_path / "data.json.v1.bak").read_bytes() == raw
     on_disk = json.loads((tmp_path / "data.json").read_text(encoding="utf-8"))
     assert on_disk["version"] == CURRENT_VERSION
+
+
+# Strict reading after migration (test_core_validation.py): the
+# hand-written files of each version above load in full, not just the
+# keys the earlier tests look at.
+
+
+@pytest.mark.parametrize("main", [V1_MAIN, V2_MAIN, V3_MAIN], ids=["v1", "v2", "v3"])
+def test_an_older_main_file_passes_the_strict_reading(
+    tmp_path: Path, main: dict
+) -> None:
+    (tmp_path / "data.json").write_text(json.dumps(main), encoding="utf-8")
+    store = load(data_dir=tmp_path)
+    assert [task.id for task in store.day.tasks] == ["t1", "t2"]
+    assert [item.id for item in store.reserve] == ["r1"]
+    assert [item.id for item in store.recurring] == ["w1"]
+    assert store.tomorrow == []

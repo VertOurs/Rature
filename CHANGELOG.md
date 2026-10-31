@@ -11,6 +11,16 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 
 ## [Unreleased]
 
+### Fixed
+
+- A data file or an archive with a value of the wrong type (`"done":
+  "yes"`, a number where text belongs, an object instead of a list), an
+  unknown key, or a missing list is now refused when it is read, instead
+  of loading and failing later in the window or losing data at the next
+  save. A refused data file follows the existing path for an unreadable
+  file. Files written by every earlier release still load, migration
+  included.
+
 ## [2.1.1] - 2026-10-30
 
 Closes chantier 9 (cleanup and hardening). One fix you can see, two new

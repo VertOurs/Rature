@@ -14,15 +14,24 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
+from rature.core import validation as check
 from rature.core.migrations import CURRENT_VERSION, migrate
 from rature.core.models import PreparedTask, RecurringItem, ReserveItem
-from rature.core.session import Day, Session
+from rature.core.session import DAY_KEYS, Day, Session
 
 FILE_VERSION = CURRENT_VERSION
 _MAIN_FILE = "data.json"
 _ARCHIVE_DIR = "archive"
 _ARCHIVE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 _logger = logging.getLogger(__name__)
+
+# The whole key set of each file, after migration (validation.exact_keys).
+_ARCHIVE_KEYS = DAY_KEYS | {"version"}
+_MAIN_KEYS = _ARCHIVE_KEYS | {"reserve", "tomorrow", "recurring"}
+
+
+def _day_part(data: dict[str, Any]) -> dict[str, Any]:
+    return {key: data[key] for key in DAY_KEYS}
 
 
 def xdg_data_dir() -> Path:
@@ -51,14 +60,21 @@ class Store:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Store:
+        # Every key is required: since version 4 each one is always
+        # written, so a missing "reserve" is a damaged file, not an empty
+        # reserve to save over the real one.
+        check.exact_keys(data, _MAIN_KEYS)
         return cls(
-            day=Day.from_dict(data),
-            reserve=[ReserveItem.from_dict(item) for item in data.get("reserve", [])],
+            day=Day.from_dict(_day_part(data)),
+            reserve=[
+                ReserveItem.from_dict(item) for item in check.objects(data, "reserve")
+            ],
             tomorrow=[
-                PreparedTask.from_dict(task) for task in data.get("tomorrow", [])
+                PreparedTask.from_dict(task) for task in check.objects(data, "tomorrow")
             ],
             recurring=[
-                RecurringItem.from_dict(item) for item in data.get("recurring", [])
+                RecurringItem.from_dict(item)
+                for item in check.objects(data, "recurring")
             ],
         )
 
@@ -250,4 +266,5 @@ def load_archive(day_date: date, *, data_dir: Path | None = None) -> Day:
     directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
     path = directory / f"{day_date.isoformat()}.json"
     raw = migrate(json.loads(path.read_text(encoding="utf-8")))
-    return Day.from_dict(raw)
+    check.exact_keys(raw, _ARCHIVE_KEYS)
+    return Day.from_dict(_day_part(raw))

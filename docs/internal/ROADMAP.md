@@ -620,8 +620,14 @@ Noté dans « Repoussé volontairement ».
 ### Découpage
 
 - [x] Session de cadrage avec VertOurs, le 31 octobre 2026
-- [ ] Validation stricte des types au chargement (point 11), indépendante
-      du reste
+- [x] Validation stricte des types au chargement (point 11), indépendante
+      du reste. Clés inconnues refusées, listes du fichier principal
+      exigées. Vérifiée sur les fichiers réellement écrits par six
+      versions publiées (`tests/data/formats/`, régénérés depuis les
+      tags) et sur une copie des vraies données de VertOurs. Hors
+      périmètre, à reprendre si le rejeu des gestes en a besoin : règles
+      qui croisent plusieurs champs (identifiants en double, `counter`
+      inférieur au plus grand `num`, texte vide)
 - [ ] Essai jetable, hors dépôt, sur le montage du portail : `os.replace`
       et `fsync` ; `chmod` `0o600`/`0o700` des fichiers de Rature (un
       échec serait un `OSError` au démarrage) ; accès qui survit à un

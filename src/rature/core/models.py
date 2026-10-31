@@ -11,6 +11,8 @@ from datetime import date, datetime
 from typing import Any
 from uuid import uuid4
 
+from rature.core import validation as check
+
 
 class Origin(enum.StrEnum):
     """Where a task came from."""
@@ -46,7 +48,8 @@ def _source_to_dict(source: ReserveSource | None) -> dict[str, Any]:
 
 
 def _source_from_dict(data: dict[str, Any]) -> ReserveSource | None:
-    source_id, created = data["source_id"], data["source_created"]
+    source_id = check.optional_text(data, "source_id")
+    created = check.optional_text(data, "source_created")
     if source_id is None and created is None:
         return None
     if source_id is None or created is None:
@@ -54,11 +57,35 @@ def _source_from_dict(data: dict[str, Any]) -> ReserveSource | None:
     return ReserveSource(id=source_id, created=date.fromisoformat(created))
 
 
+def _optional_datetime(data: dict[str, Any], key: str) -> datetime | None:
+    value = check.optional_text(data, key)
+    return datetime.fromisoformat(value) if value is not None else None
+
+
 def _check_source(origin: Origin, source: ReserveSource | None) -> None:
     if (origin == Origin.RESERVE) != (source is not None):
         raise ValueError(
             "a task has a reserve source exactly when it comes from the reserve"
         )
+
+
+# The keys each to_dict writes, and so the only ones from_dict accepts
+# (validation.exact_keys). test_core_validation checks both stay equal.
+_SOURCE_KEYS = frozenset({"source_id", "source_created"})
+_TASK_KEYS = _SOURCE_KEYS | {
+    "id",
+    "num",
+    "text",
+    "done",
+    "done_at",
+    "origin",
+    "template_id",
+    "priority",
+}
+_PREPARED_TASK_KEYS = _SOURCE_KEYS | {"id", "text", "origin", "priority"}
+_RESERVE_ITEM_KEYS = frozenset({"id", "text", "created", "priority"})
+_RECURRING_ITEM_KEYS = frozenset({"id", "text", "weekdays", "every_other_week_from"})
+_DELETION_KEYS = _TASK_KEYS | {"index", "deleted_at"}
 
 
 @dataclass(kw_only=True)
@@ -106,17 +133,17 @@ class Task:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Task:
-        done_at = data["done_at"]
+        check.exact_keys(data, _TASK_KEYS)
         return cls(
-            id=data["id"],
-            num=data["num"],
-            text=data["text"],
-            done=data["done"],
-            done_at=datetime.fromisoformat(done_at) if done_at else None,
-            origin=Origin(data["origin"]),
+            id=check.text(data, "id"),
+            num=check.integer(data, "num"),
+            text=check.text(data, "text"),
+            done=check.flag(data, "done"),
+            done_at=_optional_datetime(data, "done_at"),
+            origin=Origin(check.text(data, "origin")),
             source=_source_from_dict(data),
-            template_id=data["template_id"],
-            priority=data["priority"],
+            template_id=check.optional_text(data, "template_id"),
+            priority=check.flag(data, "priority"),
         )
 
 
@@ -152,12 +179,13 @@ class PreparedTask:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> PreparedTask:
+        check.exact_keys(data, _PREPARED_TASK_KEYS)
         return cls(
-            id=data["id"],
-            text=data["text"],
-            origin=Origin(data["origin"]),
+            id=check.text(data, "id"),
+            text=check.text(data, "text"),
+            origin=Origin(check.text(data, "origin")),
             source=_source_from_dict(data),
-            priority=data["priority"],
+            priority=check.flag(data, "priority"),
         )
 
 
@@ -180,11 +208,12 @@ class ReserveItem:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> ReserveItem:
+        check.exact_keys(data, _RESERVE_ITEM_KEYS)
         return cls(
-            id=data["id"],
-            text=data["text"],
-            created=date.fromisoformat(data["created"]),
-            priority=data["priority"],
+            id=check.text(data, "id"),
+            text=check.text(data, "text"),
+            created=date.fromisoformat(check.text(data, "created")),
+            priority=check.flag(data, "priority"),
         )
 
 
@@ -222,12 +251,15 @@ class RecurringItem:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> RecurringItem:
-        start = data["every_other_week_from"]
+        check.exact_keys(data, _RECURRING_ITEM_KEYS)
+        start = check.optional_text(data, "every_other_week_from")
         return cls(
-            id=data["id"],
-            text=data["text"],
-            weekdays=list(data["weekdays"]),
-            every_other_week_from=date.fromisoformat(start) if start else None,
+            id=check.text(data, "id"),
+            text=check.text(data, "text"),
+            weekdays=check.integers(data, "weekdays"),
+            every_other_week_from=(
+                date.fromisoformat(start) if start is not None else None
+            ),
         )
 
 
@@ -275,17 +307,17 @@ class Deletion:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Deletion:
-        done_at = data["done_at"]
+        check.exact_keys(data, _DELETION_KEYS)
         return cls(
-            id=data["id"],
-            num=data["num"],
-            text=data["text"],
-            origin=Origin(data["origin"]),
+            id=check.text(data, "id"),
+            num=check.integer(data, "num"),
+            text=check.text(data, "text"),
+            origin=Origin(check.text(data, "origin")),
             source=_source_from_dict(data),
-            template_id=data["template_id"],
-            done=data["done"],
-            done_at=datetime.fromisoformat(done_at) if done_at else None,
-            priority=data["priority"],
-            index=data["index"],
-            deleted_at=datetime.fromisoformat(data["deleted_at"]),
+            template_id=check.optional_text(data, "template_id"),
+            done=check.flag(data, "done"),
+            done_at=_optional_datetime(data, "done_at"),
+            priority=check.flag(data, "priority"),
+            index=check.integer(data, "index"),
+            deleted_at=datetime.fromisoformat(check.text(data, "deleted_at")),
         )
