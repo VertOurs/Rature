@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "date": "2026-08-27",
+  "counter": 6,
+  "locked": false,
+  "tasks": [
+    {
+      "id": "2923ce0f-9031-4ddf-a635-9b67ce596332",
+      "num": 1,
+      "text": "écrire les tests ✓ 3",
+      "done": true,
+      "done_at": "2026-08-27T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null
+    },
+    {
+      "id": "8b87804a-785b-4a75-8f18-1e9d0706cd99",
+      "num": 2,
+      "text": "call the bank 3",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null
+    },
+    {
+      "id": "71575c7b-84a5-45e9-8d10-d5e83636ffb5",
+      "num": 4,
+      "text": "already done 3",
+      "done": true,
+      "done_at": "2026-08-27T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null
+    },
+    {
+      "id": "0fd14080-d758-4bf6-80b5-d7d0ee934b06",
+      "num": 5,
+      "text": "fix the bike 3",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "658cda33-30ed-4c03-b9b2-2d7fedbb8b4d",
+      "source_created": "2026-08-27",
+      "template_id": null
+    }
+  ],
+  "deletions": [
+    {
+      "id": "1cb41289-fbb7-4503-a922-fb7b85d98d7e",
+      "num": 3,
+      "text": "never mind 3",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "done": false,
+      "done_at": null,
+      "index": 2,
+      "deleted_at": "2026-08-27T09:00:00+02:00"
+    }
+  ],
+  "reserve": [
+    {
+      "id": "377fcf35-062c-4731-8023-0fead59d26e2",
+      "text": "read the manual 0",
+      "created": "2026-08-24"
+    },
+    {
+      "id": "bc8e22cf-55b8-4034-9c1d-065173af387c",
+      "text": "fix the bike 0",
+      "created": "2026-08-24"
+    },
+    {
+      "id": "c8ee4bd0-2dff-4edd-9151-62e1709f424c",
+      "text": "call the bank 0",
+      "created": "2026-08-25"
+    },
+    {
+      "id": "09a45cfd-f1f8-4979-a872-dbccb9e82e16",
+      "text": "read the manual 1",
+      "created": "2026-08-25"
+    },
+    {
+      "id": "029b635a-2e3d-4075-bc13-eaf0e6d7467d",
+      "text": "fix the bike 1",
+      "created": "2026-08-25"
+    },
+    {
+      "id": "026cc1e9-5655-463f-8a9c-b703539e8446",
+      "text": "call the bank 1",
+      "created": "2026-08-26"
+    },
+    {
+      "id": "cfd073e3-bacd-45d9-b689-259021801226",
+      "text": "read the manual 2",
+      "created": "2026-08-26"
+    },
+    {
+      "id": "ae96356a-60ee-406b-90d9-e143cfe548f3",
+      "text": "fix the bike 2",
+      "created": "2026-08-26"
+    },
+    {
+      "id": "abe24f81-2829-493e-a33b-dec2175678c8",
+      "text": "call the bank 2",
+      "created": "2026-08-27"
+    },
+    {
+      "id": "4758d834-f258-4fb5-a6b4-5dedfada9634",
+      "text": "read the manual 3",
+      "created": "2026-08-27"
+    }
+  ],
+  "recurring": [
+    {
+      "id": "69e0cc9f-0f51-4877-95aa-7c1039520a98",
+      "text": "water plants",
+      "weekdays": [
+        1
+      ]
+    }
+  ]
+}

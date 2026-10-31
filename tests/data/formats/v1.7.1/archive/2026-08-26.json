@@ -1,0 +1,84 @@
+{
+  "version": 3,
+  "date": "2026-08-26",
+  "counter": 7,
+  "locked": false,
+  "tasks": [
+    {
+      "id": "abd676e2-6f7b-4528-ad2a-c9cac30193e2",
+      "num": 1,
+      "text": "bins",
+      "done": true,
+      "done_at": "2026-08-26T09:00:00+02:00",
+      "origin": "recurring",
+      "source_id": null,
+      "source_created": null,
+      "template_id": "b0067559-3f80-4da2-8781-a5bf50b103d5",
+      "priority": false
+    },
+    {
+      "id": "896bdf97-bb0d-418b-9702-71ea1ec20483",
+      "num": 2,
+      "text": "écrire les tests ✓ 2",
+      "done": true,
+      "done_at": "2026-08-26T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "051c184e-298d-412f-81f0-54a52de47f98",
+      "num": 3,
+      "text": "call the bank 2",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": true
+    },
+    {
+      "id": "6f4c9703-f31e-418a-b01b-5ffcd7911597",
+      "num": 5,
+      "text": "already done 2",
+      "done": true,
+      "done_at": "2026-08-26T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "e6d1a110-36dd-474a-b9cd-1ec528d0ef98",
+      "num": 6,
+      "text": "fix the bike 2",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "3c7a985f-56c7-4938-95c5-cb06e3063759",
+      "source_created": "2026-08-26",
+      "template_id": null,
+      "priority": false
+    }
+  ],
+  "deletions": [
+    {
+      "id": "5b3c27fe-5df6-4a9d-8615-c9a72ce8a71b",
+      "num": 4,
+      "text": "never mind 2",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "done": false,
+      "done_at": null,
+      "priority": false,
+      "index": 3,
+      "deleted_at": "2026-08-26T09:00:00+02:00"
+    }
+  ]
+}

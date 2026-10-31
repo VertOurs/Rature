@@ -1,0 +1,194 @@
+{
+  "version": 4,
+  "date": "2026-08-27",
+  "counter": 8,
+  "locked": false,
+  "tasks": [
+    {
+      "id": "4bbe736b-21e9-4b9d-8173-537b59019a19",
+      "num": 1,
+      "text": "prepare the slides 2",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "d74c509f-f165-439e-b6c1-2b2f238314f1",
+      "num": 2,
+      "text": "read the manual 2",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "073042b2-c923-4ee3-9e36-28f1b4177453",
+      "source_created": "2026-08-26",
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "4cf451bb-4fcc-4f46-bbec-62e29d0830ae",
+      "num": 3,
+      "text": "écrire les tests ✓ 3",
+      "done": true,
+      "done_at": "2026-08-27T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "41b8d693-4f38-4a56-ba52-48408210cf68",
+      "num": 4,
+      "text": "call the bank 3",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": true
+    },
+    {
+      "id": "5fc3e063-1c20-4efe-84d3-70a4e64bd554",
+      "num": 6,
+      "text": "already done 3",
+      "done": true,
+      "done_at": "2026-08-27T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "3c38ff38-07c7-4ad6-9c34-b1d35aae1869",
+      "num": 7,
+      "text": "fix the bike 3",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "9d58dde6-885d-4ca2-aea1-60d60af3e9b3",
+      "source_created": "2026-08-27",
+      "template_id": null,
+      "priority": false
+    }
+  ],
+  "deletions": [
+    {
+      "id": "e8f500a9-c52c-4f58-bcc7-0f4084374be0",
+      "num": 5,
+      "text": "never mind 3",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "done": false,
+      "done_at": null,
+      "priority": false,
+      "index": 4,
+      "deleted_at": "2026-08-27T09:00:00+02:00"
+    }
+  ],
+  "reserve": [
+    {
+      "id": "6aac4ab8-cb28-4852-a3ed-3ee3bcc9b478",
+      "text": "fix the bike 0",
+      "created": "2026-08-24",
+      "priority": true
+    },
+    {
+      "id": "a91cb4b1-5ce9-4e0e-9817-c86cb9cabf9e",
+      "text": "call the bank 0",
+      "created": "2026-08-25",
+      "priority": true
+    },
+    {
+      "id": "ff1636f9-0f6e-49cb-a333-7a50ed04b19c",
+      "text": "read the manual 0",
+      "created": "2026-08-24",
+      "priority": true
+    },
+    {
+      "id": "bb3b90c0-da5f-4e80-827d-10c81191fa04",
+      "text": "fix the bike 1",
+      "created": "2026-08-25",
+      "priority": false
+    },
+    {
+      "id": "f6359695-5bed-4543-9410-acfe2b4b220d",
+      "text": "prepare the slides 0",
+      "created": "2026-08-26",
+      "priority": false
+    },
+    {
+      "id": "6b0cf210-2d98-47ce-936c-a0c0ffc6d93e",
+      "text": "call the bank 1",
+      "created": "2026-08-26",
+      "priority": true
+    },
+    {
+      "id": "c46d2250-6db1-4293-a298-66be6f9e827f",
+      "text": "read the manual 1",
+      "created": "2026-08-25",
+      "priority": false
+    },
+    {
+      "id": "dda4fecb-a04c-47fd-9c7d-c0ec0a87b27e",
+      "text": "fix the bike 2",
+      "created": "2026-08-26",
+      "priority": false
+    },
+    {
+      "id": "4b6f616d-96c4-4a8d-bcbc-5e5752e6ff7c",
+      "text": "prepare the slides 1",
+      "created": "2026-08-27",
+      "priority": false
+    },
+    {
+      "id": "b3d97027-243a-425c-867d-1b01e599a717",
+      "text": "call the bank 2",
+      "created": "2026-08-27",
+      "priority": true
+    }
+  ],
+  "tomorrow": [
+    {
+      "id": "08ce63b9-a302-4cb1-80ec-f8f56f5a2808",
+      "text": "prepare the slides 3",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "priority": false
+    },
+    {
+      "id": "28b4b6c1-c86a-4c4d-94d9-23f3c9b2e56f",
+      "text": "read the manual 3",
+      "origin": "reserve",
+      "source_id": "2586aff6-c2e8-4004-b800-9fa37cbb1001",
+      "source_created": "2026-08-27",
+      "priority": false
+    }
+  ],
+  "recurring": [
+    {
+      "id": "37f76247-cfc5-403e-833b-eec261cebe06",
+      "text": "water plants",
+      "weekdays": [
+        1
+      ],
+      "every_other_week_from": null
+    },
+    {
+      "id": "b99becd0-6218-4a49-876e-f8dcd8f02240",
+      "text": "bins",
+      "weekdays": [
+        2
+      ],
+      "every_other_week_from": "2026-08-24"
+    }
+  ]
+}
