@@ -1,0 +1,108 @@
+{
+  "version": 4,
+  "date": "2026-08-25",
+  "counter": 9,
+  "locked": false,
+  "tasks": [
+    {
+      "id": "5aca758d-7439-486b-b331-fac1649d8e8e",
+      "num": 1,
+      "text": "water plants",
+      "done": true,
+      "done_at": "2026-08-25T09:00:00+02:00",
+      "origin": "recurring",
+      "source_id": null,
+      "source_created": null,
+      "template_id": "0bbd253a-1958-4be8-8362-f82e6f9feeee",
+      "priority": false
+    },
+    {
+      "id": "a2e13aca-39ba-4e2e-8669-732fd808c58c",
+      "num": 2,
+      "text": "prepare the slides 0",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "0d2c00ae-051a-4040-854e-943503581807",
+      "num": 3,
+      "text": "read the manual 0",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "9e769ef2-7a5b-47fa-8bb7-ffffec4b51c8",
+      "source_created": "2026-08-24",
+      "template_id": null,
+      "priority": true
+    },
+    {
+      "id": "bf45cb5b-5008-42d1-ad45-501535004d07",
+      "num": 4,
+      "text": "écrire les tests ✓ 1",
+      "done": true,
+      "done_at": "2026-08-25T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "4c6402dc-df5b-4705-909e-ebf0f1bbd188",
+      "num": 5,
+      "text": "call the bank 1",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": true
+    },
+    {
+      "id": "2c674b1c-91b8-4b70-8a79-303dbd1492a0",
+      "num": 7,
+      "text": "already done 1",
+      "done": true,
+      "done_at": "2026-08-25T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "priority": false
+    },
+    {
+      "id": "5d199b56-7146-4ac8-8e12-c6720f57ce57",
+      "num": 8,
+      "text": "fix the bike 1",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "3dd66de9-965e-4b2f-935f-f8b2b3011f16",
+      "source_created": "2026-08-25",
+      "template_id": null,
+      "priority": false
+    }
+  ],
+  "deletions": [
+    {
+      "id": "45e14ba2-c1a2-4b21-ad57-eb5f7a6e4f08",
+      "num": 6,
+      "text": "never mind 1",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "done": false,
+      "done_at": null,
+      "priority": false,
+      "index": 5,
+      "deleted_at": "2026-08-25T09:00:00+02:00"
+    }
+  ]
+}

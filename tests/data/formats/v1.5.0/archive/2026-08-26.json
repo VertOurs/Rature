@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "date": "2026-08-26",
+  "counter": 6,
+  "locked": false,
+  "tasks": [
+    {
+      "id": "6adb0ba5-fbb3-499f-b344-9cc249f05eb3",
+      "num": 1,
+      "text": "écrire les tests ✓ 2",
+      "done": true,
+      "done_at": "2026-08-26T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null
+    },
+    {
+      "id": "b1a5e786-500f-4eda-90f6-fcdaff2a1934",
+      "num": 2,
+      "text": "call the bank 2",
+      "done": false,
+      "done_at": null,
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null
+    },
+    {
+      "id": "1a510cd6-56ff-401f-9a28-a5852ca84893",
+      "num": 4,
+      "text": "already done 2",
+      "done": true,
+      "done_at": "2026-08-26T09:00:00+02:00",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null
+    },
+    {
+      "id": "02d8276a-efb4-465b-891f-a79689a02ba1",
+      "num": 5,
+      "text": "fix the bike 2",
+      "done": false,
+      "done_at": null,
+      "origin": "reserve",
+      "source_id": "e7b97870-de89-43ab-8d93-63278039469a",
+      "source_created": "2026-08-26",
+      "template_id": null
+    }
+  ],
+  "deletions": [
+    {
+      "id": "c2e5b461-d6a4-4709-8143-3a57acf1d1e2",
+      "num": 3,
+      "text": "never mind 2",
+      "origin": "day",
+      "source_id": null,
+      "source_created": null,
+      "template_id": null,
+      "done": false,
+      "done_at": null,
+      "index": 2,
+      "deleted_at": "2026-08-26T09:00:00+02:00"
+    }
+  ]
+}

@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Any
 
+from rature.core import validation as check
 from rature.core.models import (
     Deletion,
     Origin,
@@ -41,6 +42,12 @@ def _stamp(now: datetime) -> datetime:
     return now
 
 
+# What Day.to_dict writes. The main file and each archive hold these keys
+# next to others (version, reserve...): storage checks the file's whole
+# key set and hands Day.from_dict only these.
+DAY_KEYS = frozenset({"date", "counter", "locked", "tasks", "deletions"})
+
+
 @dataclass(kw_only=True)
 class Day:
     """The counter, the lock, the tasks and the deletion journal of one day."""
@@ -62,12 +69,15 @@ class Day:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Day:
+        check.exact_keys(data, DAY_KEYS)
         return cls(
-            date=date.fromisoformat(data["date"]),
-            counter=data["counter"],
-            locked=data["locked"],
-            tasks=[Task.from_dict(task) for task in data["tasks"]],
-            deletions=[Deletion.from_dict(entry) for entry in data["deletions"]],
+            date=date.fromisoformat(check.text(data, "date")),
+            counter=check.integer(data, "counter"),
+            locked=check.flag(data, "locked"),
+            tasks=[Task.from_dict(task) for task in check.objects(data, "tasks")],
+            deletions=[
+                Deletion.from_dict(entry) for entry in check.objects(data, "deletions")
+            ],
         )
 
 
