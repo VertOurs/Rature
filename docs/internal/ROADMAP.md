@@ -527,19 +527,110 @@ Décisions déjà prises le 30 octobre 2026 :
   rejouer le geste sur les données fraîches
 - Le téléphone (chantier 11) est le cas de référence, pas un ajout tardif
 
-- [ ] Session de cadrage avec VertOurs avant tout code, puis ADR 0009.
-      Questions à trancher :
-      - outil de synchronisation (Syncthing pressenti) ;
-      - choix du dossier par le portail, sans nouvelle permission (retour
-        d'expérience de l'ADR 0007) ;
-      - fichiers de conflit de l'outil de synchronisation ;
-      - passage du jour à 04:00 sur deux appareils ;
-      - archives synchronisées ou non ;
-      - quarantaine dans un dossier synchronisé (ne jamais écrire une
-        journée vide par-dessus des données en cours de synchronisation) ;
-      - validation des types au chargement
+### Cadrage du 31 octobre 2026
+
+Session de cadrage tenue avec VertOurs. Ce qui suit alimente l'ADR 0009,
+qui le reformule en anglais et le complète des résultats de l'essai.
+
+1. **Outil** : conçu pour tout outil qui synchronise des fichiers
+   entiers, testé et documenté avec Syncthing seul. Seuls ses fichiers de
+   conflit sont reconnus. Le client Android de Syncthing est à vérifier au
+   chantier 11, pas de mémoire.
+2. **Dossier, plan A** : choisi par le portail
+   (`Gtk.FileDialog.select_folder`), sans toucher aux `finish-args`.
+   Rature ne change les droits que de ses propres fichiers, jamais ceux du
+   dossier choisi. Le choix du dossier vit dans GSettings, hors du dossier
+   de données.
+3. **Plan B, écrit avant l'essai** : Syncthing, côté hôte, synchronise
+   directement le dossier de données de l'application
+   (`~/.var/app/io.github.vertours.Rature/data/rature` sous Flatpak).
+   Ni portail, ni FUSE, ni permission ; `os.replace`, `fsync`, `chmod` et
+   les notifications de fichier fonctionnent normalement. On y perd le
+   dialogue du point 8 : rejoindre le dossier se fait dans Syncthing, avec
+   une consigne écrite (dossier vide sur la deuxième machine). Retenu si
+   l'essai invalide le portail, sans être une solution dégradée.
+4. **Conflits** : fichiers `*.sync-conflict-*` repérés à côté de
+   `data.json` et dans `archive/`. Bandeau tant qu'un tel fichier existe,
+   avec l'action « Ouvrir le dossier ». Pas de fusion, pas de résolution
+   dans l'application, Rature ne les supprime jamais.
+5. **Passage du jour** : jamais écrit seul. Appliqué en mémoire au
+   chargement, écrit avec le premier vrai geste, qui relit avant. Sinon un
+   portable qui sort de veille passe le jour avant que Syncthing ait livré
+   le fichier du matin, et les tâches du matin partent en conflit à chaque
+   réveil.
+   **Limite connue, à écrire dans l'ADR** : un geste dans la minute qui
+   suit le réveil, avant que Syncthing ait livré, donne deux modifications
+   réellement différentes. Conflit signalé, rien de plus.
+6. **Archives** : synchronisées, le dossier synchronisé est tout le
+   dossier de données. Rien de propre à une machine n'y vit (vérifié :
+   état de la fenêtre et choix du dossier dans GSettings, journaux sur
+   stderr). Les fichiers temporaires de l'écriture atomique restent tels
+   quels ; au démarrage, Rature supprime les siens restés en place après
+   un plantage (motif exact, liens symboliques ignorés).
+7. **Fichier illisible ou absent** : jamais de journée vide écrite
+   d'office, ni de renommage `.bad-*` (renommer un fichier qui arrive,
+   c'est déjà écrire). Message bloquant avec « Réessayer » et une porte de
+   sortie explicite : mettre le fichier de côté s'il existe, puis repartir
+   d'une journée vide, après confirmation. C'est l'utilisateur qui décide
+   d'écrire. Créer `data.json` n'arrive qu'au moment de rejoindre le
+   dossier, jamais implicitement au démarrage.
+8. **Rejoindre un dossier qui contient déjà `data.json`** : le fichier du
+   dossier est pris, le fichier local mis de côté en sauvegarde, sans
+   fusion. Le dialogue dit clairement où part le fichier local. Dossier
+   vide : les données locales y sont copiées.
+9. **Deux versions de Rature sur le même dossier** : une
+   `FutureVersionError` à la relecture interdit toute écriture et demande
+   une mise à jour. Sinon l'ancienne version écrase le nouveau format.
+10. **Affichage périmé** : relire `data.json` quand la fenêtre reprend le
+    focus, sans surveillance de fichier. Lignes reconstruites seulement si
+    l'empreinte du fichier a changé ; jamais pendant qu'un menu « ⋯ » ou
+    un renommage est ouvert, le rechargement attend sa fermeture (retrait
+    de l'ADR 0007).
+11. **Validation des types au chargement** : stricte, champ par champ.
+    Aujourd'hui `"done": "yes"` ou `"text": 42` passent `Task.from_dict`
+    et ne casseraient que plus loin, dans l'interface.
+
+**Question ouverte pour l'ADR, soulevée par VertOurs : faut-il un mode
+synchronisé ?** Les points 5, 7 et 10 sont sans risque en local aussi. Les
+appliquer toujours supprime un réglage, un chemin de code et le risque
+d'oublier d'activer le mode (plan B surtout). Recommandation de l'agent :
+pas de mode, avec deux réserves à trancher dans l'ADR :
+
+- distinguer un premier lancement d'un fichier disparu par l'existence du
+  dossier de données plutôt que par un drapeau GSettings : premier
+  lancement si le dossier n'existe pas, fichier disparu s'il existe sans
+  `data.json`. Un drapeau GSettings ne suit pas les données quand le
+  dossier change (plan A), et bloquerait chaque lancement de test sur un
+  `XDG_DATA_HOME` jetable neuf, qui partage le dconf de l'hôte ;
+- coût visible en local du point 5 : la journée d'hier n'apparaît dans
+  Archives, Statistiques et l'export qu'après le premier geste du jour.
+  À accepter, ou à couvrir en servant la journée archivée en attente
+  depuis la mémoire.
+
+Le comportement local actuel du fichier illisible (mis de côté
+automatiquement, journée vide, bandeau) change avec le point 7 :
+`SPECIFICATION.md` §3.6 est à reprendre en conséquence.
+
+**Sorti du chantier** : passage du jour déterministe (identifiants dérivés
+de la date et de la source, aucun horodatage d'exécution, sérialisation
+stable). Avec l'écriture différée, il ne protège plus que
+`archive/<D>.json`, et seulement quand `data.json` est déjà en conflit.
+Noté dans « Repoussé volontairement ».
+
+### Découpage
+
+- [x] Session de cadrage avec VertOurs, le 31 octobre 2026
+- [ ] Validation stricte des types au chargement (point 11), indépendante
+      du reste
+- [ ] Essai jetable, hors dépôt, sur le montage du portail : `os.replace`
+      et `fsync` ; `chmod` `0o600`/`0o700` des fichiers de Rature (un
+      échec serait un `OSError` au démarrage) ; accès qui survit à un
+      redémarrage ; notifications de fichier, supposées absentes ;
+      `Gtk.FileLauncher` sur le dossier pour « Ouvrir le dossier ».
+      Verdict : plan A ou plan B
+- [ ] ADR 0009
 - [ ] `SPECIFICATION.md` mis à jour avant l'implémentation
-- [ ] Implémentation, découpée au cadrage
+- [ ] Implémentation, découpée d'après l'ADR
 
 **Critère de fin** : deux machines de bureau sur le même dossier, gestes
 alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
@@ -586,6 +677,15 @@ Noté ici pour ne pas y penser pendant les chantiers.
 - **Synchronisation avec Todoist ou un autre service tiers.** Abandonnée
   le 30 octobre 2026 : dépendance externe, et le besoin est couvert par le
   compagnon Android du chantier 11.
+- **Passage du jour déterministe.** Sorti du chantier 10 à son cadrage,
+  le 31 octobre 2026. Deux appareils qui passent le même jour écriraient
+  des fichiers identiques, que Syncthing ne met pas en conflit.
+  Conditions : identifiants créés par `roll_over` dérivés de la date et
+  de leur source (récurrentes, tâches renvoyées en réserve, tâches qui
+  entrent dans la journée), aucun horodatage d'exécution, sérialisation
+  stable. Avec l'écriture différée du passage du jour, il ne protège plus
+  que `archive/<D>.json`, et seulement quand `data.json` est déjà en
+  conflit. À revoir si l'usage réel montre des conflits d'archives.
 - **Étiquettes temporelles ou catégories** (« cet après-midi », « à faire
   après »). Abandonnée le 8 septembre 2026 : ce sont des catégories, que
   la méthode exclut par construction (`CLAUDE.md` §1) et que

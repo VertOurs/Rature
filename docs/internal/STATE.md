@@ -6,9 +6,13 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : aucun. Chantier 9 clos le 31 octobre 2026
-  par `2.1.1` (« Chantiers terminés »). Suivant : 10, synchronisation
-  entre appareils (`ROADMAP.md`), pas encore ouvert.
+- **Chantier en cours** : 10, synchronisation entre appareils, ouvert
+  le 31 octobre 2026. Cadrage tenu avec VertOurs le même jour, consigné
+  dans `ROADMAP.md` (« Cadrage du 31 octobre 2026 »), aucun code écrit.
+  Étape suivante : validation stricte des types au chargement, puis
+  essai jetable du portail, qui tranche entre plan A et plan B, puis
+  ADR 0009. Question ouverte pour l'ADR : mode synchronisé ou
+  comportements appliqués toujours.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid
