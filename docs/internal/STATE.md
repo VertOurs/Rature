@@ -9,12 +9,12 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 - **Chantier en cours** : 10, synchronisation entre appareils, ouvert
   le 31 octobre 2026. Cadrage tenu avec VertOurs le même jour, consigné
   dans `ROADMAP.md` (« Cadrage du 31 octobre 2026 »). Validation
-  stricte des types au chargement faite (branche
-  `fix/strict-load-validation`), vérifiée sur les fichiers des versions
-  publiées et sur une copie des vraies données (39 fichiers OK, copie
-  supprimée). Étape suivante : essai jetable du portail, qui tranche
-  entre plan A et plan B, puis ADR 0009. Question ouverte pour l'ADR : mode synchronisé ou
-  comportements appliqués toujours.
+  stricte des types au chargement faite (#213). Essai du portail fait
+  le 31 octobre 2026, avant et après redémarrage : plan A retenu. ADR
+  0009 écrit (pas de mode synchronisé, retard local des archives
+  accepté). Étape suivante : mettre à jour `SPECIFICATION.md` (§3.6,
+  §2.5, choix du dossier, dialogue pour rejoindre, bandeau de conflit)
+  avant toute implémentation.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid
