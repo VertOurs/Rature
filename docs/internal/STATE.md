@@ -6,52 +6,21 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
 
 ## Avancement
 
-- **Chantier en cours** : 9, propreté et solidité, ouvert le
-  30 octobre 2026 avec la planification de la v3 (chantiers 9, 10 et 11,
-  `ROADMAP.md`). Fait : ADR traduites en anglais et renommées,
-  renvois d'ADR et commentaires périmés corrigés, `window._perform` passé
-  au logger, booléens de priorité et de date en paramètres nommés
-  (règle ruff `FBT` activée), règles ruff `S` activées, `release.yml` refuse toute entrée qui n'est
-  pas un tag `vX.Y.Z` existant, dépendances de développement en versions
-  exactes suivies par Dependabot `pip`, `SECURITY.md` (signalement privé
-  GitHub, accusé de réception sous sept jours, dernière version seule)
-  (30 octobre 2026). `sha256` AUR calculé par `release.yml` (job `aur`,
-  `build-aux/aur/fill_checksum.py`) : les fichiers du dépôt gardent
-  `SKIP`, les copies remplies sont jointes à la release dans
-  `rature-aur.tar.gz`. Non encore exercé sur un vrai tag : à vérifier
-  au prochain (`2.1.1`), un tag antérieur saute le job. Fenêtre Archives
-  rafraîchie au passage du jour (§3.5) : date affichée et recherche
-  conservées, vérifiée par un script qui pilote la vraie fenêtre sous
-  horloge simulée (17 contrôles, 10 en échec sans le correctif),
-  contrôlée visuellement par VertOurs le 30 octobre 2026. Provenance
-  réserve regroupée dans `ReserveSource` (`Task`, `PreparedTask`,
-  `Deletion`) : fichier réécrit identique à l'octet près à celui de
-  `main`, aucune migration. `mypy --strict` sur `rature.core` dans le
-  job `lint` (mypy `2.4.1`, épinglé, suivi par Dependabot `pip`).
-  Tests d'interface : dix tests dans `tests/ui/` (ajouter, rayer,
-  dérayer, renommer, glisser-déposer dans le jour et la réserve, refus
-  entre blocs et sur soi-même), lancés par `build-aux/ui-tests.sh` dans le SDK
-  GNOME 51 sous `gtk4-broadwayd` (application installée, GSettings en
-  mémoire, `G_DEBUG=fatal-criticals`), job CI `ui`. Sautés par `pytest`
-  hors SDK. Job `ui` exigé par le ruleset `main` depuis le
-  30 octobre 2026, après deux passages verts. Base commune aux lignes
-  `EditableRow` (`editable_row.py`) : les trois templates la nomment
-  comme parent (`RatureEditableRow`). 27 tests d'interface. Contrôle
-  visuel du glisser-déposer validé par VertOurs avant fusion. Vitrine :
-  README (« Status » en deux lignes, section « Engineering »,
-  `pytest --cov`), `STATE.md` déplacé ici, en-tête du CHANGELOG aligné
-  sur `CONTRIBUTING.md`. Captures Demain et Réserve ajoutées (README,
-  page de présentation, metainfo, légendes dans les six catalogues).
-  Chantier 9 : toutes les cases cochées, clos par `2.1.1` (corrective :
-  un seul `fix` depuis `2.1.0`, aucun `feat`). Sauvegarde avant migration livrée
-  (`SPECIFICATION.md` §2.7.10, `storage.load`). `OSError` au démarrage
-  livrée (§3.6, situation 4, alerte puis fermeture, six catalogues).
-  Alertes `unreadable` et `future` contrôlées visuellement par VertOurs le
-  30 octobre 2026. Les deux cases ensemble donnent `2.1.0`.
-  Priorité (PR #187) contrôlée visuellement par VertOurs dans Jour,
-  Demain et Réserve le 30 octobre 2026. `mypy` et `gtk4-broadwayd` validés comme
-  outils de CI (`CLAUDE.md` §4 règle 6). Chantier 8 terminé le
-  29 octobre 2026, `2.0.0` publiée (ci-dessous).
+- **Chantier en cours** : aucun. Chantier 9 clos le 31 octobre 2026
+  par `2.1.1` (« Chantiers terminés »). Suivant : 10, synchronisation
+  entre appareils (`ROADMAP.md`), pas encore ouvert.
+- **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
+  `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
+  en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid
+  cross-device link », incident du runner : le job `flatpak` de la CI
+  avait passé les mêmes étapes sur le même commit et la même image
+  quelques minutes plus tôt), vert à la relance (run `41190867947`,
+  tentative 2). Premier passage réel du job `aur` : `sha256` de
+  `rature-aur.tar.gz` identique à celle de l'archive du tag (deux
+  téléchargements). `rature.flatpak` joint (114 000 octets), le dépôt
+  sert « Built from 0999aac », metainfo du bundle en `2.1.1`.
+  `flatpak update` par VertOurs le 31 octobre 2026, sans migration.
+  **Reste à la charge de VertOurs** : rien.
 - **Pour toute nouvelle langue** : l'ajouter à `po/LINGUAS`, créer le
   `.po` (`msginit`) avant `meson setup --reconfigure build`, Meson ne
   suivant pas ce fichier. Traduire les deux formats de date
@@ -143,7 +112,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `2.1.0` | Première version du chantier 9 : sauvegarde avant migration et alerte sur dossier de données inutilisable, sans changement de format. Coupée le 30 octobre 2026 |
+| Version du projet | `2.1.1` | Corrective qui clôt le chantier 9 : fenêtre Archives rafraîchie au passage du jour, captures Demain et Réserve, sans changement de format. Coupée le 31 octobre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -338,6 +307,14 @@ version taguée après le bump.
   (PR #171), catalogues `es`, `de`, `pt_BR`, `ru`, `eo` en traduction
   machine signalée (PR #174 à #178), formats de date pris au catalogue
   avec repli sans locale, correctifs de la revue de code (PR #179).
+- **Chantier 9**, 30 et 31 octobre 2026, versions `2.1.0` et `2.1.1` :
+  sauvegarde avant migration (§2.7.10), alerte sur dossier de données
+  inutilisable (§3.6), Archives rafraîchie au passage du jour (§3.5).
+  Solidité : ADR en anglais, règles ruff `FBT` et `S`, `mypy --strict`
+  sur `rature.core` (job `lint`), 27 tests d'interface sous
+  `gtk4-broadwayd` (job `ui`, exigé par le ruleset), `SECURITY.md`,
+  garde du tag et `sha256` AUR dans `release.yml`. `mypy` et
+  `gtk4-broadwayd` validés comme outils de CI (`CLAUDE.md` §4 règle 6).
 
 ## Documents
 
