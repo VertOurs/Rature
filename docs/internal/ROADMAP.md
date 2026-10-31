@@ -628,13 +628,18 @@ Noté dans « Repoussé volontairement ».
       périmètre, à reprendre si le rejeu des gestes en a besoin : règles
       qui croisent plusieurs champs (identifiants en double, `counter`
       inférieur au plus grand `num`, texte vide)
-- [ ] Essai jetable, hors dépôt, sur le montage du portail : `os.replace`
+- [x] Essai jetable, hors dépôt, sur le montage du portail : `os.replace`
       et `fsync` ; `chmod` `0o600`/`0o700` des fichiers de Rature (un
       échec serait un `OSError` au démarrage) ; accès qui survit à un
       redémarrage ; notifications de fichier, supposées absentes ;
       `Gtk.FileLauncher` sur le dossier pour « Ouvrir le dossier ».
-      Verdict : plan A ou plan B
-- [ ] ADR 0009
+      Fait le 31 octobre 2026, avant et après redémarrage : tout passe
+      sauf les notifications, absentes comme prévu. **Verdict : plan A.**
+      Non couverts, à vérifier à l'implémentation : `os.link` de la
+      sauvegarde avant migration, livraison réelle par Syncthing
+- [x] ADR 0009 (`docs/adr/0009-sync-through-a-chosen-folder.md`). Pas de
+      mode synchronisé ; retard local des archives jusqu'au premier
+      geste du jour accepté. Décisions de VertOurs du 31 octobre 2026
 - [ ] `SPECIFICATION.md` mis à jour avant l'implémentation
 - [ ] Implémentation, découpée d'après l'ADR
 
