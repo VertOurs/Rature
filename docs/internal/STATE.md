@@ -12,7 +12,9 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   stricte des types au chargement faite (#213). Essai du portail fait
   le 31 octobre 2026, avant et après redémarrage : plan A retenu. ADR
   0009 écrit (pas de mode synchronisé, retard local des archives
-  accepté). Étape suivante : mettre à jour `SPECIFICATION.md` (§3.6,
+  accepté), puis amendé après relecture : rejeu refusé avec toast,
+  annulation par identifiant sur une pile locale en mémoire, dialogue
+  de jonction complété, risque ouvert Android. Étape suivante : mettre à jour `SPECIFICATION.md` (§3.6,
   §2.5, choix du dossier, dialogue pour rejoindre, bandeau de conflit)
   avant toute implémentation.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash

@@ -52,6 +52,10 @@ raise a banner for as long as one exists, with an "Open Folder" action
 (`Gtk.FileLauncher`). No merge, no resolution inside the application, and
 Rature never deletes them.
 
+Only names of the exact shape `YYYY-MM-DD.json` are read as archived
+days, which `list_archives` already enforces: a conflict copy in
+`archive/` is never read as a day.
+
 ### Day rollover is never written on its own
 
 The rollover is applied in memory at load time and written with the first
@@ -63,6 +67,11 @@ morning's file, and the morning's tasks end up in conflict at every wake.
 has delivered, produces two genuinely different edits. The conflict is
 reported, nothing more.
 
+**Known limit**: a delivery that lands between the check before writing
+and the `os.replace` is overwritten without any conflict file, since
+Syncthing takes Rature's write for the next version of the one it has
+just delivered. A window of a few milliseconds, accepted.
+
 ### Archives
 
 Synchronised: the synchronised folder is the whole data folder. Nothing
@@ -70,14 +79,17 @@ specific to one machine lives there (window state and folder choice in
 GSettings, logs on stderr). The temporary files of the atomic write stay
 as they are; at startup Rature removes its own ones left behind by a
 crash, matching the exact pattern `.<name>.<pid>.tmp` and ignoring
-symbolic links.
+symbolic links. The user documentation gives a `.stignore` pattern for
+those files, so that a crash on one machine does not spread its
+leftovers to the others.
 
 ### Unreadable or missing file
 
 Never an empty day written by default, never a `.bad-*` rename: renaming
 a file that is arriving is already writing. A blocking message offers
 "Try Again" and an explicit way out: set the file aside if it exists,
-then start from an empty day, after confirmation. The user decides to
+then start from an empty day, after confirmation. The confirmation says
+that the empty day will also reach the other devices. The user decides to
 write. `data.json` is only created when joining a folder, never
 implicitly at startup.
 
@@ -99,18 +111,93 @@ the local file is set aside as a backup, without merging. The dialog says
 plainly where the local file goes. If the folder is empty, the local data
 is copied into it.
 
+- **Empty** ignores Syncthing's own entries (`.stfolder`, `.stignore`,
+  `.stversions`). Otherwise no Syncthing folder would ever be empty
+- For an empty folder, the dialog asks to wait until Syncthing has
+  finished its first synchronisation before joining it. Joining too early
+  would copy the local data over a folder that is about to receive the
+  other device's
+- If the folder holds other visible files, the dialog says so
+- Local archives stay in the previous folder, and the dialog says so
+
 ### Two versions of Rature on the same folder
 
 A `FutureVersionError` on reading again forbids any write and asks for an
-update. Otherwise the older version overwrites the newer format.
+update. Without this check, an older version would overwrite the newer
+format.
 
 ### Stale display
 
 `data.json` is read again when the window regains focus, with no file
-watching. Rows are rebuilt only if the file's fingerprint changed, and
+watching. The fingerprint is the SHA-256 of the content, not the
+modification time, which Syncthing copies from the device the change came
+from. The fingerprint held in memory is updated after each of Rature's own
+writes, so that a focus return with no outside change reloads nothing.
+Rows are rebuilt only if the file's fingerprint changed, and
 never while a "⋯" menu or a rename is open: the reload waits until it
 closes. This is the lesson of ADR 0007's withdrawal, where a rebuild on
 focus return destroyed a row under its open menu.
+
+### A replayed gesture that no longer applies
+
+A gesture is replayed on the fresh data once. If the replay is refused
+(its target no longer exists, or the business rules refuse it on the
+fresh data), the gesture is dropped: nothing is written, the fresh data
+is shown, and a toast says the task changed on another device. This is
+neither a conflict nor an error: no banner, and one log line without
+task text.
+
+The refusal takes its own path. The generic handling of `LockedError`,
+`KeyError` and `ValueError` in the window treats them as bugs, logged
+with a full trace and never shown (`SPECIFICATION.md` §3.6, "Refus
+métier"). A refused replay is expected: `App` raises a dedicated
+exception, caught before that generic case.
+
+This is not a rare case. The day rollover gives new identifiers to some
+of the items it creates: the recurring tasks of the new day, and the
+unstruck day tasks that return to the reserve as new items. The same task
+then has a different identifier on each device that rolled the day over.
+A gesture made just before the other device's file arrives targets an
+identifier that no longer exists. Tasks prepared in Tomorrow keep their
+identifier when they enter the day, and reserve items drawn into the day
+get their own back when they return.
+
+Gestures name their target by identifier, never by position: a position
+replayed on different data would silently hit another task.
+
+### Undo targets a local deletion
+
+Undo only covers deletions (ADR 0005). Today it restores the last entry
+of the deletion journal, with no identifier. Replayed on fresh data, it
+would undo the last deletion in the file, which may have been made on
+the other device.
+
+Undo therefore targets a deletion by identifier. Rature keeps in memory
+a stack of the identifiers of the deletions made on this device since
+launch. The header button and `Ctrl+Z` undo the most recent one, so that
+several deletions in a row can still be undone one after the other.
+
+An undo is a gesture like any other: the file is read again before
+writing, the undo is replayed on the fresh data, and it is refused with
+the toast of a refused replay if its entry is no longer in the journal
+(for instance, the other device has rolled the day over). On each reload
+with a changed fingerprint, the identifiers missing from the fresh
+journal leave the stack, so that the button and `Ctrl+Z` reflect what can
+still be undone.
+
+The stack is not cleared on a reload: clearing it on every change from
+elsewhere would disable undo as soon as the phone adds a task.
+
+The journal on disk is never cleared: it carries the counts of §2.6
+(ADR 0005).
+
+Undo is no longer offered after a restart: the stack lives in memory
+only. Today, the journal allows undoing the day's last deletion even
+after a relaunch. Accepted: keeping it would need a "device" field in the
+format, hence a migration.
+
+An undo never undoes the day rollover, even when the deletion it restores
+was the first gesture of the day, written together with the rollover.
 
 ### Strict type validation on load
 
@@ -156,13 +243,21 @@ Not covered by the spike, to check at implementation:
 - a real Syncthing delivery into the folder: covered by the end
   criterion of chantier 10, two machines for a week of real use
 
+## Open risk
+
+The spike covers the desktop only. On Android, reaching a folder written
+by another application goes through the Storage Access Framework, with no
+known atomic replacement, or through access to all files. To validate at
+chantier 11, before any commitment on the phone. A half-written file is
+already covered: it is unreadable, and falls into the blocking message.
+
 ## Alternatives rejected
 
 - **Plan B: Syncthing on the host syncs the application's own data
   folder** (`~/.var/app/io.github.vertours.Rature/data/rature` under
   Flatpak). No portal, no FUSE, no permission. Written before the spike as
   the fallback if the portal failed, not as a degraded solution. Not
-  retained since the portal passed: it loses the join dialog, joining
+  chosen, since the portal spike passed: it loses the join dialog, joining
   becomes a written instruction to follow in Syncthing (empty folder on
   the second machine), and the folder stays hidden in `~/.var`.
 - **A `--filesystem` permission** in the manifest. Rejected: it breaks
@@ -181,7 +276,9 @@ Not covered by the spike, to check at implementation:
 - `docs/internal/SPECIFICATION.md` is updated before any code: §3.6
   (unreadable file: blocking message instead of the automatic set-aside),
   §2.5 (rollover written with the first gesture), the folder choice, the
-  join dialog and the conflict banner
+  join dialog with the additions above, the conflict banner, the refused
+  replay and its toast, and undo by identifier instead of "the last
+  entry", with the local stack in memory
 - A GSettings key holds the chosen folder; without it, the default data
   folder is used, unchanged
 - `App` reads `data.json` again before each write and on focus return,
