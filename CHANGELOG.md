@@ -11,6 +11,12 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-10-30
+
+Closes chantier 9 (cleanup and hardening). One fix you can see, two new
+screenshots, and under the hood strict typing on the business logic and
+UI tests on real widgets. No change to the data format.
+
 ### Changed
 
 - Each GitHub release carries `rature-aur.tar.gz`: the AUR `PKGBUILD` and
@@ -558,7 +564,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/VertOurs/Rature/releases/tag/v2.1.1
 [2.1.0]: https://github.com/VertOurs/Rature/releases/tag/v2.1.0
 [2.0.0]: https://github.com/VertOurs/Rature/releases/tag/v2.0.0
 [1.9.0]: https://github.com/VertOurs/Rature/releases/tag/v1.9.0
