@@ -301,3 +301,18 @@ during the first synchronisation the tool delivers files in any order, and
 the other device's archives may arrive before its `data.json`. Copying
 would overwrite them. Local archives then stay in the previous folder, as
 they do when the folder already holds `data.json`, and the dialog says so.
+
+## Addendum (2026-11-01): `os.link` on the portal mount
+
+The check the spike left open was run on 1 November 2026, inside the
+installed `2.1.1` Flatpak, on a throwaway folder chosen through the portal.
+`os.link` works there: a new name is created, an existing name is refused
+with `FileExistsError`, and the target survives the removal of its source.
+The real `_back_up_before_migration` gives an identical copy in mode
+`0o600`, keeps the original backup on a second call and leaves no temporary
+file. The host sees the same mode and content.
+
+The `O_CREAT | O_EXCL` fallback is not needed, and the backup code does not
+change. That fallback would only have kept half of the guarantee: an
+existing backup is never overwritten, but an interrupted copy could leave a
+truncated backup, which would then never be replaced.

@@ -645,9 +645,9 @@ Noté dans « Repoussé volontairement ».
       §3.6 (refondue), §3.8, §3.14, §3.16. Le 1er novembre 2026, avec
       VertOurs, bloc par bloc. Écart avec l'ADR 0009 sur les archives à
       la jonction, consigné dans son addendum
-- [ ] Essai de `os.link` sur le montage du portail, dans le Flatpak. Si
-      l'essai échoue, trancher le repli : `O_CREAT | O_EXCL` seul peut
-      laisser une sauvegarde tronquée, jamais remplacée ensuite
+- [x] Essai de `os.link` sur le montage du portail, dans le Flatpak, le
+      1er novembre 2026 : tout passe, aucun repli nécessaire (ADR 0009,
+      addendum)
 
 Règles communes, sur le dossier local :
 
