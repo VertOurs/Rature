@@ -674,3 +674,18 @@ def test_striking_twice_raises_value_error(tmp_path: Path) -> None:
     app.strike(task.id)
     with pytest.raises(ValueError):
         app.strike(task.id)
+
+
+def test_open_removes_temporary_files_left_by_a_crash(tmp_path: Path) -> None:
+    (tmp_path / "archive").mkdir()
+    stale_main = tmp_path / ".data.json.4242.tmp"
+    stale_archive = tmp_path / "archive" / ".2026-08-24.json.4242.tmp"
+    delivery = tmp_path / ".syncthing.data.json.tmp"
+    for path in (stale_main, stale_archive, delivery):
+        path.write_text("{}")
+
+    App.open(tmp_path)
+
+    assert not stale_main.exists()
+    assert not stale_archive.exists()
+    assert delivery.exists()

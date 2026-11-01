@@ -26,12 +26,14 @@ from rature.core.storage import (
     FILE_VERSION,
     Store,
     _atomic_write_json,
+    _back_up_before_migration,
     archive,
     list_archives,
     load,
     load_archive,
     main_file_path,
     quarantine,
+    remove_stale_temp_files,
     restrict_data_dir_permissions,
     save,
     xdg_data_dir,
@@ -426,3 +428,177 @@ def test_a_hand_written_task_round_trips(tmp_path: Path) -> None:
     )
     save(Store(day=day), data_dir=tmp_path)
     assert load(data_dir=tmp_path).day == day
+
+
+@pytest.mark.parametrize("name", [".data.json.4242.tmp", ".data.json.v3.bak.4242.tmp"])
+def test_remove_stale_temp_files_removes_rature_names_next_to_the_data_file(
+    tmp_path: Path, name: str
+) -> None:
+    (tmp_path / name).write_text("left by a crash")
+    remove_stale_temp_files(data_dir=tmp_path)
+    assert not (tmp_path / name).exists()
+
+
+def test_remove_stale_temp_files_removes_rature_names_in_the_archive(
+    tmp_path: Path,
+) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    stale = archive_dir / ".2026-08-24.json.4242.tmp"
+    stale.write_text("left by a crash")
+    remove_stale_temp_files(data_dir=tmp_path)
+    assert not stale.exists()
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "data.json",
+        "data.json.v3.bak",
+        # A delivery in progress: removing it would break Syncthing's copy.
+        ".syncthing.data.json.tmp",
+        "data.sync-conflict-20261101-120000-ABCDEFG.json",
+        ".data.sync-conflict-20261101-120000-ABCDEFG.json.4242.tmp",
+        ".data.json.tmp",
+        ".data.json.abc.tmp",
+        ".data.json.v3.bak.tmp",
+        ".data.json.4242.tmp.bak",
+        "x.data.json.4242.tmp",
+        ".data.json.bad.4242.tmp",
+        # An archive's temporary name means nothing outside archive/.
+        ".2026-08-24.json.4242.tmp",
+    ],
+)
+def test_remove_stale_temp_files_keeps_near_names_next_to_the_data_file(
+    tmp_path: Path, name: str
+) -> None:
+    (tmp_path / name).write_text("not ours")
+    remove_stale_temp_files(data_dir=tmp_path)
+    assert (tmp_path / name).read_text() == "not ours"
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "2026-08-24.json",
+        # A delivery in progress: removing it would break Syncthing's copy.
+        ".syncthing.2026-08-24.json.tmp",
+        "2026-08-24.sync-conflict-20261101-120000-ABCDEFG.json",
+        ".2026-08-24.json.tmp",
+        ".2026-08-24.json.abc.tmp",
+        "x.2026-08-24.json.4242.tmp",
+        # The main file's temporary name means nothing inside archive/.
+        ".data.json.4242.tmp",
+    ],
+)
+def test_remove_stale_temp_files_keeps_near_names_in_the_archive(
+    tmp_path: Path, name: str
+) -> None:
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir()
+    (archive_dir / name).write_text("not ours")
+    remove_stale_temp_files(data_dir=tmp_path)
+    assert (archive_dir / name).read_text() == "not ours"
+
+
+def test_remove_stale_temp_files_matches_what_the_writers_really_use(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Ties the patterns to the code that makes these names: a writer that
+    # changed its naming would otherwise leave orphans nothing ever removes.
+    used: list[Path] = []
+    real_replace, real_link = os.replace, os.link
+
+    def spy_replace(source: Path, destination: Path) -> None:
+        used.append(Path(source))
+        real_replace(source, destination)
+
+    def spy_link(source: Path, destination: Path) -> None:
+        used.append(Path(source))
+        real_link(source, destination)
+
+    monkeypatch.setattr(os, "replace", spy_replace)
+    monkeypatch.setattr(os, "link", spy_link)
+    save(make_store(), data_dir=tmp_path)
+    archive(Day(date=date(2026, 8, 24)), data_dir=tmp_path)
+    _back_up_before_migration(main_file_path(data_dir=tmp_path), b"{}", 3)
+    assert len(used) == 3
+    for path in used:
+        path.write_text("left by a crash")
+
+    remove_stale_temp_files(data_dir=tmp_path)
+
+    assert not any(path.exists() for path in used)
+
+
+def test_remove_stale_temp_files_ignores_a_symbolic_link(tmp_path: Path) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    target = outside / "precious"
+    target.write_text("keep me")
+    folder = tmp_path / "data"
+    folder.mkdir()
+    link = folder / ".data.json.4242.tmp"
+    link.symlink_to(target)
+
+    remove_stale_temp_files(data_dir=folder)
+
+    assert link.is_symlink()
+    assert target.read_text() == "keep me"
+
+
+def test_remove_stale_temp_files_ignores_a_directory(tmp_path: Path) -> None:
+    directory = tmp_path / ".data.json.4242.tmp"
+    directory.mkdir()
+    remove_stale_temp_files(data_dir=tmp_path)
+    assert directory.is_dir()
+
+
+def test_remove_stale_temp_files_does_nothing_on_a_missing_folder(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    missing = tmp_path / "missing"
+    with caplog.at_level(logging.WARNING, logger="rature.core.storage"):
+        remove_stale_temp_files(data_dir=missing)
+    assert not missing.exists()
+    assert not caplog.records
+
+
+def test_remove_stale_temp_files_warns_when_a_folder_cannot_be_listed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    def refuse(_path: Path) -> None:
+        raise PermissionError("no access")
+
+    monkeypatch.setattr(os, "scandir", refuse)
+    with caplog.at_level(logging.WARNING, logger="rature.core.storage"):
+        remove_stale_temp_files(data_dir=tmp_path)
+    assert caplog.records[0].levelno == logging.WARNING
+    assert str(tmp_path) in caplog.text
+
+
+def test_remove_stale_temp_files_warns_and_goes_on_when_a_removal_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    refused = tmp_path / ".data.json.1.tmp"
+    removed = tmp_path / ".data.json.2.tmp"
+    refused.write_text("stuck")
+    removed.write_text("stale")
+    real_unlink = os.unlink
+
+    def refuse_one(path: str) -> None:
+        if Path(path) == refused:
+            raise PermissionError("no access")
+        real_unlink(path)
+
+    monkeypatch.setattr(os, "unlink", refuse_one)
+    with caplog.at_level(logging.WARNING, logger="rature.core.storage"):
+        remove_stale_temp_files(data_dir=tmp_path)
+    assert refused.exists()
+    assert not removed.exists()
+    assert caplog.records[0].levelno == logging.WARNING
+    assert refused.name in caplog.text

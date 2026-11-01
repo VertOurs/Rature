@@ -11,6 +11,12 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 
 ## [Unreleased]
 
+### Added
+
+- Temporary files left behind by a crash during a save are now removed at
+  startup. Only Rature's own exact names are touched: a sync tool's
+  temporary files and conflict copies in the same folder stay in place.
+
 ### Fixed
 
 - A data file or an archive with a value of the wrong type (`"done":
