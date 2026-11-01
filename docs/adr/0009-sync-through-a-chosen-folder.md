@@ -285,3 +285,15 @@ already covered: it is unreadable, and falls into the blocking message.
   and replays the gesture if the fingerprint changed
 - The implementation is split according to this ADR in
   `docs/internal/ROADMAP.md`
+
+## Addendum (2026-11-01)
+
+Joining an empty folder now copies `archive/` along with `data.json`,
+VertOurs's decision while writing `docs/internal/SPECIFICATION.md` §3.17.
+The decision above left local archives in the previous folder in every
+case. Since no button leads back to the default folder (`SPECIFICATION.md`
+§3.6), archives
+left behind would become invisible in Archives and Statistics. The folder
+is empty, so nothing is overwritten. When the chosen folder already holds
+data, nothing changes: local archives stay in the previous folder, and the
+dialog says so.
