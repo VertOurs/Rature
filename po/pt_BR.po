@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:32+0100\n"
+"POT-Creation-Date: 2026-11-01 16:56+0100\n"
 "PO-Revision-Date: 2026-10-29 18:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -740,14 +740,14 @@ msgstr "Desfazer o risco"
 msgid "Strike through"
 msgstr "Riscar"
 
-#: src/rature/ui/window.py:401
+#: src/rature/ui/window.py:384
 msgid "Changes could not be saved to disk."
 msgstr "Não foi possível salvar as alterações no disco."
 
-#: src/rature/ui/window.py:406
-msgid "A new day has started. The previous one has been archived."
-msgstr "Um novo dia começou. O anterior foi arquivado."
+#: src/rature/ui/window.py:388
+msgid "A new day has started."
+msgstr "Um novo dia começou."
 
-#: src/rature/ui/window.py:408
+#: src/rature/ui/window.py:389
 msgid "Dismiss"
 msgstr "Dispensar"

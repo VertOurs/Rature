@@ -141,20 +141,19 @@ user's confirmation, through `App.start_empty`, sets a file aside
 (`storage.set_aside`) and writes an empty day. It lets
 `migrations.FutureVersionError` pass through without building anything for a
 future version. It also lets any other `OSError` pass through (folder or file
-out of reach, backup or rollover archive impossible); the interface then
-alerts and quits, as for a future version (`SPECIFICATION.md` §3.6). Before
-returning it always runs `ensure_day`, the
-`roll_over` then `archive` then `save` sequence of `SPECIFICATION.md` §2.5:
-the caller always gets an `App` already up to date and never has to know or
-replay that sequence.
+out of reach, backup impossible); the interface then alerts and quits, as for
+a future version (`SPECIFICATION.md` §3.6). Before returning it always runs
+`ensure_day`: the caller always gets an `App` already up to date and never has
+to know a rollover happened.
 
-`ensure_day` returns an `EnsureResult(outcome, archived)`. `outcome` is
-`IDLE` (nothing due, nothing pending), `SAVED` (a write reached disk) or
-`SAVE_FAILED` (a write raised `OSError`); `archived` is the day a rollover
-archived, or `None`. A failed save is reported, not raised: it sets
-`App.save_pending` and a later `ensure_day` retries the write with no
-second `roll_over` and no second `archive`. `archives` and `read_archive`
-are the archive-reading passthroughs; `ui/` never calls `storage` directly.
+`ensure_day` runs the rollover in memory and never writes. It returns the day
+it rolled away from, or `None`, and keeps that day in a list of pending
+archives, oldest first: more than one when the application stays open several
+nights without a gesture. The first gesture writes them through `App._save`,
+then the main file (`SPECIFICATION.md` §2.5). An archive leaves the list once
+on disk, so a retry after a failed write writes only what is still missing.
+`take_written_archives` tells the interface which dates to refresh.
+`archives` and `read_archive` are the archive-reading passthroughs; `ui/` never calls `storage` directly.
 `archive_matches`, `statistics`, `day_text` and `archived_day_text`
 likewise wrap `core/search`, `core/stats` and `core/export` so `ui/`
 imports only `rature.core.app`.

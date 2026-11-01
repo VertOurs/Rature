@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:32+0100\n"
+"POT-Creation-Date: 2026-11-01 16:56+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -743,14 +743,14 @@ msgstr "Annuler la rature"
 msgid "Strike through"
 msgstr "Rayer"
 
-#: src/rature/ui/window.py:401
+#: src/rature/ui/window.py:384
 msgid "Changes could not be saved to disk."
 msgstr "Les modifications n'ont pas pu être enregistrées sur le disque."
 
-#: src/rature/ui/window.py:406
-msgid "A new day has started. The previous one has been archived."
-msgstr "Une nouvelle journée a commencé. La précédente a été archivée."
+#: src/rature/ui/window.py:388
+msgid "A new day has started."
+msgstr "Une nouvelle journée a commencé."
 
-#: src/rature/ui/window.py:408
+#: src/rature/ui/window.py:389
 msgid "Dismiss"
 msgstr "Ignorer"

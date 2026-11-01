@@ -14,7 +14,6 @@ import logging
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
-from typing import NamedTuple
 
 from rature.core import export, recurrence, search, stats, storage
 from rature.core.migrations import FutureVersionError
@@ -57,28 +56,6 @@ class DataFileUnreadableError(Exception):
     """data.json exists but does not load: it may still be arriving (§3.6)."""
 
 
-class EnsureOutcome(enum.Enum):
-    """What one App.ensure_day call did about persistence.
-
-    IDLE: no rollover was due and no earlier save was still pending.
-    SAVED: a write reached disk (a due rollover, or a retry of a pending
-    one). SAVE_FAILED: a write was attempted and raised OSError; the
-    rolled-over state is still only in memory and stays pending.
-    """
-
-    IDLE = enum.auto()
-    SAVED = enum.auto()
-    SAVE_FAILED = enum.auto()
-
-
-class EnsureResult(NamedTuple):
-    """What App.ensure_day returns: the persistence outcome and, when a
-    rollover ran, the day it archived (None otherwise)."""
-
-    outcome: EnsureOutcome
-    archived: Day | None
-
-
 def _default_clock() -> datetime:
     return datetime.now().astimezone()
 
@@ -106,19 +83,19 @@ class App:
         self.session = session
         self.clock = clock
         self.startup = startup
-        # True between a change made outside any gesture (a rollover that
-        # archived a day, a confirmed empty day) and the write that persists
-        # it: a failed write leaves it set so ensure_day retries.
-        self._save_pending = False
+        # Days rolled over in memory and not yet archived, oldest first: the
+        # first gesture writes them (SPECIFICATION.md §2.5). More than one
+        # when the application stays open several nights without a gesture.
+        self._pending_archives: list[Day] = []
+        # Dates archived since take_written_archives last ran.
+        self._written_archives: list[date] = []
+        # The empty day of start_empty could not be written (§3.6 situation
+        # 3): the next gesture writes it with everything else.
+        self.empty_day_write_failed = False
         # Identifiers of this device's deletions since launch, most recent
         # last (SPECIFICATION.md §3.2, ADR 0009). Here rather than in Session
         # because it outlives the data it points into.
         self._undo_stack: list[str] = []
-
-    @property
-    def save_pending(self) -> bool:
-        """A rollover or a confirmed empty day is not yet written to disk."""
-        return self._save_pending
 
     @property
     def can_undo(self) -> bool:
@@ -165,8 +142,9 @@ class App:
         Reads again first: a file delivered while the confirmation was open
         is loaded, never replaced. Otherwise an unreadable file is set aside
         and the empty day is written at once: the confirmation is the
-        gesture. A failed write of that day keeps it pending, for the banner
-        of §3.6 situation 3. A failed set-aside raises OSError, situation 4.
+        gesture. A failed write of that day leaves empty_day_write_failed
+        set, for the banner of §3.6 situation 3. A failed set-aside raises
+        OSError, situation 4.
         """
         try:
             return cls.open(data_dir, clock=clock)
@@ -176,8 +154,11 @@ class App:
             aside = storage.set_aside(clock(), data_dir=data_dir)
             _logger.warning("set an unreadable data file aside: %s", aside)
         app = cls._empty(data_dir, clock, StartupOutcome.STARTED_EMPTY)
-        app._save_pending = True
-        app.ensure_day()
+        try:
+            app._save()
+        except OSError:
+            _logger.warning("could not write the empty day in %s", data_dir)
+            app.empty_day_write_failed = True
         return app
 
     @classmethod
@@ -221,34 +202,23 @@ class App:
             startup=startup,
         )
 
-    def ensure_day(self) -> EnsureResult:
-        """Run the SPECIFICATION.md §2.5 rollover if due, and persist it.
+    def ensure_day(self) -> Day | None:
+        """Run the SPECIFICATION.md §2.5 rollover in memory if due.
 
-        roll_over, archive, then save, in that order. A save that raises
-        OSError is reported as EnsureResult(SAVE_FAILED, old_day), not
-        propagated: the rollover already happened in memory and was
-        archived, so a later call retries the write while _save_pending is
-        set, without a second roll_over or a second archive. Returns
-        IDLE when nothing was due and nothing was pending.
+        Never writes: the first gesture does, through _save. Returns the day
+        it rolled away from, or None when nothing was due. The undo stack
+        empties here, since the journal leaves with the day.
         """
         now = self.clock()
-        archived: Day | None = None
-        if self.session.rollover_due(now):
-            archived = self.session.roll_over(now)
-            # The journal left with the day, and archiving below may raise.
-            self._undo_stack.clear()
-            _logger.info(
-                "day rolled over from %s to %s", archived.date, self.session.day.date
-            )
-            storage.archive(archived, data_dir=self.data_dir)
-            self._save_pending = True
-        if not self._save_pending:
-            return EnsureResult(EnsureOutcome.IDLE, archived)
-        try:
-            self._save()
-        except OSError:
-            return EnsureResult(EnsureOutcome.SAVE_FAILED, archived)
-        return EnsureResult(EnsureOutcome.SAVED, archived)
+        if not self.session.rollover_due(now):
+            return None
+        archived = self.session.roll_over(now)
+        self._undo_stack.clear()
+        self._pending_archives.append(archived)
+        _logger.info(
+            "day rolled over from %s to %s", archived.date, self.session.day.date
+        )
+        return archived
 
     def archives(self) -> list[date]:
         """Dates with an archived day, most recent first."""
@@ -337,12 +307,26 @@ class App:
         """
         return export.day_text(self.archived_session(day_date))
 
+    def take_written_archives(self) -> list[date]:
+        """Dates archived since the last call, for the windows that show them.
+
+        Filled by the write of a gesture (§2.5), even if the main file then
+        fails: the archive is on disk either way (§3.6 situation 3).
+        """
+        written, self._written_archives = self._written_archives, []
+        return written
+
     def _save(self) -> None:
+        # SPECIFICATION.md §2.5: the archives, oldest first, then the main
+        # file. Each archive leaves the list once on disk, so a later retry
+        # writes only what is still missing, and a failed archive stops
+        # everything after it.
+        while self._pending_archives:
+            day = self._pending_archives[0]
+            storage.archive(day, data_dir=self.data_dir)
+            del self._pending_archives[0]
+            self._written_archives.append(day.date)
         storage.save(Store.from_session(self.session), data_dir=self.data_dir)
-        # A write that returned means whatever was pending is now on disk.
-        # Only ensure_day sets the flag, so a mutation's save clearing it
-        # is a harmless no-op in the common case.
-        self._save_pending = False
 
     # Mutations below wrap the matching Session method: supply now/today
     # from self.clock() where the operation needs one, then save. Business

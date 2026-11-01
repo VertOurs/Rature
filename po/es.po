@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:32+0100\n"
+"POT-Creation-Date: 2026-11-01 16:56+0100\n"
 "PO-Revision-Date: 2026-10-29 12:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Spanish\n"
@@ -742,14 +742,14 @@ msgstr "Deshacer el tachado"
 msgid "Strike through"
 msgstr "Tachar"
 
-#: src/rature/ui/window.py:401
+#: src/rature/ui/window.py:384
 msgid "Changes could not be saved to disk."
 msgstr "No se pudieron guardar los cambios en el disco."
 
-#: src/rature/ui/window.py:406
-msgid "A new day has started. The previous one has been archived."
-msgstr "Ha empezado un nuevo día. El anterior se ha archivado."
+#: src/rature/ui/window.py:388
+msgid "A new day has started."
+msgstr "Ha empezado un nuevo día."
 
-#: src/rature/ui/window.py:408
+#: src/rature/ui/window.py:389
 msgid "Dismiss"
 msgstr "Descartar"

@@ -29,6 +29,10 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   still be arriving from another device. A message offers to try again, or
   to start from an empty day after confirmation, which sets an unreadable
   file aside as `data.json.<date>.bak`.
+- A new day is now written with the first change of the day, not as soon as
+  it is detected. Until then the previous day does not show in Archives,
+  Statistics or the export. Otherwise a laptop waking from sleep would pass
+  the day before a sync tool has delivered the morning's file.
 
 ### Fixed
 

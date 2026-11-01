@@ -663,7 +663,7 @@ Règles communes, sur le dossier local :
       à tort que le dossier existe après `App.open` (commentaire de
       `core/app.py`) : faux au premier lancement, où rien n'est créé avant
       le premier geste
-- [ ] A4. Passage du jour en mémoire, écrit au premier geste (§2.5, §3.1,
+- [x] A4. Passage du jour en mémoire, écrit au premier geste (§2.5, §3.1,
       §3.5, §3.14). Nouvelle chaîne de la bannière de nouveau jour, six
       catalogues (§3.8)
 - [ ] A5a. Relecture avant le geste, empreinte SHA-256, passage du jour

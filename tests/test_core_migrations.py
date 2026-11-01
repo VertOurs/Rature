@@ -409,6 +409,7 @@ def test_a_version_1_file_is_migrated_and_injects_as_before(tmp_path: Path) -> N
     # The rollover sent the unfinished reserve task back, as in version 1.
     assert {item.id for item in app.session.reserve} == {"r1", "r9"}
 
+    app.add("first gesture")  # what writes the rollover (§2.5)
     archived = storage.load_archive(date(2026, 8, 24), data_dir=tmp_path)
     assert [task.id for task in archived.tasks] == ["t1", "t2"]
     on_disk = json.loads((tmp_path / "data.json").read_text(encoding="utf-8"))

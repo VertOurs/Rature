@@ -289,7 +289,10 @@ n'est jamais écrit seul. Il s'applique en mémoire, à l'ouverture comme à la
 vérification périodique, et s'écrit avec le premier geste de l'utilisateur,
 défini en §2.9, qui relit le fichier avant d'écrire. L'archive de la
 journée écoulée et le fichier principal s'écrivent à ce moment-là, dans cet
-ordre. Si le fichier relu a déjà passé le jour, sur un autre appareil, il
+ordre. Une application restée ouverte plusieurs nuits sans geste a passé le
+jour plusieurs fois en mémoire : toutes les journées écoulées attendent, et
+s'écrivent de la plus ancienne à la plus récente, avant le fichier principal.
+Si le fichier relu a déjà passé le jour, sur un autre appareil, il
 n'y a plus de passage à écrire : seul le geste est rejoué. S'il ne l'a pas
 passé, le passage s'applique au fichier relu, pas à la copie en mémoire.
 
@@ -1162,10 +1165,11 @@ modale, aucune fermeture forcée. La bannière disparaît à la première
 Depuis le chantier 10, le passage du jour s'écrit avec le premier geste
 (§2.5) : un échec d'écriture de l'archive de la journée écoulée, comme du
 fichier principal, survient donc pendant ce geste et relève de cette
-situation. Si l'archive ne peut pas s'écrire, le fichier principal n'est
+situation. Si une archive ne peut pas s'écrire, le fichier principal n'est
 pas écrit non plus : le passage reste en mémoire et sera tenté de nouveau
-au geste suivant. Si l'archive est écrite et le fichier principal ne l'est
-pas, l'archive reste sur le disque et la bannière s'affiche.
+au geste suivant, à partir de cette archive, sans réécrire celles déjà sur
+le disque. Si l'archive est écrite et le fichier principal ne l'est pas,
+l'archive reste sur le disque et la bannière s'affiche.
 
 **4. Dossier de données inutilisable au démarrage, ou mise de côté
 impossible** (`OSError`). Ajouté le 30 octobre 2026, au chantier 9. Couvre
