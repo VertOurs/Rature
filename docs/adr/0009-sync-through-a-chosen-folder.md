@@ -288,12 +288,16 @@ already covered: it is unreadable, and falls into the blocking message.
 
 ## Addendum (2026-11-01)
 
-Joining an empty folder now copies `archive/` along with `data.json`,
-VertOurs's decision while writing `docs/internal/SPECIFICATION.md` §3.17.
-The decision above left local archives in the previous folder in every
-case. Since no button leads back to the default folder (`SPECIFICATION.md`
-§3.6), archives
-left behind would become invisible in Archives and Statistics. The folder
-is empty, so nothing is overwritten. When the chosen folder already holds
-data, nothing changes: local archives stay in the previous folder, and the
-dialog says so.
+Joining a folder without `data.json` now copies `archive/` along with
+`data.json`, VertOurs's decision while writing
+`docs/internal/SPECIFICATION.md` §3.17, as long as the chosen folder has no
+`archive/` of its own. The decision above left local archives in the
+previous folder in every case. Since no button leads back to the default
+folder (`SPECIFICATION.md` §3.6), archives left behind would become
+invisible in Archives and Statistics.
+
+If the chosen folder already has an `archive/`, nothing is copied into it:
+during the first synchronisation the tool delivers files in any order, and
+the other device's archives may arrive before its `data.json`. Copying
+would overwrite them. Local archives then stay in the previous folder, as
+they do when the folder already holds `data.json`, and the dialog says so.

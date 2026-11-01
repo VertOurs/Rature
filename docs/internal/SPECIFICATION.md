@@ -284,10 +284,10 @@ qui autorise à le déclencher sans demander confirmation. Une tâche supprimée
 fait exception : la suppression est un abandon volontaire, elle ne revient
 donc pas en réserve, y compris si la tâche en était issue.
 
-**Écriture différée.** Ajouté au chantier 10 (ADR 0009). Le passage du
-jour n'est jamais écrit seul. Il s'applique en mémoire, à l'ouverture comme
-à la vérification périodique, et s'écrit avec le premier geste de
-l'utilisateur, défini en §2.9, qui relit le fichier avant d'écrire (§2.9). L'archive de la
+**Écriture différée.** Ajouté au chantier 10 (ADR 0009). Le passage du jour
+n'est jamais écrit seul. Il s'applique en mémoire, à l'ouverture comme à la
+vérification périodique, et s'écrit avec le premier geste de l'utilisateur,
+défini en §2.9, qui relit le fichier avant d'écrire. L'archive de la
 journée écoulée et le fichier principal s'écrivent à ce moment-là, dans cet
 ordre. Si le fichier relu a déjà passé le jour, sur un autre appareil, il
 n'y a plus de passage à écrire : seul le geste est rejoué. S'il ne l'a pas
@@ -622,11 +622,12 @@ aujourd'hui ; le journal n'est jamais vidé (§2.6, ADR 0005).
 
 **Rejoindre un dossier.** Si le dossier choisi contient déjà un
 `data.json`, ce fichier est pris tel quel et le fichier local est mis de
-côté en sauvegarde, sans fusion. Si le dossier est vide, les données
-locales y sont copiées, archives comprises. Si le dossier contient déjà
-des données, les archives locales restent dans l'ancien dossier. Sans
-donnée locale lisible, rien n'est mis de côté ni copié. Détail du dialogue
-en §3.17.
+côté en sauvegarde, sans fusion ; les archives locales restent dans
+l'ancien dossier. Si le dossier n'a pas de `data.json`, les données locales
+y sont copiées, archives comprises si le dossier n'a pas encore de
+`archive/`, sinon les archives locales restent dans l'ancien dossier : une
+archive de l'autre appareil n'est jamais écrasée. Sans donnée locale
+lisible, rien n'est mis de côté ni copié. Détail du dialogue en §3.17.
 
 ---
 
@@ -1126,24 +1127,24 @@ sans rien écrire, et une porte de sortie explicite :
   §3.17 et à côté de lui, puis repartir d'une journée vide
 - fichier disparu : repartir d'une journée vide
 - dossier inaccessible : choisir un dossier (§3.17). Jamais de retour
-  silencieux au dossier par défaut : après avoir rejoint un dossier vide,
-  l'ancien `data.json` y est resté et y revenir ferait repartir sur les
-  données d'avant la synchronisation ; après avoir rejoint un dossier qui
-  avait déjà un `data.json`, le fichier local a été mis de côté et l'on
-  retomberait sur un fichier disparu
+  silencieux au dossier par défaut : après avoir rejoint un dossier sans
+  `data.json`, l'ancien `data.json` y est resté et y revenir ferait
+  repartir sur les données d'avant la synchronisation ; après avoir rejoint
+  un dossier qui avait déjà un `data.json`, le fichier local a été mis de
+  côté et l'on retomberait sur un fichier disparu
 
 Repartir d'une journée vide demande une confirmation, qui dit que cette
 journée vide partira aussi sur les autres appareils synchronisés. Rien
 n'est écrit avant cette confirmation. Une fois confirmée, la journée vide
 s'écrit tout de suite, sans attendre un geste : la confirmation est le
 geste de l'utilisateur (§2.9). Attendre laisserait le dossier sans
-`data.json`, et un lancement sans geste retomberait sur « fichier
-disparu », en boucle. Vaut pour les trois cas : fichier illisible mis de
-côté, fichier disparu, dossier vide choisi sans donnée locale (§3.17). Un
-échec de cette écriture relève de la situation 3. Au démarrage, le message vient avant
-toute fenêtre ; pendant l'exécution, il est attaché à la fenêtre et le
-geste en cours n'est pas écrit. Le fichier mis de côté n'est jamais
-supprimé par l'application.
+`data.json`, et un lancement sans geste retomberait sur
+« fichier disparu », en boucle. Vaut pour les trois cas : fichier illisible
+mis de côté, fichier disparu, dossier sans `data.json` choisi sans donnée
+locale (§3.17). Un échec de cette écriture relève de la situation 3. Au
+démarrage, le message vient avant toute fenêtre ; pendant l'exécution, il
+est attaché à la fenêtre et le geste en cours n'est pas écrit. Le fichier
+mis de côté n'est jamais supprimé par l'application.
 
 **3. Échec d'écriture pendant un geste** (`OSError`). `App` ne défait pas
 la mutation en mémoire, c'est documenté sur la classe. L'interface attrape
@@ -1178,15 +1179,15 @@ attachée à la fenêtre principale, puis `quit`, comme au démarrage.
 
 **Une seule bannière, trois messages possibles.** L'échec d'écriture
 (situation 3), les copies de conflit (§3.17) et le nouveau jour (§3.1)
-partagent la même `AdwBanner` : jamais deux bannières à la fois, jamais
-de file d'attente. À chaque rafraîchissement, une fonction unique choisit le message le plus
-prioritaire parmi ceux encore actifs et non fermés, et le pose sur cette
-bannière : échec d'écriture d'abord, puis conflit, puis nouveau jour. Un
-échec d'écriture masque ainsi temporairement la bannière de conflit, qui
-réapparaît dès que l'écriture suivante réussit. La bannière de conflit ne
-se ferme pas : elle disparaît quand plus aucune copie de conflit n'existe.
-Fermer un autre message ne ferme pas les autres, et un message fermé ne
-revient jamais, y compris au rafraîchissement suivant.
+partagent la même `AdwBanner` : jamais deux bannières à la fois, jamais de
+file d'attente. À chaque rafraîchissement, une fonction unique choisit le
+message le plus prioritaire parmi ceux encore actifs et non fermés, et le
+pose sur cette bannière : échec d'écriture d'abord, puis conflit, puis
+nouveau jour. Un échec d'écriture masque ainsi temporairement la bannière
+de conflit, qui réapparaît dès que l'écriture suivante réussit. La bannière
+de conflit ne se ferme pas : elle disparaît quand plus aucune copie de
+conflit n'existe. Fermer un autre message ne ferme pas les autres, et un
+message fermé ne revient jamais, y compris au rafraîchissement suivant.
 
 **Refus métier.** `LockedError`, `KeyError` et `ValueError` remontent de
 `core` mais ne doivent jamais atteindre l'utilisateur : l'interface rend
@@ -1271,9 +1272,9 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Message bloquant, dossier inaccessible | `Rature cannot reach its data folder.`, `It may have been moved or deleted, or access to it removed: %s`, `Try Again`, `Choose a Folder…`, `Quit` |
 | Confirmation de journée vide | `Start from an empty day?`, `This empty day will also replace the data on your other synced devices.`, `Cancel`, `Start Empty` |
 | Dialogue du dossier de données | `Data Folder`, `Rature keeps its data in: %s`, `Choose a Folder…`, `Open Folder`, `Close` |
-| Dialogue pour rejoindre, dossier avec données | `Use the data in this folder?`, `Your current data will be set aside as %s, in the previous folder.`, `Archives stay in the previous folder: %s`, `Use This Folder` |
-| Dialogue pour rejoindre, dossier vide | `Copy your data to this folder?`, `If this folder is synced, wait until its first sync has finished before copying.`, `Copy Data Here` |
-| Dialogue pour rejoindre, lignes communes | `This folder also contains other files.`, `Cancel` |
+| Dialogue pour rejoindre, dossier avec données | `Use the data in this folder?`, `Your current data will be set aside as %s, in the previous folder.`, `Use This Folder` |
+| Dialogue pour rejoindre, dossier sans `data.json` | `Copy your data to this folder?`, `If this folder is synced, wait until its first sync has finished before copying.`, `Copy Data Here` |
+| Dialogue pour rejoindre, lignes communes | `This folder also contains other files.`, `Archives stay in the previous folder: %s` (dossier avec `data.json`, ou dossier qui contient déjà `archive/`), `Cancel` |
 | Dialogue pour rejoindre, refus | `This folder cannot be used.`, `Its data file cannot be read: %s`, `Its data file was saved by a newer version of Rature: %s`, `Close` |
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
@@ -1718,18 +1719,25 @@ ignorant les entrées propres à Syncthing (`.stfolder`, `.stignore`,
 - **Le dossier contient un `data.json` lisible** : `Use the data in this
   folder?`. Ce fichier est pris tel quel ; le fichier local est mis de côté
   sous un nom daté, `data.json.<AAAAMMJJ-HHMMSS>.bak`, dans l'ancien
-  dossier, et le dialogue donne ce nom. Pas de fusion
-- **Le dossier est vide** : `Copy your data to this folder?`. Le dialogue
-  demande d'attendre la fin de la première synchronisation avant de copier,
-  sinon les données locales partiraient sur un dossier qui s'apprête à
-  recevoir celles de l'autre appareil. `data.json` et `archive/` sont
-  copiés : le dossier est vide, rien n'est écrasé, et des archives laissées
-  dans l'ancien dossier deviendraient invisibles dans Archives et
-  Statistiques, puisqu'aucun bouton n'y ramène. Écart avec l'ADR 0009,
-  noté dans son addendum
-- **Le dossier contient des données** : les archives locales restent dans
-  l'ancien dossier, et le dialogue le dit, avec son chemin
-- **Dans les deux cas** : si le dossier contient d'autres fichiers visibles,
+  dossier, et le dialogue donne ce nom. Pas de fusion. Les archives
+  locales restent dans l'ancien dossier, et le dialogue l'affiche avec la
+  ligne `Archives stay in the previous folder: %s`
+- **Le dossier ne contient pas de `data.json`** : `Copy your data to
+  this folder?`. Le dialogue demande d'attendre la fin de la première
+  synchronisation avant de copier, sinon les données locales partiraient
+  sur un dossier qui s'apprête à recevoir celles de l'autre appareil.
+  `data.json` est copié. `archive/` n'est copié que si le dossier choisi
+  n'en contient pas : des archives laissées dans l'ancien dossier
+  deviendraient invisibles dans Archives et Statistiques, puisqu'aucun
+  bouton n'y ramène. Écart avec l'ADR 0009, noté dans son addendum
+- **Le dossier n'a pas de `data.json` mais contient déjà `archive/`** :
+  rien n'est copié dans `archive/`. Pendant la première synchronisation,
+  l'outil livre les fichiers dans n'importe quel ordre, et des archives de
+  l'autre appareil peuvent arriver avant `data.json` : les copier les
+  écraserait. Les archives locales restent dans l'ancien dossier, et le
+  dialogue l'affiche avec la ligne `Archives stay in the previous folder:
+  %s`
+- **Dans tous les cas** : si le dossier contient d'autres fichiers visibles,
   le dialogue le dit
 - **Le `data.json` du dossier est illisible ou écrit par une version plus
   récente** : le dossier est refusé, avec le motif, et rien ne change
@@ -1745,9 +1753,10 @@ Le second est le parcours principal du README : une deuxième machine neuve
 rejoint le dossier synchronisé. Même examen du dossier, mais rien à mettre
 de côté ni à copier, et le dialogue ne parle pas de mise de côté. Un
 dossier qui contient un `data.json` lisible est pris tel quel. Un dossier
-vide mène à la confirmation de journée vide de §3.6 ; après confirmation,
-la journée vide s'écrit tout de suite dans ce dossier (§3.6). Un dossier
-refusé ramène au message, ou laisse le premier lancement tel quel.
+sans `data.json` mène à la confirmation de journée vide de §3.6 ; après
+confirmation, la journée vide s'écrit tout de suite dans ce dossier (§3.6).
+Un dossier refusé ramène au message, ou laisse le premier lancement tel
+quel.
 
 **Copies de conflit.** Rature cherche les noms `*.sync-conflict-*` à côté
 de `data.json` et dans `archive/` à chaque lecture du fichier principal :
