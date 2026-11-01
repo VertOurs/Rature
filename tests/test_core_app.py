@@ -15,8 +15,6 @@ from rature.core.app import (
     App,
     DataFileMissingError,
     DataFileUnreadableError,
-    EnsureOutcome,
-    EnsureResult,
     StartupOutcome,
 )
 from rature.core.migrations import FutureVersionError
@@ -188,20 +186,6 @@ def test_start_empty_propagates_a_set_aside_it_cannot_perform(tmp_path: Path) ->
     assert (tmp_path / "data.json").read_text(encoding="utf-8") == "not json"
 
 
-def test_open_propagates_an_archive_it_cannot_write_at_rollover(
-    data_dir: Path,
-) -> None:
-    # A plain file where archive/ should be: the rollover cannot archive,
-    # so nothing is saved and the next launch replays it.
-    monday = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
-    App.open(data_dir, clock=clock_at(monday)).add("unfinished")
-    before = (data_dir / "data.json").read_bytes()
-    (data_dir / "archive").write_text("in the way", encoding="utf-8")
-    with pytest.raises(OSError):
-        App.open(data_dir, clock=clock_at(monday + timedelta(days=1)))
-    assert (data_dir / "data.json").read_bytes() == before
-
-
 @pytest.mark.parametrize("content", ["not json", '{"version": 1}', "[]"])
 def test_an_unreadable_file_is_refused_and_left_alone(
     tmp_path: Path, content: str
@@ -239,7 +223,7 @@ def test_start_empty_sets_an_unreadable_file_aside_and_writes_at_once(
     aside = tmp_path / "data.json.20260824-143207.bak"
     assert aside.read_text(encoding="utf-8") == "not json"
     assert load(data_dir=tmp_path).day.tasks == []
-    assert app.save_pending is False
+    assert app.empty_day_write_failed is False
 
 
 def test_start_empty_writes_at_once_when_the_file_is_missing(tmp_path: Path) -> None:
@@ -267,31 +251,33 @@ def test_start_empty_never_replaces_a_file_delivered_in_the_meantime(
     assert [path.name for path in data_dir.iterdir()] == ["data.json"]
 
 
-def test_start_empty_keeps_a_failed_write_pending_then_retries(
+def test_start_empty_reports_a_failed_write_and_the_next_gesture_retries(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(storage, "save", _raise_oserror)
 
     app = App.start_empty(tmp_path)
 
-    assert app.save_pending is True  # §3.6 situation 3: the banner, no alert
+    assert app.empty_day_write_failed is True  # §3.6 situation 3, the banner
     monkeypatch.setattr(storage, "save", save)
-    assert app.ensure_day().outcome is EnsureOutcome.SAVED
+    assert app.ensure_day() is None  # the timer never writes
+    assert not (tmp_path / "data.json").exists()
+    app.add("first gesture")
     assert (tmp_path / "data.json").exists()
 
 
-def test_open_runs_a_due_rollover_before_returning(data_dir: Path) -> None:
-    yesterday = date(2026, 8, 23)
+def test_open_runs_a_due_rollover_in_memory_and_writes_nothing(data_dir: Path) -> None:
     save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
     App.open(data_dir, clock=clock_at(save_now)).add("day = 2026-08-23")
-    session = load(data_dir=data_dir).into_session()
-    assert session.day.date == yesterday
+    before = (data_dir / "data.json").read_bytes()
 
     tomorrow_now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(tomorrow_now))
+
     assert app.startup is StartupOutcome.LOADED
     assert app.session.day.date == date(2026, 8, 24)
-    assert (data_dir / "archive" / "2026-08-23.json").exists()
+    assert (data_dir / "data.json").read_bytes() == before
+    assert not (data_dir / "archive").exists()
 
 
 def test_a_rollover_is_logged(data_dir: Path, caplog: pytest.LogCaptureFixture) -> None:
@@ -311,6 +297,7 @@ def test_open_multi_day_catch_up_runs_once(data_dir: Path) -> None:
     days_later = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(days_later))
     assert app.session.day.date == date(2026, 8, 24)
+    app.add("first gesture")
     assert (data_dir / "archive" / "2026-08-20.json").exists()
     for skipped in ("2026-08-21", "2026-08-22", "2026-08-23"):
         assert not (data_dir / "archive" / f"{skipped}.json").exists()
@@ -320,28 +307,26 @@ def test_ensure_day_is_a_no_op_when_nothing_is_due(data_dir: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(now))
     day_before = app.session.day
-    assert app.ensure_day() == EnsureResult(EnsureOutcome.IDLE, None)
+    assert app.ensure_day() is None
     assert app.session.day is day_before
     assert not (data_dir / "archive").exists()
 
 
-def test_ensure_day_returns_the_archived_day_when_due(data_dir: Path) -> None:
+def test_ensure_day_returns_the_day_it_rolled_away_from(data_dir: Path) -> None:
     save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(save_now))
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    result = app.ensure_day()
-    assert result.outcome is EnsureOutcome.SAVED
-    assert result.archived is not None
-    assert result.archived.date == date(2026, 8, 23)
+    archived = app.ensure_day()
+    assert archived is not None
+    assert archived.date == date(2026, 8, 23)
     assert app.session.day.date == date(2026, 8, 24)
-    assert app.save_pending is False
 
 
 def test_ensure_day_saves_the_prepared_list_in_the_new_day(data_dir: Path) -> None:
     app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 23, 10, 0, tzinfo=PARIS)))
     prepared = app.add_to_tomorrow("prepared")
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     reloaded = load(data_dir=data_dir).into_session()
     assert reloaded.tomorrow == []
     assert [(t.id, t.num) for t in reloaded.day.tasks] == [(prepared.id, 1)]
@@ -361,43 +346,210 @@ def test_recurring_due_tomorrow_starts_from_the_reference_date(
     assert app.recurring_due_tomorrow() == [tuesday]
 
 
+def _roll_over_and_write(app: App) -> None:
+    """The rollover stays in memory until a gesture writes it (§2.5)."""
+    app.ensure_day()
+    app.add_to_reserve("first gesture")
+
+
 def _raise_oserror(*_args, **_kwargs):
     raise OSError("disk full")
 
 
-def test_rollover_save_failure_is_retried_without_re_rolling(
+def _spy_on_writes(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    """Record every real write, in order: an archive's date, or "data.json"."""
+    writes: list[str] = []
+    real_archive, real_save = storage.archive, storage.save
+
+    def spy_archive(day, **kwargs):
+        written = real_archive(day, **kwargs)
+        writes.append(day.date.isoformat())
+        return written
+
+    def spy_save(store, **kwargs):
+        real_save(store, **kwargs)
+        writes.append("data.json")
+
+    monkeypatch.setattr(storage, "archive", spy_archive)
+    monkeypatch.setattr(storage, "save", spy_save)
+    return writes
+
+
+def _open_on_monday(data_dir: Path) -> App:
+    app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 24, 10, 0, tzinfo=PARIS)))
+    app.add("monday's task")
+    return app
+
+
+def _next_night(app: App, day: int) -> None:
+    app.clock = clock_at(datetime(2026, 8, day, 14, 0, tzinfo=PARIS))
+    assert app.ensure_day() is not None
+
+
+def test_the_timer_rollover_writes_nothing(data_dir: Path) -> None:
+    app = _open_on_monday(data_dir)
+    before = (data_dir / "data.json").read_bytes()
+
+    _next_night(app, 25)
+
+    assert app.session.day.date == date(2026, 8, 25)
+    assert (data_dir / "data.json").read_bytes() == before
+    assert not (data_dir / "archive").exists()
+
+
+def test_the_first_gesture_writes_the_archive_then_the_main_file_once(
     data_dir: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 23, 10, 0, tzinfo=PARIS)))
-    app.add("carry me over")
-    app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
+    app = _open_on_monday(data_dir)
+    _next_night(app, 25)
+    writes = _spy_on_writes(monkeypatch)
 
-    archive_calls = 0
-    real_archive = storage.archive
+    app.add("first gesture")
+    assert writes == ["2026-08-24", "data.json"]
 
-    def counting_archive(day, **kwargs):
-        nonlocal archive_calls
-        archive_calls += 1
-        return real_archive(day, **kwargs)
+    app.add("second gesture")
+    assert writes == ["2026-08-24", "data.json", "data.json"]
+    archived = storage.load_archive(date(2026, 8, 24), data_dir=data_dir)
+    assert [task.text for task in archived.tasks] == ["monday's task"]
 
-    monkeypatch.setattr(storage, "archive", counting_archive)
+
+def test_quitting_without_a_gesture_loses_nothing(data_dir: Path) -> None:
+    app = _open_on_monday(data_dir)
+    _next_night(app, 25)
+
+    # The rollover never reached the disk: the next launch runs it again.
+    relaunched = App.open(data_dir, clock=app.clock)
+
+    assert relaunched.session.day.date == date(2026, 8, 25)
+    assert [item.text for item in relaunched.session.reserve] == ["monday's task"]
+    relaunched.add("first gesture")
+    archived = storage.load_archive(date(2026, 8, 24), data_dir=data_dir)
+    assert [task.text for task in archived.tasks] == ["monday's task"]
+
+
+def test_two_nights_without_a_gesture_write_both_archives_oldest_first(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = _open_on_monday(data_dir)
+    _next_night(app, 25)
+    _next_night(app, 26)
+    writes = _spy_on_writes(monkeypatch)
+
+    app.add("first gesture")
+
+    assert writes == ["2026-08-24", "2026-08-25", "data.json"]
+    monday = storage.load_archive(date(2026, 8, 24), data_dir=data_dir)
+    assert [task.text for task in monday.tasks] == ["monday's task"]
+    assert app.archives() == [date(2026, 8, 25), date(2026, 8, 24)]
+
+
+def test_two_nights_with_a_failed_second_archive_resume_where_they_stopped(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = _open_on_monday(data_dir)
+    _next_night(app, 25)
+    _next_night(app, 26)
+    before = (data_dir / "data.json").read_bytes()
+    writes = _spy_on_writes(monkeypatch)
+    spy_archive = storage.archive
+
+    def fail_on_tuesday(day, **kwargs):
+        if day.date == date(2026, 8, 25):
+            raise OSError("disk full")
+        return spy_archive(day, **kwargs)
+
+    monkeypatch.setattr(storage, "archive", fail_on_tuesday)
+    with pytest.raises(OSError):
+        app.add("first gesture")
+
+    assert writes == ["2026-08-24"]
+    assert (data_dir / "data.json").read_bytes() == before
+
+    monkeypatch.setattr(storage, "archive", spy_archive)
+    writes.clear()
+    app.add("second gesture")
+
+    assert writes == ["2026-08-25", "data.json"]
+    assert [t.text for t in load(data_dir=data_dir).day.tasks] == [
+        "first gesture",
+        "second gesture",
+    ]
+
+
+def test_an_archive_it_cannot_write_stops_the_gesture_and_the_main_file(
+    data_dir: Path,
+) -> None:
+    # A plain file where archive/ should be. Rature still starts, and the
+    # obstacle only shows with the first gesture (§3.6 situation 3).
+    monday = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    App.open(data_dir, clock=clock_at(monday)).add("unfinished")
+    before = (data_dir / "data.json").read_bytes()
+    obstacle = data_dir / "archive"
+    obstacle.write_text("in the way", encoding="utf-8")
+
+    app = App.open(data_dir, clock=clock_at(monday + timedelta(days=1)))
+    with pytest.raises(OSError):
+        app.add("first gesture")
+    assert (data_dir / "data.json").read_bytes() == before
+
+    obstacle.unlink()
+    app.add("second gesture")
+    assert (data_dir / "archive" / "2026-08-24.json").exists()
+    assert load(data_dir=data_dir).day.date == date(2026, 8, 25)
+
+
+def test_an_archive_written_before_a_failed_main_file_is_not_written_again(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = _open_on_monday(data_dir)
+    before = (data_dir / "data.json").read_bytes()
+    _next_night(app, 25)
+    writes = _spy_on_writes(monkeypatch)
+    spy_save = storage.save
     monkeypatch.setattr(storage, "save", _raise_oserror)
 
-    failed = app.ensure_day()
-    assert failed.outcome is EnsureOutcome.SAVE_FAILED
-    assert failed.archived is not None and failed.archived.date == date(2026, 8, 23)
-    assert app.session.day.date == date(2026, 8, 24)  # rolled over in memory
-    assert app.save_pending is True  # not treated as persisted
-    assert archive_calls == 1
-    assert load(data_dir=data_dir).into_session().day.date == date(2026, 8, 23)
+    with pytest.raises(OSError):
+        app.add("first gesture")
 
-    monkeypatch.setattr(storage, "save", save)  # a working write again
-    retried = app.ensure_day()
-    assert retried.outcome is EnsureOutcome.SAVED
-    assert retried.archived is None  # no second rollover
-    assert archive_calls == 1  # not re-archived
-    assert app.save_pending is False
-    assert load(data_dir=data_dir).into_session().day.date == date(2026, 8, 24)
+    assert writes == ["2026-08-24"]
+    assert (data_dir / "archive" / "2026-08-24.json").exists()
+    assert (data_dir / "data.json").read_bytes() == before
+
+    monkeypatch.setattr(storage, "save", spy_save)
+    writes.clear()
+    app.add("second gesture")
+    assert writes == ["data.json"]
+
+
+def test_a_refused_gesture_writes_nothing_and_the_rollover_stays_pending(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = _open_on_monday(data_dir)
+    _next_night(app, 25)
+    writes = _spy_on_writes(monkeypatch)
+
+    with pytest.raises(KeyError):
+        app.strike("unknown")
+    assert writes == []
+
+    app.add("first gesture")
+    assert writes == ["2026-08-24", "data.json"]
+
+
+def test_take_written_archives_reports_each_date_once(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = _open_on_monday(data_dir)
+    _next_night(app, 25)
+    assert app.take_written_archives() == []  # nothing written at detection
+
+    monkeypatch.setattr(storage, "save", _raise_oserror)
+    with pytest.raises(OSError):
+        app.add("first gesture")
+
+    # On disk even though the main file failed (§3.6 situation 3).
+    assert app.take_written_archives() == [date(2026, 8, 24)]
+    assert app.take_written_archives() == []
 
 
 def test_archives_is_empty_before_any_rollover(data_dir: Path) -> None:
@@ -410,7 +562,7 @@ def test_archives_lists_dates_most_recent_first(data_dir: Path) -> None:
     save_now = datetime(2026, 8, 20, 10, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(save_now))
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     assert app.archives() == [date(2026, 8, 20)]
 
 
@@ -418,7 +570,7 @@ def test_read_archive_returns_the_loaded_day(data_dir: Path) -> None:
     save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(save_now))
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     assert app.read_archive(date(2026, 8, 23)).date == date(2026, 8, 23)
 
 
@@ -434,7 +586,7 @@ def test_archived_session_wraps_the_loaded_day(data_dir: Path) -> None:
     app = App.open(data_dir, clock=clock_at(save_now))
     app.add("finish the meson file")
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     session = app.archived_session(date(2026, 8, 23))
     assert [task.text for task in session.active] == ["finish the meson file"]
 
@@ -452,7 +604,7 @@ def test_archive_session_from_wraps_a_day_the_caller_already_holds(
     app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
     app.add("kept task")
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     day = app.read_archive(date(2026, 8, 20))
     session = app.archive_session_from(day)
     assert session.day is day
@@ -472,7 +624,7 @@ def test_archived_day_text_renders_an_archived_day(data_dir: Path) -> None:
     app = App.open(data_dir, clock=clock_at(save_now))
     app.add("finish the meson file")
     app.clock = clock_at(datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     assert app.archived_day_text(date(2026, 8, 23)) == (
         "Sunday 23 August\n\n[ ] 1  finish the meson file"
     )
@@ -490,10 +642,10 @@ def _two_archives(data_dir: Path) -> App:
     app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
     app.add("call the dentist")
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     app.add("answer the email")
     app.clock = clock_at(datetime(2026, 8, 22, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     return app
 
 
@@ -522,7 +674,7 @@ def test_search_archives_is_accent_and_case_insensitive(data_dir: Path) -> None:
     app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
     app.add("Réparer le vélo")
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     assert app.search_archives("REPARER LE VELO") == [date(2026, 8, 20)]
 
 
@@ -531,7 +683,7 @@ def test_search_archives_matches_a_struck_task(data_dir: Path) -> None:
     task = app.add("finish the report")
     app.strike(task.id)
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     assert app.search_archives("report") == [date(2026, 8, 20)]
 
 
@@ -559,7 +711,7 @@ def test_archive_matches_tests_an_already_loaded_day(data_dir: Path) -> None:
     app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
     app.add("Réparer le vélo")
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     day = app.read_archive(date(2026, 8, 20))
     assert app.archive_matches(day, "reparer") is True
     assert app.archive_matches(day, "helicopter") is False
@@ -579,10 +731,10 @@ def test_statistics_counts_each_archived_day_most_recent_first(data_dir: Path) -
     gone = app.add("to be deleted")
     app.delete(gone.id)
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     app.add("only this one")
     app.clock = clock_at(datetime(2026, 8, 22, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     assert app.statistics() == [
         (date(2026, 8, 21), DayCounts(added=1, struck=0, deleted=0, to_reserve=1)),
         (date(2026, 8, 20), DayCounts(added=3, struck=1, deleted=1, to_reserve=1)),
@@ -593,7 +745,7 @@ def test_statistics_skips_an_unreadable_archive(data_dir: Path) -> None:
     app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 20, 10, 0, tzinfo=PARIS)))
     app.add("kept")
     app.clock = clock_at(datetime(2026, 8, 21, 10, 0, tzinfo=PARIS))
-    app.ensure_day()
+    _roll_over_and_write(app)
     (data_dir / "archive" / "2026-08-19.json").write_text("not json", encoding="utf-8")
     assert app.statistics() == [
         (date(2026, 8, 20), DayCounts(added=1, struck=0, deleted=0, to_reserve=1)),
@@ -857,20 +1009,5 @@ def test_the_day_rollover_empties_the_undo_stack(data_dir: Path) -> None:
     app.clock = clock_at(datetime(2026, 8, 24, 4, 30, tzinfo=PARIS))
 
     app.ensure_day()
-
-    assert app.can_undo is False
-
-
-def test_the_undo_stack_is_empty_even_if_archiving_the_day_fails(
-    data_dir: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    app = App.open(data_dir, clock=clock_at(datetime(2026, 8, 24, 3, 0, tzinfo=PARIS)))
-    task = app.add("deleted before 04:00")
-    app.delete(task.id)
-    app.clock = clock_at(datetime(2026, 8, 24, 4, 30, tzinfo=PARIS))
-    monkeypatch.setattr(storage, "archive", _raise_oserror)
-
-    with pytest.raises(OSError):
-        app.ensure_day()
 
     assert app.can_undo is False

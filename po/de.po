@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:32+0100\n"
+"POT-Creation-Date: 2026-11-01 16:56+0100\n"
 "PO-Revision-Date: 2026-10-29 16:30+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: German\n"
@@ -745,14 +745,14 @@ msgstr "Durchstreichen rückgängig machen"
 msgid "Strike through"
 msgstr "Durchstreichen"
 
-#: src/rature/ui/window.py:401
+#: src/rature/ui/window.py:384
 msgid "Changes could not be saved to disk."
 msgstr "Änderungen konnten nicht auf dem Datenträger gespeichert werden."
 
-#: src/rature/ui/window.py:406
-msgid "A new day has started. The previous one has been archived."
-msgstr "Ein neuer Tag hat begonnen. Der vorherige wurde archiviert."
+#: src/rature/ui/window.py:388
+msgid "A new day has started."
+msgstr "Ein neuer Tag hat begonnen."
 
-#: src/rature/ui/window.py:408
+#: src/rature/ui/window.py:389
 msgid "Dismiss"
 msgstr "Schließen"

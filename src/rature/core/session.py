@@ -503,8 +503,8 @@ class Session:
     def roll_over(self, now: datetime) -> Day:
         """Run the SPECIFICATION.md §2.5 rollover, seven steps, return the old day.
 
-        Archiving it and saving the new one is the caller's job; App.ensure_day
-        is where that full sequence lives.
+        Archiving it and saving the new one is the caller's job: App keeps
+        the old day until the first gesture writes both (§2.5).
         """
         if not self.rollover_due(now):
             raise ValueError("no rollover is due")

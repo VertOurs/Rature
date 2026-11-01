@@ -343,7 +343,7 @@ def test_ui_modules_only_import_core_session_storage_models_for_typing() -> None
 # SPECIFICATION.md §3.6: the write-failure banner clears only on a write
 # that reached disk. Every `self._write_failure_active = False` in
 # window.py must sit under a guard naming one of these.
-_BANNER_CLEAR_GUARDS = {"SAVED", "clear_banner_on_success"}
+_BANNER_CLEAR_GUARDS = {"clear_banner_on_success"}
 
 
 def _is_banner_clear(node: ast.AST) -> bool:

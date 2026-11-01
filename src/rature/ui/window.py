@@ -16,7 +16,6 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 
 from rature.core.app import (  # noqa: E402
     App,
-    EnsureOutcome,
     LockedError,
 )
 from rature.ui import APP_ID  # noqa: E402
@@ -138,10 +137,9 @@ class RatureWindow(Adw.ApplicationWindow):
         self.sidebar_list.connect("row-activated", self._on_row_activated)
         self._install_shortcuts()
 
-        # A startup rollover whose save failed leaves App.save_pending set;
-        # show the write-failure banner now rather than after the first
-        # 60 s tick (before this, that path crashed do_activate outright).
-        self._write_failure_active = self.app.save_pending
+        # SPECIFICATION.md §3.6 situation 3: the confirmed empty day could
+        # not be written, say so from the start.
+        self._write_failure_active = self.app.empty_day_write_failed
         self._new_day_pending = False
         self._new_day_dismissed = False
         self.day_view.banner.connect("button-clicked", self._on_banner_button_clicked)
@@ -203,32 +201,15 @@ class RatureWindow(Adw.ApplicationWindow):
         GLib.source_remove(self._timer_id)
 
     def _on_ensure_day_tick(self) -> bool:
-        # Set only on the tick that archives a day; the new-day banner
-        # flag stays set until dismissed, so it cannot serve here.
-        archived_date = None
-
         def tick() -> None:
-            nonlocal archived_date
-            outcome, archived = self.app.ensure_day()
-            if archived is not None:
-                # The archive file is written before the save, so it is
-                # there even when the save then fails.
-                archived_date = archived.date
+            if self.app.ensure_day() is not None:
                 self._new_day_pending = True
                 self._new_day_dismissed = False
-            # SPECIFICATION.md §3.6: the write-failure banner clears only
-            # on a write that reached disk. The 60 s tick usually writes
-            # nothing, so map ensure_day's outcome here and tell _perform
-            # not to clear the banner on the no-exception path.
-            if outcome is EnsureOutcome.SAVED:
-                self._write_failure_active = False
-            elif outcome is EnsureOutcome.SAVE_FAILED:
-                self._write_failure_active = True
 
+        # SPECIFICATION.md §3.1: the tick never writes, and §3.6 only lifts
+        # the write-failure banner on a write that reached disk.
         self._perform(tick, clear_banner_on_success=False)
         self._refresh_all()
-        if archived_date is not None:
-            self._refresh_archive_windows(archived_date)
         return GLib.SOURCE_CONTINUE
 
     def _refresh_archive_windows(self, archived_date: date) -> None:
@@ -357,10 +338,8 @@ class RatureWindow(Adw.ApplicationWindow):
         # disabling the control; per §3.6's "Refus métier" they are a bug,
         # logged and swallowed, never shown.
         #
-        # clear_banner_on_success=False is for the timer tick: a tick that
-        # raised nothing has usually written nothing, and §3.6 only lifts
-        # the banner on a write that reached disk (the tick sets the flag
-        # itself from ensure_day's outcome).
+        # clear_banner_on_success=False is for the timer tick, which writes
+        # nothing: §3.6 only lifts the banner on a write that reached disk.
         try:
             action()
         except OSError:
@@ -373,6 +352,10 @@ class RatureWindow(Adw.ApplicationWindow):
             if clear_banner_on_success:
                 self._write_failure_active = False
             success = True
+        # SPECIFICATION.md §3.5: the gesture that writes the rollover, even
+        # if the main file then failed: the archive is on disk.
+        for archived_date in self.app.take_written_archives():
+            self._refresh_archive_windows(archived_date)
         self._update_banner()
         return success
 
@@ -402,9 +385,7 @@ class RatureWindow(Adw.ApplicationWindow):
             banner.set_button_label("")
             banner.set_revealed(True)
         elif self._new_day_pending and not self._new_day_dismissed:
-            banner.set_title(
-                _("A new day has started. The previous one has been archived.")
-            )
+            banner.set_title(_("A new day has started."))
             banner.set_button_label(_("Dismiss"))
             banner.set_revealed(True)
         else:

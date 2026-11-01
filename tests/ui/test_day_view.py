@@ -2,12 +2,13 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The Day view, driven through its real widgets (SPECIFICATION.md §3.2)."""
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from ui_helpers import drop_on_half, process_events, type_into
 
 from rature.core.app import App
 from rature.ui import list_helpers
+from rature.ui.archives_window import ArchivesWindow
 from rature.ui.task_row import TaskRow
 from rature.ui.window import RatureWindow
 
@@ -194,3 +195,40 @@ def test_undo_turns_insensitive_when_the_timer_rolls_the_day_over(
     process_events()
 
     assert not undo.get_enabled()
+
+
+def test_the_timer_announces_a_new_day_without_touching_the_archives_window(
+    window: RatureWindow, app: App, now: list[datetime]
+) -> None:
+    _add(window, "buy bread")
+    archives = ArchivesWindow(app=app, application=window.get_application())
+    archives.present()
+    process_events()
+
+    now[0] += timedelta(days=1)
+    window._on_ensure_day_tick()
+    process_events()
+
+    banner = window.day_view.banner
+    assert banner.get_revealed()
+    assert banner.get_title() == "A new day has started."
+    assert archives._dates == []
+    archives.destroy()
+
+
+def test_the_first_gesture_refreshes_the_archives_window(
+    window: RatureWindow, app: App, now: list[datetime]
+) -> None:
+    _add(window, "buy bread")
+    archives = ArchivesWindow(app=app, application=window.get_application())
+    archives.present()
+    process_events()
+    now[0] += timedelta(days=1)
+    window._on_ensure_day_tick()
+    process_events()
+
+    _add(window, "first gesture")
+    process_events()
+
+    assert archives._dates == [date(2026, 8, 24)]
+    archives.destroy()
