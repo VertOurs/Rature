@@ -2,9 +2,43 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """Helpers shared by the UI tests. Imported only once conftest.py let gi in."""
 
+from collections.abc import Callable
 from typing import Any
 
 from gi.repository import GLib, GObject, Gtk
+
+
+class FakeAlertDialog:
+    """A real Gtk.AlertDialog whose answer comes from the test."""
+
+    shown: list["FakeAlertDialog"] = []  # noqa: RUF012
+    _real_class: Any = None
+
+    def __init__(self) -> None:
+        self._real = FakeAlertDialog._real_class()
+        self._callback: Callable[[Any, Any], None] | None = None
+        self._choice: int | None = None
+        self.parent: Any = None
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._real, name)
+
+    def choose(self, _parent: Any, _cancellable: Any, callback: Any) -> None:
+        self.parent = _parent
+        self._callback = callback
+        FakeAlertDialog.shown.append(self)
+
+    def choose_finish(self, _result: Any) -> int:
+        if self._choice is None:
+            raise GLib.Error("dismissed")
+        return self._choice
+
+    def press(self, label: str) -> None:
+        self._choice = list(self._real.get_buttons()).index(label)
+        self._callback(self, None)
+
+    def dismiss(self) -> None:
+        self._callback(self, None)
 
 
 def process_events() -> None:

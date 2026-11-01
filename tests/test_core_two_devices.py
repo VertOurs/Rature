@@ -391,3 +391,130 @@ def test_pending_archives_of_replaced_data_are_dropped(data_dir: Path) -> None:
         "from the desktop",
         "second gesture of tuesday",
     ]
+
+
+def _full_device(data_dir: Path) -> App:
+    laptop = _device(data_dir)
+    laptop.add("from the laptop")
+    laptop.add_to_reserve("in the reserve")
+    return laptop
+
+
+def test_save_device_data_writes_memory_over_a_missing_file(data_dir: Path) -> None:
+    laptop = _full_device(data_dir)
+    in_memory = _as_dict(laptop.session)
+    (data_dir / "data.json").unlink()
+
+    laptop.save_device_data()
+
+    assert load(data_dir=data_dir).to_dict() == in_memory
+    assert laptop.can_undo is False
+    assert not laptop.write_failed
+
+
+def test_save_device_data_sets_an_unreadable_file_aside_first(data_dir: Path) -> None:
+    laptop = _full_device(data_dir)
+    in_memory = _as_dict(laptop.session)
+    (data_dir / "data.json").write_text("half delivered")
+
+    laptop.save_device_data()
+
+    assert load(data_dir=data_dir).to_dict() == in_memory
+    (aside,) = data_dir.glob("data.json.*.bak")
+    assert aside.read_text() == "half delivered"
+
+
+def test_save_device_data_keeps_the_undo_stack(data_dir: Path) -> None:
+    laptop = _full_device(data_dir)
+    laptop.delete(laptop.session.day.tasks[0].id)
+    (data_dir / "data.json").unlink()
+
+    laptop.save_device_data()
+
+    assert laptop.undo_last_deletion().text == "from the laptop"
+
+
+def test_save_device_data_writes_the_pending_archives_too(data_dir: Path) -> None:
+    laptop = _full_device(data_dir)
+    _wake_on_tuesday(laptop)
+    (data_dir / "data.json").unlink()
+
+    laptop.save_device_data()
+
+    assert storage.list_archives(data_dir=data_dir) == [MONDAY]
+    assert load(data_dir=data_dir).day.date == TUESDAY
+
+
+def test_save_device_data_loads_a_file_delivered_meanwhile(data_dir: Path) -> None:
+    laptop = _full_device(data_dir)
+    _device(data_dir).add("from the desktop")
+
+    laptop.save_device_data()
+
+    texts = [task.text for task in laptop.session.day.tasks]
+    assert texts == ["from the laptop", "from the desktop"]
+    assert laptop.take_reloaded()
+
+
+def test_save_device_data_never_replaces_a_future_version(data_dir: Path) -> None:
+    laptop = _full_device(data_dir)
+    path = data_dir / "data.json"
+    raw = json.loads(path.read_text())
+    raw["version"] += 1
+    path.write_text(json.dumps(raw))
+    before = path.read_bytes()
+
+    with pytest.raises(FutureVersionError):
+        laptop.save_device_data()
+
+    assert path.read_bytes() == before
+
+
+def test_a_refused_set_aside_leaves_the_file_and_memory(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    laptop = _full_device(data_dir)
+    in_memory = _as_dict(laptop.session)
+    path = data_dir / "data.json"
+    path.write_text("half delivered")
+
+    def refuse(*_args: object, **_kwargs: object) -> None:
+        raise PermissionError("no access")
+
+    monkeypatch.setattr(storage, "set_aside", refuse)
+    with pytest.raises(PermissionError):
+        laptop.save_device_data()
+
+    assert path.read_text() == "half delivered"
+    assert _as_dict(laptop.session) == in_memory
+
+
+@pytest.mark.parametrize("unreadable", [False, True])
+def test_after_a_failed_save_the_next_gesture_writes_without_asking(
+    data_dir: Path, monkeypatch: pytest.MonkeyPatch, *, unreadable: bool
+) -> None:
+    # The user has already chosen to write (§3.6): neither a missing file nor
+    # a set-aside one may raise DataFileMissingError on the next gesture.
+    laptop = _full_device(data_dir)
+    path = data_dir / "data.json"
+    if unreadable:
+        path.write_text("half delivered")
+    else:
+        path.unlink()
+
+    def disk_full(*_args: object, **_kwargs: object) -> str:
+        raise OSError("disk full")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(storage, "save", disk_full)
+        laptop.save_device_data()
+    assert laptop.write_failed
+    assert not path.exists()
+
+    laptop.add("next gesture")
+
+    assert not laptop.write_failed
+    assert [task.text for task in load(data_dir=data_dir).day.tasks] == [
+        "from the laptop",
+        "next gesture",
+    ]

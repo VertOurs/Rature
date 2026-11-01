@@ -1157,9 +1157,27 @@ geste de l'utilisateur (§2.9). Attendre laisserait le dossier sans
 « fichier disparu », en boucle. Vaut pour les trois cas : fichier illisible
 mis de côté, fichier disparu, dossier sans `data.json` choisi sans donnée
 locale (§3.17). Un échec de cette écriture relève de la situation 3. Au
-démarrage, le message vient avant toute fenêtre ; pendant l'exécution, il
-est attaché à la fenêtre et le geste en cours n'est pas écrit. Le fichier
-mis de côté n'est jamais supprimé par l'application.
+démarrage, le message vient avant toute fenêtre. Le fichier mis de côté
+n'est jamais supprimé par l'application.
+
+**Pendant l'exécution**, le message est attaché à la fenêtre et le geste en
+cours n'est pas écrit, ni rejoué après « Réessayer ». La mémoire contient
+la dernière lecture réussie : la sortie écrit ces données, jamais une
+journée vide, qui jetterait la réserve, les récurrentes et Demain. Réécrire
+la mémoire perd au pire les changements de l'autre appareil, que la journée
+vide perd aussi.
+
+- fichier illisible : mise de côté, puis écriture de la mémoire
+- fichier disparu : écriture de la mémoire
+
+Après une confirmation qui dit que ces données remplaceront aussi celles
+des autres appareils. Le fichier est relu juste avant : un fichier livré
+entre-temps est chargé, jamais remplacé. L'écriture passe par le chemin de
+tout geste (archives en attente, puis `data.json`), et un échec relève de
+la situation 3 : le geste suivant retente l'écriture sans redemander,
+l'utilisateur a déjà choisi d'écrire. Échap vaut « Quitter » au démarrage,
+où rien n'est en mémoire, et « Réessayer » pendant l'exécution : quitter y
+jette la copie en mémoire, ce doit être un clic volontaire.
 
 **3. Échec d'écriture pendant un geste** (`OSError`). `App` ne défait pas
 la mutation en mémoire, c'est documenté sur la classe. L'interface attrape
@@ -1191,7 +1209,8 @@ support), seul l'utilisateur peut la corriger. L'exception complète est
 journalisée au niveau `ERROR`. Depuis le chantier 10, rien n'est créé au
 démarrage (§2.9) : un dossier impossible à créer ou un disque plein se
 révèle au premier geste, situation 3. En cours d'exécution, l'alerte est
-attachée à la fenêtre principale, puis `quit`, comme au démarrage.
+attachée à la fenêtre principale, puis le message de la situation 2
+revient : quitter y jetterait la copie en mémoire.
 
 **Une seule bannière, trois messages possibles.** L'échec d'écriture
 (situation 3), les copies de conflit (§3.17) et le nouveau jour (§3.1)
@@ -1287,6 +1306,9 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Message bloquant, fichier disparu | `The data file is missing.`, `No data file was found in this folder: %s`, `Try Again`, `Start Empty`, `Quit` |
 | Message bloquant, dossier inaccessible | `Rature cannot reach its data folder.`, `It may have been moved or deleted, or access to it removed: %s`, `Try Again`, `Choose a Folder…`, `Quit` |
 | Confirmation de journée vide | `Start from an empty day?`, `This empty day will also replace the data on your other synced devices.`, `Cancel`, `Start Empty` |
+| Message bloquant en cours d'exécution, fichier illisible | mêmes titre et détail qu'au démarrage, `Try Again`, `Set Aside and Save This Device's Data`, `Quit` |
+| Message bloquant en cours d'exécution, fichier disparu | mêmes titre et détail qu'au démarrage, `Try Again`, `Save This Device's Data`, `Quit` |
+| Confirmation d'écriture des données de l'appareil | `Save this device's data?`, `It will also replace the data on your other synced devices. Recent changes made on them may be lost.`, `Cancel`, `Save This Device's Data` |
 | Dialogue du dossier de données | `Data Folder`, `Rature keeps its data in: %s`, `Choose a Folder…`, `Open Folder`, `Close` |
 | Dialogue pour rejoindre, dossier avec données | `Use the data in this folder?`, `Your current data will be set aside as %s, in the previous folder.`, `Use This Folder` |
 | Dialogue pour rejoindre, dossier sans `data.json` | `Copy your data to this folder?`, `If this folder is synced, wait until its first sync has finished before copying.`, `Copy Data Here` |
@@ -1294,7 +1316,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Dialogue pour rejoindre, refus | `This folder cannot be used.`, `Its data file cannot be read: %s`, `Its data file was saved by a newer version of Rature: %s`, `Close` |
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
-| Alerte dossier de données inutilisable | `Rature could not use its data folder.`, `Check that this folder can be read and written, and that the disk is not full: %s`, `Quit` |
+| Alerte dossier de données inutilisable | `Rature could not use its data folder.`, `Check that this folder can be read and written, and that the disk is not full: %s`, `Quit` au démarrage, `Close` en cours d'exécution |
 | Format de la date longue (titres de la vue Jour et de la fenêtre d'archives, colonne Day des Statistiques, copie texte) | `%A %-d %B` |
 | Format de la date avec année (barre latérale de la fenêtre d'archives) | `%-d %B %Y` |
 

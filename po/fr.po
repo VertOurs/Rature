@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 17:19+0100\n"
+"POT-Creation-Date: 2026-11-01 17:48+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -497,7 +497,7 @@ msgstr "Modifier"
 msgid "Recurring task"
 msgstr "Tâche récurrente"
 
-#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:176
+#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:227
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -579,8 +579,8 @@ msgstr "Total"
 msgid "General"
 msgstr "Général"
 
-#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:155
-#: src/rature/ui/application.py:191
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:190
+#: src/rature/ui/application.py:266
 msgid "Quit"
 msgstr "Quitter"
 
@@ -642,22 +642,84 @@ msgstr "%A %-d %B"
 msgid "%-d %B %Y"
 msgstr "%-d %B %Y"
 
-#: src/rature/ui/application.py:89
+#: src/rature/ui/application.py:117
 msgid "This file was saved by a newer version of Rature."
 msgstr "Ce fichier a été enregistré par une version plus récente de Rature."
 
-#: src/rature/ui/application.py:91
+#: src/rature/ui/application.py:119
 #, python-format
 msgid "Opening it could overwrite data. Update Rature to open this file: %s"
 msgstr ""
 "L'ouvrir pourrait écraser des données. Mettez Rature à jour pour ouvrir ce "
 "fichier : %s"
 
-#: src/rature/ui/application.py:101
+#: src/rature/ui/application.py:150
+msgid "The data file cannot be read."
+msgstr "Le fichier de données est illisible."
+
+#: src/rature/ui/application.py:151
+#, python-format
+msgid "It may still be syncing, or it may be damaged: %s"
+msgstr ""
+"Il est peut-être encore en cours de synchronisation, ou il est endommagé : %s"
+
+#: src/rature/ui/application.py:152
+msgid "Set Aside and Start Empty"
+msgstr "Mettre de côté et repartir à vide"
+
+#: src/rature/ui/application.py:154
+msgid "Set Aside and Save This Device's Data"
+msgstr "Mettre de côté et enregistrer les données de cet appareil"
+
+#: src/rature/ui/application.py:161
+msgid "The data file is missing."
+msgstr "Le fichier de données est introuvable."
+
+#: src/rature/ui/application.py:162
+#, python-format
+msgid "No data file was found in this folder: %s"
+msgstr "Aucun fichier de données dans ce dossier : %s"
+
+#: src/rature/ui/application.py:163 src/rature/ui/application.py:216
+msgid "Start Empty"
+msgstr "Repartir à vide"
+
+#: src/rature/ui/application.py:165 src/rature/ui/application.py:223
+msgid "Save This Device's Data"
+msgstr "Enregistrer les données de cet appareil"
+
+#: src/rature/ui/application.py:190
+msgid "Try Again"
+msgstr "Réessayer"
+
+#: src/rature/ui/application.py:211
+msgid "Start from an empty day?"
+msgstr "Repartir d'une journée vide ?"
+
+#: src/rature/ui/application.py:213
+msgid "This empty day will also replace the data on your other synced devices."
+msgstr ""
+"Cette journée vide remplacera aussi les données de vos autres appareils "
+"synchronisés."
+
+#: src/rature/ui/application.py:218
+msgid "Save this device's data?"
+msgstr "Enregistrer les données de cet appareil ?"
+
+#: src/rature/ui/application.py:220
+msgid ""
+"It will also replace the data on your other synced devices. Recent changes "
+"made on them may be lost."
+msgstr ""
+"Elles remplaceront aussi les données de vos autres appareils synchronisés. "
+"Les modifications récentes faites sur ceux-ci peuvent être perdues."
+
+#. SPECIFICATION.md §3.6 situation 4.
+#: src/rature/ui/application.py:235
 msgid "Rature could not use its data folder."
 msgstr "Rature n'a pas pu utiliser son dossier de données."
 
-#: src/rature/ui/application.py:103
+#: src/rature/ui/application.py:238
 #, python-format
 msgid ""
 "Check that this folder can be read and written, and that the disk is not "
@@ -666,46 +728,9 @@ msgstr ""
 "Vérifiez que ce dossier est accessible en lecture et en écriture, et que le "
 "disque n'est pas plein : %s"
 
-#: src/rature/ui/application.py:119
-msgid "The data file cannot be read."
-msgstr "Le fichier de données est illisible."
-
-#: src/rature/ui/application.py:120
-#, python-format
-msgid "It may still be syncing, or it may be damaged: %s"
-msgstr ""
-"Il est peut-être encore en cours de synchronisation, ou il est endommagé : %s"
-
-#: src/rature/ui/application.py:121
-msgid "Set Aside and Start Empty"
-msgstr "Mettre de côté et repartir à vide"
-
-#: src/rature/ui/application.py:128
-msgid "The data file is missing."
-msgstr "Le fichier de données est introuvable."
-
-#: src/rature/ui/application.py:129
-#, python-format
-msgid "No data file was found in this folder: %s"
-msgstr "Aucun fichier de données dans ce dossier : %s"
-
-#: src/rature/ui/application.py:130 src/rature/ui/application.py:176
-msgid "Start Empty"
-msgstr "Repartir à vide"
-
-#: src/rature/ui/application.py:155
-msgid "Try Again"
-msgstr "Réessayer"
-
-#: src/rature/ui/application.py:171
-msgid "Start from an empty day?"
-msgstr "Repartir d'une journée vide ?"
-
-#: src/rature/ui/application.py:173
-msgid "This empty day will also replace the data on your other synced devices."
-msgstr ""
-"Cette journée vide remplacera aussi les données de vos autres appareils "
-"synchronisés."
+#: src/rature/ui/application.py:251
+msgid "Close"
+msgstr "Fermer"
 
 #: src/rature/ui/day_view.py:106
 msgid "Unfreeze the list"
@@ -743,18 +768,18 @@ msgstr "Annuler la rature"
 msgid "Strike through"
 msgstr "Rayer"
 
-#: src/rature/ui/window.py:366
+#: src/rature/ui/window.py:377
 msgid "This task changed on another device."
 msgstr "Cette tâche a changé sur un autre appareil."
 
-#: src/rature/ui/window.py:412
+#: src/rature/ui/window.py:434
 msgid "Changes could not be saved to disk."
 msgstr "Les modifications n'ont pas pu être enregistrées sur le disque."
 
-#: src/rature/ui/window.py:416
+#: src/rature/ui/window.py:438
 msgid "A new day has started."
 msgstr "Une nouvelle journée a commencé."
 
-#: src/rature/ui/window.py:417
+#: src/rature/ui/window.py:439
 msgid "Dismiss"
 msgstr "Ignorer"

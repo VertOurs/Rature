@@ -12,43 +12,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from gi.repository import GLib, Gtk
-from ui_helpers import process_events
+from gi.repository import Gtk
+from ui_helpers import FakeAlertDialog, process_events
 
 from rature.core import storage
 from rature.core.app import App
 from rature.ui.application import RatureApplication
-
-
-class _Dialog:
-    """A real Gtk.AlertDialog whose answer comes from the test."""
-
-    shown: list["_Dialog"] = []  # noqa: RUF012
-    _real_class: Any = None
-
-    def __init__(self) -> None:
-        self._real = _Dialog._real_class()
-        self._callback: Callable[[Any, Any], None] | None = None
-        self._choice: int | None = None
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._real, name)
-
-    def choose(self, _parent: Any, _cancellable: Any, callback: Any) -> None:
-        self._callback = callback
-        _Dialog.shown.append(self)
-
-    def choose_finish(self, _result: Any) -> int:
-        if self._choice is None:
-            raise GLib.Error("dismissed")
-        return self._choice
-
-    def press(self, label: str) -> None:
-        self._choice = list(self._real.get_buttons()).index(label)
-        self._callback(self, None)
-
-    def dismiss(self) -> None:
-        self._callback(self, None)
 
 
 class _Startup:
@@ -60,8 +29,8 @@ class _Startup:
         self.quits = 0
 
     @property
-    def dialog(self) -> _Dialog:
-        return _Dialog.shown[-1]
+    def dialog(self) -> FakeAlertDialog:
+        return FakeAlertDialog.shown[-1]
 
     def message(self) -> str:
         return self.dialog.get_message()
@@ -77,9 +46,9 @@ def startup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> Iterator[_Startup]:
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
-    _Dialog._real_class = Gtk.AlertDialog
-    _Dialog.shown = []
-    monkeypatch.setattr(Gtk, "AlertDialog", _Dialog)
+    FakeAlertDialog._real_class = Gtk.AlertDialog
+    FakeAlertDialog.shown = []
+    monkeypatch.setattr(Gtk, "AlertDialog", FakeAlertDialog)
     state = _Startup(application, tmp_path / "rature")
 
     def count(name: str) -> Callable[[], None]:
@@ -111,7 +80,7 @@ def _unreadable(startup: _Startup) -> Path:
 def test_a_first_launch_opens_the_window_and_creates_nothing(startup: _Startup) -> None:
     startup.application.do_activate()
 
-    assert _Dialog.shown == []
+    assert FakeAlertDialog.shown == []
     assert len(startup.windows()) == 1
     assert not startup.folder.exists()
     assert (startup.holds, startup.quits) == (0, 0)
@@ -221,7 +190,7 @@ def test_a_second_activation_does_not_start_a_second_loop(startup: _Startup) -> 
     startup.application.do_activate()
     startup.application.do_activate()
 
-    assert len(_Dialog.shown) == 1
+    assert len(FakeAlertDialog.shown) == 1
     assert startup.holds == 1
 
 

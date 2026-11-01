@@ -113,9 +113,6 @@ class App:
         self._write_failed = False
         # Fresh data replaced memory since take_reloaded last ran.
         self._reloaded = False
-        # The empty day of start_empty could not be written (§3.6 situation
-        # 3): the next gesture writes it with everything else.
-        self.empty_day_write_failed = False
         # Identifiers of this device's deletions since launch, most recent
         # last (SPECIFICATION.md §3.2, ADR 0009). Here rather than in Session
         # because it outlives the data it points into.
@@ -166,9 +163,9 @@ class App:
         Reads again first: a file delivered while the confirmation was open
         is loaded, never replaced. Otherwise an unreadable file is set aside
         and the empty day is written at once: the confirmation is the
-        gesture. A failed write of that day leaves empty_day_write_failed
-        set, for the banner of §3.6 situation 3. A failed set-aside raises
-        OSError, situation 4.
+        gesture. A failed write of that day leaves write_failed set, for the
+        banner of §3.6 situation 3. A failed set-aside raises OSError,
+        situation 4.
         """
         try:
             return cls.open(data_dir, clock=clock)
@@ -178,12 +175,39 @@ class App:
             aside = storage.set_aside(clock(), data_dir=data_dir)
             _logger.warning("set an unreadable data file aside: %s", aside)
         app = cls._empty(data_dir, clock, StartupOutcome.STARTED_EMPTY)
-        try:
-            app._save()
-        except OSError:
-            _logger.warning("could not write the empty day in %s", data_dir)
-            app.empty_day_write_failed = True
+        app._save_confirmed()
         return app
+
+    def save_device_data(self) -> None:
+        """The user's confirmed way out of a failed re-read while running (§3.6).
+
+        Memory holds the last successful read, reserve and recurring tasks
+        included, so that is what gets written, never an empty day. Reads
+        again first: a file delivered while the confirmation was open is
+        loaded, never replaced. Otherwise an unreadable file is set aside and
+        memory is written at once. After a failed write, the next gesture
+        writes without asking: the user has already chosen. A failed set-aside
+        raises OSError, situation 4.
+        """
+        try:
+            self.reread()
+        except DataFileMissingError:
+            pass
+        except DataFileUnreadableError:
+            aside = storage.set_aside(self.clock(), data_dir=self.data_dir)
+            _logger.warning("set an unreadable data file aside: %s", aside)
+        else:
+            return
+        self._fingerprint = None
+        self._save_confirmed()
+
+    def _save_confirmed(self) -> None:
+        # The confirmation is the gesture. A failed write leaves write_failed
+        # set, for the banner of §3.6 situation 3.
+        try:
+            self._save()
+        except OSError:
+            _logger.warning("could not write the data in %s", self.data_dir)
 
     @classmethod
     def _load(cls, data_dir: Path, clock: Callable[[], datetime]) -> App:
@@ -356,7 +380,7 @@ class App:
         )
         self._write_failed = False
 
-    def _reread(self) -> bool:
+    def reread(self) -> bool:
         """Read the main file again, and take what changed (§2.9).
 
         Writes nothing but the backup any load makes of an older format.
@@ -391,6 +415,11 @@ class App:
         self.ensure_day()
         return True
 
+    @property
+    def write_failed(self) -> bool:
+        """Whether a change lives only in memory after a failed write."""
+        return self._write_failed
+
     def take_reloaded(self) -> bool:
         """Whether fresh data replaced memory since the last call."""
         reloaded, self._reloaded = self._reloaded, False
@@ -405,7 +434,7 @@ class App:
         raises as is. A failed write leaves the change in memory, see the
         class docstring.
         """
-        fresh = copy.deepcopy(self.session) if self._reread() else None
+        fresh = copy.deepcopy(self.session) if self.reread() else None
         try:
             result = apply(self.session)
         except (LockedError, KeyError, ValueError) as error:
