@@ -465,7 +465,7 @@ def test_an_existing_backup_is_kept_and_not_doubled(tmp_path: Path) -> None:
 
 
 def test_an_unreadable_old_file_is_not_backed_up(tmp_path: Path) -> None:
-    # Version 1, but no date: the load fails and the file goes to quarantine.
+    # Version 1, but no date: the load fails and the file stays untouched.
     _write_raw(tmp_path, {key: v for key, v in V1_MAIN.items() if key != "date"})
     with pytest.raises((KeyError, ValueError)):
         load(data_dir=tmp_path)

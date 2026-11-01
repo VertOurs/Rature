@@ -23,6 +23,12 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   recent first, rather than the last entry of the day's journal, which may
   come from another device. A relaunch therefore leaves nothing to undo,
   even when the day's journal holds entries.
+- Rature no longer writes anything at startup. A first launch creates its
+  data folder with the first change. A data file that cannot be read, or
+  that has vanished, is no longer replaced by an empty day on its own: it may
+  still be arriving from another device. A message offers to try again, or
+  to start from an empty day after confirmation, which sets an unreadable
+  file aside as `data.json.<date>.bak`.
 
 ### Fixed
 

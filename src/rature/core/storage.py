@@ -188,6 +188,21 @@ def save(store: Store, *, data_dir: Path | None = None) -> None:
     _atomic_write_json(target / _MAIN_FILE, store.to_dict())
 
 
+def data_dir_exists(*, data_dir: Path | None = None) -> bool:
+    """Whether the data folder exists: its absence means a first launch.
+
+    os.stat rather than Path.exists, which also answers False on a refused
+    access: a folder Rature cannot reach is not a first launch, and any
+    OSError but FileNotFoundError goes up to the caller (SPECIFICATION.md
+    §2.9, §3.6).
+    """
+    try:
+        os.stat(data_dir or xdg_data_dir())
+    except FileNotFoundError:
+        return False
+    return True
+
+
 def restrict_data_dir_permissions(*, data_dir: Path | None = None) -> None:
     """Narrow the data directory itself to owner-only access (0o700).
 
@@ -234,21 +249,21 @@ def _remove_matching(directory: Path, name: re.Pattern[str]) -> None:
             _logger.warning("could not remove a temporary file: %s", entry.path)
 
 
-def quarantine(now: datetime, *, data_dir: Path | None = None) -> Path:
-    """Rename the unreadable main file aside; return its new path.
+def set_aside(now: datetime, *, data_dir: Path | None = None) -> Path:
+    """Rename the main file to data.json.<stamp>.bak; return its new path.
 
-    The stamp comes from the caller, not the system clock: storage never
-    reads it. On a name collision (two quarantines within the same
-    second), a numeric suffix is appended rather than overwriting the
-    earlier one.
+    Only ever on the user's confirmation (SPECIFICATION.md §3.6). The stamp
+    comes from the caller, not the system clock: storage never reads it. On
+    a name collision (two within the same second), a numeric suffix is
+    added rather than overwriting the earlier file.
     """
     target = data_dir or xdg_data_dir()
     path = target / _MAIN_FILE
     stamp = now.strftime("%Y%m%d-%H%M%S")
-    dest = path.with_name(f"{path.name}.bad-{stamp}")
+    dest = path.with_name(f"{path.name}.{stamp}.bak")
     suffix = 2
     while dest.exists():
-        dest = path.with_name(f"{path.name}.bad-{stamp}-{suffix}")
+        dest = path.with_name(f"{path.name}.{stamp}-{suffix}.bak")
         suffix += 1
     path.rename(dest)
     return dest

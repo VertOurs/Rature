@@ -132,13 +132,18 @@ clock (`clock`, a `Callable[[], datetime]`, the system clock by default).
 It is the project's only clock seam: `session.py` and `storage.py` always
 receive `now`/`today` as arguments and never read the time themselves.
 
-`App.open` loads the file or creates one on first launch, quarantines an
-unreadable file (`storage.quarantine`) and starts empty, and lets
+`App.open` loads the file and never creates or replaces one. A data folder
+that does not exist is a first launch, an empty day in memory: the folder and
+`data.json` are born together with the first gesture. A folder without
+`data.json` raises `DataFileMissingError`, a file that does not load raises
+`DataFileUnreadableError`, and the interface blocks on a message: only the
+user's confirmation, through `App.start_empty`, sets a file aside
+(`storage.set_aside`) and writes an empty day. It lets
 `migrations.FutureVersionError` pass through without building anything for a
-future version. It also lets any `OSError` pass through (unreadable file,
-folder or first write impossible, quarantine, backup or rollover archive
-impossible); the interface then alerts and quits, as for a future
-version (`SPECIFICATION.md` §3.6). Before returning it always runs `ensure_day`, the
+future version. It also lets any other `OSError` pass through (folder or file
+out of reach, backup or rollover archive impossible); the interface then
+alerts and quits, as for a future version (`SPECIFICATION.md` §3.6). Before
+returning it always runs `ensure_day`, the
 `roll_over` then `archive` then `save` sequence of `SPECIFICATION.md` §2.5:
 the caller always gets an `App` already up to date and never has to know or
 replay that sequence.

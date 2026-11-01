@@ -18,7 +18,6 @@ from rature.core.app import (  # noqa: E402
     App,
     EnsureOutcome,
     LockedError,
-    StartupOutcome,
 )
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.archives_window import ArchivesWindow  # noqa: E402
@@ -143,12 +142,9 @@ class RatureWindow(Adw.ApplicationWindow):
         # show the write-failure banner now rather than after the first
         # 60 s tick (before this, that path crashed do_activate outright).
         self._write_failure_active = self.app.save_pending
-        self._quarantine_dismissed = False
         self._new_day_pending = False
         self._new_day_dismissed = False
         self.day_view.banner.connect("button-clicked", self._on_banner_button_clicked)
-        # StartupOutcome.RECOVERED_FROM_CORRUPTION is already known at this
-        # point; show its banner immediately, not after the first tick.
         self._update_banner()
 
         self._timer_id = GLib.timeout_add_seconds(
@@ -398,22 +394,12 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _update_banner(self) -> None:
         # SPECIFICATION.md §3.6: one AdwBanner, one message at a time,
-        # picked fresh on every call: write failure, then quarantine, then
-        # new day. A dismissed message is skipped even if still "active".
+        # picked fresh on every call: write failure, then new day. A
+        # dismissed message is skipped even if still "active".
         banner = self.day_view.banner
         if self._write_failure_active:
             banner.set_title(_("Changes could not be saved to disk."))
             banner.set_button_label("")
-            banner.set_revealed(True)
-        elif (
-            self.app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
-            and not self._quarantine_dismissed
-        ):
-            banner.set_title(
-                _("The data file could not be read. It was moved aside as %s.")
-                % self.app.quarantined_path.name
-            )
-            banner.set_button_label(_("Dismiss"))
             banner.set_revealed(True)
         elif self._new_day_pending and not self._new_day_dismissed:
             banner.set_title(
@@ -425,13 +411,7 @@ class RatureWindow(Adw.ApplicationWindow):
             banner.set_revealed(False)
 
     def _on_banner_button_clicked(self, _banner: Adw.Banner) -> None:
-        if (
-            self.app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
-            and not self._quarantine_dismissed
-        ):
-            self._quarantine_dismissed = True
-        else:
-            self._new_day_dismissed = True
+        self._new_day_dismissed = True
         self._update_banner()
 
     def _on_row_selected(

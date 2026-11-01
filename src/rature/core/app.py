@@ -33,16 +33,28 @@ _logger = logging.getLogger(__name__)
 
 
 class StartupOutcome(enum.Enum):
-    """What App.open had to do to produce a ready App.
+    """How a ready App came to be.
 
     A file newer than this build supports has no place here: it raises
     migrations.FutureVersionError straight out of open(), and no App is
     built at all, so the interface never has to handle a half-valid one.
+    The same goes for an unreadable or missing data file, see below.
     """
 
     LOADED = enum.auto()
     FIRST_LAUNCH = enum.auto()
-    RECOVERED_FROM_CORRUPTION = enum.auto()
+    STARTED_EMPTY = enum.auto()
+
+
+class DataFileMissingError(Exception):
+    """The data folder exists without data.json: a vanished file (§2.9).
+
+    Not an OSError, which means a folder Rature cannot use (§3.6).
+    """
+
+
+class DataFileUnreadableError(Exception):
+    """data.json exists but does not load: it may still be arriving (§3.6)."""
 
 
 class EnsureOutcome(enum.Enum):
@@ -89,17 +101,14 @@ class App:
         session: Session,
         clock: Callable[[], datetime],
         startup: StartupOutcome,
-        quarantined_path: Path | None = None,
     ) -> None:
         self.data_dir = data_dir
         self.session = session
         self.clock = clock
         self.startup = startup
-        # Set only when startup is RECOVERED_FROM_CORRUPTION: the file
-        # storage.quarantine() moved the unreadable data file to.
-        self.quarantined_path = quarantined_path
-        # True between a rollover that archived a day and the write that
-        # persists it: a failed write leaves it set so ensure_day retries.
+        # True between a change made outside any gesture (a rollover that
+        # archived a day, a confirmed empty day) and the write that persists
+        # it: a failed write leaves it set so ensure_day retries.
         self._save_pending = False
         # Identifiers of this device's deletions since launch, most recent
         # last (SPECIFICATION.md §3.2, ADR 0009). Here rather than in Session
@@ -108,7 +117,7 @@ class App:
 
     @property
     def save_pending(self) -> bool:
-        """A rolled-over day is archived but not yet written to disk."""
+        """A rollover or a confirmed empty day is not yet written to disk."""
         return self._save_pending
 
     @property
@@ -123,69 +132,93 @@ class App:
         *,
         clock: Callable[[], datetime] = _default_clock,
     ) -> App:
-        """Load or create the data file, then catch up on any due rollover.
+        """Load the data file, then catch up on any due rollover.
 
         Returns an App whose day already matches the current reference
         date (SPECIFICATION.md §2.5): the caller never has to know a
-        rollover happened, let alone run it itself.
+        rollover happened, let alone run it itself. Creates nothing and
+        never replaces a file (§2.9): a first launch starts on an empty day
+        in memory, born on disk with the first gesture. Raises
+        DataFileMissingError or DataFileUnreadableError for start_empty to
+        settle once the user has decided, FutureVersionError for a newer
+        file, and OSError for a folder or file it cannot reach (§3.6).
         """
         resolved_dir = data_dir if data_dir is not None else storage.xdg_data_dir()
         _logger.info("starting, data directory: %s", resolved_dir)
-        now = clock()
         storage.remove_stale_temp_files(data_dir=resolved_dir)
-        try:
-            store = storage.load(data_dir=resolved_dir)
-        except FileNotFoundError:
-            app = cls._bootstrap(resolved_dir, clock, now, StartupOutcome.FIRST_LAUNCH)
-        except (ValueError, KeyError, TypeError):
-            quarantined_path = storage.quarantine(now, data_dir=resolved_dir)
-            _logger.warning("quarantined an unreadable data file: %s", quarantined_path)
-            app = cls._bootstrap(
-                resolved_dir,
-                clock,
-                now,
-                StartupOutcome.RECOVERED_FROM_CORRUPTION,
-                quarantined_path=quarantined_path,
-            )
+        if storage.data_dir_exists(data_dir=resolved_dir):
+            app = cls._load(resolved_dir, clock)
         else:
-            app = cls(
-                data_dir=resolved_dir,
-                session=store.into_session(),
-                clock=clock,
-                startup=StartupOutcome.LOADED,
-            )
-        try:
-            storage.restrict_data_dir_permissions(data_dir=resolved_dir)
-        except OSError:
-            # Self-healing, not a startup requirement (ADR 0003
-            # addendum): the data directory already existed by now in
-            # every branch above, so this never blocks a launch over a
-            # permission narrowing it would be nice, not essential, to
-            # have.
-            _logger.warning(
-                "could not restrict data directory permissions: %s", resolved_dir
-            )
+            app = cls._empty(resolved_dir, clock, StartupOutcome.FIRST_LAUNCH)
         app.ensure_day()
         return app
 
     @classmethod
-    def _bootstrap(
+    def start_empty(
+        cls,
+        data_dir: Path,
+        *,
+        clock: Callable[[], datetime] = _default_clock,
+    ) -> App:
+        """The user's confirmed way out of a missing or unreadable file (§3.6).
+
+        Reads again first: a file delivered while the confirmation was open
+        is loaded, never replaced. Otherwise an unreadable file is set aside
+        and the empty day is written at once: the confirmation is the
+        gesture. A failed write of that day keeps it pending, for the banner
+        of §3.6 situation 3. A failed set-aside raises OSError, situation 4.
+        """
+        try:
+            return cls.open(data_dir, clock=clock)
+        except DataFileMissingError:
+            pass
+        except DataFileUnreadableError:
+            aside = storage.set_aside(clock(), data_dir=data_dir)
+            _logger.warning("set an unreadable data file aside: %s", aside)
+        app = cls._empty(data_dir, clock, StartupOutcome.STARTED_EMPTY)
+        app._save_pending = True
+        app.ensure_day()
+        return app
+
+    @classmethod
+    def _load(cls, data_dir: Path, clock: Callable[[], datetime]) -> App:
+        path = storage.main_file_path(data_dir=data_dir)
+        try:
+            store = storage.load(data_dir=data_dir)
+        except FileNotFoundError as error:
+            _logger.warning("the data file is missing: %s", path)
+            raise DataFileMissingError(path) from error
+        except (ValueError, KeyError, TypeError) as error:
+            _logger.warning("the data file cannot be read: %s", path)
+            raise DataFileUnreadableError(path) from error
+        try:
+            storage.restrict_data_dir_permissions(data_dir=data_dir)
+        except OSError:
+            # Self-healing, not a startup requirement (ADR 0003 addendum):
+            # the folder exists, since the file was just read from it, and a
+            # permission narrowing is nice, not essential, to have.
+            _logger.warning(
+                "could not restrict data directory permissions: %s", data_dir
+            )
+        return cls(
+            data_dir=data_dir,
+            session=store.into_session(),
+            clock=clock,
+            startup=StartupOutcome.LOADED,
+        )
+
+    @classmethod
+    def _empty(
         cls,
         data_dir: Path,
         clock: Callable[[], datetime],
-        now: datetime,
         startup: StartupOutcome,
-        *,
-        quarantined_path: Path | None = None,
     ) -> App:
-        session = Session(Day(date=reference_date(now)))
-        storage.save(Store.from_session(session), data_dir=data_dir)
         return cls(
             data_dir=data_dir,
-            session=session,
+            session=Session(Day(date=reference_date(clock()))),
             clock=clock,
             startup=startup,
-            quarantined_path=quarantined_path,
         )
 
     def ensure_day(self) -> EnsureResult:

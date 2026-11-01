@@ -11,7 +11,14 @@ from pathlib import Path
 import pytest
 
 from rature.core import storage
-from rature.core.app import App, EnsureOutcome, EnsureResult, StartupOutcome
+from rature.core.app import (
+    App,
+    DataFileMissingError,
+    DataFileUnreadableError,
+    EnsureOutcome,
+    EnsureResult,
+    StartupOutcome,
+)
 from rature.core.migrations import FutureVersionError
 from rature.core.session import LockedError
 from rature.core.stats import DayCounts
@@ -29,12 +36,26 @@ def test_open_default_clock_is_timezone_aware(data_dir: Path) -> None:
     assert app.clock().tzinfo is not None
 
 
-def test_first_launch_creates_the_file_immediately(data_dir: Path) -> None:
+def test_first_launch_creates_nothing(data_dir: Path) -> None:
     now = datetime(2026, 8, 24, 14, 32, 7, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(now))
     assert app.startup is StartupOutcome.FIRST_LAUNCH
     assert app.session.day.date == date(2026, 8, 24)
+    assert not data_dir.exists()
+
+
+def test_the_first_gesture_creates_the_folder_and_the_file(data_dir: Path) -> None:
+    App.open(data_dir).add("first")
     assert (data_dir / "data.json").exists()
+    assert stat.S_IMODE(data_dir.stat().st_mode) == 0o700
+
+
+def test_relaunching_before_any_gesture_is_still_a_first_launch(
+    data_dir: Path,
+) -> None:
+    App.open(data_dir)
+    assert App.open(data_dir).startup is StartupOutcome.FIRST_LAUNCH
+    assert not data_dir.exists()
 
 
 def test_first_launch_uses_the_reference_date_not_the_calendar_date(
@@ -69,6 +90,7 @@ def test_open_restricts_an_already_existing_directorys_permissions(
 def test_open_survives_a_permission_restriction_failure(
     data_dir: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
+    App.open(data_dir).add("the file exists")
     monkeypatch.setattr(storage, "restrict_data_dir_permissions", _raise_oserror)
     with caplog.at_level(logging.WARNING, logger="rature.core.app"):
         app = App.open(data_dir)
@@ -109,7 +131,7 @@ _needs_permissions = pytest.mark.skipif(
 @_needs_permissions
 def test_open_propagates_an_unreadable_data_file(data_dir: Path) -> None:
     now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
-    App.open(data_dir, clock=clock_at(now))
+    App.open(data_dir, clock=clock_at(now)).add("the file exists")
     path = data_dir / "data.json"
     before = path.read_bytes()
     path.chmod(0o000)
@@ -122,26 +144,45 @@ def test_open_propagates_an_unreadable_data_file(data_dir: Path) -> None:
     assert list(data_dir.iterdir()) == [path]
 
 
+def test_a_folder_without_a_data_file_is_a_missing_file(tmp_path: Path) -> None:
+    (tmp_path / "archive").mkdir()
+    with pytest.raises(DataFileMissingError):
+        App.open(tmp_path)
+    assert [path.name for path in tmp_path.iterdir()] == ["archive"]
+
+
 @_needs_permissions
-def test_open_propagates_a_first_launch_into_a_read_only_directory(
-    tmp_path: Path,
-) -> None:
-    tmp_path.chmod(0o500)
+def test_a_folder_out_of_reach_is_not_a_first_launch(tmp_path: Path) -> None:
+    data = tmp_path / "rature"
+    data.mkdir()
+    tmp_path.chmod(0o000)
     try:
-        with pytest.raises(OSError):
-            App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, tzinfo=PARIS)))
+        with pytest.raises(OSError) as raised:
+            App.open(data)
     finally:
         tmp_path.chmod(0o700)
-    assert list(tmp_path.iterdir()) == []
+    assert isinstance(raised.value, PermissionError)
+    assert list(data.iterdir()) == []
 
 
 @_needs_permissions
-def test_open_propagates_a_quarantine_it_cannot_perform(tmp_path: Path) -> None:
+def test_a_data_file_out_of_reach_is_not_a_missing_file(tmp_path: Path) -> None:
+    (tmp_path / "data.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "data.json").chmod(0o000)
+    try:
+        with pytest.raises(PermissionError):
+            App.open(tmp_path)
+    finally:
+        (tmp_path / "data.json").chmod(0o600)
+
+
+@_needs_permissions
+def test_start_empty_propagates_a_set_aside_it_cannot_perform(tmp_path: Path) -> None:
     (tmp_path / "data.json").write_text("not json", encoding="utf-8")
     tmp_path.chmod(0o500)
     try:
         with pytest.raises(OSError):
-            App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, tzinfo=PARIS)))
+            App.start_empty(tmp_path)
     finally:
         tmp_path.chmod(0o700)
     assert (tmp_path / "data.json").read_text(encoding="utf-8") == "not json"
@@ -161,48 +202,88 @@ def test_open_propagates_an_archive_it_cannot_write_at_rollover(
     assert (data_dir / "data.json").read_bytes() == before
 
 
-def test_open_quarantines_invalid_json_and_starts_fresh(tmp_path: Path) -> None:
-    (tmp_path / "data.json").write_text("not json", encoding="utf-8")
-    now = datetime(2026, 8, 24, 14, 32, 7, tzinfo=PARIS)
-    app = App.open(tmp_path, clock=clock_at(now))
-    assert app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
-    assert app.session.day.date == date(2026, 8, 24)
-    assert app.quarantined_path == tmp_path / "data.json.bad-20260824-143207"
-    assert app.quarantined_path.read_text(encoding="utf-8") == "not json"
-    assert (tmp_path / "data.json").exists()
+@pytest.mark.parametrize("content", ["not json", '{"version": 1}', "[]"])
+def test_an_unreadable_file_is_refused_and_left_alone(
+    tmp_path: Path, content: str
+) -> None:
+    (tmp_path / "data.json").write_text(content, encoding="utf-8")
+    with pytest.raises(DataFileUnreadableError):
+        App.open(tmp_path)
+    assert [path.name for path in tmp_path.iterdir()] == ["data.json"]
+    assert (tmp_path / "data.json").read_text(encoding="utf-8") == content
 
 
-def test_open_logs_a_quarantine_at_warning(
+def test_an_unreadable_file_is_logged_at_warning_without_its_content(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    (tmp_path / "data.json").write_text("not json", encoding="utf-8")
-    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+    (tmp_path / "data.json").write_text("my secret task", encoding="utf-8")
+    with (
+        caplog.at_level(logging.WARNING, logger="rature.core.app"),
+        pytest.raises(DataFileUnreadableError),
+    ):
         App.open(tmp_path)
     assert caplog.records[0].levelno == logging.WARNING
-    assert "quarantin" in caplog.text.lower()
+    assert "secret" not in caplog.text
 
 
-def test_quarantined_path_is_none_without_a_corruption(data_dir: Path) -> None:
-    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
-    first_launch = App.open(data_dir, clock=clock_at(now))
-    assert first_launch.quarantined_path is None
-
-    loaded = App.open(data_dir, clock=clock_at(now))
-    assert loaded.quarantined_path is None
-
-
-def test_open_quarantines_a_missing_field_and_starts_fresh(tmp_path: Path) -> None:
-    (tmp_path / "data.json").write_text('{"version": 1}', encoding="utf-8")
+def test_start_empty_sets_an_unreadable_file_aside_and_writes_at_once(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "data.json").write_text("not json", encoding="utf-8")
     now = datetime(2026, 8, 24, 14, 32, 7, tzinfo=PARIS)
-    app = App.open(tmp_path, clock=clock_at(now))
-    assert app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
-    assert (tmp_path / "data.json.bad-20260824-143207").exists()
+
+    app = App.start_empty(tmp_path, clock=clock_at(now))
+
+    assert app.startup is StartupOutcome.STARTED_EMPTY
+    assert app.session.day.date == date(2026, 8, 24)
+    aside = tmp_path / "data.json.20260824-143207.bak"
+    assert aside.read_text(encoding="utf-8") == "not json"
+    assert load(data_dir=tmp_path).day.tasks == []
+    assert app.save_pending is False
+
+
+def test_start_empty_writes_at_once_when_the_file_is_missing(tmp_path: Path) -> None:
+    app = App.start_empty(tmp_path)
+    assert app.startup is StartupOutcome.STARTED_EMPTY
+    assert [path.name for path in tmp_path.iterdir()] == ["data.json"]
+    # The next launch no longer falls on a missing file, in a loop (§3.6).
+    assert App.open(tmp_path).startup is StartupOutcome.LOADED
+
+
+def test_start_empty_never_replaces_a_file_delivered_in_the_meantime(
+    data_dir: Path,
+) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    App.open(data_dir, clock=clock_at(now)).add("delivered while the dialog was open")
+    before = (data_dir / "data.json").read_bytes()
+
+    app = App.start_empty(data_dir, clock=clock_at(now))
+
+    assert app.startup is StartupOutcome.LOADED
+    assert [t.text for t in app.session.day.tasks] == [
+        "delivered while the dialog was open"
+    ]
+    assert (data_dir / "data.json").read_bytes() == before
+    assert [path.name for path in data_dir.iterdir()] == ["data.json"]
+
+
+def test_start_empty_keeps_a_failed_write_pending_then_retries(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(storage, "save", _raise_oserror)
+
+    app = App.start_empty(tmp_path)
+
+    assert app.save_pending is True  # §3.6 situation 3: the banner, no alert
+    monkeypatch.setattr(storage, "save", save)
+    assert app.ensure_day().outcome is EnsureOutcome.SAVED
+    assert (tmp_path / "data.json").exists()
 
 
 def test_open_runs_a_due_rollover_before_returning(data_dir: Path) -> None:
     yesterday = date(2026, 8, 23)
     save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
-    App.open(data_dir, clock=clock_at(save_now))  # first launch, day = 2026-08-23
+    App.open(data_dir, clock=clock_at(save_now)).add("day = 2026-08-23")
     session = load(data_dir=data_dir).into_session()
     assert session.day.date == yesterday
 
@@ -215,7 +296,7 @@ def test_open_runs_a_due_rollover_before_returning(data_dir: Path) -> None:
 
 def test_a_rollover_is_logged(data_dir: Path, caplog: pytest.LogCaptureFixture) -> None:
     save_now = datetime(2026, 8, 23, 10, 0, 0, tzinfo=PARIS)
-    App.open(data_dir, clock=clock_at(save_now))
+    App.open(data_dir, clock=clock_at(save_now)).add("the file exists")
 
     tomorrow_now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     with caplog.at_level(logging.INFO, logger="rature.core.app"):
@@ -225,7 +306,7 @@ def test_a_rollover_is_logged(data_dir: Path, caplog: pytest.LogCaptureFixture) 
 
 def test_open_multi_day_catch_up_runs_once(data_dir: Path) -> None:
     save_now = datetime(2026, 8, 20, 10, 0, 0, tzinfo=PARIS)
-    App.open(data_dir, clock=clock_at(save_now))  # day = 2026-08-20
+    App.open(data_dir, clock=clock_at(save_now)).add("day = 2026-08-20")
 
     days_later = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
     app = App.open(data_dir, clock=clock_at(days_later))

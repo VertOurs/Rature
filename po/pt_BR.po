@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-10-30 18:56+0100\n"
+"POT-Creation-Date: 2026-11-01 16:32+0100\n"
 "PO-Revision-Date: 2026-10-29 18:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -495,7 +495,7 @@ msgstr "Editar"
 msgid "Recurring task"
 msgstr "Tarefa recorrente"
 
-#: data/ui/recurring_form.ui:22
+#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:176
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -577,7 +577,8 @@ msgstr "Total"
 msgid "General"
 msgstr "Geral"
 
-#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:105
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:155
+#: src/rature/ui/application.py:191
 msgid "Quit"
 msgstr "Sair"
 
@@ -639,22 +640,22 @@ msgstr "%A, %-d de %B"
 msgid "%-d %B %Y"
 msgstr "%-d de %B de %Y"
 
-#: src/rature/ui/application.py:69
+#: src/rature/ui/application.py:89
 msgid "This file was saved by a newer version of Rature."
 msgstr "Este arquivo foi salvo por uma versão mais recente do Rature."
 
-#: src/rature/ui/application.py:71
+#: src/rature/ui/application.py:91
 #, python-format
 msgid "Opening it could overwrite data. Update Rature to open this file: %s"
 msgstr ""
 "Abri-lo poderia sobrescrever dados. Atualize o Rature para abrir este "
 "arquivo: %s"
 
-#: src/rature/ui/application.py:82
+#: src/rature/ui/application.py:101
 msgid "Rature could not use its data folder."
 msgstr "O Rature não conseguiu usar sua pasta de dados."
 
-#: src/rature/ui/application.py:84
+#: src/rature/ui/application.py:103
 #, python-format
 msgid ""
 "Check that this folder can be read and written, and that the disk is not "
@@ -662,6 +663,46 @@ msgid ""
 msgstr ""
 "Verifique se esta pasta pode ser lida e gravada e se o disco não está cheio: "
 "%s"
+
+#: src/rature/ui/application.py:119
+msgid "The data file cannot be read."
+msgstr "Não é possível ler o arquivo de dados."
+
+#: src/rature/ui/application.py:120
+#, python-format
+msgid "It may still be syncing, or it may be damaged: %s"
+msgstr "Ele pode ainda estar sincronizando ou pode estar danificado: %s"
+
+#: src/rature/ui/application.py:121
+msgid "Set Aside and Start Empty"
+msgstr "Separar e começar vazio"
+
+#: src/rature/ui/application.py:128
+msgid "The data file is missing."
+msgstr "O arquivo de dados está faltando."
+
+#: src/rature/ui/application.py:129
+#, python-format
+msgid "No data file was found in this folder: %s"
+msgstr "Nenhum arquivo de dados foi encontrado nesta pasta: %s"
+
+#: src/rature/ui/application.py:130 src/rature/ui/application.py:176
+msgid "Start Empty"
+msgstr "Começar vazio"
+
+#: src/rature/ui/application.py:155
+msgid "Try Again"
+msgstr "Tentar novamente"
+
+#: src/rature/ui/application.py:171
+msgid "Start from an empty day?"
+msgstr "Começar com um dia vazio?"
+
+#: src/rature/ui/application.py:173
+msgid "This empty day will also replace the data on your other synced devices."
+msgstr ""
+"Este dia vazio também substituirá os dados nos seus outros dispositivos "
+"sincronizados."
 
 #: src/rature/ui/day_view.py:106
 msgid "Unfreeze the list"
@@ -699,21 +740,14 @@ msgstr "Desfazer o risco"
 msgid "Strike through"
 msgstr "Riscar"
 
-#: src/rature/ui/window.py:405
+#: src/rature/ui/window.py:401
 msgid "Changes could not be saved to disk."
 msgstr "Não foi possível salvar as alterações no disco."
 
-#: src/rature/ui/window.py:413
-#, python-format
-msgid "The data file could not be read. It was moved aside as %s."
-msgstr ""
-"Não foi possível ler o arquivo de dados. Ele foi colocado de lado com o nome "
-"%s."
-
-#: src/rature/ui/window.py:416 src/rature/ui/window.py:422
-msgid "Dismiss"
-msgstr "Dispensar"
-
-#: src/rature/ui/window.py:420
+#: src/rature/ui/window.py:406
 msgid "A new day has started. The previous one has been archived."
 msgstr "Um novo dia começou. O anterior foi arquivado."
+
+#: src/rature/ui/window.py:408
+msgid "Dismiss"
+msgstr "Dispensar"
