@@ -651,8 +651,8 @@ Noté dans « Repoussé volontairement ».
 
 Règles communes, sur le dossier local :
 
-- [ ] A1. Fichiers temporaires restés après un plantage supprimés au
-      démarrage (ADR 0009)
+- [x] A1. Fichiers temporaires restés après un plantage supprimés au
+      démarrage (ADR 0009), le 1er novembre 2026
 - [ ] A2. Annulation par identifiant, pile en mémoire (§3.2). La pile se
       vide au passage du jour dès cette PR, sans attendre A4 : la minuterie
       passe encore le jour et le journal part avec l'archive. Sans cela,

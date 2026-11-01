@@ -23,6 +23,11 @@ FILE_VERSION = CURRENT_VERSION
 _MAIN_FILE = "data.json"
 _ARCHIVE_DIR = "archive"
 _ARCHIVE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
+# The temporary names of _atomic_write_json and _back_up_before_migration,
+# and nothing else: a sync tool writes its own temporary files in this same
+# folder (.syncthing.data.json.tmp), and removing one would break a delivery.
+_MAIN_TEMP_NAME = re.compile(r"\.data\.json(\.v\d+\.bak)?\.\d+\.tmp")
+_ARCHIVE_TEMP_NAME = re.compile(r"\.\d{4}-\d{2}-\d{2}\.json\.\d+\.tmp")
 _logger = logging.getLogger(__name__)
 
 # The whole key set of each file, after migration (validation.exact_keys).
@@ -196,6 +201,37 @@ def restrict_data_dir_permissions(*, data_dir: Path | None = None) -> None:
     """
     target = data_dir or xdg_data_dir()
     os.chmod(target, 0o700)
+
+
+def remove_stale_temp_files(*, data_dir: Path | None = None) -> None:
+    """Remove Rature's own temporary files left behind by a crash (ADR 0009).
+
+    Exact names only, in the data folder and in archive/. Symbolic links are
+    ignored. A missing folder is nothing to do. Never raises: this is
+    housekeeping, and a folder that is really unusable fails on the read
+    that follows, with the error that belongs to it.
+    """
+    target = data_dir or xdg_data_dir()
+    _remove_matching(target, _MAIN_TEMP_NAME)
+    _remove_matching(target / _ARCHIVE_DIR, _ARCHIVE_TEMP_NAME)
+
+
+def _remove_matching(directory: Path, name: re.Pattern[str]) -> None:
+    try:
+        with os.scandir(directory) as entries:
+            stale = [entry for entry in entries if name.fullmatch(entry.name)]
+    except FileNotFoundError:
+        return
+    except OSError:
+        _logger.warning("could not look for temporary files in %s", directory)
+        return
+    for entry in stale:
+        try:
+            if entry.is_file(follow_symlinks=False):
+                os.unlink(entry.path)
+                _logger.info("removed a stale temporary file: %s", entry.path)
+        except OSError:
+            _logger.warning("could not remove a temporary file: %s", entry.path)
 
 
 def quarantine(now: datetime, *, data_dir: Path | None = None) -> Path:

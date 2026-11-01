@@ -123,6 +123,7 @@ class App:
         resolved_dir = data_dir if data_dir is not None else storage.xdg_data_dir()
         _logger.info("starting, data directory: %s", resolved_dir)
         now = clock()
+        storage.remove_stale_temp_files(data_dir=resolved_dir)
         try:
             store = storage.load(data_dir=resolved_dir)
         except FileNotFoundError:
