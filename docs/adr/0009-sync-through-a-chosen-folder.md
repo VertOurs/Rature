@@ -285,3 +285,19 @@ already covered: it is unreadable, and falls into the blocking message.
   and replays the gesture if the fingerprint changed
 - The implementation is split according to this ADR in
   `docs/internal/ROADMAP.md`
+
+## Addendum (2026-11-01)
+
+Joining a folder without `data.json` now copies `archive/` along with
+`data.json`, VertOurs's decision while writing
+`docs/internal/SPECIFICATION.md` §3.17, as long as the chosen folder has no
+`archive/` of its own. The decision above left local archives in the
+previous folder in every case. Since no button leads back to the default
+folder (`SPECIFICATION.md` §3.6), archives left behind would become
+invisible in Archives and Statistics.
+
+If the chosen folder already has an `archive/`, nothing is copied into it:
+during the first synchronisation the tool delivers files in any order, and
+the other device's archives may arrive before its `data.json`. Copying
+would overwrite them. Local archives then stay in the previous folder, as
+they do when the folder already holds `data.json`, and the dialog says so.

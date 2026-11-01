@@ -284,6 +284,22 @@ qui autorise à le déclencher sans demander confirmation. Une tâche supprimée
 fait exception : la suppression est un abandon volontaire, elle ne revient
 donc pas en réserve, y compris si la tâche en était issue.
 
+**Écriture différée.** Ajouté au chantier 10 (ADR 0009). Le passage du jour
+n'est jamais écrit seul. Il s'applique en mémoire, à l'ouverture comme à la
+vérification périodique, et s'écrit avec le premier geste de l'utilisateur,
+défini en §2.9, qui relit le fichier avant d'écrire. L'archive de la
+journée écoulée et le fichier principal s'écrivent à ce moment-là, dans cet
+ordre. Si le fichier relu a déjà passé le jour, sur un autre appareil, il
+n'y a plus de passage à écrire : seul le geste est rejoué. S'il ne l'a pas
+passé, le passage s'applique au fichier relu, pas à la copie en mémoire.
+
+Motif : un portable qui sort de veille passerait le jour avant que l'outil
+de synchronisation ait livré le fichier du matin, et les tâches du matin
+partiraient en conflit à chaque réveil. La règle vaut aussi sans
+synchronisation : elle ne coûte rien en local, sauf que la journée écoulée
+n'apparaît dans les archives, les statistiques et l'export qu'après le
+premier geste du jour. Accepté.
+
 Il n'existe aucun moyen de forcer un passage du jour dont la date de
 référence n'a pas encore avancé. Une bascule anticipée archiverait la
 journée en cours sous une date que la bascule suivante réécrirait, ce qui
@@ -488,7 +504,7 @@ est faite avant toute écriture du fichier principal.
   mémoire. Si `data.json.v<N>.bak` existe déjà, il n'est ni écrasé ni
   doublé : la sauvegarde la plus ancienne est la vraie copie d'origine.
 - **Jamais supprimée** par l'application. Elle reste à la charge de
-  l'utilisateur, comme les fichiers mis en quarantaine.
+  l'utilisateur, comme les fichiers mis de côté (§3.6).
 - **Échec de la copie** : aucune donnée migrée n'est écrite sans
   sauvegarde. L'échec remonte de `App.open` comme une `OSError` au
   démarrage et suit le traitement de §3.6.
@@ -501,6 +517,117 @@ est faite avant toute écriture du fichier principal.
 Motif : une migration ratée détruit des données (`CLAUDE.md` §4 règle 7).
 Jusqu'ici, la sauvegarde avant une mise à jour dépendait de l'utilisateur ;
 elle devient automatique.
+
+### 2.9 Synchronisation entre appareils
+
+Ajoutée au chantier 10, décisions dans l'ADR 0009. Le numéro §2.8 n'est
+pas réutilisé : il désignait la boîte de dépôt, retirée, et l'ADR 0007 le
+cite encore.
+
+Plusieurs appareils partagent le même dossier de données, synchronisé par
+un outil extérieur qui copie des fichiers entiers. Rature est conçue pour
+tout outil de ce genre, testée et documentée avec Syncthing seul. Rature
+ne synchronise rien elle-même : pas de réseau, pas de compte, pas de
+serveur.
+
+**Pas de mode synchronisé.** Les règles de cette section s'appliquent
+toujours, qu'un dossier soit synchronisé ou non. Aucun réglage ne les
+active.
+
+**Geste.** Toute action qui modifie les données : ajouter, rayer, dérayer,
+renommer, marquer, supprimer, annuler une suppression, réordonner, figer,
+tirer, renvoyer, décaler, éditer une récurrente. Ni la navigation, ni la
+copie en texte, ni les archives, ni les statistiques ne sont des gestes :
+elles n'écrivent rien. « Premier geste » en §2.5 désigne le premier geste
+au sens de cette définition.
+
+**Le dossier.** Par défaut, le dossier de données habituel. L'utilisateur
+peut en choisir un autre (§3.17). Le dossier choisi contient tout :
+`data.json`, `archive/`, les sauvegardes de §2.7.10. Rien de propre à un
+appareil n'y vit : le choix du dossier et l'état de la fenêtre restent
+dans les réglages de l'appareil. Rature ne change jamais les droits du
+dossier choisi, seulement ceux de ses propres fichiers.
+
+**Relire avant d'écrire.** Avant chaque écriture, Rature relit
+`data.json`. Si son empreinte a changé depuis la dernière lecture, les
+données fraîches remplacent celles en mémoire et le geste est rejoué
+dessus, une fois. L'empreinte est le SHA-256 du contenu, jamais la date de
+modification, que l'outil de synchronisation recopie depuis l'appareil
+d'origine. Elle est mise à jour après chaque écriture de Rature.
+
+Une relecture vaut un chargement, avant un geste comme au retour du focus
+(§3.1) : si les données relues portent une date dépassée, le passage du
+jour s'applique en mémoire sur elles (§2.5), sans rien écrire. Sans cela,
+un portable qui a passé le jour à la sortie de veille afficherait la
+journée d'hier dès que l'autre appareil livre son fichier de la veille.
+
+**Rejeu refusé.** Si le geste ne s'applique plus aux données fraîches
+(sa cible n'existe plus, ou les règles métier le refusent), il est
+abandonné : rien n'est écrit, les données fraîches s'affichent, et un
+toast dit que la tâche a changé sur un autre appareil (§3.17). Ce n'est
+ni un conflit ni une erreur. C'est un cas courant : le passage du jour
+donne un identifiant neuf aux tâches issues d'une récurrente et aux tâches
+du jour qui partent en réserve comme nouvel item, donc la même tâche n'a
+pas le même identifiant sur deux appareils qui ont chacun passé le jour.
+Chaque geste vise sa cible par identifiant, jamais par position.
+
+Conséquence attendue de §2.5 : quand le fichier relu n'a pas encore passé
+le jour, le passage s'exécute une seconde fois, sur ce fichier, et redonne
+de nouveaux identifiants aux récurrentes du jour et aux tâches renvoyées
+en réserve comme nouvel item. Un premier geste qui vise l'une d'elles est
+donc refusé au rejeu, avec le toast. Ce n'est pas un bogue.
+
+**Conflits.** Quand deux appareils modifient le fichier sans se voir,
+l'outil de synchronisation garde les deux versions et crée une copie de
+conflit. Rature reconnaît celles de Syncthing (`*.sync-conflict-*`), à côté
+de `data.json` et dans `archive/`, et le signale par un bandeau tant
+qu'une telle copie existe (§3.17). Pas de fusion, pas de résolution dans
+l'application, et Rature ne supprime jamais une copie de conflit. Dans
+`archive/`, seuls les noms `AAAA-MM-JJ.json` exacts sont lus comme des
+journées (§2.7.5).
+
+**Limites connues**, acceptées :
+
+- un geste fait juste après le réveil d'un appareil, avant que l'outil ait
+  livré le fichier de l'autre, donne deux modifications réellement
+  différentes. Le conflit est signalé, rien de plus
+- une livraison qui arrive entre la relecture et l'écriture est écrasée
+  sans copie de conflit. Fenêtre de quelques millisecondes
+
+**Fichier illisible ou absent.** Rature n'écrit jamais d'office une
+journée vide et ne renomme jamais un fichier qu'elle ne peut pas lire :
+renommer un fichier en cours d'arrivée, c'est déjà écrire. C'est
+l'utilisateur qui décide d'écrire (§3.6). Au premier lancement, reconnu
+à l'absence du dossier de données lui-même, Rature démarre sur une journée
+vide sans rien écrire ni créer : le dossier de données et `data.json`
+naissent ensemble, au premier geste, ou en rejoignant un dossier. Ni l'un
+ni l'autre n'est jamais créé d'office au démarrage. Naître au premier
+geste ne vaut qu'au premier lancement, dossier de données absent. Partout
+ailleurs, une journée vide confirmée par l'utilisateur (§3.6) s'écrit tout
+de suite : la confirmation est son geste. Un dossier qui existe
+sans `data.json` est un fichier disparu, pas un premier lancement : créer
+le dossier seul au démarrage ferait tomber le lancement suivant dans le
+message bloquant de §3.6.
+
+**Deux versions de Rature sur le même dossier.** Si la relecture trouve un
+fichier écrit par une version plus récente, toute écriture est refusée et
+l'application demande une mise à jour (§3.6). Sans cette vérification, une
+version ancienne écraserait le nouveau format.
+
+**Annulation.** Elle ne vise que les suppressions faites sur cet appareil
+depuis son lancement, par identifiant (§3.2). Elle ne restaure jamais une
+suppression faite ailleurs, et ne défait jamais un passage du jour.
+Restaurer retire du journal `deletions` la seule entrée restaurée, comme
+aujourd'hui ; le journal n'est jamais vidé (§2.6, ADR 0005).
+
+**Rejoindre un dossier.** Si le dossier choisi contient déjà un
+`data.json`, ce fichier est pris tel quel et le fichier local est mis de
+côté en sauvegarde, sans fusion ; les archives locales restent dans
+l'ancien dossier. Si le dossier n'a pas de `data.json`, les données locales
+y sont copiées, archives comprises si le dossier n'a pas encore de
+`archive/`, sinon les archives locales restent dans l'ancien dossier : une
+archive de l'autre appareil n'est jamais écrasée. Sans donnée locale
+lisible, rien n'est mis de côté ni copié. Détail du dialogue en §3.17.
 
 ---
 
@@ -553,7 +680,8 @@ menu principal, dans une fenêtre distincte, voir §3.5.
 Le menu principal (`open-menu-symbolic`, en tête du panneau latéral) contient
 au chantier 3 : Archives, puis About Rature. Au chantier 4, Keyboard
 Shortcuts rejoint le menu, groupé avec About Rature (§3.11), et Statistics
-rejoint Archives dans le premier groupe (§3.14).
+rejoint Archives dans le premier groupe (§3.14). Au chantier 10, Data
+Folder… rejoint le menu, seul dans un groupe entre les deux (§3.17).
 
 **Taille et état.** La fenêtre lit `window-width`, `window-height` et
 `window-maximized` à la construction, et les écrit à la fermeture. Pas de
@@ -566,11 +694,26 @@ est en §3.6. Aucun autre objet n'appelle `App.open`.
 
 **Passage du jour en cours d'exécution.** Une minuterie de soixante secondes
 appelle `App.ensure_day`. Si elle rend une journée, toutes les vues se
-rafraîchissent et une bannière neutre l'annonce, voir §3.8. La bannière ne
+rafraîchissent et une bannière neutre l'annonce, voir §3.8. Depuis le
+chantier 10, le passage ainsi détecté reste en mémoire et ne s'écrit qu'au
+premier geste (§2.5) : la minuterie n'écrit jamais rien. La bannière ne
 change pas avec Demain : elle ne dit rien de la liste préparée entrée dans
 la journée. Un délai fixe et
 court, plutôt qu'un réveil calculé jusqu'à 04:00, parce que le calcul se
 trompe une nuit par an au changement d'heure.
+
+**Retour du focus.** Ajouté au chantier 10 (§2.9). Quand la fenêtre
+principale reprend le focus, `data.json` est relu, sans surveillance de
+fichier. Si son empreinte n'a pas changé, rien ne bouge. Si elle a changé,
+les données fraîches remplacent celles en mémoire, les vues se
+reconstruisent, et la pile d'annulation perd les entrées absentes du
+journal frais (§3.2). Si les données fraîches portent une date plus
+récente que la journée affichée, la bannière de nouveau jour s'affiche
+comme pour la minuterie. Jamais pendant qu'un menu « ⋯ » ou un renommage
+est ouvert : le rechargement attend sa fermeture. Leçon du retrait de
+l'ADR 0007, où une reconstruction au retour du focus détruisait une ligne
+sous son menu ouvert. Une relecture qui échoue suit §3.6, comme au
+démarrage.
 
 ---
 
@@ -626,18 +769,42 @@ C'est le second geste nécessaire pour ouvrir le menu qui protège, pas une
 question.
 
 **Annuler la dernière suppression.** Un bouton dans l'en-tête, jamais un
-contrôle de ligne : la ligne a disparu. Il restaure la dernière entrée du
-journal `deletions` de la journée en cours, conformément à §2.2 et à
-l'ADR 0005 :
+contrôle de ligne : la ligne a disparu. Il restaure une entrée du journal
+`deletions` de la journée en cours, conformément à §2.2 et à l'ADR 0005 :
 
+- **laquelle** : depuis le chantier 10 (§2.9, ADR 0009), la plus récente des
+  suppressions faites **sur cet appareil depuis son lancement**, désignée
+  par son identifiant, et non plus la dernière entrée du journal, qui peut
+  venir d'un autre appareil. Ces identifiants forment une pile, en mémoire
+  seulement : plusieurs suppressions d'affilée s'annulent l'une après
+  l'autre, de la plus récente à la plus ancienne
 - la tâche réapparaît à sa position d'origine (`index` du journal), avec son
   numéro d'origine, rayée si elle l'était, non rayée sinon
 - l'entrée de journal est ensuite retirée. Le journal doit rester juste,
   sinon le comptage de §2.6 dérive
 - une seule entrée à la fois, et seulement la journée en cours : le journal
   part avec l'archive au passage du jour, il n'y a plus rien à annuler après
+- l'annulation est un geste (§2.9) : relecture avant l'écriture, rejeu sur
+  les données fraîches, refus avec le toast du rejeu refusé (§3.17) si
+  l'entrée n'est plus dans le journal frais, par exemple parce que l'autre
+  appareil a passé le jour
+- au rechargement (§3.1), la pile perd les identifiants absents du journal
+  frais. Elle n'est jamais vidée pour autant : la vider à chaque changement
+  venu d'ailleurs désactiverait l'annulation dès que le téléphone ajoute
+  une tâche
+- au passage du jour en mémoire (§2.5), à la minuterie comme après une
+  relecture, la pile se vide : le journal part avec la journée écoulée.
+  Sans cela, une suppression faite avant 04:00 laisserait le bouton actif
+  sur un journal vide, et le clic afficherait à tort le toast du rejeu
+  refusé
+- après un redémarrage, la pile est vide et rien n'est annulable, même si
+  le journal de la journée contient des entrées. Écart accepté avec le
+  comportement d'avant le chantier 10 : le garder demanderait un champ
+  « appareil » dans le format, donc une migration
+- une annulation ne défait jamais un passage du jour, même quand la
+  suppression restaurée était le premier geste du jour, écrit avec lui
 
-Le bouton est insensible quand le journal de la journée est vide. Aucun
+Le bouton est insensible quand la pile est vide. Aucun
 autre retour : la tâche réapparaît, sans bandeau ni message, §2.3. Le bouton
 reste actif quand la liste est figée, comme la suppression elle-même.
 
@@ -900,8 +1067,12 @@ Fenêtre distincte, ouverte depuis le menu principal, en lecture seule.
 - Aucune archive : `AdwStatusPage`, texte en §3.8.
 
 **Rafraîchissement.** Ajouté au chantier 9. Une fenêtre d'archives
-ouverte se met à jour quand le passage du jour archive une journée,
-détecté par la minuterie de §3.1, comme la fenêtre Statistiques (§3.14) :
+ouverte se met à jour quand une journée est archivée, comme la fenêtre
+Statistiques (§3.14). Depuis le chantier 10, cela arrive à deux moments :
+quand le premier geste du jour écrit le passage (§2.5), jamais à sa
+détection par la minuterie de §3.1 ; et quand un rechargement (§3.1)
+apporte une journée plus récente, l'autre appareil ayant passé le jour et
+écrit l'archive. Dans les deux cas :
 la nouvelle date apparaît en tête de la liste. La date affichée reste
 sélectionnée et son contenu ne bouge pas. Une recherche en cours est
 conservée : la nouvelle date n'apparaît que si elle y répond (§3.13). Une
@@ -911,6 +1082,12 @@ n'attire l'attention sur le changement : ni mise en évidence de la
 nouvelle date, ni sélection déplacée, ni retour en haut du défilement, ni
 fenêtre ramenée au premier plan.
 
+**Limite connue**, acceptée : l'outil de synchronisation livre les fichiers
+dans l'ordre qu'il veut, et `archive/<D>.json` peut arriver après
+`data.json`. La journée n'apparaît alors dans Archives et Statistiques
+qu'à la réouverture de la fenêtre : le rafraîchissement suivant n'arrive
+qu'au passage du jour d'après.
+
 La recherche dans les archives est spécifiée en §3.13.
 
 ---
@@ -918,54 +1095,99 @@ La recherche dans les archives est spécifiée en §3.13.
 ### 3.6 Démarrage, erreurs et refus
 
 Quatre situations, quatre traitements distincts. Aucune n'est un plantage.
+Refondue au chantier 10 (§2.9, ADR 0009) : la relecture avant chaque
+écriture et au retour du focus (§3.1) peut rencontrer les mêmes situations
+qu'au démarrage.
 
-**1. Fichier écrit par une version future** (`FutureVersionError`, levée par
-`App.open`). Il n'y a pas encore de fenêtre, donc une `Gtk.AlertDialog`
-présentée sans parent, puis `quit`. L'application ne démarre pas. Écraser les
-données d'une version plus récente est la seule faute irréparable.
+**1. Fichier écrit par une version future** (`FutureVersionError`). Au
+démarrage, levée par `App.open` : il n'y a pas encore de fenêtre, donc une
+`Gtk.AlertDialog` présentée sans parent, puis `quit`. L'application ne
+démarre pas. Pendant l'exécution, levée par une relecture : le geste en
+cours n'est pas écrit, la même alerte s'affiche, attachée à la fenêtre
+principale, puis `quit`. Écraser les données d'une version plus récente
+est la seule faute irréparable.
 
-**2. Fichier illisible mis en quarantaine**
-(`StartupOutcome.RECOVERED_FROM_CORRUPTION`). L'application démarre sur une
-journée vide. Une `AdwBanner` non modale en tête de la vue Jour indique que
-le fichier a été mis de côté et donne son nouveau nom. Fermable, elle ne
-revient pas. Sans elle, l'utilisateur croit avoir tout perdu.
+**2. Fichier illisible, disparu ou dossier inaccessible.** Remplace, au
+chantier 10, la mise en quarantaine automatique sur une journée vide :
+renommer un fichier en cours d'arrivée, c'est déjà écrire (§2.9). Trois
+cas, un seul message bloquant, sans rien écrire :
 
-**3. Échec d'écriture pendant une mutation** (`OSError`). `App` ne défait pas
+- `data.json` existe mais ne se lit pas (JSON invalide, format refusé par
+  la validation) : par exemple un fichier à moitié livré par l'outil de
+  synchronisation
+- le dossier de données existe sans `data.json` : un fichier disparu, pas
+  un premier lancement (§2.9)
+- le dossier choisi (§3.17) n'est plus accessible : accès du portail
+  retiré, dossier déplacé ou supprimé
+
+Le message donne le chemin concerné et propose « Réessayer », qui relit
+sans rien écrire, et une porte de sortie explicite :
+
+- fichier illisible : mettre le fichier de côté, sous le nom daté de
+  §3.17 et à côté de lui, puis repartir d'une journée vide
+- fichier disparu : repartir d'une journée vide
+- dossier inaccessible : choisir un dossier (§3.17). Jamais de retour
+  silencieux au dossier par défaut : après avoir rejoint un dossier sans
+  `data.json`, l'ancien `data.json` y est resté et y revenir ferait
+  repartir sur les données d'avant la synchronisation ; après avoir rejoint
+  un dossier qui avait déjà un `data.json`, le fichier local a été mis de
+  côté et l'on retomberait sur un fichier disparu
+
+Repartir d'une journée vide demande une confirmation, qui dit que cette
+journée vide partira aussi sur les autres appareils synchronisés. Rien
+n'est écrit avant cette confirmation. Une fois confirmée, la journée vide
+s'écrit tout de suite, sans attendre un geste : la confirmation est le
+geste de l'utilisateur (§2.9). Attendre laisserait le dossier sans
+`data.json`, et un lancement sans geste retomberait sur
+« fichier disparu », en boucle. Vaut pour les trois cas : fichier illisible
+mis de côté, fichier disparu, dossier sans `data.json` choisi sans donnée
+locale (§3.17). Un échec de cette écriture relève de la situation 3. Au
+démarrage, le message vient avant toute fenêtre ; pendant l'exécution, il
+est attaché à la fenêtre et le geste en cours n'est pas écrit. Le fichier
+mis de côté n'est jamais supprimé par l'application.
+
+**3. Échec d'écriture pendant un geste** (`OSError`). `App` ne défait pas
 la mutation en mémoire, c'est documenté sur la classe. L'interface attrape
 l'`OSError` **en un seul endroit**, l'enrobage commun de toutes les actions,
 et affiche une `AdwBanner`. L'application reste utilisable, aucune boîte
 modale, aucune fermeture forcée. La bannière disparaît à la première
 écriture réussie.
 
-**4. Dossier de données inutilisable au démarrage** (`OSError` levée par
-`App.open`). Ajouté le 30 octobre 2026, au chantier 9. Couvre toute
-`OSError` qui sort de `App.open` : fichier principal illisible faute de
-permission, dossier impossible à créer, disque plein ou en lecture seule
-au premier lancement, quarantaine impossible, sauvegarde avant migration
-impossible (§2.7.10). Même traitement que la situation 1 : pas encore de
-fenêtre, donc une `Gtk.AlertDialog` présentée sans parent, qui donne le
-chemin du dossier de données, puis `quit`. Rien n'est écrit, rien n'est
-réparé automatiquement : la cause est hors de l'application (droits,
-place, support), seul l'utilisateur peut la corriger. L'exception
-complète est journalisée au niveau `ERROR`.
+Depuis le chantier 10, le passage du jour s'écrit avec le premier geste
+(§2.5) : un échec d'écriture de l'archive de la journée écoulée, comme du
+fichier principal, survient donc pendant ce geste et relève de cette
+situation. Si l'archive ne peut pas s'écrire, le fichier principal n'est
+pas écrit non plus : le passage reste en mémoire et sera tenté de nouveau
+au geste suivant. Si l'archive est écrite et le fichier principal ne l'est
+pas, l'archive reste sur le disque et la bannière s'affiche.
 
-Au passage du jour fait à l'ouverture, les deux écritures se distinguent.
-L'archive de la journée écoulée qui ne peut pas s'écrire entre dans ce
-cas : rien n'a encore été écrit, le passage sera rejoué au lancement
-suivant. Le fichier principal qui ne peut pas s'écrire n'y entre pas :
-`ensure_day` le rend comme `SAVE_FAILED`, l'archive est déjà sur le
-disque, l'application démarre et la situation 3 s'applique.
+**4. Dossier de données inutilisable au démarrage, ou mise de côté
+impossible** (`OSError`). Ajouté le 30 octobre 2026, au chantier 9. Couvre
+toute `OSError` qui sort de `App.open`, et depuis le chantier 10 l'échec
+de la mise de côté choisie dans le message de la situation 2, au démarrage
+comme en cours d'exécution. Côté `App.open` : fichier principal illisible
+faute de permission, sauvegarde avant migration impossible (§2.7.10). Même
+traitement que la situation 1 : pas encore de fenêtre, donc une
+`Gtk.AlertDialog` présentée sans parent, qui donne le chemin du dossier de
+données, puis `quit`. Rien n'est écrit, rien n'est réparé
+automatiquement : la cause est hors de l'application (droits, place,
+support), seul l'utilisateur peut la corriger. L'exception complète est
+journalisée au niveau `ERROR`. Depuis le chantier 10, rien n'est créé au
+démarrage (§2.9) : un dossier impossible à créer ou un disque plein se
+révèle au premier geste, situation 3. En cours d'exécution, l'alerte est
+attachée à la fenêtre principale, puis `quit`, comme au démarrage.
 
-**Une seule bannière, trois messages possibles.** Les situations 2 et 3
-partagent la même `AdwBanner`, avec le nouveau jour (§3.1) : jamais deux
-bannières à la fois, jamais de file d'attente. À chaque rafraîchissement,
-une fonction unique choisit le message le plus prioritaire parmi ceux
-encore actifs et non fermés, et le pose sur cette bannière : échec
-d'écriture d'abord, puis quarantaine, puis nouveau jour. Un échec
-d'écriture masque ainsi temporairement une bannière de quarantaine
-affichée, qui réapparaît dès que l'écriture suivante réussit. Fermer un
-message ne ferme pas les autres, et un message fermé ne revient jamais,
-y compris au rafraîchissement suivant.
+**Une seule bannière, trois messages possibles.** L'échec d'écriture
+(situation 3), les copies de conflit (§3.17) et le nouveau jour (§3.1)
+partagent la même `AdwBanner` : jamais deux bannières à la fois, jamais de
+file d'attente. À chaque rafraîchissement, une fonction unique choisit le
+message le plus prioritaire parmi ceux encore actifs et non fermés, et le
+pose sur cette bannière : échec d'écriture d'abord, puis conflit, puis
+nouveau jour. Un échec d'écriture masque ainsi temporairement la bannière
+de conflit, qui réapparaît dès que l'écriture suivante réussit. La bannière
+de conflit ne se ferme pas : elle disparaît quand plus aucune copie de
+conflit n'existe. Fermer un autre message ne ferme pas les autres, et un
+message fermé ne revient jamais, y compris au rafraîchissement suivant.
 
 **Refus métier.** `LockedError`, `KeyError` et `ValueError` remontent de
 `core` mais ne doivent jamais atteindre l'utilisateur : l'interface rend
@@ -1012,7 +1234,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 |---|---|
 | Entrée de navigation | `Day`, `Tomorrow`, `Reserve`, `Recurring` |
 | Titre de la vue Demain | `Tomorrow` |
-| Menu principal | `Archives`, `Statistics`, `Keyboard Shortcuts`, `About Rature` |
+| Menu principal | `Archives`, `Statistics`, `Data Folder…`, `Keyboard Shortcuts`, `About Rature` |
 | Saisie du jour | `Add a task…` |
 | Saisie de Demain | `Add a task for tomorrow…` |
 | Saisie de la réserve | `Add to the reserve…` |
@@ -1041,9 +1263,19 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Archive illisible | `This archive cannot be read.` |
 | Fenêtre Statistiques, en-têtes de colonne | `Day` (contexte `statistics column`, distinct du `Day` de la navigation), `Added`, `Struck`, `Deleted`, `To reserve` |
 | Fenêtre Statistiques, ligne de total | `Total` |
-| Bannière de quarantaine | `The data file could not be read. It was moved aside as %s.` |
 | Bannière d'écriture | `Changes could not be saved to disk.` |
-| Bannière de nouveau jour | `A new day has started. The previous one has been archived.` |
+| Bannière de conflit | `Two devices changed the data at the same time. Both versions were kept.`, bouton `Open Folder` |
+| Bannière de nouveau jour | `A new day has started.` |
+| Toast du rejeu refusé | `This task changed on another device.` |
+| Message bloquant, fichier illisible | `The data file cannot be read.`, `It may still be syncing, or it may be damaged: %s`, `Try Again`, `Set Aside and Start Empty`, `Quit` |
+| Message bloquant, fichier disparu | `The data file is missing.`, `No data file was found in this folder: %s`, `Try Again`, `Start Empty`, `Quit` |
+| Message bloquant, dossier inaccessible | `Rature cannot reach its data folder.`, `It may have been moved or deleted, or access to it removed: %s`, `Try Again`, `Choose a Folder…`, `Quit` |
+| Confirmation de journée vide | `Start from an empty day?`, `This empty day will also replace the data on your other synced devices.`, `Cancel`, `Start Empty` |
+| Dialogue du dossier de données | `Data Folder`, `Rature keeps its data in: %s`, `Choose a Folder…`, `Open Folder`, `Close` |
+| Dialogue pour rejoindre, dossier avec données | `Use the data in this folder?`, `Your current data will be set aside as %s, in the previous folder.`, `Use This Folder` |
+| Dialogue pour rejoindre, dossier sans `data.json` | `Copy your data to this folder?`, `If this folder is synced, wait until its first sync has finished before copying.`, `Copy Data Here` |
+| Dialogue pour rejoindre, lignes communes | `This folder also contains other files.`, `Archives stay in the previous folder: %s` (dossier avec `data.json`, ou dossier qui contient déjà `archive/`), `Cancel` |
+| Dialogue pour rejoindre, refus | `This folder cannot be used.`, `Its data file cannot be read: %s`, `Its data file was saved by a newer version of Rature: %s`, `Close` |
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 | Alerte dossier de données inutilisable | `Rature could not use its data folder.`, `Check that this folder can be read and written, and that the disk is not full: %s`, `Quit` |
@@ -1051,6 +1283,14 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Format de la date avec année (barre latérale de la fenêtre d'archives) | `%-d %B %Y` |
 
 Aucun de ces textes ne félicite, n'encourage, ne compte ni ne compare, §2.3.
+
+**Chantier 10.** La bannière de nouveau jour perd sa seconde phrase : à la
+détection, rien n'est encore archivé (§2.5). Le changement de `msgid`
+invalide sa traduction dans les six catalogues de `po/LINGUAS` (`de`,
+`eo`, `es`, `fr`, `pt_BR`, `ru`), à retraduire avec les nouvelles chaînes.
+La bannière de quarantaine disparaît avec la quarantaine (§3.6). Les
+boutons des dialogues suivent la casse de titre des recommandations GNOME,
+comme `Quit` et `Cancel`.
 
 **Noms accessibles.** Ajouté au chantier 8. Chaque bouton à icône seule
 porte un nom accessible, lu par un lecteur d'écran : le texte de son
@@ -1351,8 +1591,9 @@ dans aucune autre vue. §2.6 : un chiffre qu'on va chercher est une
 consultation ; poussé, il devient un commentaire.
 
 **Rafraîchissement.** Ajouté au chantier 8. Une fenêtre Statistiques
-ouverte se reconstruit quand le passage du jour archive une journée,
-détecté par la minuterie de §3.1 : la nouvelle ligne apparaît en tête et
+ouverte se reconstruit quand une journée est archivée, aux deux moments
+de §3.5 (premier geste du jour, rechargement qui apporte une journée plus
+récente) : la nouvelle ligne apparaît en tête et
 la ligne de total suit. Une fenêtre qui affichait `No archived days.`
 passe au tableau. C'est le seul événement qui change les archives pendant
 que l'application tourne : rayer, dérayer, ajouter ou supprimer une tâche
@@ -1440,7 +1681,8 @@ des espaces n'ajoute rien. Jamais insensible, figer la journée ne concerne
 pas Demain.
 
 **Annulation.** `Ctrl+Z` garde son effet de §3.11 depuis cette vue : il
-restaure la dernière suppression de la journée, dans la journée. Il ne
+restaure la dernière suppression faite sur cet appareil (§3.2), dans la
+journée. Il ne
 restaure jamais une tâche supprimée dans Demain, qui n'a pas de journal.
 
 **Vue vide.** Un `AdwStatusPage` sans icône, texte `Nothing is prepared.`
@@ -1450,3 +1692,93 @@ deux blocs, jamais la barre de saisie.
 **Ce que la vue ne montre pas.** Aucune date, aucun compteur, aucune
 indication sur ce que deviendra la liste. Rien n'annonce son entrée dans la
 journée au passage du jour : la bannière de §3.1 reste inchangée.
+
+---
+
+### 3.17 Dossier de données et synchronisation
+
+Ajoutée au chantier 10, règles produit en §2.9, décisions dans l'ADR 0009.
+
+**Choisir le dossier.** L'entrée Data Folder… du menu principal ouvre un
+`AdwAlertDialog` qui donne le chemin du dossier courant, avec `Choose a
+Folder…`, `Open Folder` et `Close`. `Choose a Folder…` ouvre le sélecteur
+du portail (`Gtk.FileDialog.select_folder`) : aucune permission de système
+de fichiers n'est ajoutée au manifeste. Le chemin rendu par le portail est
+gardé dans la clé GSettings `data-folder` ; vide, c'est le dossier par
+défaut. Aucun bouton ne ramène au dossier par défaut, pour les raisons de
+§3.6, situation 2. Pour arrêter de synchroniser, on arrête l'outil de
+synchronisation : les données restent dans le dossier choisi.
+`Open Folder` ouvre le dossier dans le gestionnaire de fichiers
+(`Gtk.FileLauncher`), comme le bouton de la bannière de conflit.
+
+**Rejoindre le dossier choisi.** Un second `AdwAlertDialog` dit ce qui va
+se passer, avant d'écrire quoi que ce soit. Le dossier est examiné en
+ignorant les entrées propres à Syncthing (`.stfolder`, `.stignore`,
+`.stversions`), sans quoi aucun dossier Syncthing ne serait jamais vide.
+
+- **Le dossier contient un `data.json` lisible** : `Use the data in this
+  folder?`. Ce fichier est pris tel quel ; le fichier local est mis de côté
+  sous un nom daté, `data.json.<AAAAMMJJ-HHMMSS>.bak`, dans l'ancien
+  dossier, et le dialogue donne ce nom. Pas de fusion. Les archives
+  locales restent dans l'ancien dossier, et le dialogue l'affiche avec la
+  ligne `Archives stay in the previous folder: %s`
+- **Le dossier ne contient pas de `data.json`** : `Copy your data to
+  this folder?`. Le dialogue demande d'attendre la fin de la première
+  synchronisation avant de copier, sinon les données locales partiraient
+  sur un dossier qui s'apprête à recevoir celles de l'autre appareil.
+  `data.json` est copié. `archive/` n'est copié que si le dossier choisi
+  n'en contient pas : des archives laissées dans l'ancien dossier
+  deviendraient invisibles dans Archives et Statistiques, puisqu'aucun
+  bouton n'y ramène. Écart avec l'ADR 0009, noté dans son addendum
+- **Le dossier n'a pas de `data.json` mais contient déjà `archive/`** :
+  rien n'est copié dans `archive/`. Pendant la première synchronisation,
+  l'outil livre les fichiers dans n'importe quel ordre, et des archives de
+  l'autre appareil peuvent arriver avant `data.json` : les copier les
+  écraserait. Les archives locales restent dans l'ancien dossier, et le
+  dialogue l'affiche avec la ligne `Archives stay in the previous folder:
+  %s`
+- **Dans tous les cas** : si le dossier contient d'autres fichiers visibles,
+  le dialogue le dit
+- **Le `data.json` du dossier est illisible ou écrit par une version plus
+  récente** : le dossier est refusé, avec le motif, et rien ne change
+
+Après avoir rejoint, les données sont rechargées depuis le nouveau
+dossier, toutes les vues se reconstruisent et la pile d'annulation se vide
+(§3.2) : ce ne sont plus les mêmes données. `Cancel` ne change rien.
+
+**Sans donnée locale lisible.** Deux parcours : `Choose a Folder…` depuis
+le message d'un dossier inaccessible (§3.6, situation 2), et le premier
+lancement avant tout geste, où le dossier de données n'existe pas encore.
+Le second est le parcours principal du README : une deuxième machine neuve
+rejoint le dossier synchronisé. Même examen du dossier, mais rien à mettre
+de côté ni à copier, et le dialogue ne parle pas de mise de côté. Un
+dossier qui contient un `data.json` lisible est pris tel quel. Un dossier
+sans `data.json` mène à la confirmation de journée vide de §3.6 ; après
+confirmation, la journée vide s'écrit tout de suite dans ce dossier (§3.6).
+Un dossier refusé ramène au message, ou laisse le premier lancement tel
+quel.
+
+**Copies de conflit.** Rature cherche les noms `*.sync-conflict-*` à côté
+de `data.json` et dans `archive/` à chaque lecture du fichier principal :
+au démarrage, à chaque relecture avant un geste et au retour du focus
+(§3.1), et après chaque écriture. La bannière de conflit (§3.6) s'affiche
+tant qu'une copie existe et disparaît à la première de ces vérifications
+qui n'en trouve plus. Son bouton `Open Folder` ouvre le dossier de
+données. La bannière ne se ferme pas, Rature ne lit, ne fusionne et ne
+supprime jamais une copie de conflit.
+
+**Toast du rejeu refusé.** Un `AdwToast` dans un `AdwToastOverlay` de la
+fenêtre principale, durée par défaut, sans bouton. Même toast pour un geste
+et pour une annulation refusés (§2.9, §3.2). Une seule ligne au journal, au
+niveau `INFO`, sans texte de tâche.
+
+**Documentation utilisateur.** Le README explique la mise en place avec
+Syncthing : dossier vide sur la deuxième machine, attente de la première
+synchronisation, et un motif `.stignore` pour les fichiers temporaires de
+l'écriture atomique laissés par un plantage (`.*.tmp`), pour qu'ils ne
+partent pas sur les autres appareils.
+
+**Ce que l'interface ne contient pas.** Ni état de synchronisation, ni
+indicateur d'appareil connecté, ni date de dernière synchronisation, ni
+résolution de conflit : Rature ne sait pas ce que fait l'outil de
+synchronisation et ne prétend pas le savoir.
