@@ -189,19 +189,24 @@ class Session:
         )
         self.day.tasks.remove(task)
 
-    def undo_last_deletion(self) -> Task:
-        """Restore the most recently deleted task and drop its journal entry.
+    def undo_deletion(self, task_id: str) -> Task:
+        """Restore one deleted task and drop its journal entry, nothing else.
 
         SPECIFICATION.md §3.2: the task reappears at its recorded index
         with its original number, struck iff it was struck. The entry
         leaves the journal so the §2.6 count stays exact (ADR 0005). The
         index is clamped: adds, other deletes or a reorder since may have
         left no slot at the original position. The counter is untouched,
-        so the freed number is still never reused (§2.4).
+        so the freed number is still never reused (§2.4). Named by
+        identifier, since the last entry may come from another device
+        (ADR 0009). An identifier not in the journal raises KeyError.
         """
-        if not self.day.deletions:
-            raise ValueError("no deletion to undo")
-        entry = self.day.deletions.pop()
+        for position, entry in enumerate(self.day.deletions):
+            if entry.id == task_id:
+                del self.day.deletions[position]
+                break
+        else:
+            raise KeyError(task_id)
         task = Task(
             id=entry.id,
             num=entry.num,

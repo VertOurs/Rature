@@ -2,6 +2,8 @@
 # SPDX-FileCopyrightText: 2026 VertOurs
 """The Day view, driven through its real widgets (SPECIFICATION.md §3.2)."""
 
+from datetime import datetime, timedelta
+
 from ui_helpers import drop_on_half, process_events, type_into
 
 from rature.core.app import App
@@ -157,3 +159,38 @@ def test_delete_from_the_row_menu_removes_the_task_and_can_be_undone(
     assert _texts(_active(window)) == ["call the dentist"]
     # SPECIFICATION.md §2.2: Delete goes to the journal, so Undo exists.
     assert [entry.text for entry in app.session.day.deletions] == ["buy bread"]
+
+
+def test_undo_restores_the_task_and_then_turns_insensitive(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread")
+    undo = window.lookup_action("undo-delete")
+    assert not undo.get_enabled()
+
+    _active(window)[0].delete_button.emit("clicked")
+    process_events()
+    assert undo.get_enabled()
+
+    undo.activate(None)
+    process_events()
+    assert _texts(_active(window)) == ["buy bread"]
+    assert not undo.get_enabled()
+
+
+def test_undo_turns_insensitive_when_the_timer_rolls_the_day_over(
+    window: RatureWindow, app: App, now: list[datetime]
+) -> None:
+    # SPECIFICATION.md §3.2: a deletion made before 04:00 leaves the button
+    # active on an empty journal otherwise, and a click would raise KeyError.
+    _add(window, "buy bread")
+    _active(window)[0].delete_button.emit("clicked")
+    process_events()
+    undo = window.lookup_action("undo-delete")
+    assert undo.get_enabled()
+
+    now[0] += timedelta(days=1)
+    window._on_ensure_day_tick()
+    process_events()
+
+    assert not undo.get_enabled()

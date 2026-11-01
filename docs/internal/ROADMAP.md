@@ -653,7 +653,7 @@ Règles communes, sur le dossier local :
 
 - [x] A1. Fichiers temporaires restés après un plantage supprimés au
       démarrage (ADR 0009), le 1er novembre 2026
-- [ ] A2. Annulation par identifiant, pile en mémoire (§3.2). La pile se
+- [x] A2. Annulation par identifiant, pile en mémoire (§3.2). La pile se
       vide au passage du jour dès cette PR, sans attendre A4 : la minuterie
       passe encore le jour et le journal part avec l'archive. Sans cela,
       une suppression faite avant 04:00 laisse le bouton actif sur un

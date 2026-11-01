@@ -205,7 +205,7 @@ def test_undo_restores_the_priority() -> None:
     session.set_priority(task.id, priority=True)
     session.delete(task.id, now=NOW)
     assert session.day.deletions[0].priority
-    assert session.undo_last_deletion().priority
+    assert session.undo_deletion(task.id).priority
 
 
 # App saves each change.
