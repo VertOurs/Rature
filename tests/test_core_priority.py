@@ -211,17 +211,17 @@ def test_undo_restores_the_priority() -> None:
 # App saves each change.
 
 
-def test_app_saves_a_task_priority(tmp_path: Path) -> None:
-    app = App.open(tmp_path, clock=lambda: NOW)
+def test_app_saves_a_task_priority(data_dir: Path) -> None:
+    app = App.open(data_dir, clock=lambda: NOW)
     task = app.add("call the bank")
     app.set_priority(task.id, priority=True)
-    reopened = App.open(tmp_path, clock=lambda: NOW)
+    reopened = App.open(data_dir, clock=lambda: NOW)
     assert reopened.session.day.tasks[0].priority
 
 
-def test_app_saves_a_reserve_priority(tmp_path: Path) -> None:
-    app = App.open(tmp_path, clock=lambda: NOW)
+def test_app_saves_a_reserve_priority(data_dir: Path) -> None:
+    app = App.open(data_dir, clock=lambda: NOW)
     item = app.add_to_reserve("fix the bike")
     app.set_reserve_priority(item.id, priority=True)
-    reopened = App.open(tmp_path, clock=lambda: NOW)
+    reopened = App.open(data_dir, clock=lambda: NOW)
     assert reopened.session.reserve[0].priority

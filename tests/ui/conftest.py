@@ -52,7 +52,7 @@ def now() -> list[datetime]:
 @pytest.fixture
 def app(tmp_path: Path, now: list[datetime]) -> App:
     clock: Callable[[], datetime] = lambda: now[0]  # noqa: E731
-    return App.open(tmp_path, clock=clock)
+    return App.open(tmp_path / "rature", clock=clock)
 
 
 @pytest.fixture(scope="session")

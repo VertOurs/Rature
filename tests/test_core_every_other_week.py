@@ -164,11 +164,11 @@ class MovingClock:
         return self.moment
 
 
-def test_app_computes_the_monday_from_the_reference_date(tmp_path: Path) -> None:
+def test_app_computes_the_monday_from_the_reference_date(data_dir: Path) -> None:
     # Monday 4 January 2027 at 02:00 still belongs to Sunday 3 January
     # (04:00 boundary), so "this week" is the week of 28 December.
     clock = MovingClock(datetime(2027, 1, 4, 2, 0, tzinfo=PARIS))
-    app = App.open(tmp_path, clock=clock)
+    app = App.open(data_dir, clock=clock)
     item = app.add_recurring("swimming", [1], Cadence.EVERY_OTHER_FROM_THIS_WEEK)
     assert item.every_other_week_from == W53
     assert app.cadence(item) is Cadence.EVERY_OTHER_FROM_THIS_WEEK
@@ -176,9 +176,9 @@ def test_app_computes_the_monday_from_the_reference_date(tmp_path: Path) -> None
     assert app.cadence(item) is Cadence.EVERY_OTHER_FROM_NEXT_WEEK
 
 
-def test_app_text_only_edit_does_not_shift_the_weeks(tmp_path: Path) -> None:
+def test_app_text_only_edit_does_not_shift_the_weeks(data_dir: Path) -> None:
     clock = MovingClock(datetime(2026, 12, 21, 9, 0, tzinfo=PARIS))
-    app = App.open(tmp_path, clock=clock)
+    app = App.open(data_dir, clock=clock)
     item = app.add_recurring("swimming", [1], Cadence.EVERY_OTHER_FROM_THIS_WEEK)
     clock.moment = datetime(2026, 12, 29, 9, 0, tzinfo=PARIS)
     edited = app.edit_recurring(item.id, text="pool")
@@ -187,30 +187,30 @@ def test_app_text_only_edit_does_not_shift_the_weeks(tmp_path: Path) -> None:
 
 
 def test_app_resaving_the_preselected_cadence_keeps_the_monday(
-    tmp_path: Path,
+    data_dir: Path,
 ) -> None:
     # What the form does on Save: it sends back the cadence core reported.
     clock = MovingClock(datetime(2026, 12, 21, 9, 0, tzinfo=PARIS))
-    app = App.open(tmp_path, clock=clock)
+    app = App.open(data_dir, clock=clock)
     item = app.add_recurring("swimming", [1], Cadence.EVERY_OTHER_FROM_THIS_WEEK)
     clock.moment = datetime(2027, 1, 13, 9, 0, tzinfo=PARIS)
     edited = app.edit_recurring(item.id, text="pool", cadence=app.cadence(item))
     assert edited.every_other_week_from == W52
 
 
-def test_app_edit_back_to_weekly_is_saved(tmp_path: Path) -> None:
+def test_app_edit_back_to_weekly_is_saved(data_dir: Path) -> None:
     clock = MovingClock(datetime(2026, 12, 21, 9, 0, tzinfo=PARIS))
-    app = App.open(tmp_path, clock=clock)
+    app = App.open(data_dir, clock=clock)
     item = app.add_recurring("swimming", [1], Cadence.EVERY_OTHER_FROM_NEXT_WEEK)
     app.edit_recurring(item.id, cadence=Cadence.WEEKLY)
-    reopened = App.open(tmp_path, clock=clock)
+    reopened = App.open(data_dir, clock=clock)
     assert reopened.session.recurring[0].every_other_week_from is None
 
 
-def test_week_a_and_week_b_alternate_over_four_weeks(tmp_path: Path) -> None:
+def test_week_a_and_week_b_alternate_over_four_weeks(data_dir: Path) -> None:
     """The real need: two activities in week A, two others in week B."""
     clock = MovingClock(datetime(2026, 12, 21, 9, 0, tzinfo=PARIS))
-    app = App.open(tmp_path, clock=clock)
+    app = App.open(data_dir, clock=clock)
     week_a = Cadence.EVERY_OTHER_FROM_THIS_WEEK
     week_b = Cadence.EVERY_OTHER_FROM_NEXT_WEEK
     app.add_recurring("swimming", [1], week_a)
