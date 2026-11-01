@@ -645,13 +645,67 @@ Noté dans « Repoussé volontairement ».
       §3.6 (refondue), §3.8, §3.14, §3.16. Le 1er novembre 2026, avec
       VertOurs, bloc par bloc. Écart avec l'ADR 0009 sur les archives à
       la jonction, consigné dans son addendum
-- [ ] Implémentation, découpée d'après l'ADR. Points relevés en amont,
-      à reprendre au découpage :
-      - `restrict_data_dir_permissions` suppose que le dossier existe
-        après `App.open` (commentaire de `core/app.py`) : faux au premier
-        lancement, où rien n'est créé avant le premier geste (§2.9)
-      - `os.link` de la sauvegarde avant migration, non couvert par
-        l'essai du portail (ADR 0009)
+- [ ] Essai de `os.link` sur le montage du portail, dans le Flatpak. Si
+      l'essai échoue, trancher le repli : `O_CREAT | O_EXCL` seul peut
+      laisser une sauvegarde tronquée, jamais remplacée ensuite
+
+Règles communes, sur le dossier local :
+
+- [ ] A1. Fichiers temporaires restés après un plantage supprimés au
+      démarrage (ADR 0009)
+- [ ] A2. Annulation par identifiant, pile en mémoire (§3.2). La pile se
+      vide au passage du jour dès cette PR, sans attendre A4 : la minuterie
+      passe encore le jour et le journal part avec l'archive. Sans cela,
+      une suppression faite avant 04:00 laisse le bouton actif sur un
+      journal vide, et le clic lève une `KeyError` traitée comme un bogue
+- [ ] A3. Démarrage sans écriture, message bloquant, mise de côté, fin de
+      la quarantaine (§2.9, §3.6). `restrict_data_dir_permissions` suppose
+      à tort que le dossier existe après `App.open` (commentaire de
+      `core/app.py`) : faux au premier lancement, où rien n'est créé avant
+      le premier geste
+- [ ] A4. Passage du jour en mémoire, écrit au premier geste (§2.5, §3.1,
+      §3.5, §3.14). Nouvelle chaîne de la bannière de nouveau jour, six
+      catalogues (§3.8)
+- [ ] A5a. Relecture avant le geste, empreinte SHA-256, passage du jour
+      sur les données relues, geste refusé et toast (§2.9, §3.17). Tests
+      « deux appareils » dans `core`, deux `App` sur le même dossier
+      temporaire, chacune avec son horloge :
+      - sortie de veille : A passe le jour en mémoire, B écrit sur la
+        veille, puis premier geste de A. Rien de perdu, l'archive de la
+        veille contient les gestes de B
+      - premier geste visant une récurrente après le second passage du
+        jour : refusé, avec l'exception dédiée
+      - annulation refusée après le passage du jour écrit par l'autre
+        appareil
+      - fichier écrit par une version future par B : aucune écriture de A
+- [ ] A5b. Erreurs de relecture en cours d'exécution : version future,
+      alerte attachée à la fenêtre puis `quit` ; message bloquant attaché
+      à la fenêtre, geste non écrit (§3.6). À enchaîner juste après A5a :
+      entre les deux, une erreur de relecture n'écrit rien mais reste peu
+      parlante
+- [ ] A6. Rechargement au retour du focus, nettoyage de la pile (§3.1,
+      §3.2, §3.5, §3.14). Test `gtk4-broadwayd` du cas de l'ADR 0007 : menu
+      « ⋯ » ouvert, fichier changé, retour du focus. La ligne n'est pas
+      détruite, le rechargement a lieu à la fermeture du menu
+- [ ] A7. Bannière de conflit, bannière unique à priorités (§3.6, §3.17)
+
+Dossier choisi :
+
+- [ ] B1. Clé `data-folder`, ouverture du dossier choisi sans toucher à
+      ses droits (§2.9, §3.6). Absent, il est inaccessible, jamais un
+      premier lancement. Tant que B3 n'existe pas, le message ne propose
+      pas « Choose a Folder… »
+- [ ] B2. Jonction dans `core` : examen, copie, mise de côté, rechargement
+      (§2.9, §3.17)
+- [ ] B3. Entrée Data Folder…, les deux dialogues, parcours sans donnée
+      locale (§3.1, §3.17), « Choose a Folder… » dans le message
+
+Clôture :
+
+- [ ] C1. README (Syncthing, `.stignore`), `ARCHITECTURE.md`, CHANGELOG
+- [ ] `2.2.0` coupée après C1, aucune version avant : A4 et A5a touchent à
+      l'écriture des vraies données. Puis la semaine d'usage réel du
+      critère de fin, Syncthing à installer sur les deux machines
 
 **Critère de fin** : deux machines de bureau sur le même dossier, gestes
 alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
