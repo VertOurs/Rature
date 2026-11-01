@@ -16,6 +16,10 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 - Temporary files left behind by a crash during a save are now removed at
   startup. Only Rature's own exact names are touched: a sync tool's
   temporary files and conflict copies in the same folder stay in place.
+- Rature now reads its data file again before every change, so that it never
+  overwrites what another device wrote. A change applies to the fresh data. If
+  its task no longer exists there, the change is dropped and a message says
+  that the task changed on another device.
 
 ### Changed
 

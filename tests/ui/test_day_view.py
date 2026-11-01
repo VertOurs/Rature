@@ -232,3 +232,84 @@ def test_the_first_gesture_refreshes_the_archives_window(
 
     assert archives._dates == [date(2026, 8, 24)]
     archives.destroy()
+
+
+def _other_device(app: App) -> App:
+    return App.open(app.data_dir, clock=app.clock)
+
+
+def test_a_rename_on_a_changed_file_rebuilds_the_views(
+    window: RatureWindow, app: App
+) -> None:
+    _add(window, "buy bread")
+    row = _active(window)[0]
+    _other_device(app).add("from the other device")
+
+    row.rename_button.emit("clicked")
+    process_events()
+    type_into(row.rename_entry, "buy rye bread")
+
+    assert _texts(_active(window)) == ["buy rye bread", "from the other device"]
+    # Bound to the fresh data, not to what memory held before the re-read.
+    assert all(
+        row.task is task
+        for row, task in zip(_active(window), app.session.day.tasks, strict=True)
+    )
+    assert not window.day_view.banner.get_revealed()
+
+
+def test_a_rename_flushed_by_a_refresh_on_a_changed_file_does_not_nest(
+    window: RatureWindow, app: App
+) -> None:
+    # day_view.refresh commits a pending rename before rebuilding: the reload
+    # that commit triggers must not rebuild inside the rebuild.
+    _add(window, "buy bread")
+    row = _active(window)[0]
+    row.rename_button.emit("clicked")
+    process_events()
+    row.rename_entry.set_text("buy rye bread")
+    _other_device(app).add("from the other device")
+
+    window.day_view.refresh()
+    process_events()
+
+    assert _texts(_active(window)) == ["buy rye bread", "from the other device"]
+
+
+def test_a_refused_gesture_shows_the_toast_and_the_fresh_data(
+    window: RatureWindow, app: App, monkeypatch
+) -> None:
+    toasts = []
+    monkeypatch.setattr(
+        window.toast_overlay,
+        "add_toast",
+        lambda toast: toasts.append(toast.get_title()),
+    )
+    _add(window, "buy bread")
+    row = _active(window)[0]
+    other = _other_device(app)
+    other.delete(row.task.id)
+    other.add("from the other device")
+
+    row.strike_button.emit("clicked")
+    process_events()
+
+    assert toasts == ["This task changed on another device."]
+    assert _texts(_active(window)) == ["from the other device"]
+    assert not window.day_view.banner.get_revealed()
+
+
+def test_a_later_date_in_the_fresh_data_announces_a_new_day(
+    window: RatureWindow, app: App, now: list[datetime]
+) -> None:
+    _add(window, "buy bread")
+    tomorrow = now[0] + timedelta(days=1)
+    App.open(app.data_dir, clock=lambda: tomorrow).add("from the other device")
+
+    _add(window, "second")
+    process_events()
+
+    assert _texts(_active(window)) == ["from the other device", "second"]
+    banner = window.day_view.banner
+    assert banner.get_revealed()
+    assert banner.get_title() == "A new day has started."

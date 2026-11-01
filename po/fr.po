@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:56+0100\n"
+"POT-Creation-Date: 2026-11-01 17:19+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -397,23 +397,23 @@ msgstr "Raccourcis clavier"
 msgid "About Rature"
 msgstr "À propos de Rature"
 
-#: data/ui/window.ui:43 data/ui/window.ui:45
+#: data/ui/window.ui:45 data/ui/window.ui:47
 msgid "Main menu"
 msgstr "Menu principal"
 
-#: data/ui/window.ui:63 data/ui/window.ui:125
+#: data/ui/window.ui:65 data/ui/window.ui:127
 msgid "Day"
 msgstr "Jour"
 
-#: data/ui/window.ui:79 data/ui/window.ui:146
+#: data/ui/window.ui:81 data/ui/window.ui:150
 msgid "Tomorrow"
 msgstr "Demain"
 
-#: data/ui/window.ui:93 data/ui/window.ui:149
+#: data/ui/window.ui:95 data/ui/window.ui:153
 msgid "Reserve"
 msgstr "Réserve"
 
-#: data/ui/window.ui:107 data/ui/window.ui:152
+#: data/ui/window.ui:109 data/ui/window.ui:156
 msgid "Recurring"
 msgstr "Récurrentes"
 
@@ -743,14 +743,18 @@ msgstr "Annuler la rature"
 msgid "Strike through"
 msgstr "Rayer"
 
-#: src/rature/ui/window.py:384
+#: src/rature/ui/window.py:366
+msgid "This task changed on another device."
+msgstr "Cette tâche a changé sur un autre appareil."
+
+#: src/rature/ui/window.py:412
 msgid "Changes could not be saved to disk."
 msgstr "Les modifications n'ont pas pu être enregistrées sur le disque."
 
-#: src/rature/ui/window.py:388
+#: src/rature/ui/window.py:416
 msgid "A new day has started."
 msgstr "Une nouvelle journée a commencé."
 
-#: src/rature/ui/window.py:389
+#: src/rature/ui/window.py:417
 msgid "Dismiss"
 msgstr "Ignorer"

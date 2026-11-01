@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:56+0100\n"
+"POT-Creation-Date: 2026-11-01 17:19+0100\n"
 "PO-Revision-Date: 2026-10-29 19:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Russian\n"
@@ -390,23 +390,23 @@ msgstr "Комбинации клавиш"
 msgid "About Rature"
 msgstr "О программе Rature"
 
-#: data/ui/window.ui:43 data/ui/window.ui:45
+#: data/ui/window.ui:45 data/ui/window.ui:47
 msgid "Main menu"
 msgstr "Главное меню"
 
-#: data/ui/window.ui:63 data/ui/window.ui:125
+#: data/ui/window.ui:65 data/ui/window.ui:127
 msgid "Day"
 msgstr "Сегодня"
 
-#: data/ui/window.ui:79 data/ui/window.ui:146
+#: data/ui/window.ui:81 data/ui/window.ui:150
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: data/ui/window.ui:93 data/ui/window.ui:149
+#: data/ui/window.ui:95 data/ui/window.ui:153
 msgid "Reserve"
 msgstr "Резерв"
 
-#: data/ui/window.ui:107 data/ui/window.ui:152
+#: data/ui/window.ui:109 data/ui/window.ui:156
 msgid "Recurring"
 msgstr "Повторяющиеся"
 
@@ -735,14 +735,18 @@ msgstr "Отменить зачёркивание"
 msgid "Strike through"
 msgstr "Зачеркнуть"
 
-#: src/rature/ui/window.py:384
+#: src/rature/ui/window.py:366
+msgid "This task changed on another device."
+msgstr "Эта задача изменилась на другом устройстве."
+
+#: src/rature/ui/window.py:412
 msgid "Changes could not be saved to disk."
 msgstr "Не удалось сохранить изменения на диск."
 
-#: src/rature/ui/window.py:388
+#: src/rature/ui/window.py:416
 msgid "A new day has started."
 msgstr "Начался новый день."
 
-#: src/rature/ui/window.py:389
+#: src/rature/ui/window.py:417
 msgid "Dismiss"
 msgstr "Закрыть"
