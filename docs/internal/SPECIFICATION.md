@@ -593,6 +593,12 @@ journées (§2.7.5).
   différentes. Le conflit est signalé, rien de plus
 - une livraison qui arrive entre la relecture et l'écriture est écrasée
   sans copie de conflit. Fenêtre de quelques millisecondes
+- un geste dont l'écriture a échoué n'existe qu'en mémoire (§3.6,
+  situation 3). Si une relecture trouve ensuite un fichier changé, avant un
+  geste ou au retour du focus, les données fraîches le remplacent et il est
+  perdu, sans message. Une ligne au journal, au niveau `WARNING`, sans texte
+  de tâche. La bannière d'échec disparaît à l'écriture réussie suivante :
+  elle ne garantit donc plus que les gestes précédents ont été écrits
 
 **Fichier illisible ou absent.** Rature n'écrit jamais d'office une
 journée vide et ne renomme jamais un fichier qu'elle ne peut pas lire :
