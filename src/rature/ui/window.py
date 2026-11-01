@@ -148,9 +148,14 @@ class RatureWindow(Adw.ApplicationWindow):
         self._shown_date = self.app.session.day.date
         self._new_day_pending = False
         self._refresh_source_id = 0
+        # A catch-up put off because a row's menu or rename is open (§3.1).
+        self._catch_up_waiting = False
+        self._catch_up_source_id = 0
         self._new_day_dismissed = False
         self.day_view.banner.connect("button-clicked", self._on_banner_button_clicked)
         self._update_banner()
+
+        self.connect("notify::is-active", self._on_is_active_changed)
 
         self._timer_id = GLib.timeout_add_seconds(
             _ENSURE_DAY_INTERVAL_SECONDS, self._on_ensure_day_tick
@@ -185,6 +190,10 @@ class RatureWindow(Adw.ApplicationWindow):
         self.add_action(undo)
         self._undo_delete_action = undo
 
+        editor_closed = Gio.SimpleAction.new("row-editor-closed", None)
+        editor_closed.connect("activate", self._on_row_editor_closed)
+        self.add_action(editor_closed)
+
         help_action = Gio.SimpleAction.new("show-help-overlay", None)
         help_action.connect("activate", lambda _a, _p: self._help_overlay.present(self))
         self.add_action(help_action)
@@ -208,12 +217,63 @@ class RatureWindow(Adw.ApplicationWindow):
         GLib.source_remove(self._timer_id)
         if self._refresh_source_id:
             GLib.source_remove(self._refresh_source_id)
+        if self._catch_up_source_id:
+            GLib.source_remove(self._catch_up_source_id)
+
+    def _row_editor_open(self) -> bool:
+        return any(
+            view.has_open_row_editor()
+            for view in (
+                self.day_view,
+                self.tomorrow_view,
+                self.reserve_view,
+                self.recurring_view,
+            )
+        )
+
+    def _on_is_active_changed(self, _window: Gtk.Window, _param: object) -> None:
+        if self.is_active():
+            self._catch_up_when_free()
+
+    def _catch_up_when_free(self) -> None:
+        # SPECIFICATION.md §3.1, and the lesson of ADR 0007's withdrawal:
+        # never rebuild a row under an open menu or rename.
+        if self._row_editor_open():
+            self._catch_up_waiting = True
+            return
+        self._catch_up_waiting = False
+        self._perform(self._catch_up, clear_banner_on_success=False)
+
+    def _catch_up(self) -> None:
+        try:
+            self.app.catch_up()
+        except OSError:
+            # No gesture was lost, so the write-failure banner would be wrong.
+            # The next gesture meets the same error and shows it.
+            _logger.warning("could not read the data file again", exc_info=True)
+
+    def _on_row_editor_closed(self, _action: Gio.SimpleAction, _param: object) -> None:
+        # Not right here: Rename closes the menu before it opens the entry,
+        # and a rebuild now would destroy the row in between.
+        if not self._catch_up_waiting or self._catch_up_source_id:
+            return
+
+        def catch_up_once() -> bool:
+            self._catch_up_source_id = 0
+            self._catch_up_when_free()
+            return GLib.SOURCE_REMOVE
+
+        self._catch_up_source_id = GLib.idle_add(catch_up_once)
 
     def _on_ensure_day_tick(self) -> bool:
+        if self._row_editor_open():
+            self._catch_up_waiting = True
+            return GLib.SOURCE_CONTINUE
         # SPECIFICATION.md §3.1: the tick never writes, and §3.6 only lifts
         # the write-failure banner on a write that reached disk.
+        # A rollover rebuilds through _perform. Otherwise nothing shown depends
+        # on the minute, and a rebuild would destroy a row mid-drag.
         self._perform(self.app.ensure_day, clear_banner_on_success=False)
-        self._refresh_all()
         return GLib.SOURCE_CONTINUE
 
     def _refresh_archive_windows(self, archived_date: date) -> None:
@@ -390,12 +450,19 @@ class RatureWindow(Adw.ApplicationWindow):
             self._refresh_archive_windows(archived_date)
         # SPECIFICATION.md §3.1: the day on screen moved on, by the timer or
         # through fresh data.
-        if self.app.session.day.date > self._shown_date:
+        previous_date = self._shown_date
+        self._shown_date = self.app.session.day.date
+        day_moved_on = self._shown_date > previous_date
+        if day_moved_on:
             self._new_day_pending = True
             self._new_day_dismissed = False
-        self._shown_date = self.app.session.day.date
-        if self.app.take_reloaded():
+        reloaded = self.app.take_reloaded()
+        if reloaded or day_moved_on:
             self._refresh_soon()
+        # SPECIFICATION.md §3.5 and §3.14: the other device passed the day and
+        # wrote the archive. The timer's rollover, in memory, archives nothing.
+        if reloaded and day_moved_on:
+            self._refresh_archive_windows(previous_date)
         self._update_banner()
         return success
 
@@ -413,7 +480,7 @@ class RatureWindow(Adw.ApplicationWindow):
         # App does not roll back an in-memory mutation on a save failure
         # (documented on the class), so the view refreshes unconditionally:
         # skipping it would leave the screen contradicting the session
-        # until the next timer tick. For a business error nothing changed,
+        # until the next gesture. For a business error nothing changed,
         # and the redraw is a no-op.
         #
         # _refresh_all rebuilds the list rows, and this often runs from

@@ -54,6 +54,10 @@ class RecurringRow(Adw.ActionRow):
         self.set_subtitle(self._subtitle())
 
         self.edit_button.connect("clicked", self._on_edit_clicked)
+        self.row_popover.connect(
+            "closed",
+            lambda _popover: self.activate_action("win.row-editor-closed", None),
+        )
         self.delete_button.connect("clicked", self._on_delete_clicked)
 
     def _subtitle(self) -> str:
@@ -68,6 +72,11 @@ class RecurringRow(Adw.ActionRow):
         else:
             week = _("next week")
         return " · ".join((days, _("every two weeks"), week))
+
+    @property
+    def editor_open(self) -> bool:
+        """Whether a rebuild would destroy this row under the user's hands."""
+        return self.row_popover.get_visible()
 
     def _on_edit_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()

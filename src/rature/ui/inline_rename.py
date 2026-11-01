@@ -25,7 +25,7 @@ class InlineRename:
     and losing focus commit, Escape discards. Committing updates the label
     locally and calls ``commit`` with the new text; it never triggers a
     view refresh, so a caller may flush a pending edit before rebuilding
-    its rows.
+    its rows. ``finished`` runs once the entry has closed, either way.
     """
 
     def __init__(
@@ -35,11 +35,13 @@ class InlineRename:
         label: Gtk.Label,
         current_text: Callable[[], str],
         commit: Callable[[str], None],
+        finished: Callable[[], None],
     ) -> None:
         self._entry = entry
         self._label = label
         self._current_text = current_text
         self._commit = commit
+        self._finished = finished
         self._editing = False
 
         entry.connect("activate", lambda _entry: self.commit())
@@ -49,6 +51,10 @@ class InlineRename:
         focus_controller = Gtk.EventControllerFocus()
         focus_controller.connect("leave", lambda _controller: self.commit())
         entry.add_controller(focus_controller)
+
+    @property
+    def editing(self) -> bool:
+        return self._editing
 
     def begin(self) -> None:
         """Show the entry primed with the current text, all of it selected."""
@@ -70,6 +76,7 @@ class InlineRename:
         if text and text != self._current_text():
             self._label.set_label(text)
             self._commit(text)
+        self._finished()
 
     def _on_key_pressed(
         self, _controller: Gtk.EventControllerKey, keyval: int, _keycode: int, _state
@@ -87,3 +94,4 @@ class InlineRename:
         self._editing = False
         self._entry.set_visible(False)
         self._label.set_visible(True)
+        self._finished()
