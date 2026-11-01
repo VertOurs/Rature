@@ -14,9 +14,12 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   0009 écrit (pas de mode synchronisé, retard local des archives
   accepté), puis amendé après relecture : rejeu refusé avec toast,
   annulation par identifiant sur une pile locale en mémoire, dialogue
-  de jonction complété, risque ouvert Android. Étape suivante : mettre à jour `SPECIFICATION.md` (§3.6,
-  §2.5, choix du dossier, dialogue pour rejoindre, bandeau de conflit)
-  avant toute implémentation.
+  de jonction complété, risque ouvert Android. `SPECIFICATION.md` mise
+  à jour le 1er novembre 2026 (§2.9 et §3.17 nouvelles, §3.6 refondue),
+  addendum à l'ADR 0009 (archives copiées en rejoignant un dossier
+  vide). Étape suivante : découper l'implémentation dans `ROADMAP.md`,
+  en partant des deux points déjà relevés
+  (`restrict_data_dir_permissions`, `os.link`).
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid

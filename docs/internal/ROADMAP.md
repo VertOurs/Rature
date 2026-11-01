@@ -640,8 +640,18 @@ Noté dans « Repoussé volontairement ».
 - [x] ADR 0009 (`docs/adr/0009-sync-through-a-chosen-folder.md`). Pas de
       mode synchronisé ; retard local des archives jusqu'au premier
       geste du jour accepté. Décisions de VertOurs du 31 octobre 2026
-- [ ] `SPECIFICATION.md` mis à jour avant l'implémentation
-- [ ] Implémentation, découpée d'après l'ADR
+- [x] `SPECIFICATION.md` mis à jour avant l'implémentation : §2.5
+      (écriture différée), §2.9 et §3.17 (nouvelles), §3.1, §3.2, §3.5,
+      §3.6 (refondue), §3.8, §3.14, §3.16. Le 1er novembre 2026, avec
+      VertOurs, bloc par bloc. Écart avec l'ADR 0009 sur les archives à
+      la jonction, consigné dans son addendum
+- [ ] Implémentation, découpée d'après l'ADR. Points relevés en amont,
+      à reprendre au découpage :
+      - `restrict_data_dir_permissions` suppose que le dossier existe
+        après `App.open` (commentaire de `core/app.py`) : faux au premier
+        lancement, où rien n'est créé avant le premier geste (§2.9)
+      - `os.link` de la sauvegarde avant migration, non couvert par
+        l'essai du portail (ADR 0009)
 
 **Critère de fin** : deux machines de bureau sur le même dossier, gestes
 alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
