@@ -159,6 +159,9 @@ class DayView(Adw.Bin):
         else:
             self.run_action(self.app.lock)
 
+    def has_open_row_editor(self) -> bool:
+        return list_helpers.editor_open(self.struck_list, self.active_list)
+
     def _commit_pending_renames(self) -> None:
         for list_box in (self.struck_list, self.active_list):
             for row in list_helpers.rows(list_box):

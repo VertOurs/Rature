@@ -96,7 +96,9 @@ class EditableRow(Gtk.ListBoxRow):
             label=self.text_label,
             current_text=lambda: self._model.text,
             commit=lambda text: self.perform(lambda: self._rename_in_core(text)),
+            finished=self._on_editor_closed,
         )
+        self.row_popover.connect("closed", lambda _popover: self._on_editor_closed())
         self._wire_drag_and_drop()
 
     # What a subclass must say: which App call does each change.
@@ -211,6 +213,14 @@ class EditableRow(Gtk.ListBoxRow):
     def _on_delete_clicked(self, _button: Gtk.Button) -> None:
         self.row_popover.popdown()
         self.run_action(self._delete_in_core)
+
+    @property
+    def editor_open(self) -> bool:
+        """Whether a rebuild would destroy this row under the user's hands."""
+        return self.row_popover.get_visible() or self._rename.editing
+
+    def _on_editor_closed(self) -> None:
+        self.activate_action("win.row-editor-closed", None)
 
     def commit_pending_rename(self) -> None:
         """Flush a pending edit, e.g. before the view rebuilds its rows."""

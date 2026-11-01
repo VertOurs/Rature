@@ -415,6 +415,15 @@ class App:
         self.ensure_day()
         return True
 
+    def catch_up(self) -> None:
+        """Take what changed elsewhere and a due rollover, on return of focus.
+
+        Writes nothing, like the timer (§3.1): an unchanged file with no
+        rollover due leaves memory untouched, so nothing needs rebuilding.
+        """
+        self.reread()
+        self.ensure_day()
+
     @property
     def write_failed(self) -> bool:
         """Whether a change lives only in memory after a failed write."""

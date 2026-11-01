@@ -67,6 +67,9 @@ class TomorrowView(Adw.Bin):
         self.entry.add_controller(key_controller)
         self.refresh()
 
+    def has_open_row_editor(self) -> bool:
+        return list_helpers.editor_open(self.prepared_list)
+
     def refresh(self) -> None:
         # Commit a rename in progress before the rows are rebuilt, as the
         # Day and Reserve views do.

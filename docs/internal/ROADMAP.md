@@ -683,7 +683,7 @@ Règles communes, sur le dossier local :
       à la fenêtre, geste non écrit (§3.6). À enchaîner juste après A5a :
       entre les deux, une erreur de relecture n'écrit rien mais reste peu
       parlante
-- [ ] A6. Rechargement au retour du focus, nettoyage de la pile (§3.1,
+- [x] A6. Rechargement au retour du focus, nettoyage de la pile (§3.1,
       §3.2, §3.5, §3.14). Test `gtk4-broadwayd` du cas de l'ADR 0007 : menu
       « ⋯ » ouvert, fichier changé, retour du focus. La ligne n'est pas
       détruite, le rechargement a lieu à la fermeture du menu. Au retour
