@@ -41,6 +41,8 @@ class RatureApplication(Adw.Application):
         )
         self._app: App | None = None
         self._held_for_dialogs = False
+        # The window a re-read failed on, while its message is open (§3.6).
+        self._failing_window: RatureWindow | None = None
         self._add_action("quit", self._on_quit, accels=["<primary>q"])
         self._add_action("about", self._on_about)
         self._add_action("archives", self._on_archives)
@@ -79,13 +81,39 @@ class RatureApplication(Adw.Application):
         window.present()
         self._release_after_dialogs()
 
+    def report_read_failure(self, window: RatureWindow, error: Exception) -> None:
+        """A re-read failed while running: the messages of §3.6, on the window.
+
+        One at a time: the modal message takes the focus away from an open
+        rename, whose commit fails the same way.
+        """
+        if self._failing_window is not None:
+            return
+        self._failing_window = window
+
+        def fail_again() -> None:
+            raise error
+
+        self._settle(fail_again)
+
+    def _data_folder(self) -> Path:
+        if self._failing_window is not None:
+            return self._failing_window.app.data_dir
+        return storage.xdg_data_dir()
+
     def _open_data(self, opener: Callable[[Path], App]) -> None:
-        data_dir = storage.xdg_data_dir()
+        def attempt() -> None:
+            self._app = opener(storage.xdg_data_dir())
+
+        self._settle(attempt)
+
+    def _settle(self, attempt: Callable[[], object]) -> None:
+        data_dir = self._data_folder()
         try:
-            self._app = opener(data_dir)
+            attempt()
         except FutureVersionError:
             # SPECIFICATION.md §3.6 situation 1.
-            self._show_startup_error_and_quit(
+            self._show_error_and_quit(
                 _("This file was saved by a newer version of Rature."),
                 _(
                     "Opening it could overwrite data. "
@@ -97,28 +125,33 @@ class RatureApplication(Adw.Application):
             # SPECIFICATION.md §3.6 situation 4: the cause (rights, space,
             # medium) is outside Rature, so nothing is retried or repaired.
             _logger.exception("cannot use the data folder %s", data_dir)
-            self._show_startup_error_and_quit(
-                _("Rature could not use its data folder."),
-                _(
-                    "Check that this folder can be read and written, "
-                    "and that the disk is not full: %s"
-                )
-                % data_dir,
-            )
+            self._show_folder_error(data_dir)
         except DataFileUnreadableError:
             self._show_unreadable_file_message()
         except DataFileMissingError:
             self._show_missing_file_message()
         else:
-            self._present_window()
+            if self._failing_window is None:
+                self._present_window()
+            else:
+                window, self._failing_window = self._failing_window, None
+                window.data_recovered()
+
+    def _try_again(self) -> None:
+        if self._failing_window is None:
+            self._open_data(App.open)
+        else:
+            self._settle(self._failing_window.app.reread)
 
     def _show_unreadable_file_message(self) -> None:
         # SPECIFICATION.md §3.6 situation 2.
-        path = storage.main_file_path(data_dir=storage.xdg_data_dir())
+        path = storage.main_file_path(data_dir=self._data_folder())
         self._show_blocking_message(
             _("The data file cannot be read."),
             _("It may still be syncing, or it may be damaged: %s") % path,
-            _("Set Aside and Start Empty"),
+            _("Set Aside and Start Empty")
+            if self._failing_window is None
+            else _("Set Aside and Save This Device's Data"),
             self._show_unreadable_file_message,
         )
 
@@ -126,8 +159,10 @@ class RatureApplication(Adw.Application):
         # SPECIFICATION.md §3.6 situation 2.
         self._show_blocking_message(
             _("The data file is missing."),
-            _("No data file was found in this folder: %s") % storage.xdg_data_dir(),
-            _("Start Empty"),
+            _("No data file was found in this folder: %s") % self._data_folder(),
+            _("Start Empty")
+            if self._failing_window is None
+            else _("Save This Device's Data"),
             self._show_missing_file_message,
         )
 
@@ -138,13 +173,13 @@ class RatureApplication(Adw.Application):
         way_out: str,
         show_again: Callable[[], None],
     ) -> None:
-        try_again, confirm = 0, 1
+        try_again, confirm, leave = 0, 1, 2
 
         def on_choice(choice: int) -> None:
             if choice == try_again:
-                self._open_data(App.open)
+                self._try_again()
             elif choice == confirm:
-                self._confirm_start_empty(show_again)
+                self._confirm_way_out(show_again)
             else:
                 self._release_after_dialogs()
                 self.quit()
@@ -153,33 +188,73 @@ class RatureApplication(Adw.Application):
             message,
             detail,
             [_("Try Again"), way_out, _("Quit")],
-            cancel_button=2,
+            # Quitting while running discards the copy in memory: a deliberate
+            # click, never Escape.
+            cancel_button=leave if self._failing_window is None else try_again,
             default_button=try_again,
             on_choice=on_choice,
         )
 
-    def _confirm_start_empty(self, show_again: Callable[[], None]) -> None:
-        cancel, start_empty = 0, 1
+    def _confirm_way_out(self, show_again: Callable[[], None]) -> None:
+        cancel, confirm = 0, 1
+        window = self._failing_window
 
         def on_choice(choice: int) -> None:
-            if choice == start_empty:
+            if choice != confirm:
+                show_again()
+            elif window is None:
                 self._open_data(App.start_empty)
             else:
-                show_again()
+                self._settle(window.app.save_device_data)
 
-        self._ask(
-            _("Start from an empty day?"),
-            _(
+        if window is None:
+            message = _("Start from an empty day?")
+            detail = _(
                 "This empty day will also replace the data "
                 "on your other synced devices."
-            ),
-            [_("Cancel"), _("Start Empty")],
+            )
+            confirm_label = _("Start Empty")
+        else:
+            message = _("Save this device's data?")
+            detail = _(
+                "It will also replace the data on your other synced devices. "
+                "Recent changes made on them may be lost."
+            )
+            confirm_label = _("Save This Device's Data")
+        self._ask(
+            message,
+            detail,
+            [_("Cancel"), confirm_label],
             cancel_button=cancel,
             default_button=cancel,
             on_choice=on_choice,
         )
 
-    def _show_startup_error_and_quit(self, message: str, detail: str) -> None:
+    def _show_folder_error(self, data_dir: Path) -> None:
+        # SPECIFICATION.md §3.6 situation 4.
+        message = _("Rature could not use its data folder.")
+        detail = (
+            _(
+                "Check that this folder can be read and written, "
+                "and that the disk is not full: %s"
+            )
+            % data_dir
+        )
+        if self._failing_window is None:
+            self._show_error_and_quit(message, detail)
+            return
+        # Quitting here would discard the copy in memory without a choice:
+        # back to the message of situation 2, or to the data if it recovered.
+        self._ask(
+            message,
+            detail,
+            [_("Close")],
+            cancel_button=0,
+            default_button=0,
+            on_choice=lambda _choice: self._try_again(),
+        )
+
+    def _show_error_and_quit(self, message: str, detail: str) -> None:
         # SPECIFICATION.md §3.6 situations 1 and 4.
         def on_choice(_choice: int) -> None:
             self._release_after_dialogs()
@@ -204,12 +279,13 @@ class RatureApplication(Adw.Application):
         default_button: int,
         on_choice: Callable[[int], None],
     ) -> None:
-        # No window exists yet, so hold() is what keeps the process alive
-        # while a dialog shows: without it GApplication would shut down the
-        # moment do_activate returns. One hold for the whole loop of dialogs,
-        # released only once the window is open or on Quit, or the process
-        # could end between two dialogs.
-        if not self._held_for_dialogs:
+        # At startup no window exists yet, so hold() is what keeps the process
+        # alive while a dialog shows: without it GApplication would shut down
+        # the moment do_activate returns. One hold for the whole loop of
+        # dialogs, released only once the window is open or on Quit, or the
+        # process could end between two dialogs.
+        parent = self._failing_window
+        if parent is None and not self._held_for_dialogs:
             self.hold()
             self._held_for_dialogs = True
         dialog = Gtk.AlertDialog()
@@ -226,7 +302,7 @@ class RatureApplication(Adw.Application):
                 choice = cancel_button
             on_choice(choice)
 
-        dialog.choose(None, None, on_response)
+        dialog.choose(parent, None, on_response)
 
     def _release_after_dialogs(self) -> None:
         if self._held_for_dialogs:

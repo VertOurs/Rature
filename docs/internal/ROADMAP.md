@@ -678,7 +678,7 @@ Règles communes, sur le dossier local :
       - annulation refusée après le passage du jour écrit par l'autre
         appareil
       - fichier écrit par une version future par B : aucune écriture de A
-- [ ] A5b. Erreurs de relecture en cours d'exécution : version future,
+- [x] A5b. Erreurs de relecture en cours d'exécution : version future,
       alerte attachée à la fenêtre puis `quit` ; message bloquant attaché
       à la fenêtre, geste non écrit (§3.6). À enchaîner juste après A5a :
       entre les deux, une erreur de relecture n'écrit rien mais reste peu
@@ -698,7 +698,9 @@ Dossier choisi :
 - [ ] B1. Clé `data-folder`, ouverture du dossier choisi sans toucher à
       ses droits (§2.9, §3.6). Absent, il est inaccessible, jamais un
       premier lancement. Tant que B3 n'existe pas, le message ne propose
-      pas « Choose a Folder… »
+      pas « Choose a Folder… ». L'erreur de droits à la relecture passe
+      aujourd'hui par la bannière d'échec d'écriture : à corriger avec le
+      dossier inaccessible
 - [ ] B2. Jonction dans `core` : examen, copie, mise de côté, rechargement
       (§2.9, §3.17)
 - [ ] B3. Entrée Data Folder…, les deux dialogues, parcours sans donnée

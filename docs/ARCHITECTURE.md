@@ -171,6 +171,12 @@ written. On unchanged data, business errors (`LockedError`, `KeyError`,
 mid-mutation does not undo the in-memory mutation, a deliberate decision
 documented on the class itself (`SPECIFICATION.md` §2.9).
 
+A re-read that fails raises what `App.open` raises, and nothing is written. The
+interface shows the startup messages on the main window, with one difference:
+memory holds the last successful read, so the way out is
+`App.save_device_data`, which writes it, rather than an empty day. The same
+`App` stays in place, since every view holds it (`SPECIFICATION.md` §3.6).
+
 A graphical application can be written calling only `App`: no
 product-behaviour decision is left to make in `ui/`.
 

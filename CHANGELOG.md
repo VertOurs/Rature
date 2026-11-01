@@ -20,6 +20,10 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   overwrites what another device wrote. A change applies to the fresh data. If
   its task no longer exists there, the change is dropped and a message says
   that the task changed on another device.
+- If the data file vanishes or can no longer be read while Rature is open, a
+  message on the window offers to try again, or to save this device's data
+  after confirmation. An unreadable file is set aside first. A file saved by a
+  newer version of Rature shows an alert, then Rature quits, without writing.
 
 ### Changed
 

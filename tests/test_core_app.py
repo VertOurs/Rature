@@ -223,7 +223,7 @@ def test_start_empty_sets_an_unreadable_file_aside_and_writes_at_once(
     aside = tmp_path / "data.json.20260824-143207.bak"
     assert aside.read_text(encoding="utf-8") == "not json"
     assert load(data_dir=tmp_path).day.tasks == []
-    assert app.empty_day_write_failed is False
+    assert app.write_failed is False
 
 
 def test_start_empty_writes_at_once_when_the_file_is_missing(tmp_path: Path) -> None:
@@ -258,7 +258,7 @@ def test_start_empty_reports_a_failed_write_and_the_next_gesture_retries(
 
     app = App.start_empty(tmp_path)
 
-    assert app.empty_day_write_failed is True  # §3.6 situation 3, the banner
+    assert app.write_failed is True  # §3.6 situation 3, the banner
     monkeypatch.setattr(storage, "save", save)
     assert app.ensure_day() is None  # the timer never writes
     assert not (tmp_path / "data.json").exists()

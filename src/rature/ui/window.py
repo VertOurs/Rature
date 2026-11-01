@@ -16,9 +16,12 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 
 from rature.core.app import (  # noqa: E402
     App,
+    DataFileMissingError,
+    DataFileUnreadableError,
     GestureRefusedError,
     LockedError,
 )
+from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.archives_window import ArchivesWindow  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
@@ -141,7 +144,8 @@ class RatureWindow(Adw.ApplicationWindow):
 
         # SPECIFICATION.md §3.6 situation 3: the confirmed empty day could
         # not be written, say so from the start.
-        self._write_failure_active = self.app.empty_day_write_failed
+        self._write_failure_active = self.app.write_failed
+        self._shown_date = self.app.session.day.date
         self._new_day_pending = False
         self._refresh_source_id = 0
         self._new_day_dismissed = False
@@ -354,11 +358,18 @@ class RatureWindow(Adw.ApplicationWindow):
         #
         # clear_banner_on_success=False is for the timer tick, which writes
         # nothing: §3.6 only lifts the banner on a write that reached disk.
-        shown_date = self.app.session.day.date
         try:
             action()
         except OSError:
             self._write_failure_active = True
+            success = False
+        except (
+            DataFileMissingError,
+            DataFileUnreadableError,
+            FutureVersionError,
+        ) as error:
+            # SPECIFICATION.md §3.6: the gesture stays unwritten.
+            self.get_application().report_read_failure(self, error)
             success = False
         except GestureRefusedError:
             # SPECIFICATION.md §3.17: expected, so caught before the bugs.
@@ -379,13 +390,24 @@ class RatureWindow(Adw.ApplicationWindow):
             self._refresh_archive_windows(archived_date)
         # SPECIFICATION.md §3.1: the day on screen moved on, by the timer or
         # through fresh data.
-        if self.app.session.day.date > shown_date:
+        if self.app.session.day.date > self._shown_date:
             self._new_day_pending = True
             self._new_day_dismissed = False
+        self._shown_date = self.app.session.day.date
         if self.app.take_reloaded():
             self._refresh_soon()
         self._update_banner()
         return success
+
+    def data_recovered(self) -> None:
+        """The read failure's message closed on readable or rewritten data.
+
+        Rebuilds even on an unchanged file: a row may still show a rename
+        that was never written.
+        """
+        self._write_failure_active = self.app.write_failed
+        self._perform(lambda: None, clear_banner_on_success=False)
+        self._refresh_all()
 
     def _run_app_action(self, action) -> bool:
         # App does not roll back an in-memory mutation on a save failure

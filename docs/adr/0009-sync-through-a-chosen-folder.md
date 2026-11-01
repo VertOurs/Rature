@@ -316,3 +316,18 @@ The `O_CREAT | O_EXCL` fallback is not needed, and the backup code does not
 change. That fallback would only have kept half of the guarantee: an
 existing backup is never overwritten, but an interrupted copy could leave a
 truncated backup, which would then never be replaced.
+
+## Addendum (2026-11-01): the way out while running
+
+The section "Unreadable or missing file" offers an empty day in every case.
+That stays true at startup, when memory holds nothing. While the application
+runs, memory holds the last successful read: reserve, recurring tasks,
+Tomorrow and the day. An empty day would throw all of that away, so the way
+out writes memory instead, after a confirmation saying it will also replace
+the data on the other devices. An unreadable file is set aside first, as
+before. At worst this loses what the other device changed, which an empty day
+loses too.
+
+Quitting discards that copy, so it takes a deliberate click: Escape means Try
+Again while running, and still means Quit at startup. For the same reason, a
+refused set-aside while running returns to the message instead of quitting.
