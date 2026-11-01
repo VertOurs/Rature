@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:56+0100\n"
+"POT-Creation-Date: 2026-11-01 17:19+0100\n"
 "PO-Revision-Date: 2026-10-29 20:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Esperanto\n"
@@ -384,23 +384,23 @@ msgstr "Klavkombinoj"
 msgid "About Rature"
 msgstr "Pri Rature"
 
-#: data/ui/window.ui:43 data/ui/window.ui:45
+#: data/ui/window.ui:45 data/ui/window.ui:47
 msgid "Main menu"
 msgstr "Ĉefa menuo"
 
-#: data/ui/window.ui:63 data/ui/window.ui:125
+#: data/ui/window.ui:65 data/ui/window.ui:127
 msgid "Day"
 msgstr "Hodiaŭ"
 
-#: data/ui/window.ui:79 data/ui/window.ui:146
+#: data/ui/window.ui:81 data/ui/window.ui:150
 msgid "Tomorrow"
 msgstr "Morgaŭ"
 
-#: data/ui/window.ui:93 data/ui/window.ui:149
+#: data/ui/window.ui:95 data/ui/window.ui:153
 msgid "Reserve"
 msgstr "Rezervo"
 
-#: data/ui/window.ui:107 data/ui/window.ui:152
+#: data/ui/window.ui:109 data/ui/window.ui:156
 msgid "Recurring"
 msgstr "Ripetiĝantaj"
 
@@ -729,14 +729,18 @@ msgstr "Malforstreki"
 msgid "Strike through"
 msgstr "Forstreki"
 
-#: src/rature/ui/window.py:384
+#: src/rature/ui/window.py:366
+msgid "This task changed on another device."
+msgstr "Ĉi tiu tasko ŝanĝiĝis en alia aparato."
+
+#: src/rature/ui/window.py:412
 msgid "Changes could not be saved to disk."
 msgstr "Ne eblis konservi la ŝanĝojn al la disko."
 
-#: src/rature/ui/window.py:388
+#: src/rature/ui/window.py:416
 msgid "A new day has started."
 msgstr "Nova tago komenciĝis."
 
-#: src/rature/ui/window.py:389
+#: src/rature/ui/window.py:417
 msgid "Dismiss"
 msgstr "Fermi"

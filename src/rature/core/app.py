@@ -9,6 +9,7 @@ other way around.
 
 from __future__ import annotations
 
+import copy
 import enum
 import logging
 from collections.abc import Callable
@@ -25,7 +26,7 @@ from rature.core.recurrence import Cadence
 
 # LockedError re-exported: ui/ may only import rature.core.app, and its
 # mutation wrappers below raise it straight from Session.
-from rature.core.session import Day, LockedError, Session, reference_date  # noqa: F401
+from rature.core.session import Day, LockedError, Session, reference_date
 from rature.core.storage import Store
 
 _logger = logging.getLogger(__name__)
@@ -54,6 +55,23 @@ class DataFileMissingError(Exception):
 
 class DataFileUnreadableError(Exception):
     """data.json exists but does not load: it may still be arriving (§3.6)."""
+
+
+class GestureRefusedError(Exception):
+    """A gesture no longer applies to data that changed elsewhere (§2.9).
+
+    Expected, not a bug: not a LockedError, KeyError or ValueError, which the
+    interface treats as one (§3.6). Nothing was written.
+    """
+
+
+def _parse(content: bytes, data_dir: Path) -> Store:
+    try:
+        return storage.parse_main(content, data_dir=data_dir)
+    except (ValueError, KeyError, TypeError) as error:
+        path = storage.main_file_path(data_dir=data_dir)
+        _logger.warning("the data file cannot be read: %s", path)
+        raise DataFileUnreadableError(path) from error
 
 
 def _default_clock() -> datetime:
@@ -89,6 +107,12 @@ class App:
         self._pending_archives: list[Day] = []
         # Dates archived since take_written_archives last ran.
         self._written_archives: list[date] = []
+        # The main file as last read or written, None until there is one.
+        self._fingerprint: str | None = None
+        # A write failed and its change lives only in memory (§2.9).
+        self._write_failed = False
+        # Fresh data replaced memory since take_reloaded last ran.
+        self._reloaded = False
         # The empty day of start_empty could not be written (§3.6 situation
         # 3): the next gesture writes it with everything else.
         self.empty_day_write_failed = False
@@ -165,13 +189,11 @@ class App:
     def _load(cls, data_dir: Path, clock: Callable[[], datetime]) -> App:
         path = storage.main_file_path(data_dir=data_dir)
         try:
-            store = storage.load(data_dir=data_dir)
+            content = storage.read_main(data_dir=data_dir)
         except FileNotFoundError as error:
             _logger.warning("the data file is missing: %s", path)
             raise DataFileMissingError(path) from error
-        except (ValueError, KeyError, TypeError) as error:
-            _logger.warning("the data file cannot be read: %s", path)
-            raise DataFileUnreadableError(path) from error
+        store = _parse(content, data_dir)
         try:
             storage.restrict_data_dir_permissions(data_dir=data_dir)
         except OSError:
@@ -181,12 +203,14 @@ class App:
             _logger.warning(
                 "could not restrict data directory permissions: %s", data_dir
             )
-        return cls(
+        app = cls(
             data_dir=data_dir,
             session=store.into_session(),
             clock=clock,
             startup=StartupOutcome.LOADED,
         )
+        app._fingerprint = storage.fingerprint(content)
+        return app
 
     @classmethod
     def _empty(
@@ -321,147 +345,202 @@ class App:
         # file. Each archive leaves the list once on disk, so a later retry
         # writes only what is still missing, and a failed archive stops
         # everything after it.
+        self._write_failed = True
         while self._pending_archives:
             day = self._pending_archives[0]
             storage.archive(day, data_dir=self.data_dir)
             del self._pending_archives[0]
             self._written_archives.append(day.date)
-        storage.save(Store.from_session(self.session), data_dir=self.data_dir)
+        self._fingerprint = storage.save(
+            Store.from_session(self.session), data_dir=self.data_dir
+        )
+        self._write_failed = False
 
-    # Mutations below wrap the matching Session method: supply now/today
-    # from self.clock() where the operation needs one, then save. Business
-    # errors (LockedError, KeyError, ValueError) come straight from Session
-    # and are not caught here.
+    def _reread(self) -> bool:
+        """Read the main file again, and take what changed (§2.9).
+
+        Writes nothing but the backup any load makes of an older format.
+
+        Returns whether the file changed. An unchanged file leaves memory
+        alone, a due rollover included: the gesture applies to the day on
+        screen, and the timer rolls over within the minute. Raises what
+        open() raises for a file that vanished or no longer loads.
+        """
+        try:
+            content = storage.read_main(data_dir=self.data_dir)
+        except FileNotFoundError as error:
+            if self._fingerprint is None:
+                return False  # not written yet: a first launch, or a failed write
+            path = storage.main_file_path(data_dir=self.data_dir)
+            _logger.warning("the data file is missing: %s", path)
+            raise DataFileMissingError(path) from error
+        digest = storage.fingerprint(content)
+        if digest == self._fingerprint:
+            return False
+        store = _parse(content, self.data_dir)
+        if self._write_failed:
+            # SPECIFICATION.md §2.9, known limits.
+            _logger.warning("fresh data replaced a change that could not be saved")
+        self._write_failed = False
+        self.session = store.into_session()
+        self._fingerprint = digest
+        self._pending_archives.clear()
+        journal = {entry.id for entry in self.session.day.deletions}
+        self._undo_stack = [item for item in self._undo_stack if item in journal]
+        self._reloaded = True
+        self.ensure_day()
+        return True
+
+    def take_reloaded(self) -> bool:
+        """Whether fresh data replaced memory since the last call."""
+        reloaded, self._reloaded = self._reloaded, False
+        return reloaded
+
+    def _gesture[T](self, apply: Callable[[Session], T]) -> T:
+        """One gesture (§2.9): read again, apply once, write.
+
+        Refused on data that changed, the gesture raises GestureRefusedError
+        and memory is exactly the data as read: nothing is written. On data
+        that did not change, a refusal stays the bug it always was, and
+        raises as is. A failed write leaves the change in memory, see the
+        class docstring.
+        """
+        fresh = copy.deepcopy(self.session) if self._reread() else None
+        try:
+            result = apply(self.session)
+        except (LockedError, KeyError, ValueError) as error:
+            if fresh is None:
+                raise
+            self.session = fresh
+            _logger.info("a gesture no longer applies to the fresh data")
+            raise GestureRefusedError from error
+        self._save()
+        return result
+
+    # Mutations below name the matching Session method for _gesture, and
+    # supply now/today from self.clock() where the operation needs one.
+    # Business errors (LockedError, KeyError, ValueError) come straight from
+    # Session when the data did not change.
 
     def add(self, text: str) -> Task:
-        task = self.session.add(text)
-        self._save()
-        return task
+        return self._gesture(lambda session: session.add(text))
 
     def add_struck(self, text: str) -> Task:
-        task = self.session.add_struck(text, now=self.clock())
-        self._save()
-        return task
+        return self._gesture(lambda session: session.add_struck(text, now=self.clock()))
 
     def strike(self, task_id: str) -> None:
-        self.session.strike(task_id, now=self.clock())
-        self._save()
+        self._gesture(lambda session: session.strike(task_id, now=self.clock()))
 
     def unstrike(self, task_id: str) -> None:
-        self.session.unstrike(task_id)
-        self._save()
+        self._gesture(lambda session: session.unstrike(task_id))
 
     def rename(self, task_id: str, text: str) -> None:
-        self.session.rename(task_id, text)
-        self._save()
+        self._gesture(lambda session: session.rename(task_id, text))
 
     def set_priority(self, task_id: str, *, priority: bool) -> None:
-        self.session.set_priority(task_id, priority=priority)
-        self._save()
+        self._gesture(lambda session: session.set_priority(task_id, priority=priority))
 
     def delete(self, task_id: str) -> None:
-        self.session.delete(task_id, now=self.clock())
-        # Before the write: a failed write leaves the deletion in memory
-        # (see the class docstring), and it stays undoable.
-        self._undo_stack.append(task_id)
-        self._save()
+        def apply(session: Session) -> None:
+            session.delete(task_id, now=self.clock())
+            # Before the write: a failed write leaves the deletion in memory
+            # (see the class docstring), and it stays undoable.
+            self._undo_stack.append(task_id)
+
+        self._gesture(apply)
 
     def move_before(self, task_id: str, target_id: str | None) -> None:
-        self.session.move_before(task_id, target_id)
-        self._save()
+        self._gesture(lambda session: session.move_before(task_id, target_id))
 
     def undo_last_deletion(self) -> Task:
-        """Undo this device's most recent deletion still on the stack."""
+        """Undo this device's most recent deletion still on the stack.
+
+        The target is chosen before reading again: gone from the fresh
+        journal, the undo is refused rather than moved to an older deletion.
+        """
         if not self._undo_stack:
             raise ValueError("no deletion to undo")
-        task = self.session.undo_deletion(self._undo_stack[-1])
-        # Before the write: a failed write leaves the task restored in memory
-        # (see the class docstring), and undoing it again would raise.
-        self._undo_stack.pop()
-        self._save()
-        return task
+        target = self._undo_stack[-1]
+
+        def apply(session: Session) -> Task:
+            task = session.undo_deletion(target)
+            # Before the write: a failed write leaves the task restored in
+            # memory (see the class docstring), and undoing it again would
+            # raise.
+            self._undo_stack.pop()
+            return task
+
+        return self._gesture(apply)
 
     def lock(self) -> None:
-        self.session.lock()
-        self._save()
+        self._gesture(lambda session: session.lock())
 
     def unlock(self) -> None:
-        self.session.unlock()
-        self._save()
+        self._gesture(lambda session: session.unlock())
 
     def add_to_reserve(self, text: str) -> ReserveItem:
-        item = self.session.add_to_reserve(text, today=reference_date(self.clock()))
-        self._save()
-        return item
+        return self._gesture(
+            lambda session: session.add_to_reserve(
+                text, today=reference_date(self.clock())
+            )
+        )
 
     def rename_reserve(self, item_id: str, text: str) -> None:
-        self.session.rename_reserve(item_id, text)
-        self._save()
+        self._gesture(lambda session: session.rename_reserve(item_id, text))
 
     def set_reserve_priority(self, item_id: str, *, priority: bool) -> None:
-        self.session.set_reserve_priority(item_id, priority=priority)
-        self._save()
+        self._gesture(
+            lambda session: session.set_reserve_priority(item_id, priority=priority)
+        )
 
     def delete_from_reserve(self, item_id: str) -> None:
-        self.session.delete_from_reserve(item_id)
-        self._save()
+        self._gesture(lambda session: session.delete_from_reserve(item_id))
 
     def move_reserve_before(self, item_id: str, target_id: str | None) -> None:
-        self.session.move_reserve_before(item_id, target_id)
-        self._save()
+        self._gesture(lambda session: session.move_reserve_before(item_id, target_id))
 
     def draw_from_reserve(self, item_id: str) -> Task:
-        task = self.session.draw_from_reserve(item_id)
-        self._save()
-        return task
+        return self._gesture(lambda session: session.draw_from_reserve(item_id))
 
     def send_to_reserve(self, task_id: str) -> ReserveItem:
-        item = self.session.send_to_reserve(task_id, today=reference_date(self.clock()))
-        self._save()
-        return item
+        return self._gesture(
+            lambda session: session.send_to_reserve(
+                task_id, today=reference_date(self.clock())
+            )
+        )
 
     def add_to_tomorrow(self, text: str) -> PreparedTask:
-        task = self.session.add_to_tomorrow(text)
-        self._save()
-        return task
+        return self._gesture(lambda session: session.add_to_tomorrow(text))
 
     def rename_tomorrow(self, task_id: str, text: str) -> None:
-        self.session.rename_tomorrow(task_id, text)
-        self._save()
+        self._gesture(lambda session: session.rename_tomorrow(task_id, text))
 
     def set_tomorrow_priority(self, task_id: str, *, priority: bool) -> None:
-        self.session.set_tomorrow_priority(task_id, priority=priority)
-        self._save()
+        self._gesture(
+            lambda session: session.set_tomorrow_priority(task_id, priority=priority)
+        )
 
     def delete_from_tomorrow(self, task_id: str) -> None:
-        self.session.delete_from_tomorrow(task_id)
-        self._save()
+        self._gesture(lambda session: session.delete_from_tomorrow(task_id))
 
     def move_tomorrow_before(self, task_id: str, target_id: str | None) -> None:
-        self.session.move_tomorrow_before(task_id, target_id)
-        self._save()
+        self._gesture(lambda session: session.move_tomorrow_before(task_id, target_id))
 
     def move_to_tomorrow(self, task_id: str) -> PreparedTask:
-        task = self.session.move_to_tomorrow(task_id)
-        self._save()
-        return task
+        return self._gesture(lambda session: session.move_to_tomorrow(task_id))
 
     def move_reserve_to_tomorrow(self, item_id: str) -> PreparedTask:
-        task = self.session.move_reserve_to_tomorrow(item_id)
-        self._save()
-        return task
+        return self._gesture(lambda session: session.move_reserve_to_tomorrow(item_id))
 
     def move_to_today(self, task_id: str) -> Task:
-        task = self.session.move_to_today(task_id)
-        self._save()
-        return task
+        return self._gesture(lambda session: session.move_to_today(task_id))
 
     def send_tomorrow_to_reserve(self, task_id: str) -> ReserveItem:
-        item = self.session.send_tomorrow_to_reserve(
-            task_id, today=reference_date(self.clock())
+        return self._gesture(
+            lambda session: session.send_tomorrow_to_reserve(
+                task_id, today=reference_date(self.clock())
+            )
         )
-        self._save()
-        return item
 
     def add_recurring(
         self,
@@ -469,11 +548,11 @@ class App:
         weekdays: list[int],
         cadence: Cadence = Cadence.WEEKLY,
     ) -> RecurringItem:
-        item = self.session.add_recurring(
-            text, weekdays, cadence=cadence, today=reference_date(self.clock())
+        return self._gesture(
+            lambda session: session.add_recurring(
+                text, weekdays, cadence=cadence, today=reference_date(self.clock())
+            )
         )
-        self._save()
-        return item
 
     def edit_recurring(
         self,
@@ -483,15 +562,15 @@ class App:
         weekdays: list[int] | None = None,
         cadence: Cadence | None = None,
     ) -> RecurringItem:
-        item = self.session.edit_recurring(
-            item_id,
-            text=text,
-            weekdays=weekdays,
-            cadence=cadence,
-            today=reference_date(self.clock()),
+        return self._gesture(
+            lambda session: session.edit_recurring(
+                item_id,
+                text=text,
+                weekdays=weekdays,
+                cadence=cadence,
+                today=reference_date(self.clock()),
+            )
         )
-        self._save()
-        return item
 
     def cadence(self, item: RecurringItem) -> Cadence:
         """``item``'s cadence seen from the reference date's week.
@@ -506,5 +585,4 @@ class App:
         return self.session.recurring_due_tomorrow(reference_date(self.clock()))
 
     def delete_recurring(self, item_id: str) -> None:
-        self.session.delete_recurring(item_id)
-        self._save()
+        self._gesture(lambda session: session.delete_recurring(item_id))

@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -108,14 +109,15 @@ def _open_private(path: str, flags: int) -> int:
     return os.open(path, flags, 0o600)
 
 
-def _atomic_write_json(path: Path, obj: dict[str, Any]) -> None:
+def _atomic_write_json(path: Path, obj: dict[str, Any]) -> bytes:
+    """Write obj to path atomically and return the bytes written."""
     # docs/adr/0003-single-json-file.md: temp file in the same directory,
     # flush, fsync the file, replace, then fsync the directory.
+    content = (json.dumps(obj, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:
-        with open(tmp, "w", encoding="utf-8", opener=_open_private) as handle:
-            json.dump(obj, handle, ensure_ascii=False, indent=2)
-            handle.write("\n")
+        with open(tmp, "wb", opener=_open_private) as handle:
+            handle.write(content)
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(tmp, path)
@@ -131,6 +133,7 @@ def _atomic_write_json(path: Path, obj: dict[str, Any]) -> None:
         os.fsync(dir_fd)
     finally:
         os.close(dir_fd)
+    return content
 
 
 def main_file_path(*, data_dir: Path | None = None) -> Path:
@@ -138,9 +141,27 @@ def main_file_path(*, data_dir: Path | None = None) -> Path:
     return (data_dir or xdg_data_dir()) / _MAIN_FILE
 
 
+def fingerprint(content: bytes) -> str:
+    """What tells two versions of the main file apart (SPECIFICATION.md §2.9).
+
+    The content, never the modification time: a sync tool copies that one
+    from the device the change came from.
+    """
+    return hashlib.sha256(content).hexdigest()
+
+
+def read_main(*, data_dir: Path | None = None) -> bytes:
+    """The main file's bytes, for parse_main and fingerprint to share one read."""
+    return main_file_path(data_dir=data_dir).read_bytes()
+
+
 def load(*, data_dir: Path | None = None) -> Store:
+    return parse_main(read_main(data_dir=data_dir), data_dir=data_dir)
+
+
+def parse_main(original: bytes, *, data_dir: Path | None = None) -> Store:
+    """Migrate and validate the main file's bytes, as read from data_dir."""
     path = main_file_path(data_dir=data_dir)
-    original = path.read_bytes()
     raw = json.loads(original.decode("utf-8"))
     store = Store.from_dict(migrate(raw))
     # migrate has validated raw: a dict with an int version.
@@ -180,12 +201,13 @@ def _back_up_before_migration(path: Path, original: bytes, version: int) -> None
     _logger.info("backed up the data file before migration: %s", backup)
 
 
-def save(store: Store, *, data_dir: Path | None = None) -> None:
+def save(store: Store, *, data_dir: Path | None = None) -> str:
+    """Write the main file and return the fingerprint of what was written."""
     target = data_dir or xdg_data_dir()
     # Explicit 0o700, not the umask-masked default: same reasoning as
     # _open_private (ADR 0003 addendum).
     target.mkdir(parents=True, exist_ok=True, mode=0o700)
-    _atomic_write_json(target / _MAIN_FILE, store.to_dict())
+    return fingerprint(_atomic_write_json(target / _MAIN_FILE, store.to_dict()))
 
 
 def data_dir_exists(*, data_dir: Path | None = None) -> bool:

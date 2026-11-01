@@ -558,6 +558,11 @@ dessus, une fois. L'empreinte est le SHA-256 du contenu, jamais la date de
 modification, que l'outil de synchronisation recopie depuis l'appareil
 d'origine. Elle est mise à jour après chaque écriture de Rature.
 
+Si l'empreinte n'a pas changé, rien ne bouge en mémoire, passage du jour
+dû compris : le geste s'applique à la journée affichée, et la minuterie de
+§3.1 passe le jour dans la minute. Seul un fichier changé vaut un
+chargement.
+
 Une relecture vaut un chargement, avant un geste comme au retour du focus
 (§3.1) : si les données relues portent une date dépassée, le passage du
 jour s'applique en mémoire sur elles (§2.5), sans rien écrire. Sans cela,
@@ -705,8 +710,9 @@ est en §3.6. Aucun autre objet n'appelle `App.open`.
 appelle `App.ensure_day`. Si elle rend une journée, toutes les vues se
 rafraîchissent et une bannière neutre l'annonce, voir §3.8. Depuis le
 chantier 10, le passage ainsi détecté reste en mémoire et ne s'écrit qu'au
-premier geste (§2.5) : la minuterie n'écrit jamais rien. La bannière ne
-change pas avec Demain : elle ne dit rien de la liste préparée entrée dans
+premier geste (§2.5) : la minuterie n'écrit jamais rien. Si la relecture
+qui précède un geste (§2.9) apporte une date plus récente que la journée
+affichée, la même bannière s'affiche. La bannière ne change pas avec Demain : elle ne dit rien de la liste préparée entrée dans
 la journée. Un délai fixe et
 court, plutôt qu'un réveil calculé jusqu'à 04:00, parce que le calcul se
 trompe une nuit par an au changement d'heure.

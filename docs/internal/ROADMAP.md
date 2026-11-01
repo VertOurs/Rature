@@ -666,7 +666,7 @@ Règles communes, sur le dossier local :
 - [x] A4. Passage du jour en mémoire, écrit au premier geste (§2.5, §3.1,
       §3.5, §3.14). Nouvelle chaîne de la bannière de nouveau jour, six
       catalogues (§3.8)
-- [ ] A5a. Relecture avant le geste, empreinte SHA-256, passage du jour
+- [x] A5a. Relecture avant le geste, empreinte SHA-256, passage du jour
       sur les données relues, geste refusé et toast (§2.9, §3.17). Tests
       « deux appareils » dans `core`, deux `App` sur le même dossier
       temporaire, chacune avec son horloge :
@@ -686,7 +686,11 @@ Règles communes, sur le dossier local :
 - [ ] A6. Rechargement au retour du focus, nettoyage de la pile (§3.1,
       §3.2, §3.5, §3.14). Test `gtk4-broadwayd` du cas de l'ADR 0007 : menu
       « ⋯ » ouvert, fichier changé, retour du focus. La ligne n'est pas
-      détruite, le rechargement a lieu à la fermeture du menu
+      détruite, le rechargement a lieu à la fermeture du menu. Au retour
+      du focus, appeler aussi la détection du passage du jour (en mémoire,
+      sans écrire) : au réveil, la fenêtre reprend le focus, ce qui referme
+      le créneau de la décision 1, où un geste sur un fichier inchangé
+      s'applique à la journée affichée
 - [ ] A7. Bannière de conflit, bannière unique à priorités (§3.6, §3.17)
 
 Dossier choisi :

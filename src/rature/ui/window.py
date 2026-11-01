@@ -16,6 +16,7 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 
 from rature.core.app import (  # noqa: E402
     App,
+    GestureRefusedError,
     LockedError,
 )
 from rature.ui import APP_ID  # noqa: E402
@@ -41,6 +42,7 @@ class RatureWindow(Adw.ApplicationWindow):
 
     __gtype_name__ = "RatureWindow"
 
+    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()
     sidebar_list: Gtk.ListBox = Gtk.Template.Child()
     day_sidebar_row: Gtk.ListBoxRow = Gtk.Template.Child()
@@ -141,6 +143,7 @@ class RatureWindow(Adw.ApplicationWindow):
         # not be written, say so from the start.
         self._write_failure_active = self.app.empty_day_write_failed
         self._new_day_pending = False
+        self._refresh_source_id = 0
         self._new_day_dismissed = False
         self.day_view.banner.connect("button-clicked", self._on_banner_button_clicked)
         self._update_banner()
@@ -199,16 +202,13 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _on_destroy(self, _window: Gtk.Window) -> None:
         GLib.source_remove(self._timer_id)
+        if self._refresh_source_id:
+            GLib.source_remove(self._refresh_source_id)
 
     def _on_ensure_day_tick(self) -> bool:
-        def tick() -> None:
-            if self.app.ensure_day() is not None:
-                self._new_day_pending = True
-                self._new_day_dismissed = False
-
         # SPECIFICATION.md §3.1: the tick never writes, and §3.6 only lifts
         # the write-failure banner on a write that reached disk.
-        self._perform(tick, clear_banner_on_success=False)
+        self._perform(self.app.ensure_day, clear_banner_on_success=False)
         self._refresh_all()
         return GLib.SOURCE_CONTINUE
 
@@ -221,6 +221,20 @@ class RatureWindow(Adw.ApplicationWindow):
                 window.refresh(archived_date)
             elif isinstance(window, StatisticsWindow):
                 window.refresh()
+
+    def _refresh_soon(self) -> None:
+        # Fresh data replaced the rows' models, also on the path of a refused
+        # gesture. Not right here: a rename reaches _perform from inside a
+        # view's refresh, which flushes pending edits before rebuilding.
+        if self._refresh_source_id:
+            return
+
+        def refresh_once() -> bool:
+            self._refresh_source_id = 0
+            self._refresh_all()
+            return GLib.SOURCE_REMOVE
+
+        self._refresh_source_id = GLib.idle_add(refresh_once)
 
     def _refresh_all(self) -> None:
         self.day_view.refresh()
@@ -340,10 +354,17 @@ class RatureWindow(Adw.ApplicationWindow):
         #
         # clear_banner_on_success=False is for the timer tick, which writes
         # nothing: §3.6 only lifts the banner on a write that reached disk.
+        shown_date = self.app.session.day.date
         try:
             action()
         except OSError:
             self._write_failure_active = True
+            success = False
+        except GestureRefusedError:
+            # SPECIFICATION.md §3.17: expected, so caught before the bugs.
+            self.toast_overlay.add_toast(
+                Adw.Toast.new(_("This task changed on another device."))
+            )
             success = False
         except (LockedError, KeyError, ValueError):
             _logger.exception("refused business command")
@@ -356,6 +377,13 @@ class RatureWindow(Adw.ApplicationWindow):
         # if the main file then failed: the archive is on disk.
         for archived_date in self.app.take_written_archives():
             self._refresh_archive_windows(archived_date)
+        # SPECIFICATION.md §3.1: the day on screen moved on, by the timer or
+        # through fresh data.
+        if self.app.session.day.date > shown_date:
+            self._new_day_pending = True
+            self._new_day_dismissed = False
+        if self.app.take_reloaded():
+            self._refresh_soon()
         self._update_banner()
         return success
 

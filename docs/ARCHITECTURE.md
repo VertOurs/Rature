@@ -159,11 +159,17 @@ likewise wrap `core/search`, `core/stats` and `core/export` so `ui/`
 imports only `rature.core.app`.
 
 A per-mutation wrapper over `Session` (`add`, `strike`, `delete`,
-`move_before`, `add_to_reserve`, ...) supplies `now`/`today` from `clock`
-and saves afterwards. Business errors (`LockedError`, `KeyError`,
-`ValueError`) propagate as-is; `App` does not swallow them. A save that
-fails mid-mutation does not undo the in-memory mutation, a deliberate
-decision documented on the class itself.
+`move_before`, `add_to_reserve`, ...) goes through `App._gesture`, which reads
+the main file again, applies the gesture once and saves. `now`/`today` come
+from `clock`. A file whose SHA-256 fingerprint changed since the last read or
+write counts as a load: the fresh data replaces memory, with a rollover if its
+date is past, and `take_reloaded` tells the interface to rebuild its views. An
+unchanged file leaves memory alone. A gesture that no longer applies to fresh
+data raises `GestureRefusedError` and leaves memory exactly as read, nothing
+written. On unchanged data, business errors (`LockedError`, `KeyError`,
+`ValueError`) propagate as-is; `App` does not swallow them. A save that fails
+mid-mutation does not undo the in-memory mutation, a deliberate decision
+documented on the class itself (`SPECIFICATION.md` §2.9).
 
 A graphical application can be written calling only `App`: no
 product-behaviour decision is left to make in `ui/`.

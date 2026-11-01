@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 16:56+0100\n"
+"POT-Creation-Date: 2026-11-01 17:19+0100\n"
 "PO-Revision-Date: 2026-10-29 12:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Spanish\n"
@@ -397,23 +397,23 @@ msgstr "Atajos de teclado"
 msgid "About Rature"
 msgstr "Acerca de Rature"
 
-#: data/ui/window.ui:43 data/ui/window.ui:45
+#: data/ui/window.ui:45 data/ui/window.ui:47
 msgid "Main menu"
 msgstr "Menú principal"
 
-#: data/ui/window.ui:63 data/ui/window.ui:125
+#: data/ui/window.ui:65 data/ui/window.ui:127
 msgid "Day"
 msgstr "Hoy"
 
-#: data/ui/window.ui:79 data/ui/window.ui:146
+#: data/ui/window.ui:81 data/ui/window.ui:150
 msgid "Tomorrow"
 msgstr "Mañana"
 
-#: data/ui/window.ui:93 data/ui/window.ui:149
+#: data/ui/window.ui:95 data/ui/window.ui:153
 msgid "Reserve"
 msgstr "Reserva"
 
-#: data/ui/window.ui:107 data/ui/window.ui:152
+#: data/ui/window.ui:109 data/ui/window.ui:156
 msgid "Recurring"
 msgstr "Recurrentes"
 
@@ -742,14 +742,18 @@ msgstr "Deshacer el tachado"
 msgid "Strike through"
 msgstr "Tachar"
 
-#: src/rature/ui/window.py:384
+#: src/rature/ui/window.py:366
+msgid "This task changed on another device."
+msgstr "Esta tarea cambió en otro dispositivo."
+
+#: src/rature/ui/window.py:412
 msgid "Changes could not be saved to disk."
 msgstr "No se pudieron guardar los cambios en el disco."
 
-#: src/rature/ui/window.py:388
+#: src/rature/ui/window.py:416
 msgid "A new day has started."
 msgstr "Ha empezado un nuevo día."
 
-#: src/rature/ui/window.py:389
+#: src/rature/ui/window.py:417
 msgid "Dismiss"
 msgstr "Descartar"
