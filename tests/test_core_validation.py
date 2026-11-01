@@ -12,7 +12,7 @@ from typing import Any
 import pytest
 
 from rature.core import storage, validation
-from rature.core.app import App, StartupOutcome
+from rature.core.app import App, DataFileUnreadableError, StartupOutcome
 from rature.core.models import (
     Deletion,
     Origin,
@@ -62,9 +62,7 @@ def test_released_archives_load(tmp_path: Path, tag: str) -> None:
 
 
 @pytest.mark.parametrize("tag", TAGS)
-def test_a_released_data_directory_opens_without_quarantine(
-    tmp_path: Path, tag: str
-) -> None:
+def test_a_released_data_directory_opens_as_loaded(tmp_path: Path, tag: str) -> None:
     shutil.copytree(FORMATS / tag, tmp_path / "data")
     moment = datetime(2026, 8, 27, 9, 0, tzinfo=PARIS)
     app = App.open(tmp_path / "data", clock=lambda: moment)
@@ -226,13 +224,15 @@ def test_an_archive_with_main_file_keys_is_refused(tmp_path: Path) -> None:
         storage.load_archive(date(2026, 8, 27), data_dir=tmp_path)
 
 
-def test_an_invalid_main_file_takes_the_quarantine_path(tmp_path: Path) -> None:
+def test_an_invalid_main_file_is_refused_and_left_alone(tmp_path: Path) -> None:
     data = _main_file()
     data["tasks"][0]["done"] = "yes"
     (tmp_path / "data.json").write_text(json.dumps(data), encoding="utf-8")
     moment = datetime(2026, 8, 27, 9, 0, tzinfo=PARIS)
-    app = App.open(tmp_path, clock=lambda: moment)
-    assert app.startup is StartupOutcome.RECOVERED_FROM_CORRUPTION
+    before = (tmp_path / "data.json").read_bytes()
+    with pytest.raises(DataFileUnreadableError):
+        App.open(tmp_path, clock=lambda: moment)
+    assert (tmp_path / "data.json").read_bytes() == before
 
 
 # Messages name the key and the types, never the value: it can be the

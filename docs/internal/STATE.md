@@ -20,7 +20,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   vide). Découpage de l'implémentation consigné dans `ROADMAP.md` le
   1er novembre 2026, limite du geste perdu après un échec d'écriture
   ajoutée à §2.9. Essai de `os.link` sur le portail réussi le même jour,
-  sans repli. A1 (#218) et A2 faites. Étape suivante : A3.
+  sans repli. A1 (#218), A2 (#219) et A3 faites. Étape suivante : A4.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid

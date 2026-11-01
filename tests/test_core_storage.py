@@ -28,14 +28,15 @@ from rature.core.storage import (
     _atomic_write_json,
     _back_up_before_migration,
     archive,
+    data_dir_exists,
     list_archives,
     load,
     load_archive,
     main_file_path,
-    quarantine,
     remove_stale_temp_files,
     restrict_data_dir_permissions,
     save,
+    set_aside,
     xdg_data_dir,
 )
 
@@ -218,30 +219,30 @@ def test_load_truncated_json_raises(tmp_path: Path) -> None:
         load(data_dir=tmp_path)
 
 
-def test_quarantine_renames_the_main_file(tmp_path: Path) -> None:
+def test_set_aside_renames_the_main_file(tmp_path: Path) -> None:
     save(make_store(), data_dir=tmp_path)
-    dest = quarantine(STAMP, data_dir=tmp_path)
-    assert dest == tmp_path / "data.json.bad-20260824-143207"
+    dest = set_aside(STAMP, data_dir=tmp_path)
+    assert dest == tmp_path / "data.json.20260824-143207.bak"
     assert dest.exists()
     assert not (tmp_path / "data.json").exists()
 
 
-def test_quarantine_preserves_the_content(tmp_path: Path) -> None:
+def test_set_aside_preserves_the_content(tmp_path: Path) -> None:
     save(make_store(), data_dir=tmp_path)
     original = (tmp_path / "data.json").read_text(encoding="utf-8")
-    dest = quarantine(STAMP, data_dir=tmp_path)
+    dest = set_aside(STAMP, data_dir=tmp_path)
     assert dest.read_text(encoding="utf-8") == original
 
 
-def test_quarantine_does_not_overwrite_a_same_second_collision(
+def test_set_aside_does_not_overwrite_a_same_second_collision(
     tmp_path: Path,
 ) -> None:
-    (tmp_path / "data.json.bad-20260824-143207").write_text("first", encoding="utf-8")
+    (tmp_path / "data.json.20260824-143207.bak").write_text("first", encoding="utf-8")
     (tmp_path / "data.json").write_text("second", encoding="utf-8")
-    dest = quarantine(STAMP, data_dir=tmp_path)
-    assert dest == tmp_path / "data.json.bad-20260824-143207-2"
+    dest = set_aside(STAMP, data_dir=tmp_path)
+    assert dest == tmp_path / "data.json.20260824-143207-2.bak"
     assert dest.read_text(encoding="utf-8") == "second"
-    assert (tmp_path / "data.json.bad-20260824-143207").read_text(
+    assert (tmp_path / "data.json.20260824-143207.bak").read_text(
         encoding="utf-8"
     ) == "first"
 
@@ -602,3 +603,21 @@ def test_remove_stale_temp_files_warns_and_goes_on_when_a_removal_fails(
     assert not removed.exists()
     assert caplog.records[0].levelno == logging.WARNING
     assert refused.name in caplog.text
+
+
+def test_data_dir_exists_tells_a_missing_folder(tmp_path: Path) -> None:
+    assert data_dir_exists(data_dir=tmp_path) is True
+    assert data_dir_exists(data_dir=tmp_path / "missing") is False
+
+
+def test_data_dir_exists_lets_a_refused_access_go_up(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Path.exists would answer False here, and a folder out of reach would
+    # pass for a first launch.
+    def refuse(_path: Path) -> None:
+        raise PermissionError("no access")
+
+    monkeypatch.setattr(os, "stat", refuse)
+    with pytest.raises(PermissionError):
+        data_dir_exists(data_dir=tmp_path)

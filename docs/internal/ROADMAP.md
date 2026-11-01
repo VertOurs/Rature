@@ -658,7 +658,7 @@ Règles communes, sur le dossier local :
       passe encore le jour et le journal part avec l'archive. Sans cela,
       une suppression faite avant 04:00 laisse le bouton actif sur un
       journal vide, et le clic lève une `KeyError` traitée comme un bogue
-- [ ] A3. Démarrage sans écriture, message bloquant, mise de côté, fin de
+- [x] A3. Démarrage sans écriture, message bloquant, mise de côté, fin de
       la quarantaine (§2.9, §3.6). `restrict_data_dir_permissions` suppose
       à tort que le dossier existe après `App.open` (commentaire de
       `core/app.py`) : faux au premier lancement, où rien n'est créé avant
