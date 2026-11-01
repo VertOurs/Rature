@@ -17,6 +17,13 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   startup. Only Rature's own exact names are touched: a sync tool's
   temporary files and conflict copies in the same folder stay in place.
 
+### Changed
+
+- Undo now follows the deletions made on this device since launch, most
+  recent first, rather than the last entry of the day's journal, which may
+  come from another device. A relaunch therefore leaves nothing to undo,
+  even when the day's journal holds entries.
+
 ### Fixed
 
 - A data file or an archive with a value of the wrong type (`"done":

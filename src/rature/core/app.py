@@ -101,11 +101,20 @@ class App:
         # True between a rollover that archived a day and the write that
         # persists it: a failed write leaves it set so ensure_day retries.
         self._save_pending = False
+        # Identifiers of this device's deletions since launch, most recent
+        # last (SPECIFICATION.md §3.2, ADR 0009). Here rather than in Session
+        # because it outlives the data it points into.
+        self._undo_stack: list[str] = []
 
     @property
     def save_pending(self) -> bool:
         """A rolled-over day is archived but not yet written to disk."""
         return self._save_pending
+
+    @property
+    def can_undo(self) -> bool:
+        """A deletion made on this device today can still be undone."""
+        return bool(self._undo_stack)
 
     @classmethod
     def open(
@@ -193,6 +202,8 @@ class App:
         archived: Day | None = None
         if self.session.rollover_due(now):
             archived = self.session.roll_over(now)
+            # The journal left with the day, and archiving below may raise.
+            self._undo_stack.clear()
             _logger.info(
                 "day rolled over from %s to %s", archived.date, self.session.day.date
             )
@@ -333,6 +344,9 @@ class App:
 
     def delete(self, task_id: str) -> None:
         self.session.delete(task_id, now=self.clock())
+        # Before the write: a failed write leaves the deletion in memory
+        # (see the class docstring), and it stays undoable.
+        self._undo_stack.append(task_id)
         self._save()
 
     def move_before(self, task_id: str, target_id: str | None) -> None:
@@ -340,7 +354,13 @@ class App:
         self._save()
 
     def undo_last_deletion(self) -> Task:
-        task = self.session.undo_last_deletion()
+        """Undo this device's most recent deletion still on the stack."""
+        if not self._undo_stack:
+            raise ValueError("no deletion to undo")
+        task = self.session.undo_deletion(self._undo_stack[-1])
+        # Before the write: a failed write leaves the task restored in memory
+        # (see the class docstring), and undoing it again would raise.
+        self._undo_stack.pop()
         self._save()
         return task
 

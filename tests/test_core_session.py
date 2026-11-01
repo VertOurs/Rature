@@ -177,7 +177,7 @@ def test_undo_restores_the_last_deleted_task_and_drops_the_entry() -> None:
     gone = session.add("drop")
     session.delete(gone.id, now=STAMP)
 
-    restored = session.undo_last_deletion()
+    restored = session.undo_deletion(gone.id)
 
     assert (restored.id, restored.num, restored.text) == (gone.id, 2, "drop")
     assert session.day.deletions == []
@@ -188,7 +188,7 @@ def test_undo_puts_the_task_back_at_its_recorded_index() -> None:
     session = make_session()
     a, b, c = session.add("a"), session.add("b"), session.add("c")
     session.delete(b.id, now=STAMP)
-    session.undo_last_deletion()
+    session.undo_deletion(b.id)
     assert [task.id for task in session.day.tasks] == [a.id, b.id, c.id]
 
 
@@ -197,8 +197,8 @@ def test_undo_clamps_the_index_when_the_list_has_shrunk() -> None:
     a, b, c = session.add("a"), session.add("b"), session.add("c")
     session.delete(c.id, now=STAMP)  # index 2
     session.delete(a.id, now=STAMP)  # list is now [b]
-    session.undo_last_deletion()  # a restored at min(0, 1)
-    session.undo_last_deletion()  # c restored at min(2, 2)
+    session.undo_deletion(a.id)  # a restored at min(0, 1)
+    session.undo_deletion(c.id)  # c restored at min(2, 2)
     assert [task.id for task in session.day.tasks] == [a.id, b.id, c.id]
 
 
@@ -207,27 +207,31 @@ def test_undo_restores_a_struck_task_struck() -> None:
     task = session.add("done thing")
     session.strike(task.id, now=STAMP)
     session.delete(task.id, now=STAMP)
-    restored = session.undo_last_deletion()
+    restored = session.undo_deletion(task.id)
     assert restored.done is True
     assert restored.done_at == STAMP
 
 
-def test_undo_takes_only_the_most_recent_deletion() -> None:
+def test_undo_restores_only_the_named_entry() -> None:
     session = make_session()
     first = session.add("first")
     second = session.add("second")
     session.delete(first.id, now=STAMP)
     session.delete(second.id, now=STAMP)
 
-    assert session.undo_last_deletion().id == second.id
-    assert session.undo_last_deletion().id == first.id
-    assert session.day.deletions == []
+    # Not the last entry: it may come from another device (ADR 0009).
+    assert session.undo_deletion(first.id).id == first.id
+    assert [entry.id for entry in session.day.deletions] == [second.id]
+    assert [task.id for task in session.day.tasks] == [first.id]
 
 
-def test_undo_with_an_empty_journal_is_refused() -> None:
+def test_undo_of_an_identifier_not_in_the_journal_is_refused() -> None:
     session = make_session()
-    with pytest.raises(ValueError):
-        session.undo_last_deletion()
+    deleted = session.add("deleted")
+    session.delete(deleted.id, now=STAMP)
+    with pytest.raises(KeyError):
+        session.undo_deletion("unknown")
+    assert [entry.id for entry in session.day.deletions] == [deleted.id]
 
 
 def test_undo_does_not_reuse_the_freed_number() -> None:
@@ -236,7 +240,7 @@ def test_undo_does_not_reuse_the_freed_number() -> None:
     two = session.add("two")
     session.add("three")
     session.delete(two.id, now=STAMP)
-    session.undo_last_deletion()
+    session.undo_deletion(two.id)
     assert session.add("four").num == 4
     assert session._task(two.id).num == 2
 
@@ -246,7 +250,7 @@ def test_undo_works_while_the_list_is_frozen() -> None:
     task = session.add("thing")
     session.delete(task.id, now=STAMP)
     session.lock()
-    session.undo_last_deletion()
+    session.undo_deletion(task.id)
     assert [t.id for t in session.day.tasks] == [task.id]
 
 
@@ -256,7 +260,7 @@ def test_undo_restores_a_reserve_task_with_its_source() -> None:
     drawn = session.draw_from_reserve(item.id)
     session.delete(drawn.id, now=STAMP)
 
-    restored = session.undo_last_deletion()
+    restored = session.undo_deletion(drawn.id)
 
     assert restored.origin == Origin.RESERVE
     assert restored.source.id == item.id

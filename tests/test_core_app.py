@@ -689,3 +689,105 @@ def test_open_removes_temporary_files_left_by_a_crash(tmp_path: Path) -> None:
     assert not stale_main.exists()
     assert not stale_archive.exists()
     assert delivery.exists()
+
+
+def test_undo_follows_this_devices_deletions_most_recent_first(tmp_path: Path) -> None:
+    app = App.open(tmp_path)
+    assert app.can_undo is False
+    first, second = app.add("first"), app.add("second")
+    app.delete(first.id)
+    app.delete(second.id)
+
+    assert app.undo_last_deletion().id == second.id
+    assert app.can_undo is True
+    assert app.undo_last_deletion().id == first.id
+    assert app.can_undo is False
+    with pytest.raises(ValueError):
+        app.undo_last_deletion()
+
+
+def test_undo_leaves_another_devices_journal_entry_alone(tmp_path: Path) -> None:
+    now = datetime(2026, 8, 24, 14, 0, 0, tzinfo=PARIS)
+    elsewhere = App.open(tmp_path, clock=clock_at(now))
+    theirs = elsewhere.add("deleted elsewhere")
+    elsewhere.delete(theirs.id)
+
+    app = App.open(tmp_path, clock=clock_at(now))
+    assert app.can_undo is False  # the journal holds an entry, none of ours
+
+    ours = app.add("deleted here")
+    app.delete(ours.id)
+    assert app.undo_last_deletion().id == ours.id
+
+    assert [entry.id for entry in app.session.day.deletions] == [theirs.id]
+    assert app.can_undo is False
+
+
+def test_a_refused_deletion_leaves_the_undo_stack_unchanged(tmp_path: Path) -> None:
+    app = App.open(tmp_path)
+    with pytest.raises(KeyError):
+        app.delete("unknown")
+    assert app.can_undo is False
+
+
+def test_a_deletion_whose_write_failed_stays_undoable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = App.open(tmp_path)
+    task = app.add("thing")
+    monkeypatch.setattr(storage, "save", _raise_oserror)
+
+    with pytest.raises(OSError):
+        app.delete(task.id)
+
+    assert app.can_undo is True
+    monkeypatch.setattr(storage, "save", save)
+    assert app.undo_last_deletion().id == task.id
+
+
+def test_an_undo_whose_write_failed_leaves_the_stack_without_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = App.open(tmp_path)
+    earlier, task = app.add("earlier"), app.add("thing")
+    app.delete(earlier.id)
+    app.delete(task.id)
+    monkeypatch.setattr(storage, "save", _raise_oserror)
+
+    with pytest.raises(OSError):
+        app.undo_last_deletion()
+
+    # Restored in memory: a second click undoes the earlier deletion, and
+    # never raises KeyError on an entry that has already left the journal.
+    assert task.id in [t.id for t in app.session.day.tasks]
+    assert app.can_undo is True
+    with pytest.raises(OSError):
+        app.undo_last_deletion()
+    assert earlier.id in [t.id for t in app.session.day.tasks]
+    assert app.can_undo is False
+
+
+def test_the_day_rollover_empties_the_undo_stack(tmp_path: Path) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, 3, 0, tzinfo=PARIS)))
+    task = app.add("deleted before 04:00")
+    app.delete(task.id)
+    app.clock = clock_at(datetime(2026, 8, 24, 4, 30, tzinfo=PARIS))
+
+    app.ensure_day()
+
+    assert app.can_undo is False
+
+
+def test_the_undo_stack_is_empty_even_if_archiving_the_day_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = App.open(tmp_path, clock=clock_at(datetime(2026, 8, 24, 3, 0, tzinfo=PARIS)))
+    task = app.add("deleted before 04:00")
+    app.delete(task.id)
+    app.clock = clock_at(datetime(2026, 8, 24, 4, 30, tzinfo=PARIS))
+    monkeypatch.setattr(storage, "archive", _raise_oserror)
+
+    with pytest.raises(OSError):
+        app.ensure_day()
+
+    assert app.can_undo is False

@@ -180,7 +180,7 @@ class RatureWindow(Adw.ApplicationWindow):
             "activate",
             lambda _a, _p: self._run_app_action(self.app.undo_last_deletion),
         )
-        undo.set_enabled(bool(self.app.session.day.deletions))
+        undo.set_enabled(self.app.can_undo)
         self.add_action(undo)
         self._undo_delete_action = undo
 
@@ -251,8 +251,8 @@ class RatureWindow(Adw.ApplicationWindow):
         self.reserve_view.refresh()
         self.recurring_view.refresh()
         # SPECIFICATION.md §3.2: the undo control, header button and
-        # Ctrl+Z alike, follows the day's deletion journal.
-        self._undo_delete_action.set_enabled(bool(self.app.session.day.deletions))
+        # Ctrl+Z alike, follows this device's own deletions.
+        self._undo_delete_action.set_enabled(self.app.can_undo)
 
     def send_to_day(self, item_id: str) -> None:
         # SPECIFICATION.md §3.3: the Reserve view's send button and the
