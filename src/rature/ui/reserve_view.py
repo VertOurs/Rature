@@ -59,6 +59,9 @@ class ReserveView(Adw.Bin):
         self.entry.connect("activate", self._on_entry_activate)
         self.refresh()
 
+    def has_open_row_editor(self) -> bool:
+        return list_helpers.editor_open(self.item_list)
+
     def refresh(self) -> None:
         # SPECIFICATION.md §3.2's "losing focus commits" applied to another
         # trigger: rebuilding the rows would otherwise discard whatever the

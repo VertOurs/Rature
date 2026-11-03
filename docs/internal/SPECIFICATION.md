@@ -559,8 +559,8 @@ modification, que l'outil de synchronisation recopie depuis l'appareil
 d'origine. Elle est mise à jour après chaque écriture de Rature.
 
 Si l'empreinte n'a pas changé, rien ne bouge en mémoire, passage du jour
-dû compris : le geste s'applique à la journée affichée, et la minuterie de
-§3.1 passe le jour dans la minute. Seul un fichier changé vaut un
+dû compris : le geste s'applique à la journée affichée, et la minuterie ou
+le retour du focus (§3.1) passe le jour. Seul un fichier changé vaut un
 chargement.
 
 Une relecture vaut un chargement, avant un geste comme au retour du focus
@@ -719,16 +719,22 @@ trompe une nuit par an au changement d'heure.
 
 **Retour du focus.** Ajouté au chantier 10 (§2.9). Quand la fenêtre
 principale reprend le focus, `data.json` est relu, sans surveillance de
-fichier. Si son empreinte n'a pas changé, rien ne bouge. Si elle a changé,
+fichier, et le passage du jour est détecté, en mémoire, sans rien écrire :
+au réveil d'un appareil, la fenêtre reprend le focus. Si l'empreinte n'a
+pas changé et qu'aucun passage n'est dû, rien ne bouge, aucune ligne n'est
+reconstruite. Si elle a changé,
 les données fraîches remplacent celles en mémoire, les vues se
 reconstruisent, et la pile d'annulation perd les entrées absentes du
 journal frais (§3.2). Si les données fraîches portent une date plus
 récente que la journée affichée, la bannière de nouveau jour s'affiche
 comme pour la minuterie. Jamais pendant qu'un menu « ⋯ » ou un renommage
-est ouvert : le rechargement attend sa fermeture. Leçon du retrait de
-l'ADR 0007, où une reconstruction au retour du focus détruisait une ligne
-sous son menu ouvert. Une relecture qui échoue suit §3.6, comme au
-démarrage.
+est ouvert : le rechargement attend sa fermeture. La minuterie suit la même
+attente, un seul mécanisme : le passage du jour arrive dès la fermeture.
+Leçon du retrait de l'ADR 0007, où une reconstruction au retour du focus
+détruisait une ligne sous son menu ouvert. Une relecture qui échoue suit
+§3.6, comme au démarrage. Une erreur de droits à la relecture ne va qu'au
+journal : aucun geste n'est perdu, et la bannière d'échec d'écriture
+serait fausse.
 
 ---
 

@@ -518,3 +518,55 @@ def test_after_a_failed_save_the_next_gesture_writes_without_asking(
         "from the laptop",
         "next gesture",
     ]
+
+
+def test_catch_up_on_an_unchanged_file_touches_nothing(data_dir: Path) -> None:
+    laptop = _device(data_dir)
+    laptop.add("from the laptop")
+    session = laptop.session
+    before = _main_bytes(data_dir)
+
+    laptop.catch_up()
+
+    assert laptop.session is session
+    assert not laptop.take_reloaded()
+    assert _main_bytes(data_dir) == before
+
+
+def test_catch_up_takes_what_changed_and_writes_nothing(data_dir: Path) -> None:
+    laptop = _device(data_dir)
+    laptop.add("from the laptop")
+    laptop.delete(laptop.session.day.tasks[0].id)
+    _device(data_dir).add("from the desktop")
+    before = _main_bytes(data_dir)
+
+    laptop.catch_up()
+
+    assert [task.text for task in laptop.session.day.tasks] == ["from the desktop"]
+    assert laptop.take_reloaded()
+    assert laptop.can_undo  # §3.2: the stack only loses what left the journal
+    assert _main_bytes(data_dir) == before
+
+
+def test_catch_up_rolls_a_due_day_over_in_memory(data_dir: Path) -> None:
+    laptop = _device(data_dir)
+    laptop.add("from the laptop")
+    before = _main_bytes(data_dir)
+    laptop.clock = _on(TUESDAY)
+
+    laptop.catch_up()
+
+    assert laptop.session.day.date == TUESDAY
+    assert _main_bytes(data_dir) == before
+    assert storage.list_archives(data_dir=data_dir) == []
+
+
+def test_catch_up_lets_a_read_failure_through_unwritten(data_dir: Path) -> None:
+    laptop = _device(data_dir)
+    laptop.add("from the laptop")
+    (data_dir / "data.json").write_text("half delivered")
+
+    with pytest.raises(DataFileUnreadableError):
+        laptop.catch_up()
+
+    assert (data_dir / "data.json").read_text() == "half delivered"

@@ -26,6 +26,11 @@ def rows(list_box: Gtk.ListBox) -> Iterator[Gtk.ListBoxRow]:
         row = row.get_next_sibling()
 
 
+def editor_open(*list_boxes: Gtk.ListBox) -> bool:
+    """Whether a row's menu or rename is open in any of ``list_boxes``."""
+    return any(row.editor_open for box in list_boxes for row in rows(box))
+
+
 def clear(list_box: Gtk.ListBox) -> None:
     """Remove every row from a ListBox."""
     while (row := list_box.get_row_at_index(0)) is not None:

@@ -51,6 +51,9 @@ class RecurringView(Adw.Bin):
         self.add_button.connect("clicked", self._on_add_clicked)
         self.refresh()
 
+    def has_open_row_editor(self) -> bool:
+        return list_helpers.editor_open(self.item_list)
+
     def refresh(self) -> None:
         recurring = self.app.session.recurring
         list_helpers.clear(self.item_list)

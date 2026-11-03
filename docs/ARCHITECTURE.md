@@ -177,6 +177,12 @@ memory holds the last successful read, so the way out is
 `App.save_device_data`, which writes it, rather than an empty day. The same
 `App` stays in place, since every view holds it (`SPECIFICATION.md` §3.6).
 
+When the window regains focus, `App.catch_up` reads the file again and detects
+a due rollover, in memory. An unchanged file with no rollover rebuilds nothing.
+While a row's menu or rename is open, the catch-up waits for it to close, and
+so does the timer, so that no row is destroyed under the user's hands (ADR 0007,
+"Withdrawal").
+
 A graphical application can be written calling only `App`: no
 product-behaviour decision is left to make in `ui/`.
 
