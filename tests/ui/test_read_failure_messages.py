@@ -253,3 +253,74 @@ def test_a_rename_never_written_leaves_the_row_once_recovered(
     process_events()
 
     assert running.shown() == ["buy bread"]
+
+
+def test_a_read_refused_before_a_gesture_is_out_of_reach_not_a_failed_write(
+    running: _Running, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # SPECIFICATION.md §3.6 situation 2, even on the default folder.
+    before = running.path.read_bytes()
+    monkeypatch.setattr(storage, "read_main", _refuse)
+
+    running.gesture()
+
+    assert running.dialog.get_message() == "Rature cannot reach its data folder."
+    assert str(running.app.data_dir) in running.dialog.get_detail()
+    assert list(running.dialog.get_buttons()) == ["Try Again", "Quit"]
+    assert running.dialog.parent is running.window
+    assert not running.window.day_view.banner.get_revealed()
+    assert running.path.read_bytes() == before
+
+
+def test_try_again_on_a_folder_still_refused_comes_back_to_the_message(
+    running: _Running, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(storage, "read_main", _refuse)
+    running.gesture()
+    first = running.dialog
+
+    first.dismiss()  # Escape tries again while running
+
+    assert running.quits == 0
+    assert running.dialog is not first
+    assert running.dialog.get_message() == "Rature cannot reach its data folder."
+
+
+def test_try_again_on_a_folder_reachable_again_keeps_the_data(
+    running: _Running, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    real_read = storage.read_main
+    monkeypatch.setattr(storage, "read_main", _refuse)
+    running.gesture()
+
+    monkeypatch.setattr(storage, "read_main", real_read)
+    running.dialog.press("Try Again")
+    process_events()
+
+    assert running.shown() == ["buy bread"]
+    assert len(FakeAlertDialog.shown) == 1
+
+
+def test_a_chosen_folder_moved_while_running_is_out_of_reach(
+    application: RatureApplication,
+    running: _Running,
+    tmp_path: Path,
+) -> None:
+    folder = tmp_path / "Sync"
+    folder.mkdir()
+    chosen = App.start_empty(folder, chosen=True, clock=running.app.clock)
+    window = RatureWindow(application=application, app=chosen)
+    window.present()
+    process_events()
+    try:
+        folder.rename(tmp_path / "moved")
+
+        type_into(window.day_view.entry, "never written")
+
+        assert running.dialog.get_message() == "Rature cannot reach its data folder."
+        assert running.dialog.parent is window
+        assert not folder.exists()
+    finally:
+        application._failing_window = None
+        window.destroy()
+        process_events()

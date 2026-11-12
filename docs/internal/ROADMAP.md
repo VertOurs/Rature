@@ -695,7 +695,7 @@ Règles communes, sur le dossier local :
 
 Dossier choisi :
 
-- [ ] B1. Clé `data-folder`, ouverture du dossier choisi sans toucher à
+- [x] B1. Clé `data-folder`, ouverture du dossier choisi sans toucher à
       ses droits (§2.9, §3.6). Absent, il est inaccessible, jamais un
       premier lancement. Tant que B3 n'existe pas, le message ne propose
       pas « Choose a Folder… ». L'erreur de droits à la relecture passe

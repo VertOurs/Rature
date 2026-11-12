@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-03 15:02+0100\n"
+"POT-Creation-Date: 2026-11-12 15:53+0100\n"
 "PO-Revision-Date: 2026-10-29 20:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Esperanto\n"
@@ -484,7 +484,7 @@ msgstr "Redakti"
 msgid "Recurring task"
 msgstr "Ripetiĝanta tasko"
 
-#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:227
+#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:255
 msgid "Cancel"
 msgstr "Nuligi"
 
@@ -566,8 +566,8 @@ msgstr "Sume"
 msgid "General"
 msgstr "Ĝenerale"
 
-#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:190
-#: src/rature/ui/application.py:266
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:203
+#: src/rature/ui/application.py:294
 msgid "Quit"
 msgstr "Ĉesi"
 
@@ -629,70 +629,79 @@ msgstr "%A, la %-d-a de %B"
 msgid "%-d %B %Y"
 msgstr "la %-d-a de %B %Y"
 
-#: src/rature/ui/application.py:117
+#: src/rature/ui/application.py:127
 msgid "This file was saved by a newer version of Rature."
 msgstr "Ĉi tiu dosiero estis konservita de pli nova versio de Rature."
 
-#: src/rature/ui/application.py:119
+#: src/rature/ui/application.py:129
 #, python-format
 msgid "Opening it could overwrite data. Update Rature to open this file: %s"
 msgstr ""
 "Malfermi ĝin povus anstataŭigi datumojn. Ĝisdatigu Rature por malfermi ĉi "
 "tiun dosieron: %s"
 
-#: src/rature/ui/application.py:150
+#: src/rature/ui/application.py:162
 msgid "The data file cannot be read."
 msgstr "La datumdosiero ne legeblas."
 
-#: src/rature/ui/application.py:151
+#: src/rature/ui/application.py:163
 #, python-format
 msgid "It may still be syncing, or it may be damaged: %s"
 msgstr "Eble ĝi ankoraŭ sinkroniĝas, aŭ ĝi estas difektita: %s"
 
-#: src/rature/ui/application.py:152
+#: src/rature/ui/application.py:164
 msgid "Set Aside and Start Empty"
 msgstr "Flankenmeti kaj komenci malplene"
 
-#: src/rature/ui/application.py:154
+#: src/rature/ui/application.py:166
 msgid "Set Aside and Save This Device's Data"
 msgstr "Flankenmeti kaj konservi la datumojn de ĉi tiu aparato"
 
-#: src/rature/ui/application.py:161
+#: src/rature/ui/application.py:173
 msgid "The data file is missing."
 msgstr "La datumdosiero mankas."
 
-#: src/rature/ui/application.py:162
+#: src/rature/ui/application.py:174
 #, python-format
 msgid "No data file was found in this folder: %s"
 msgstr "Neniu datumdosiero troviĝis en ĉi tiu dosierujo: %s"
 
-#: src/rature/ui/application.py:163 src/rature/ui/application.py:216
+#: src/rature/ui/application.py:175 src/rature/ui/application.py:244
 msgid "Start Empty"
 msgstr "Komenci malplene"
 
-#: src/rature/ui/application.py:165 src/rature/ui/application.py:223
+#: src/rature/ui/application.py:177 src/rature/ui/application.py:251
 msgid "Save This Device's Data"
 msgstr "Konservi la datumojn de ĉi tiu aparato"
 
-#: src/rature/ui/application.py:190
+#: src/rature/ui/application.py:186
+msgid "Rature cannot reach its data folder."
+msgstr "Rature ne povas atingi sian datumdosierujon."
+
+#: src/rature/ui/application.py:187
+#, python-format
+msgid "It may have been moved or deleted, or access to it removed: %s"
+msgstr "Eble ĝi estis movita aŭ forigita, aŭ la aliro al ĝi estis forprenita: %s"
+
+#: src/rature/ui/application.py:200
 msgid "Try Again"
 msgstr "Reprovi"
 
-#: src/rature/ui/application.py:211
+#: src/rature/ui/application.py:239
 msgid "Start from an empty day?"
 msgstr "Ĉu komenci per malplena tago?"
 
-#: src/rature/ui/application.py:213
+#: src/rature/ui/application.py:241
 msgid "This empty day will also replace the data on your other synced devices."
 msgstr ""
 "Ĉi tiu malplena tago ankaŭ anstataŭigos la datumojn en viaj aliaj "
 "sinkronigitaj aparatoj."
 
-#: src/rature/ui/application.py:218
+#: src/rature/ui/application.py:246
 msgid "Save this device's data?"
 msgstr "Ĉu konservi la datumojn de ĉi tiu aparato?"
 
-#: src/rature/ui/application.py:220
+#: src/rature/ui/application.py:248
 msgid ""
 "It will also replace the data on your other synced devices. Recent changes "
 "made on them may be lost."
@@ -701,11 +710,11 @@ msgstr ""
 "Lastatempaj ŝanĝoj faritaj en ili eble perdiĝos."
 
 #. SPECIFICATION.md §3.6 situation 4.
-#: src/rature/ui/application.py:235
+#: src/rature/ui/application.py:263
 msgid "Rature could not use its data folder."
 msgstr "Rature ne povis uzi sian datumdosierujon."
 
-#: src/rature/ui/application.py:238
+#: src/rature/ui/application.py:266
 #, python-format
 msgid ""
 "Check that this folder can be read and written, and that the disk is not "
@@ -714,7 +723,7 @@ msgstr ""
 "Kontrolu, ke ĉi tiu dosierujo estas legebla kaj skribebla, kaj ke la disko "
 "ne estas plena: %s"
 
-#: src/rature/ui/application.py:251
+#: src/rature/ui/application.py:279
 msgid "Close"
 msgstr "Fermi"
 
@@ -754,26 +763,27 @@ msgstr "Malforstreki"
 msgid "Strike through"
 msgstr "Forstreki"
 
-#: src/rature/ui/window.py:437
+#: src/rature/ui/window.py:439
 msgid "This task changed on another device."
 msgstr "Ĉi tiu tasko ŝanĝiĝis en alia aparato."
 
-#: src/rature/ui/window.py:502
+#: src/rature/ui/window.py:504
 msgid "Changes could not be saved to disk."
 msgstr "Ne eblis konservi la ŝanĝojn al la disko."
 
-#: src/rature/ui/window.py:508
+#: src/rature/ui/window.py:510
 msgid "Two devices changed the data at the same time. Both versions were kept."
-msgstr "Du aparatoj samtempe ŝanĝis la datumojn. Ambaŭ versioj estis konservitaj."
+msgstr ""
+"Du aparatoj samtempe ŝanĝis la datumojn. Ambaŭ versioj estis konservitaj."
 
-#: src/rature/ui/window.py:512
+#: src/rature/ui/window.py:514
 msgid "Open Folder"
 msgstr "Malfermi dosierujon"
 
-#: src/rature/ui/window.py:515
+#: src/rature/ui/window.py:517
 msgid "A new day has started."
 msgstr "Nova tago komenciĝis."
 
-#: src/rature/ui/window.py:516
+#: src/rature/ui/window.py:518
 msgid "Dismiss"
 msgstr "Fermi"

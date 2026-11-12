@@ -203,12 +203,19 @@ def _back_up_before_migration(path: Path, original: bytes, version: int) -> None
     _logger.info("backed up the data file before migration: %s", backup)
 
 
-def save(store: Store, *, data_dir: Path | None = None) -> str:
-    """Write the main file and return the fingerprint of what was written."""
+def save(
+    store: Store, *, data_dir: Path | None = None, create_data_dir: bool = True
+) -> str:
+    """Write the main file and return the fingerprint of what was written.
+
+    create_data_dir=False is for a folder the user chose (SPECIFICATION.md
+    §2.9): moved or deleted, it is never created again, and the write fails.
+    """
     target = data_dir or xdg_data_dir()
-    # Explicit 0o700, not the umask-masked default: same reasoning as
-    # _open_private (ADR 0003 addendum).
-    target.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if create_data_dir:
+        # Explicit 0o700, not the umask-masked default: same reasoning as
+        # _open_private (ADR 0003 addendum).
+        target.mkdir(parents=True, exist_ok=True, mode=0o700)
     return fingerprint(_atomic_write_json(target / _MAIN_FILE, store.to_dict()))
 
 
@@ -311,10 +318,16 @@ def set_aside(now: datetime, *, data_dir: Path | None = None) -> Path:
     return dest
 
 
-def archive(day: Day, *, data_dir: Path | None = None) -> Path:
-    """Write the day to archive/<day.date>.json, overwriting any earlier archive."""
+def archive(
+    day: Day, *, data_dir: Path | None = None, create_data_dir: bool = True
+) -> Path:
+    """Write the day to archive/<day.date>.json, overwriting any earlier archive.
+
+    archive/ is always created if missing. With create_data_dir=False, the
+    data folder above it never is: see save.
+    """
     directory = (data_dir or xdg_data_dir()) / _ARCHIVE_DIR
-    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    directory.mkdir(parents=create_data_dir, exist_ok=True, mode=0o700)
     path = directory / f"{day.date.isoformat()}.json"
     _atomic_write_json(path, {"version": FILE_VERSION, **day.to_dict()})
     _logger.info("archived %s", path)

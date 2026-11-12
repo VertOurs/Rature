@@ -1139,7 +1139,12 @@ cas, un seul message bloquant, sans rien écrire :
 - le dossier de données existe sans `data.json` : un fichier disparu, pas
   un premier lancement (§2.9)
 - le dossier choisi (§3.17) n'est plus accessible : accès du portail
-  retiré, dossier déplacé ou supprimé
+  retiré, dossier déplacé ou supprimé. Pendant l'exécution, à la relecture
+  avant un geste ou sur « Réessayer », une erreur de droits sur n'importe quel dossier, celui
+  par défaut compris, relève aussi de ce cas : rien n'a échoué à
+  l'écriture. Au démarrage, une erreur de droits sur le dossier par défaut
+  reste en situation 4 ; au retour du focus, elle ne va qu'au journal
+  (§3.1)
 
 Le message donne le chemin concerné et propose « Réessayer », qui relit
 sans rien écrire, et une porte de sortie explicite :

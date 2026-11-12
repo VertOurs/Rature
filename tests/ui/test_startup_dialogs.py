@@ -12,11 +12,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from gi.repository import Gtk
+from gi.repository import Gio, Gtk
 from ui_helpers import FakeAlertDialog, process_events
 
 from rature.core import storage
 from rature.core.app import App
+from rature.ui import APP_ID
 from rature.ui.application import RatureApplication
 
 
@@ -233,3 +234,60 @@ def test_a_failed_write_of_the_empty_day_opens_the_window_with_the_banner(
     (window,) = startup.windows()
     assert window.day_view.banner.get_revealed()
     assert startup.quits == 0
+
+
+@pytest.fixture
+def chosen_folder(tmp_path: Path) -> Iterator[Path]:
+    """The data-folder key set to a folder that does not exist yet (§3.17)."""
+    folder = tmp_path / "Sync" / "rature"
+    settings = Gio.Settings.new(APP_ID)
+    settings.set_string("data-folder", str(folder))
+    yield folder
+    settings.reset("data-folder")
+
+
+def test_a_chosen_folder_that_is_gone_is_out_of_reach(
+    startup: _Startup, chosen_folder: Path
+) -> None:
+    startup.application.do_activate()
+
+    assert startup.message() == "Rature cannot reach its data folder."
+    assert str(chosen_folder) in startup.dialog.get_detail()
+    # No way out until a folder can be chosen (ROADMAP.md, B3).
+    assert list(startup.dialog.get_buttons()) == ["Try Again", "Quit"]
+    assert startup.windows() == []
+
+    # The sync tool brings the folder back, data included.
+    chosen_folder.mkdir(parents=True)
+    App.start_empty(chosen_folder, chosen=True)
+    startup.dialog.press("Try Again")
+
+    assert len(startup.windows()) == 1
+    assert startup.application._app.data_dir == chosen_folder
+    assert not startup.folder.exists()
+
+
+@pytest.mark.parametrize("leave", ["press", "dismiss"])
+def test_leaving_the_out_of_reach_message_quits(
+    startup: _Startup, chosen_folder: Path, leave: str
+) -> None:
+    startup.application.do_activate()
+
+    if leave == "press":
+        startup.dialog.press("Quit")
+    else:
+        startup.dialog.dismiss()
+
+    assert startup.quits == 1
+    assert not chosen_folder.exists()
+
+
+def test_an_empty_chosen_folder_is_a_missing_file(
+    startup: _Startup, chosen_folder: Path
+) -> None:
+    chosen_folder.mkdir(parents=True)
+
+    startup.application.do_activate()
+
+    assert startup.message() == "The data file is missing."
+    assert str(chosen_folder) in startup.dialog.get_detail()

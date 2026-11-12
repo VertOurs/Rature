@@ -18,6 +18,7 @@ from rature.core.app import (  # noqa: E402
     App,
     DataFileMissingError,
     DataFileUnreadableError,
+    DataFolderUnreachableError,
     GestureRefusedError,
     LockedError,
 )
@@ -426,6 +427,7 @@ class RatureWindow(Adw.ApplicationWindow):
         except (
             DataFileMissingError,
             DataFileUnreadableError,
+            DataFolderUnreachableError,
             FutureVersionError,
         ) as error:
             # SPECIFICATION.md §3.6: the gesture stays unwritten.
