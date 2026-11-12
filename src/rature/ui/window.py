@@ -494,12 +494,22 @@ class RatureWindow(Adw.ApplicationWindow):
 
     def _update_banner(self) -> None:
         # SPECIFICATION.md §3.6: one AdwBanner, one message at a time,
-        # picked fresh on every call: write failure, then new day. A
-        # dismissed message is skipped even if still "active".
+        # picked fresh on every call: write failure, then conflict copies,
+        # then new day. A dismissed message is skipped even if still
+        # "active". The conflict message cannot be dismissed (§3.17).
         banner = self.day_view.banner
         if self._write_failure_active:
             banner.set_title(_("Changes could not be saved to disk."))
             banner.set_button_label("")
+            banner.set_revealed(True)
+        elif self.app.has_conflict_copies:
+            banner.set_title(
+                _(
+                    "Two devices changed the data at the same time. "
+                    "Both versions were kept."
+                )
+            )
+            banner.set_button_label(_("Open Folder"))
             banner.set_revealed(True)
         elif self._new_day_pending and not self._new_day_dismissed:
             banner.set_title(_("A new day has started."))
@@ -509,8 +519,27 @@ class RatureWindow(Adw.ApplicationWindow):
             banner.set_revealed(False)
 
     def _on_banner_button_clicked(self, _banner: Adw.Banner) -> None:
+        # The write failure has no button, so the conflict message is on the
+        # banner whenever a copy exists.
+        if self.app.has_conflict_copies:
+            self._open_data_folder()
+            return
         self._new_day_dismissed = True
         self._update_banner()
+
+    def _open_data_folder(self) -> None:
+        # SPECIFICATION.md §3.17. Through the portal under Flatpak, so the
+        # manifest gains no file system permission.
+        folder = Gio.File.new_for_path(str(self.app.data_dir))
+        Gtk.FileLauncher.new(folder).launch(self, None, self._on_data_folder_opened)
+
+    def _on_data_folder_opened(
+        self, launcher: Gtk.FileLauncher, result: Gio.AsyncResult
+    ) -> None:
+        try:
+            launcher.launch_finish(result)
+        except GLib.Error:
+            _logger.warning("could not open the data folder", exc_info=True)
 
     def _on_row_selected(
         self, _list_box: Gtk.ListBox, row: Gtk.ListBoxRow | None

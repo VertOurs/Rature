@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-01 17:48+0100\n"
+"POT-Creation-Date: 2026-11-03 15:02+0100\n"
 "PO-Revision-Date: 2026-10-29 20:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Esperanto\n"
@@ -734,15 +734,15 @@ msgstr "Forigi la prioritaton"
 msgid "Mark as priority"
 msgstr "Marki kiel prioritatan"
 
-#: src/rature/ui/recurring_row.py:67
+#: src/rature/ui/recurring_row.py:71
 msgid "this week"
 msgstr "ĉi-semajne"
 
-#: src/rature/ui/recurring_row.py:69
+#: src/rature/ui/recurring_row.py:73
 msgid "next week"
 msgstr "venontsemajne"
 
-#: src/rature/ui/recurring_row.py:70
+#: src/rature/ui/recurring_row.py:74
 msgid "every two weeks"
 msgstr "ĉiun duan semajnon"
 
@@ -754,18 +754,26 @@ msgstr "Malforstreki"
 msgid "Strike through"
 msgstr "Forstreki"
 
-#: src/rature/ui/window.py:377
+#: src/rature/ui/window.py:437
 msgid "This task changed on another device."
 msgstr "Ĉi tiu tasko ŝanĝiĝis en alia aparato."
 
-#: src/rature/ui/window.py:434
+#: src/rature/ui/window.py:502
 msgid "Changes could not be saved to disk."
 msgstr "Ne eblis konservi la ŝanĝojn al la disko."
 
-#: src/rature/ui/window.py:438
+#: src/rature/ui/window.py:508
+msgid "Two devices changed the data at the same time. Both versions were kept."
+msgstr "Du aparatoj samtempe ŝanĝis la datumojn. Ambaŭ versioj estis konservitaj."
+
+#: src/rature/ui/window.py:512
+msgid "Open Folder"
+msgstr "Malfermi dosierujon"
+
+#: src/rature/ui/window.py:515
 msgid "A new day has started."
 msgstr "Nova tago komenciĝis."
 
-#: src/rature/ui/window.py:439
+#: src/rature/ui/window.py:516
 msgid "Dismiss"
 msgstr "Fermi"

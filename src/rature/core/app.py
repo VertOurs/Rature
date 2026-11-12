@@ -117,6 +117,8 @@ class App:
         # last (SPECIFICATION.md §3.2, ADR 0009). Here rather than in Session
         # because it outlives the data it points into.
         self._undo_stack: list[str] = []
+        self._conflict_copies = False
+        self._look_for_conflict_copies()
 
     @property
     def can_undo(self) -> bool:
@@ -379,6 +381,21 @@ class App:
             Store.from_session(self.session), data_dir=self.data_dir
         )
         self._write_failed = False
+        self._look_for_conflict_copies()
+
+    def _look_for_conflict_copies(self) -> None:
+        # SPECIFICATION.md §3.17: at startup, with every read of the main file
+        # and after every write. A folder that cannot be listed says nothing
+        # about the copies, so the last answer stands.
+        try:
+            self._conflict_copies = storage.has_conflict_copies(data_dir=self.data_dir)
+        except OSError:
+            _logger.warning("could not look for conflict copies in %s", self.data_dir)
+
+    @property
+    def has_conflict_copies(self) -> bool:
+        """Whether a conflict copy existed at the last look (§3.17)."""
+        return self._conflict_copies
 
     def reread(self) -> bool:
         """Read the main file again, and take what changed (§2.9).
@@ -390,6 +407,7 @@ class App:
         screen, and the timer rolls over within the minute. Raises what
         open() raises for a file that vanished or no longer loads.
         """
+        self._look_for_conflict_copies()
         try:
             content = storage.read_main(data_dir=self.data_dir)
         except FileNotFoundError as error:

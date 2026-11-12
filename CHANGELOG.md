@@ -27,6 +27,10 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 - Changes from another device now show when the window regains focus, and a
   day that passed during sleep shows on waking. Nothing is rebuilt under an
   open menu or rename: the reload waits until it closes.
+- When a sync tool leaves a conflict copy of the data, a banner says that both
+  versions were kept and offers to open the data folder. It stays until no
+  copy remains. Rature never reads, merges or deletes these copies. Syncthing's
+  names are recognized.
 
 ### Changed
 
