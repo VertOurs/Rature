@@ -29,6 +29,8 @@ _ARCHIVE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 # folder (.syncthing.data.json.tmp), and removing one would break a delivery.
 _MAIN_TEMP_NAME = re.compile(r"\.data\.json(\.v\d+\.bak)?\.\d+\.tmp")
 _ARCHIVE_TEMP_NAME = re.compile(r"\.\d{4}-\d{2}-\d{2}\.json\.\d+\.tmp")
+# Syncthing's name for the version it kept aside (SPECIFICATION.md §2.9).
+_CONFLICT_COPY_NAME = re.compile(r".*\.sync-conflict-.*")
 _logger = logging.getLogger(__name__)
 
 # The whole key set of each file, after migration (validation.exact_keys).
@@ -269,6 +271,24 @@ def _remove_matching(directory: Path, name: re.Pattern[str]) -> None:
                 _logger.info("removed a stale temporary file: %s", entry.path)
         except OSError:
             _logger.warning("could not remove a temporary file: %s", entry.path)
+
+
+def has_conflict_copies(*, data_dir: Path | None = None) -> bool:
+    """Whether a sync tool left a conflict copy, SPECIFICATION.md §3.17.
+
+    Looks at names only, next to the main file and in archive/. A missing
+    folder holds none. Raises OSError for a folder that cannot be listed.
+    """
+    target = data_dir or xdg_data_dir()
+    return _holds_conflict_copy(target) or _holds_conflict_copy(target / _ARCHIVE_DIR)
+
+
+def _holds_conflict_copy(directory: Path) -> bool:
+    try:
+        with os.scandir(directory) as entries:
+            return any(_CONFLICT_COPY_NAME.fullmatch(entry.name) for entry in entries)
+    except FileNotFoundError:
+        return False
 
 
 def set_aside(now: datetime, *, data_dir: Path | None = None) -> Path:

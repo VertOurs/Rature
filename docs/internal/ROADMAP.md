@@ -691,7 +691,7 @@ Règles communes, sur le dossier local :
       sans écrire) : au réveil, la fenêtre reprend le focus, ce qui referme
       le créneau de la décision 1, où un geste sur un fichier inchangé
       s'applique à la journée affichée
-- [ ] A7. Bannière de conflit, bannière unique à priorités (§3.6, §3.17)
+- [x] A7. Bannière de conflit, bannière unique à priorités (§3.6, §3.17)
 
 Dossier choisi :
 

@@ -570,3 +570,119 @@ def test_catch_up_lets_a_read_failure_through_unwritten(data_dir: Path) -> None:
         laptop.catch_up()
 
     assert (data_dir / "data.json").read_text() == "half delivered"
+
+
+# Conflict copies, SPECIFICATION.md §3.17.
+
+_COPY = "data.sync-conflict-20260824-100000-ABCDEFG.json"
+
+
+@pytest.fixture
+def folder(tmp_path: Path) -> Path:
+    return tmp_path / "rature"
+
+
+def _app_with_a_day(folder: Path) -> App:
+    app = App.open(folder, clock=lambda: datetime(2026, 8, 24, 10, 0, tzinfo=PARIS))
+    app.add("buy bread")
+    return app
+
+
+def test_no_conflict_copy_in_a_folder_that_does_not_exist(folder: Path) -> None:
+    assert not App.open(folder / "not-yet").has_conflict_copies
+
+
+def test_a_conflict_copy_is_seen_at_startup(folder: Path) -> None:
+    _app_with_a_day(folder)
+    (folder / _COPY).write_text("{}")
+
+    assert App.open(folder).has_conflict_copies
+
+
+def test_a_conflict_copy_in_the_archives_is_seen(folder: Path) -> None:
+    _app_with_a_day(folder)
+    (folder / "archive").mkdir()
+    (folder / "archive" / "2026-08-24.sync-conflict-x-y.json").write_text("{}")
+
+    assert App.open(folder).has_conflict_copies
+
+
+def test_other_names_are_not_conflict_copies(folder: Path) -> None:
+    _app_with_a_day(folder)
+    (folder / "data.json.20260824-100000.bak").write_text("{}")
+    (folder / ".syncthing.data.json.tmp").write_text("{}")
+
+    assert not App.open(folder).has_conflict_copies
+
+
+def test_catching_up_sees_a_copy_come_and_go_on_an_unchanged_file(
+    folder: Path,
+) -> None:
+    app = _app_with_a_day(folder)
+    copy = folder / _COPY
+
+    copy.write_text("{}")
+    app.catch_up()
+    assert app.has_conflict_copies
+    assert not app.take_reloaded()
+
+    copy.unlink()
+    app.catch_up()
+    assert not app.has_conflict_copies
+
+
+def test_a_gesture_sees_a_copy_that_appeared(folder: Path) -> None:
+    app = _app_with_a_day(folder)
+    (folder / _COPY).write_text("{}")
+
+    app.add("buy milk")
+
+    assert app.has_conflict_copies
+
+
+def test_a_copy_delivered_during_the_write_is_seen_after_it(
+    folder: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Only the check after the write can find it: the read one saw nothing."""
+    app = _app_with_a_day(folder)
+    real_save = storage.save
+
+    def save_then_deliver(*args: object, **kwargs: object) -> str:
+        digest = real_save(*args, **kwargs)
+        (folder / _COPY).write_text("{}")
+        return digest
+
+    monkeypatch.setattr(storage, "save", save_then_deliver)
+
+    app.add("buy milk")
+
+    assert app.has_conflict_copies
+
+
+def test_rature_never_touches_a_conflict_copy(folder: Path) -> None:
+    app = _app_with_a_day(folder)
+    copy = folder / _COPY
+    copy.write_text("kept as is")
+
+    app.add("buy milk")
+    App.open(folder)
+
+    assert copy.read_text() == "kept as is"
+
+
+def test_a_folder_that_cannot_be_listed_keeps_the_last_answer(
+    folder: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    app = _app_with_a_day(folder)
+    (folder / _COPY).write_text("{}")
+    app.catch_up()
+
+    def refuse(*_args: object, **_kwargs: object) -> bool:
+        raise PermissionError
+
+    monkeypatch.setattr(storage, "has_conflict_copies", refuse)
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        app.catch_up()
+
+    assert app.has_conflict_copies
+    assert "could not look for conflict copies" in caplog.text
