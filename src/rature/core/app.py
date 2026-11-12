@@ -12,6 +12,7 @@ from __future__ import annotations
 import copy
 import enum
 import logging
+import os
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
@@ -57,6 +58,16 @@ class DataFileUnreadableError(Exception):
     """data.json exists but does not load: it may still be arriving (§3.6)."""
 
 
+class DataFolderUnreachableError(Exception):
+    """The data folder cannot be reached (§3.6 situation 2).
+
+    A chosen folder that is gone or refuses access, at startup or on any
+    re-read; or, while running, any folder that refuses access on the read
+    before a gesture or on Try Again. Not an OSError, which means a folder
+    Rature cannot use (§3.6 situation 4).
+    """
+
+
 class GestureRefusedError(Exception):
     """A gesture no longer applies to data that changed elsewhere (§2.9).
 
@@ -72,6 +83,16 @@ def _parse(content: bytes, data_dir: Path) -> Store:
         path = storage.main_file_path(data_dir=data_dir)
         _logger.warning("the data file cannot be read: %s", path)
         raise DataFileUnreadableError(path) from error
+
+
+def _check_reachable(data_dir: Path) -> None:
+    # SPECIFICATION.md §3.6 situation 2: a chosen folder that is gone or
+    # refuses access, the portal's access removed included.
+    try:
+        os.stat(data_dir)
+    except OSError as error:
+        _logger.warning("cannot reach the data folder %s", data_dir)
+        raise DataFolderUnreachableError(data_dir) from error
 
 
 def _default_clock() -> datetime:
@@ -96,8 +117,11 @@ class App:
         session: Session,
         clock: Callable[[], datetime],
         startup: StartupOutcome,
+        chosen: bool = False,
     ) -> None:
         self.data_dir = data_dir
+        # A folder the user chose (§2.9): never created, its rights untouched.
+        self._chosen = chosen
         self.session = session
         self.clock = clock
         self.startup = startup
@@ -130,6 +154,7 @@ class App:
         cls,
         data_dir: Path | None = None,
         *,
+        chosen: bool = False,
         clock: Callable[[], datetime] = _default_clock,
     ) -> App:
         """Load the data file, then catch up on any due rollover.
@@ -142,12 +167,18 @@ class App:
         DataFileMissingError or DataFileUnreadableError for start_empty to
         settle once the user has decided, FutureVersionError for a newer
         file, and OSError for a folder or file it cannot reach (§3.6).
+
+        chosen is for a folder the user chose (§2.9, §3.17): absent or
+        refusing access, it raises DataFolderUnreachableError, never a first
+        launch, and its rights are never changed.
         """
         resolved_dir = data_dir if data_dir is not None else storage.xdg_data_dir()
         _logger.info("starting, data directory: %s", resolved_dir)
+        if chosen:
+            _check_reachable(resolved_dir)
         storage.remove_stale_temp_files(data_dir=resolved_dir)
         if storage.data_dir_exists(data_dir=resolved_dir):
-            app = cls._load(resolved_dir, clock)
+            app = cls._load(resolved_dir, clock, chosen=chosen)
         else:
             app = cls._empty(resolved_dir, clock, StartupOutcome.FIRST_LAUNCH)
         app.ensure_day()
@@ -158,6 +189,7 @@ class App:
         cls,
         data_dir: Path,
         *,
+        chosen: bool = False,
         clock: Callable[[], datetime] = _default_clock,
     ) -> App:
         """The user's confirmed way out of a missing or unreadable file (§3.6).
@@ -170,13 +202,13 @@ class App:
         situation 4.
         """
         try:
-            return cls.open(data_dir, clock=clock)
+            return cls.open(data_dir, chosen=chosen, clock=clock)
         except DataFileMissingError:
             pass
         except DataFileUnreadableError:
             aside = storage.set_aside(clock(), data_dir=data_dir)
             _logger.warning("set an unreadable data file aside: %s", aside)
-        app = cls._empty(data_dir, clock, StartupOutcome.STARTED_EMPTY)
+        app = cls._empty(data_dir, clock, StartupOutcome.STARTED_EMPTY, chosen=chosen)
         app._save_confirmed()
         return app
 
@@ -212,7 +244,9 @@ class App:
             _logger.warning("could not write the data in %s", self.data_dir)
 
     @classmethod
-    def _load(cls, data_dir: Path, clock: Callable[[], datetime]) -> App:
+    def _load(
+        cls, data_dir: Path, clock: Callable[[], datetime], *, chosen: bool
+    ) -> App:
         path = storage.main_file_path(data_dir=data_dir)
         try:
             content = storage.read_main(data_dir=data_dir)
@@ -220,20 +254,23 @@ class App:
             _logger.warning("the data file is missing: %s", path)
             raise DataFileMissingError(path) from error
         store = _parse(content, data_dir)
-        try:
-            storage.restrict_data_dir_permissions(data_dir=data_dir)
-        except OSError:
-            # Self-healing, not a startup requirement (ADR 0003 addendum):
-            # the folder exists, since the file was just read from it, and a
-            # permission narrowing is nice, not essential, to have.
-            _logger.warning(
-                "could not restrict data directory permissions: %s", data_dir
-            )
+        if not chosen:
+            # Never on a chosen folder (§2.9): its rights belong to the user.
+            try:
+                storage.restrict_data_dir_permissions(data_dir=data_dir)
+            except OSError:
+                # Self-healing, not a startup requirement (ADR 0003 addendum):
+                # the folder exists, since the file was just read from it, and
+                # a permission narrowing is nice, not essential, to have.
+                _logger.warning(
+                    "could not restrict data directory permissions: %s", data_dir
+                )
         app = cls(
             data_dir=data_dir,
             session=store.into_session(),
             clock=clock,
             startup=StartupOutcome.LOADED,
+            chosen=chosen,
         )
         app._fingerprint = storage.fingerprint(content)
         return app
@@ -244,12 +281,15 @@ class App:
         data_dir: Path,
         clock: Callable[[], datetime],
         startup: StartupOutcome,
+        *,
+        chosen: bool = False,
     ) -> App:
         return cls(
             data_dir=data_dir,
             session=Session(Day(date=reference_date(clock()))),
             clock=clock,
             startup=startup,
+            chosen=chosen,
         )
 
     def ensure_day(self) -> Day | None:
@@ -374,11 +414,15 @@ class App:
         self._write_failed = True
         while self._pending_archives:
             day = self._pending_archives[0]
-            storage.archive(day, data_dir=self.data_dir)
+            storage.archive(
+                day, data_dir=self.data_dir, create_data_dir=not self._chosen
+            )
             del self._pending_archives[0]
             self._written_archives.append(day.date)
         self._fingerprint = storage.save(
-            Store.from_session(self.session), data_dir=self.data_dir
+            Store.from_session(self.session),
+            data_dir=self.data_dir,
+            create_data_dir=not self._chosen,
         )
         self._write_failed = False
         self._look_for_conflict_copies()
@@ -405,12 +449,17 @@ class App:
         Returns whether the file changed. An unchanged file leaves memory
         alone, a due rollover included: the gesture applies to the day on
         screen, and the timer rolls over within the minute. Raises what
-        open() raises for a file that vanished or no longer loads.
+        open() raises for a file that vanished or no longer loads, and
+        DataFolderUnreachableError for a chosen folder that is gone. A folder
+        that refuses access raises OSError as is: what it means depends on
+        the caller (§3.1, §3.6).
         """
         self._look_for_conflict_copies()
         try:
             content = storage.read_main(data_dir=self.data_dir)
         except FileNotFoundError as error:
+            if self._chosen:
+                _check_reachable(self.data_dir)
             if self._fingerprint is None:
                 return False  # not written yet: a first launch, or a failed write
             path = storage.main_file_path(data_dir=self.data_dir)
@@ -432,6 +481,20 @@ class App:
         self._reloaded = True
         self.ensure_day()
         return True
+
+    def try_again(self) -> bool:
+        """Read again before a gesture, or on Try Again while running (§3.6).
+
+        As reread, except that a folder refusing access is out of reach:
+        before a gesture, nothing failed to write, so the write-failure
+        banner would be wrong; on Try Again, the message the user can quit
+        from comes back.
+        """
+        try:
+            return self.reread()
+        except OSError as error:
+            _logger.warning("cannot reach the data folder %s", self.data_dir)
+            raise DataFolderUnreachableError(self.data_dir) from error
 
     def catch_up(self) -> None:
         """Take what changed elsewhere and a due rollover, on return of focus.
@@ -461,7 +524,9 @@ class App:
         raises as is. A failed write leaves the change in memory, see the
         class docstring.
         """
-        fresh = copy.deepcopy(self.session) if self.reread() else None
+        # SPECIFICATION.md §3.6 situation 2: a read refused before a gesture
+        # is out of reach, not a failed write.
+        fresh = copy.deepcopy(self.session) if self.try_again() else None
         try:
             result = apply(self.session)
         except (LockedError, KeyError, ValueError) as error:

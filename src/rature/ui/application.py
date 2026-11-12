@@ -21,6 +21,7 @@ from rature.core.app import (  # noqa: E402
     App,
     DataFileMissingError,
     DataFileUnreadableError,
+    DataFolderUnreachableError,
 )
 from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
@@ -99,11 +100,20 @@ class RatureApplication(Adw.Application):
     def _data_folder(self) -> Path:
         if self._failing_window is not None:
             return self._failing_window.app.data_dir
-        return storage.xdg_data_dir()
+        return self._setting_folder()[0]
 
-    def _open_data(self, opener: Callable[[Path], App]) -> None:
+    def _setting_folder(self) -> tuple[Path, bool]:
+        # SPECIFICATION.md §3.17: the folder chosen on this device, kept in
+        # GSettings, never in the data folder. Empty is the default folder.
+        chosen = Gio.Settings.new(APP_ID).get_string("data-folder")
+        if chosen:
+            return Path(chosen), True
+        return storage.xdg_data_dir(), False
+
+    def _open_data(self, opener: Callable[..., App]) -> None:
         def attempt() -> None:
-            self._app = opener(storage.xdg_data_dir())
+            folder, chosen = self._setting_folder()
+            self._app = opener(folder, chosen=chosen)
 
         self._settle(attempt)
 
@@ -130,6 +140,8 @@ class RatureApplication(Adw.Application):
             self._show_unreadable_file_message()
         except DataFileMissingError:
             self._show_missing_file_message()
+        except DataFolderUnreachableError:
+            self._show_unreachable_folder_message()
         else:
             if self._failing_window is None:
                 self._present_window()
@@ -141,7 +153,7 @@ class RatureApplication(Adw.Application):
         if self._failing_window is None:
             self._open_data(App.open)
         else:
-            self._settle(self._failing_window.app.reread)
+            self._settle(self._failing_window.app.try_again)
 
     def _show_unreadable_file_message(self) -> None:
         # SPECIFICATION.md §3.6 situation 2.
@@ -166,28 +178,44 @@ class RatureApplication(Adw.Application):
             self._show_missing_file_message,
         )
 
+    def _show_unreachable_folder_message(self) -> None:
+        # SPECIFICATION.md §3.6 situation 2. No way out until a folder can be
+        # chosen (ROADMAP.md, chantier 10, B3): never back to the default
+        # folder in silence.
+        self._show_blocking_message(
+            _("Rature cannot reach its data folder."),
+            _("It may have been moved or deleted, or access to it removed: %s")
+            % self._data_folder(),
+            None,
+            self._show_unreachable_folder_message,
+        )
+
     def _show_blocking_message(
         self,
         message: str,
         detail: str,
-        way_out: str,
+        way_out: str | None,
         show_again: Callable[[], None],
     ) -> None:
-        try_again, confirm, leave = 0, 1, 2
+        buttons = [_("Try Again")]
+        if way_out is not None:
+            buttons.append(way_out)
+        buttons.append(_("Quit"))
+        try_again, leave = 0, len(buttons) - 1
 
         def on_choice(choice: int) -> None:
             if choice == try_again:
                 self._try_again()
-            elif choice == confirm:
-                self._confirm_way_out(show_again)
-            else:
+            elif choice == leave:
                 self._release_after_dialogs()
                 self.quit()
+            else:
+                self._confirm_way_out(show_again)
 
         self._ask(
             message,
             detail,
-            [_("Try Again"), way_out, _("Quit")],
+            buttons,
             # Quitting while running discards the copy in memory: a deliberate
             # click, never Escape.
             cancel_button=leave if self._failing_window is None else try_again,

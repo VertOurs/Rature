@@ -24,6 +24,8 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   message on the window offers to try again, or to save this device's data
   after confirmation. An unreadable file is set aside first. A file saved by a
   newer version of Rature shows an alert, then Rature quits, without writing.
+  A data folder that refuses access before a change shows a message that
+  offers to try again or to quit, rather than reporting a failed save.
 - Changes from another device now show when the window regains focus, and a
   day that passed during sleep shows on waking. Nothing is rebuilt under an
   open menu or rename: the reload waits until it closes.
