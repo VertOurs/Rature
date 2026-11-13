@@ -135,8 +135,6 @@ class JoinOutcome:
     """What joining did, the preview's promise as actually kept (§3.17)."""
 
     set_aside: Path | None
-    # Differs from the preview only if archive/ arrived during the join.
-    archives_left_in: Path | None
 
 
 def _default_clock() -> datetime:
@@ -669,7 +667,7 @@ class App:
         # its days rolled over in memory are empty. Nothing to keep.
         self._pending_archives.clear()
         if taken is None:
-            outcome = self._copy_into(folder)
+            outcome = self._copy_into(preview)
         else:
             outcome = self._take(preview, *taken)
         self.data_dir = folder
@@ -704,15 +702,19 @@ class App:
             _logger.warning("joined data replaced a change that could not be saved")
         self.session = store.into_session()
         self._fingerprint = storage.fingerprint(content)
-        return JoinOutcome(set_aside=aside, archives_left_in=preview.archives_stay_in)
+        return JoinOutcome(set_aside=aside)
 
-    def _copy_into(self, folder: Path) -> JoinOutcome:
+    def _copy_into(self, preview: FolderPreview) -> JoinOutcome:
+        folder = preview.folder
         copied = storage.copy_archives(source=self.data_dir, target=folder)
         self._fingerprint = storage.save(
             Store.from_session(self.session), data_dir=folder, create_data_dir=False
         )
-        left = None if copied or not self.archives() else self.data_dir
-        return JoinOutcome(set_aside=None, archives_left_in=left)
+        if not copied and preview.archives_stay_in is None and self.archives():
+            # The preview promised a copy, but archive/ arrived meanwhile: a
+            # race of milliseconds, too rare for a message of its own.
+            _logger.warning("local archives stayed in %s", self.data_dir)
+        return JoinOutcome(set_aside=None)
 
     def try_again(self) -> bool:
         """Read again before a gesture, or on Try Again while running (§3.6).

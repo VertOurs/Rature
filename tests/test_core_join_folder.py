@@ -208,7 +208,6 @@ def test_a_folder_with_data_is_taken_and_ours_set_aside(
     assert app.data_dir == folder
     assert outcome.set_aside == local / "data.json.20260824-100000.bak"
     assert _listing(local) == {"data.json.20260824-100000.bak"}
-    assert outcome.archives_left_in is None
     assert app.take_reloaded()
     assert not app.reread()
 
@@ -217,9 +216,8 @@ def test_local_archives_stay_behind_when_taking(local: Path, folder: Path) -> No
     _with_archive(local, date(2026, 8, 20))
     _with_data(folder)
 
-    outcome = _join(App.open(local, clock=_on(MONDAY)), folder)
+    _join(App.open(local, clock=_on(MONDAY)), folder)
 
-    assert outcome.archives_left_in == local
     assert not (folder / "archive").exists()
 
 
@@ -320,7 +318,6 @@ def test_an_empty_folder_receives_our_data_and_archives(
         date=date(2026, 8, 20)
     )
     assert outcome.set_aside is None
-    assert outcome.archives_left_in is None
     assert (local / "data.json").exists()
     assert app.data_dir == folder
     assert app.take_reloaded()
@@ -330,38 +327,44 @@ def test_an_empty_folder_receives_our_data_and_archives(
 def test_without_local_archives_no_archive_folder_is_made(
     local: Path, folder: Path
 ) -> None:
-    outcome = _join(App.open(local, clock=_on(MONDAY)), folder)
+    _join(App.open(local, clock=_on(MONDAY)), folder)
 
     assert _listing(folder) == {"data.json"}
-    assert outcome.archives_left_in is None
 
 
 def test_an_archive_folder_already_there_is_left_alone(
-    local: Path, folder: Path
+    local: Path, folder: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     _with_archive(local, date(2026, 8, 20))
     (folder / "archive").mkdir()
     theirs = folder / "archive" / "2026-08-20.json"
     theirs.write_text("theirs")
 
-    outcome = _join(App.open(local, clock=_on(MONDAY)), folder)
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        _join(App.open(local, clock=_on(MONDAY)), folder)
 
     assert theirs.read_text() == "theirs"
-    assert outcome.archives_left_in == local
+    # The preview said so: nothing unexpected to log.
+    assert "local archives stayed" not in caplog.text
 
 
-def test_archives_stay_if_archive_folder_arrives_during_the_join(
-    local: Path, folder: Path, monkeypatch: pytest.MonkeyPatch
+def test_archives_left_behind_against_the_preview_are_logged(
+    local: Path,
+    folder: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     _with_archive(local, date(2026, 8, 20))
     app = App.open(local, clock=_on(MONDAY))
     shown = app.examine(folder)
     assert shown.archives_stay_in is None
+    # archive/ arrived during the join: copy_archives found it there.
     monkeypatch.setattr(storage, "copy_archives", lambda **_kwargs: False)
 
-    outcome = app.join(shown)
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        app.join(shown)
 
-    assert outcome.archives_left_in == local
+    assert f"local archives stayed in {local}" in caplog.text
 
 
 def test_a_first_launch_writes_its_empty_day_into_the_folder(
@@ -373,7 +376,7 @@ def test_a_first_launch_writes_its_empty_day_into_the_folder(
     outcome = _join(app, folder)
 
     assert load(data_dir=folder).day == Day(date=MONDAY)
-    assert outcome == type(outcome)(set_aside=None, archives_left_in=None)
+    assert outcome == JoinOutcome(set_aside=None)
     assert not local.exists()
 
 
@@ -491,11 +494,10 @@ def test_pending_archives_go_to_the_previous_folder_then_along(
     app.clock = _on(TUESDAY)
     app.ensure_day()
 
-    outcome = _join(app, folder)
+    _join(app, folder)
 
     assert load_archive(MONDAY, data_dir=local).tasks[0].text == "local task"
     assert load_archive(MONDAY, data_dir=folder).tasks[0].text == "local task"
-    assert outcome.archives_left_in is None
 
 
 def test_pending_archives_stay_behind_when_taking(local: Path, folder: Path) -> None:
@@ -504,10 +506,10 @@ def test_pending_archives_stay_behind_when_taking(local: Path, folder: Path) -> 
     app.clock = _on(TUESDAY)
     app.ensure_day()
 
-    outcome = _join(app, folder)
+    _join(app, folder)
 
     assert load_archive(MONDAY, data_dir=local).tasks[0].text == "local task"
-    assert outcome.archives_left_in == local
+    assert not (folder / "archive").exists()
 
 
 def test_a_first_launch_keeps_no_pending_archive(tmp_path: Path, folder: Path) -> None:
