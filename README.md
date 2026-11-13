@@ -78,6 +78,8 @@ The method it reproduces:
   text.
 - **Statistics window** — a plain table of counts per archived day, no
   chart and no judgement.
+- **Data folder** — keep the data in a folder of your choice, such as one
+  a sync tool shares between computers (see below).
 - **Undo the last deletion**, **copy a day as plain text**, keyboard
   shortcuts with a help window, a full French translation, and
   Spanish, German, Brazilian Portuguese, Russian and Esperanto machine
@@ -100,6 +102,47 @@ install without adding the repository.
 AUR, COPR and Mageia packages are prepared (`build-aux/`) but not yet
 submitted. Flathub is deliberately not a target
 ([`docs/adr/0001-reject-flathub.md`](docs/adr/0001-reject-flathub.md)).
+
+## Using Rature on several computers
+
+Rature syncs nothing itself: no account, no server, no network. It keeps
+its data in one folder, and a tool that copies whole files between
+computers can share that folder. Rature is tested with
+[Syncthing](https://syncthing.net/); any tool of that kind should work, but
+only Syncthing's conflict copies are recognized.
+
+On the first computer, the one that already holds your data:
+
+1. Share an empty folder with Syncthing, for example `~/Sync/rature`.
+2. In Rature, open **Data Folder…** in the main menu, choose **Choose a
+   Folder…** and pick that folder.
+3. Confirm **Copy Data Here**. Your data, and your archives, are copied
+   into it.
+
+On each other computer:
+
+1. Accept the shared folder in Syncthing and **wait until its first sync
+   has finished**. A folder still empty at this point would start an empty
+   day that replaces the data on the first computer.
+2. In Rature, choose the same folder through **Data Folder…**, then
+   **Use This Folder**. If this computer already had data, its data file
+   is set aside under a dated name, never deleted, and its archives stay
+   in its previous folder.
+
+Add this line to the folder's `.stignore`, so that the temporary files a
+crash may leave behind stay on the computer where it happened:
+
+```
+.*.tmp
+```
+
+Rature reads the data again before every change, so it builds on what
+another computer wrote once that has arrived, instead of overwriting it.
+When both computers change the data before Syncthing has carried it
+across, Syncthing keeps both versions and Rature shows a banner until you
+remove the conflict copy; it never reads, merges or deletes it. Which folder is used stays a setting of each
+computer: it never travels with the data. The design is in
+[ADR 0009](docs/adr/0009-sync-through-a-chosen-folder.md).
 
 ## Status
 

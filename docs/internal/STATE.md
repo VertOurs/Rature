@@ -27,18 +27,20 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   droits à la relecture avant un geste traitée en dossier inaccessible,
   quel que soit le dossier (§3.6). B2 : `App.examine` et `App.join`
   dans `core`, sans interface ; deux cas tranchés dans la spec (archives
-  en attente, dossier courant). B3, branche `feat/data-folder-dialogs`,
-  le 13 novembre 2026 : entrée Data Folder…, dialogues en
+  en attente, dossier courant). B3 (#229), le 13 novembre 2026 : entrée Data Folder…, dialogues en
   `AdwAlertDialog`, « Choose a Folder… » dans le message du dossier
   inaccessible, au démarrage et en cours d'exécution (fenêtre laissée,
-  dossier rouvert comme au démarrage). `JoinOutcome.archives_left_in`
-  retiré, `App.has_local_data` et `confirm_folder` ajoutés. 107 tests
-  d'interface verts dans le SDK 51. Catalogues complétés en traduction
-  machine, français compris. **Reste à la charge de VertOurs** : contrôle
-  visuel des dialogues, relecture du français, essai dans le Flatpak du
-  chemin du portail (`/run/user/…/doc/…`) face à `samefile` (choisir le
-  dossier courant doit être refusé), et le point « À trancher » ajouté
-  sous B3 dans `ROADMAP.md`. Étape suivante : C1.
+  dossier rouvert comme au démarrage). Contrôle visuel fait par VertOurs
+  le même jour, sur une build hôte. Suivi de #230 : la confirmation de
+  journée vide sans donnée locale demande d'attendre la première
+  synchronisation. C1 fait le même jour (README, `ARCHITECTURE.md`,
+  CHANGELOG). Incident du runner « Invalid cross-device link » revu sur
+  le job `flatpak` de #230, vert à la relance. **Reste à la charge de
+  VertOurs** : relecture du catalogue français (chaînes de B3 en
+  traduction machine), essai dans le Flatpak du chemin du portail
+  (`/run/user/…/doc/…`) face à `samefile` (choisir le dossier courant doit
+  être refusé), installation de Syncthing sur les deux machines pour la
+  semaine d'usage réel. Étape suivante : couper `2.2.0`.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid
