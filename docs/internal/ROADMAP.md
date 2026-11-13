@@ -701,10 +701,22 @@ Dossier choisi :
       pas « Choose a Folder… ». L'erreur de droits à la relecture passe
       aujourd'hui par la bannière d'échec d'écriture : à corriger avec le
       dossier inaccessible
-- [ ] B2. Jonction dans `core` : examen, copie, mise de côté, rechargement
-      (§2.9, §3.17)
+- [x] B2. Jonction dans `core` : examen, copie, mise de côté, rechargement
+      (§2.9, §3.17). Rejoindre relit d'abord, comme un geste ; le dossier
+      courant est refusé (`os.path.samefile`). `App.examine` rend ce que
+      la jonction fera, nom de la mise de côté compris ; `App.join` prend
+      cet examen et refuse avec `FolderChangedError` si le dossier a
+      changé depuis
 - [ ] B3. Entrée Data Folder…, les deux dialogues, parcours sans donnée
-      locale (§3.1, §3.17), « Choose a Folder… » dans le message
+      locale (§3.1, §3.17), « Choose a Folder… » dans le message. Pour un
+      dossier sans `data.json` et sans donnée locale, la confirmation de
+      journée vide de §3.6 vient avant `join`, qui écrit cette journée tout
+      de suite. Si `join` lève `FolderChangedError`, le dialogue se rouvre
+      sur le nouveau constat (`preview`) ou sur le refus (`refusal`). Premier
+      commit de B3, spec avant le code : une phrase dans §3.17 sur ce
+      dialogue rouvert. `JoinOutcome.archives_left_in` : dire où les
+      archives sont restées quand il diffère de l'examen, ou retirer le
+      champ s'il ne sert pas
 
 Clôture :
 
