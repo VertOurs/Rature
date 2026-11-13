@@ -163,13 +163,58 @@ def load(*, data_dir: Path | None = None) -> Store:
 
 def parse_main(original: bytes, *, data_dir: Path | None = None) -> Store:
     """Migrate and validate the main file's bytes, as read from data_dir."""
-    path = main_file_path(data_dir=data_dir)
+    store, version = _decode_main(original)
+    if version < CURRENT_VERSION:
+        _back_up_before_migration(main_file_path(data_dir=data_dir), original, version)
+    return store
+
+
+def _decode_main(original: bytes) -> tuple[Store, int]:
+    """The Store in the main file's bytes and the version they were written in.
+
+    Writes nothing: the backup before migration is parse_main's to make.
+    """
     raw = json.loads(original.decode("utf-8"))
     store = Store.from_dict(migrate(raw))
     # migrate has validated raw: a dict with an int version.
-    if raw["version"] < CURRENT_VERSION:
-        _back_up_before_migration(path, original, raw["version"])
-    return store
+    return store, raw["version"]
+
+
+@dataclass(frozen=True, kw_only=True)
+class FolderContents:
+    """What a folder holds before Rature joins it, SPECIFICATION.md §3.17."""
+
+    # The bytes of a valid data.json, None when there is none.
+    main: bytes | None
+    has_archive: bool
+    # A visible entry other than data.json and archive/.
+    other_files: bool
+
+
+def examine_folder(folder: Path) -> FolderContents:
+    """Look at a folder before joining it, writing nothing (§3.17).
+
+    Names starting with a dot are not visible, Syncthing's own .stfolder,
+    .stignore and .stversions included: otherwise no Syncthing folder would
+    ever be empty. A data.json is validated without the backup before
+    migration, which waits for the load that follows joining. Raises
+    OSError for a folder or file it cannot read, what parse_main raises for
+    a data.json that does not load, FutureVersionError included.
+    """
+    with os.scandir(folder) as entries:
+        names = {entry.name for entry in entries}
+    main: bytes | None = None
+    if _MAIN_FILE in names:
+        main = read_main(data_dir=folder)
+        _decode_main(main)
+    return FolderContents(
+        main=main,
+        has_archive=_ARCHIVE_DIR in names,
+        other_files=any(
+            not name.startswith(".") and name not in {_MAIN_FILE, _ARCHIVE_DIR}
+            for name in names
+        ),
+    )
 
 
 def _back_up_before_migration(path: Path, original: bytes, version: int) -> None:
