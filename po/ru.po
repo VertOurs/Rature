@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-12 15:53+0100\n"
+"POT-Creation-Date: 2026-11-13 18:01+0100\n"
 "PO-Revision-Date: 2026-10-29 19:00+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: Russian\n"
@@ -382,31 +382,35 @@ msgstr "Архив"
 msgid "Statistics"
 msgstr "Статистика"
 
-#: data/ui/window.ui:20 data/ui/shortcuts.ui:22
+#: data/ui/window.ui:18
+msgid "Data Folder…"
+msgstr "Папка данных…"
+
+#: data/ui/window.ui:24 data/ui/shortcuts.ui:22
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: data/ui/window.ui:24
+#: data/ui/window.ui:28
 msgid "About Rature"
 msgstr "О программе Rature"
 
-#: data/ui/window.ui:45 data/ui/window.ui:47
+#: data/ui/window.ui:49 data/ui/window.ui:51
 msgid "Main menu"
 msgstr "Главное меню"
 
-#: data/ui/window.ui:65 data/ui/window.ui:127
+#: data/ui/window.ui:69 data/ui/window.ui:131
 msgid "Day"
 msgstr "Сегодня"
 
-#: data/ui/window.ui:81 data/ui/window.ui:150
+#: data/ui/window.ui:85 data/ui/window.ui:154
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: data/ui/window.ui:95 data/ui/window.ui:153
+#: data/ui/window.ui:99 data/ui/window.ui:157
 msgid "Reserve"
 msgstr "Резерв"
 
-#: data/ui/window.ui:109 data/ui/window.ui:156
+#: data/ui/window.ui:113 data/ui/window.ui:160
 msgid "Recurring"
 msgstr "Повторяющиеся"
 
@@ -490,7 +494,8 @@ msgstr "Изменить"
 msgid "Recurring task"
 msgstr "Повторяющаяся задача"
 
-#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:255
+#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:295
+#: src/rature/ui/data_folder.py:201
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -572,8 +577,8 @@ msgstr "Итого"
 msgid "General"
 msgstr "Общие"
 
-#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:203
-#: src/rature/ui/application.py:294
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:243
+#: src/rature/ui/application.py:334
 msgid "Quit"
 msgstr "Выйти"
 
@@ -635,79 +640,87 @@ msgstr "%A, %-d %B"
 msgid "%-d %B %Y"
 msgstr "%-d %B %Y"
 
-#: src/rature/ui/application.py:127
+#: src/rature/ui/application.py:135
 msgid "This file was saved by a newer version of Rature."
 msgstr "Этот файл был сохранён более новой версией Rature."
 
-#: src/rature/ui/application.py:129
+#: src/rature/ui/application.py:137
 #, python-format
 msgid "Opening it could overwrite data. Update Rature to open this file: %s"
 msgstr ""
 "Его открытие может перезаписать данные. Обновите Rature, чтобы открыть этот "
 "файл: %s"
 
-#: src/rature/ui/application.py:162
+#: src/rature/ui/application.py:170
 msgid "The data file cannot be read."
 msgstr "Не удаётся прочитать файл данных."
 
-#: src/rature/ui/application.py:163
+#: src/rature/ui/application.py:171
 #, python-format
 msgid "It may still be syncing, or it may be damaged: %s"
 msgstr "Возможно, он ещё синхронизируется или повреждён: %s"
 
-#: src/rature/ui/application.py:164
+#: src/rature/ui/application.py:172
 msgid "Set Aside and Start Empty"
 msgstr "Отложить и начать с пустого"
 
-#: src/rature/ui/application.py:166
+#: src/rature/ui/application.py:174
 msgid "Set Aside and Save This Device's Data"
 msgstr "Отложить и сохранить данные этого устройства"
 
-#: src/rature/ui/application.py:173
+#: src/rature/ui/application.py:181
 msgid "The data file is missing."
 msgstr "Файл данных отсутствует."
 
-#: src/rature/ui/application.py:174
+#: src/rature/ui/application.py:182
 #, python-format
 msgid "No data file was found in this folder: %s"
 msgstr "В этой папке не найден файл данных: %s"
 
-#: src/rature/ui/application.py:175 src/rature/ui/application.py:244
+#: src/rature/ui/application.py:183 src/rature/ui/application.py:284
+#: src/rature/ui/data_folder.py:175
 msgid "Start Empty"
 msgstr "Начать с пустого"
 
-#: src/rature/ui/application.py:177 src/rature/ui/application.py:251
+#: src/rature/ui/application.py:185 src/rature/ui/application.py:291
 msgid "Save This Device's Data"
 msgstr "Сохранить данные этого устройства"
 
-#: src/rature/ui/application.py:186
+#: src/rature/ui/application.py:193
 msgid "Rature cannot reach its data folder."
 msgstr "Rature не может получить доступ к папке данных."
 
-#: src/rature/ui/application.py:187
+#: src/rature/ui/application.py:194
 #, python-format
 msgid "It may have been moved or deleted, or access to it removed: %s"
-msgstr "Возможно, она была перемещена или удалена, либо доступ к ней отозван: %s"
+msgstr ""
+"Возможно, она была перемещена или удалена, либо доступ к ней отозван: %s"
 
-#: src/rature/ui/application.py:200
+#: src/rature/ui/application.py:196 src/rature/ui/window.py:566
+msgid "Choose a Folder…"
+msgstr "Выбрать папку…"
+
+#: src/rature/ui/application.py:243
 msgid "Try Again"
 msgstr "Повторить"
 
-#: src/rature/ui/application.py:239
+#. Nothing to set aside or copy: the empty day of §3.6, written
+#. into the folder as soon as it is confirmed.
+#: src/rature/ui/application.py:279 src/rature/ui/data_folder.py:168
 msgid "Start from an empty day?"
 msgstr "Начать с пустого дня?"
 
-#: src/rature/ui/application.py:241
+#: src/rature/ui/application.py:281 src/rature/ui/data_folder.py:171
 msgid "This empty day will also replace the data on your other synced devices."
 msgstr ""
 "Этот пустой день также заменит данные на других ваших синхронизируемых "
 "устройствах."
 
-#: src/rature/ui/application.py:246
+#: src/rature/ui/application.py:286
 msgid "Save this device's data?"
 msgstr "Сохранить данные этого устройства?"
 
-#: src/rature/ui/application.py:248
+#: src/rature/ui/application.py:288
 msgid ""
 "It will also replace the data on your other synced devices. Recent changes "
 "made on them may be lost."
@@ -716,11 +729,11 @@ msgstr ""
 "изменения, сделанные на них, могут быть потеряны."
 
 #. SPECIFICATION.md §3.6 situation 4.
-#: src/rature/ui/application.py:263
+#: src/rature/ui/application.py:303
 msgid "Rature could not use its data folder."
 msgstr "Rature не удалось использовать папку данных."
 
-#: src/rature/ui/application.py:266
+#: src/rature/ui/application.py:306
 #, python-format
 msgid ""
 "Check that this folder can be read and written, and that the disk is not "
@@ -729,9 +742,72 @@ msgstr ""
 "Проверьте, что эта папка доступна для чтения и записи и что диск не "
 "заполнен: %s"
 
-#: src/rature/ui/application.py:279
+#: src/rature/ui/application.py:319 src/rature/ui/data_folder.py:137
+#: src/rature/ui/window.py:564
 msgid "Close"
 msgstr "Закрыть"
+
+#: src/rature/ui/data_folder.py:123
+#, python-format
+msgid "Its data file cannot be read: %s"
+msgstr "Не удаётся прочитать её файл данных: %s"
+
+#: src/rature/ui/data_folder.py:126
+#, python-format
+msgid "Its data file was saved by a newer version of Rature: %s"
+msgstr "Её файл данных был сохранён более новой версией Rature: %s"
+
+#: src/rature/ui/data_folder.py:130
+#, python-format
+msgid "This is already the data folder: %s"
+msgstr "Это уже папка данных: %s"
+
+#: src/rature/ui/data_folder.py:132
+#, python-format
+msgid "This folder cannot be read: %s"
+msgstr "Не удаётся прочитать эту папку: %s"
+
+#: src/rature/ui/data_folder.py:135
+msgid "This folder cannot be used."
+msgstr "Эту папку нельзя использовать."
+
+#: src/rature/ui/data_folder.py:146
+msgid "Use the data in this folder?"
+msgstr "Использовать данные из этой папки?"
+
+#: src/rature/ui/data_folder.py:150
+#, python-format
+msgid "Your current data will be set aside as %s, in the previous folder."
+msgstr "Текущие данные будут отложены под именем %s в прежней папке."
+
+#: src/rature/ui/data_folder.py:155
+msgid "Use This Folder"
+msgstr "Использовать эту папку"
+
+#: src/rature/ui/data_folder.py:157
+msgid "Copy your data to this folder?"
+msgstr "Скопировать данные в эту папку?"
+
+#: src/rature/ui/data_folder.py:160
+msgid ""
+"If this folder is synced, wait until its first sync has finished before "
+"copying."
+msgstr ""
+"Если эта папка синхронизируется, перед копированием дождитесь окончания её "
+"первой синхронизации."
+
+#: src/rature/ui/data_folder.py:164
+msgid "Copy Data Here"
+msgstr "Скопировать данные сюда"
+
+#: src/rature/ui/data_folder.py:179
+#, python-format
+msgid "Archives stay in the previous folder: %s"
+msgstr "Архив остаётся в прежней папке: %s"
+
+#: src/rature/ui/data_folder.py:182
+msgid "This folder also contains other files."
+msgstr "В этой папке есть и другие файлы."
 
 #: src/rature/ui/day_view.py:106
 msgid "Unfreeze the list"
@@ -769,26 +845,35 @@ msgstr "Отменить зачёркивание"
 msgid "Strike through"
 msgstr "Зачеркнуть"
 
-#: src/rature/ui/window.py:439
+#: src/rature/ui/window.py:446
 msgid "This task changed on another device."
 msgstr "Эта задача изменилась на другом устройстве."
 
-#: src/rature/ui/window.py:504
+#: src/rature/ui/window.py:511
 msgid "Changes could not be saved to disk."
 msgstr "Не удалось сохранить изменения на диск."
 
-#: src/rature/ui/window.py:510
+#: src/rature/ui/window.py:517
 msgid "Two devices changed the data at the same time. Both versions were kept."
 msgstr "Два устройства изменили данные одновременно. Обе версии сохранены."
 
-#: src/rature/ui/window.py:514
+#: src/rature/ui/window.py:521 src/rature/ui/window.py:565
 msgid "Open Folder"
 msgstr "Открыть папку"
 
-#: src/rature/ui/window.py:517
+#: src/rature/ui/window.py:524
 msgid "A new day has started."
 msgstr "Начался новый день."
 
-#: src/rature/ui/window.py:518
+#: src/rature/ui/window.py:525
 msgid "Dismiss"
 msgstr "Закрыть"
+
+#: src/rature/ui/window.py:561
+msgid "Data Folder"
+msgstr "Папка данных"
+
+#: src/rature/ui/window.py:562
+#, python-format
+msgid "Rature keeps its data in: %s"
+msgstr "Rature хранит данные в папке: %s"
