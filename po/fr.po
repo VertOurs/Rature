@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-13 18:01+0100\n"
+"POT-Creation-Date: 2026-11-13 18:49+0100\n"
 "PO-Revision-Date: 2026-09-02 23:40+0200\n"
 "Last-Translator: VertOurs <vertours.dev@gmail.com>\n"
 "Language-Team: French\n"
@@ -502,7 +502,7 @@ msgid "Recurring task"
 msgstr "Tâche récurrente"
 
 #: data/ui/recurring_form.ui:22 src/rature/ui/application.py:295
-#: src/rature/ui/data_folder.py:201
+#: src/rature/ui/data_folder.py:206
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -686,7 +686,7 @@ msgid "No data file was found in this folder: %s"
 msgstr "Aucun fichier de données dans ce dossier : %s"
 
 #: src/rature/ui/application.py:183 src/rature/ui/application.py:284
-#: src/rature/ui/data_folder.py:175
+#: src/rature/ui/data_folder.py:180
 msgid "Start Empty"
 msgstr "Repartir à vide"
 
@@ -712,12 +712,14 @@ msgid "Try Again"
 msgstr "Réessayer"
 
 #. Nothing to set aside or copy: the empty day of §3.6, written
-#. into the folder as soon as it is confirmed.
-#: src/rature/ui/application.py:279 src/rature/ui/data_folder.py:168
+#. into the folder as soon as it is confirmed. On a second
+#. computer, an empty folder has most often not finished its
+#. first sync: the empty day would go to the other device.
+#: src/rature/ui/application.py:279 src/rature/ui/data_folder.py:172
 msgid "Start from an empty day?"
 msgstr "Repartir d'une journée vide ?"
 
-#: src/rature/ui/application.py:281 src/rature/ui/data_folder.py:171
+#: src/rature/ui/application.py:281 src/rature/ui/data_folder.py:175
 msgid "This empty day will also replace the data on your other synced devices."
 msgstr ""
 "Cette journée vide remplacera aussi les données de vos autres appareils "
@@ -749,57 +751,12 @@ msgstr ""
 "Vérifiez que ce dossier est accessible en lecture et en écriture, et que le "
 "disque n'est pas plein : %s"
 
-#: src/rature/ui/application.py:319 src/rature/ui/data_folder.py:137
+#: src/rature/ui/application.py:319 src/rature/ui/data_folder.py:144
 #: src/rature/ui/window.py:564
 msgid "Close"
 msgstr "Fermer"
 
-#: src/rature/ui/data_folder.py:123
-#, python-format
-msgid "Its data file cannot be read: %s"
-msgstr "Son fichier de données est illisible : %s"
-
-#: src/rature/ui/data_folder.py:126
-#, python-format
-msgid "Its data file was saved by a newer version of Rature: %s"
-msgstr ""
-"Son fichier de données a été enregistré par une version plus récente de "
-"Rature : %s"
-
-#: src/rature/ui/data_folder.py:130
-#, python-format
-msgid "This is already the data folder: %s"
-msgstr "C'est déjà le dossier de données : %s"
-
-#: src/rature/ui/data_folder.py:132
-#, python-format
-msgid "This folder cannot be read: %s"
-msgstr "Ce dossier est illisible : %s"
-
-#: src/rature/ui/data_folder.py:135
-msgid "This folder cannot be used."
-msgstr "Ce dossier ne peut pas être utilisé."
-
-#: src/rature/ui/data_folder.py:146
-msgid "Use the data in this folder?"
-msgstr "Utiliser les données de ce dossier ?"
-
-#: src/rature/ui/data_folder.py:150
-#, python-format
-msgid "Your current data will be set aside as %s, in the previous folder."
-msgstr ""
-"Vos données actuelles seront mises de côté sous le nom %s, dans l'ancien "
-"dossier."
-
-#: src/rature/ui/data_folder.py:155
-msgid "Use This Folder"
-msgstr "Utiliser ce dossier"
-
-#: src/rature/ui/data_folder.py:157
-msgid "Copy your data to this folder?"
-msgstr "Copier vos données dans ce dossier ?"
-
-#: src/rature/ui/data_folder.py:160
+#: src/rature/ui/data_folder.py:72
 msgid ""
 "If this folder is synced, wait until its first sync has finished before "
 "copying."
@@ -807,16 +764,61 @@ msgstr ""
 "Si ce dossier est synchronisé, attendez la fin de sa première "
 "synchronisation avant de copier."
 
+#: src/rature/ui/data_folder.py:130
+#, python-format
+msgid "Its data file cannot be read: %s"
+msgstr "Son fichier de données est illisible : %s"
+
+#: src/rature/ui/data_folder.py:133
+#, python-format
+msgid "Its data file was saved by a newer version of Rature: %s"
+msgstr ""
+"Son fichier de données a été enregistré par une version plus récente de "
+"Rature : %s"
+
+#: src/rature/ui/data_folder.py:137
+#, python-format
+msgid "This is already the data folder: %s"
+msgstr "C'est déjà le dossier de données : %s"
+
+#: src/rature/ui/data_folder.py:139
+#, python-format
+msgid "This folder cannot be read: %s"
+msgstr "Ce dossier est illisible : %s"
+
+#: src/rature/ui/data_folder.py:142
+msgid "This folder cannot be used."
+msgstr "Ce dossier ne peut pas être utilisé."
+
+#: src/rature/ui/data_folder.py:153
+msgid "Use the data in this folder?"
+msgstr "Utiliser les données de ce dossier ?"
+
+#: src/rature/ui/data_folder.py:157
+#, python-format
+msgid "Your current data will be set aside as %s, in the previous folder."
+msgstr ""
+"Vos données actuelles seront mises de côté sous le nom %s, dans l'ancien "
+"dossier."
+
+#: src/rature/ui/data_folder.py:162
+msgid "Use This Folder"
+msgstr "Utiliser ce dossier"
+
 #: src/rature/ui/data_folder.py:164
+msgid "Copy your data to this folder?"
+msgstr "Copier vos données dans ce dossier ?"
+
+#: src/rature/ui/data_folder.py:166
 msgid "Copy Data Here"
 msgstr "Copier les données ici"
 
-#: src/rature/ui/data_folder.py:179
+#: src/rature/ui/data_folder.py:184
 #, python-format
 msgid "Archives stay in the previous folder: %s"
 msgstr "Les archives restent dans l'ancien dossier : %s"
 
-#: src/rature/ui/data_folder.py:182
+#: src/rature/ui/data_folder.py:187
 msgid "This folder also contains other files."
 msgstr "Ce dossier contient aussi d'autres fichiers."
 

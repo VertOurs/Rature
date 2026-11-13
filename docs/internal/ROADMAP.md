@@ -721,13 +721,14 @@ Dossier choisi :
       §3.8, Archives et Statistiques fermées à la jonction. En cours
       d'exécution, « Choose a Folder… » laisse la fenêtre comme Quitter
       et rouvre le dossier choisi comme au démarrage
-- [ ] À trancher avec VertOurs, relevé pendant B3 : sans donnée locale, un
+- [x] À trancher avec VertOurs, relevé pendant B3 : sans donnée locale, un
       dossier sans `data.json` mène à la confirmation de journée vide de
       §3.6, qui ne dit pas d'attendre la première synchronisation. C'est
       le parcours principal du README (deuxième machine neuve) : rejoindre
       trop tôt écrit une journée vide qui part vers l'autre appareil.
       Ajouter la ligne `If this folder is synced, wait until its first
-      sync has finished…` à ce dialogue demande une décision de spec
+      sync has finished…` à ce dialogue demande une décision de spec.
+      Tranché le 13 novembre 2026 : ligne ajoutée (§3.17), avant C1
 
 Clôture :
 
