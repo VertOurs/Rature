@@ -629,3 +629,38 @@ def test_no_local_archives_means_nothing_copied(tmp_path: Path, folder: Path) ->
 
     assert not storage.copy_archives(source=tmp_path / "source", target=folder)
     assert _listing(folder) == set()
+
+
+# Without local data
+
+
+def test_a_first_launch_has_no_local_data(tmp_path: Path) -> None:
+    app = App.open(tmp_path / "never created", clock=_on(MONDAY))
+
+    assert not app.has_local_data
+
+
+def test_a_first_gesture_makes_local_data(tmp_path: Path) -> None:
+    app = App.open(tmp_path / "never created", clock=_on(MONDAY))
+    app.add("first")
+
+    assert app.has_local_data
+
+
+def test_a_first_gesture_that_failed_to_write_counts_as_local_data(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = App.open(tmp_path / "never created", clock=_on(MONDAY))
+
+    def refuse(*_args: object, **_kwargs: object) -> str:
+        raise OSError("disk full")
+
+    monkeypatch.setattr(storage, "save", refuse)
+    with pytest.raises(OSError, match="disk full"):
+        app.add("first")
+
+    assert app.has_local_data
+
+
+def test_a_loaded_file_is_local_data(local: Path) -> None:
+    assert App.open(local, clock=_on(MONDAY)).has_local_data

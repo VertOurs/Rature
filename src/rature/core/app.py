@@ -740,6 +740,16 @@ class App:
         self.ensure_day()
 
     @property
+    def has_local_data(self) -> bool:
+        """Whether joining a folder has data of this device to keep (§3.17).
+
+        False only on a first launch before any gesture: then a folder
+        without data.json leads to the empty-day confirmation, not to a copy.
+        A first gesture whose write failed lives in memory, and counts.
+        """
+        return self._fingerprint is not None or self._write_failed
+
+    @property
     def write_failed(self) -> bool:
         """Whether a change lives only in memory after a failed write."""
         return self._write_failed
