@@ -25,7 +25,8 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   after confirmation. An unreadable file is set aside first. A file saved by a
   newer version of Rature shows an alert, then Rature quits, without writing.
   A data folder that refuses access before a change shows a message that
-  offers to try again or to quit, rather than reporting a failed save.
+  offers to try again, to choose another folder, or to quit, rather than
+  reporting a failed save.
 - Changes from another device now show when the window regains focus, and a
   day that passed during sleep shows on waking. Nothing is rebuilt under an
   open menu or rename: the reload waits until it closes.
@@ -33,6 +34,17 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   versions were kept and offers to open the data folder. It stays until no
   copy remains. Rature never reads, merges or deletes these copies. Syncthing's
   names are recognized.
+- Data Folder… in the main menu shows where the data lives and lets you
+  choose another folder, such as one a sync tool shares between devices.
+  Before anything is written, a dialog says what will happen: a folder that
+  already holds data is used as is, and your current data file is set aside
+  under a dated name; an empty folder receives a copy of your data, and of
+  your archives if it has none. Archives left in the previous folder are
+  named. A folder whose data cannot be read, or was saved by a newer
+  version, is refused. A second computer with no data yet can join the
+  shared folder directly. The choice is kept on each device, never in the
+  shared folder. Without Flatpak file system permissions: the folder is
+  picked through the desktop portal.
 
 ### Changed
 

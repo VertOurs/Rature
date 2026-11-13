@@ -707,7 +707,7 @@ Dossier choisi :
       la jonction fera, nom de la mise de côté compris ; `App.join` prend
       cet examen et refuse avec `FolderChangedError` si le dossier a
       changé depuis
-- [ ] B3. Entrée Data Folder…, les deux dialogues, parcours sans donnée
+- [x] B3. Entrée Data Folder…, les deux dialogues, parcours sans donnée
       locale (§3.1, §3.17), « Choose a Folder… » dans le message. Pour un
       dossier sans `data.json` et sans donnée locale, la confirmation de
       journée vide de §3.6 vient avant `join`, qui écrit cette journée tout
@@ -716,7 +716,18 @@ Dossier choisi :
       commit de B3, spec avant le code : une phrase dans §3.17 sur ce
       dialogue rouvert. `JoinOutcome.archives_left_in` : dire où les
       archives sont restées quand il diffère de l'examen, ou retirer le
-      champ s'il ne sert pas
+      champ s'il ne sert pas. Fait le 13 novembre 2026 : champ retiré,
+      `core` journalise un `WARNING`, deux motifs de refus ajoutés à
+      §3.8, Archives et Statistiques fermées à la jonction. En cours
+      d'exécution, « Choose a Folder… » laisse la fenêtre comme Quitter
+      et rouvre le dossier choisi comme au démarrage
+- [ ] À trancher avec VertOurs, relevé pendant B3 : sans donnée locale, un
+      dossier sans `data.json` mène à la confirmation de journée vide de
+      §3.6, qui ne dit pas d'attendre la première synchronisation. C'est
+      le parcours principal du README (deuxième machine neuve) : rejoindre
+      trop tôt écrit une journée vide qui part vers l'autre appareil.
+      Ajouter la ligne `If this folder is synced, wait until its first
+      sync has finished…` à ce dialogue demande une décision de spec
 
 Clôture :
 
