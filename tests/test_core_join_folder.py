@@ -24,6 +24,7 @@ from rature.core.app import (
     JoinOutcome,
     JoinRefusal,
     JoinRefusedError,
+    confirm_folder,
     examine_folder,
 )
 from rature.core.migrations import CURRENT_VERSION
@@ -664,3 +665,40 @@ def test_a_first_gesture_that_failed_to_write_counts_as_local_data(
 
 def test_a_loaded_file_is_local_data(local: Path) -> None:
     assert App.open(local, clock=_on(MONDAY)).has_local_data
+
+
+def test_an_unchanged_folder_is_confirmed(tmp_path: Path, folder: Path) -> None:
+    current = tmp_path / "gone"
+    shown = examine_folder(folder, current=current, clock=_on(MONDAY))
+
+    confirm_folder(shown, current=current)
+
+
+def test_a_data_file_that_arrived_changes_the_preview(
+    tmp_path: Path, folder: Path
+) -> None:
+    current = tmp_path / "gone"
+    shown = examine_folder(folder, current=current, clock=_on(MONDAY))
+    _with_data(folder)
+
+    with pytest.raises(FolderChangedError) as changed:
+        confirm_folder(shown, current=current)
+
+    assert changed.value.preview is not None
+    assert changed.value.preview.has_data
+    assert changed.value.preview.examined_at == shown.examined_at
+    assert changed.value.refusal is None
+
+
+def test_a_folder_that_became_unreadable_is_refused_on_confirming(
+    tmp_path: Path, folder: Path
+) -> None:
+    current = tmp_path / "gone"
+    shown = examine_folder(folder, current=current, clock=_on(MONDAY))
+    (folder / "data.json").write_text("{half delivered")
+
+    with pytest.raises(FolderChangedError) as changed:
+        confirm_folder(shown, current=current)
+
+    assert changed.value.preview is None
+    assert changed.value.refusal is JoinRefusal.UNREADABLE

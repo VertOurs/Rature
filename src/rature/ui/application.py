@@ -22,10 +22,15 @@ from rature.core.app import (  # noqa: E402
     DataFileMissingError,
     DataFileUnreadableError,
     DataFolderUnreachableError,
+    FolderChangedError,
+    FolderPreview,
+    confirm_folder,
+    examine_folder,
 )
 from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.archives_window import ArchivesWindow  # noqa: E402
+from rature.ui.data_folder import FolderJoiner  # noqa: E402
 from rature.ui.statistics_window import StatisticsWindow  # noqa: E402
 from rature.ui.window import RatureWindow  # noqa: E402
 
@@ -76,9 +81,12 @@ class RatureApplication(Adw.Application):
             self._open_data(App.open)
 
     def _present_window(self) -> None:
-        window = self.props.active_window or RatureWindow(
-            application=self, app=self._app
-        )
+        # Only a main window: a dialog shown without a parent (§3.17) has a
+        # window of its own, which may still be closing.
+        window = next(
+            (each for each in self.get_windows() if isinstance(each, RatureWindow)),
+            None,
+        ) or RatureWindow(application=self, app=self._app)
         window.present()
         self._release_after_dialogs()
 
@@ -164,7 +172,7 @@ class RatureApplication(Adw.Application):
             _("Set Aside and Start Empty")
             if self._failing_window is None
             else _("Set Aside and Save This Device's Data"),
-            self._show_unreadable_file_message,
+            lambda: self._confirm_way_out(self._show_unreadable_file_message),
         )
 
     def _show_missing_file_message(self) -> None:
@@ -175,33 +183,65 @@ class RatureApplication(Adw.Application):
             _("Start Empty")
             if self._failing_window is None
             else _("Save This Device's Data"),
-            self._show_missing_file_message,
+            lambda: self._confirm_way_out(self._show_missing_file_message),
         )
 
     def _show_unreachable_folder_message(self) -> None:
-        # SPECIFICATION.md §3.6 situation 2. No way out until a folder can be
-        # chosen (ROADMAP.md, chantier 10, B3): never back to the default
-        # folder in silence.
+        # SPECIFICATION.md §3.6 situation 2. The way out is another folder,
+        # never the default folder in silence.
         self._show_blocking_message(
             _("Rature cannot reach its data folder."),
             _("It may have been moved or deleted, or access to it removed: %s")
             % self._data_folder(),
-            None,
-            self._show_unreachable_folder_message,
+            _("Choose a Folder…"),
+            self._choose_folder,
         )
+
+    def _choose_folder(self) -> None:
+        # SPECIFICATION.md §3.17, without readable local data: nothing is set
+        # aside or copied, and a refused folder leads back to the message.
+        current = self._data_folder()
+        FolderJoiner(
+            parent=self._failing_window,
+            examine=lambda folder: examine_folder(folder, current=current),
+            join=lambda preview: self._join_without_local_data(preview, current),
+            has_local_data=False,
+            back=self._show_unreachable_folder_message,
+        ).choose()
+
+    def _join_without_local_data(
+        self, preview: FolderPreview, current: Path
+    ) -> FolderChangedError | None:
+        try:
+            confirm_folder(preview, current=current)
+        except FolderChangedError as changed:
+            return changed
+        # Kept on this device, never in the data folder (§2.9).
+        Gio.Settings.new(APP_ID).set_string("data-folder", str(preview.folder))
+        # While running, what this window held is left behind, as Quit would
+        # leave it: its folder is out of reach. The windows go, held so the
+        # process outlives them, and the chosen folder opens as at startup.
+        if not self._held_for_dialogs:
+            self.hold()
+            self._held_for_dialogs = True
+        self._failing_window = None
+        self._app = None
+        for window in list(self.get_windows()):
+            window.close()
+        # §3.6: a folder without data.json starts from the confirmed empty
+        # day, written at once.
+        self._open_data(App.open if preview.has_data else App.start_empty)
+        return None
 
     def _show_blocking_message(
         self,
         message: str,
         detail: str,
-        way_out: str | None,
-        show_again: Callable[[], None],
+        way_out: str,
+        on_way_out: Callable[[], None],
     ) -> None:
-        buttons = [_("Try Again")]
-        if way_out is not None:
-            buttons.append(way_out)
-        buttons.append(_("Quit"))
-        try_again, leave = 0, len(buttons) - 1
+        buttons = [_("Try Again"), way_out, _("Quit")]
+        try_again, leave = 0, 2
 
         def on_choice(choice: int) -> None:
             if choice == try_again:
@@ -210,7 +250,7 @@ class RatureApplication(Adw.Application):
                 self._release_after_dialogs()
                 self.quit()
             else:
-                self._confirm_way_out(show_again)
+                on_way_out()
 
         self._ask(
             message,

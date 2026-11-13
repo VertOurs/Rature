@@ -13,7 +13,13 @@ from typing import Any
 
 import pytest
 from gi.repository import Gio, Gtk
-from ui_helpers import FakeAlertDialog, process_events
+from ui_helpers import (
+    FakeAdwAlertDialog,
+    FakeAlertDialog,
+    FakeFileDialog,
+    fake_folder_dialogs,
+    process_events,
+)
 
 from rature.core import storage
 from rature.core.app import App
@@ -253,8 +259,11 @@ def test_a_chosen_folder_that_is_gone_is_out_of_reach(
 
     assert startup.message() == "Rature cannot reach its data folder."
     assert str(chosen_folder) in startup.dialog.get_detail()
-    # No way out until a folder can be chosen (ROADMAP.md, B3).
-    assert list(startup.dialog.get_buttons()) == ["Try Again", "Quit"]
+    assert list(startup.dialog.get_buttons()) == [
+        "Try Again",
+        "Choose a Folder…",
+        "Quit",
+    ]
     assert startup.windows() == []
 
     # The sync tool brings the folder back, data included.
@@ -291,3 +300,94 @@ def test_an_empty_chosen_folder_is_a_missing_file(
 
     assert startup.message() == "The data file is missing."
     assert str(chosen_folder) in startup.dialog.get_detail()
+
+
+@pytest.fixture
+def other_folder(tmp_path: Path) -> Path:
+    """A folder to choose from the out-of-reach message, empty."""
+    folder = tmp_path / "Other"
+    folder.mkdir()
+    return folder
+
+
+def _choose_from_the_message(
+    startup: _Startup, folder: Path, monkeypatch: pytest.MonkeyPatch
+) -> FakeAdwAlertDialog:
+    fake_folder_dialogs(monkeypatch)
+    startup.application.do_activate()
+    startup.dialog.press("Choose a Folder…")
+    picker = FakeFileDialog.shown[-1]
+    assert picker.parent is None
+    picker.pick(folder)
+    return FakeAdwAlertDialog.shown[-1]
+
+
+def test_a_folder_with_data_is_taken_from_the_out_of_reach_message(
+    startup: _Startup,
+    chosen_folder: Path,
+    other_folder: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    App.start_empty(other_folder, chosen=True).add("other device")
+
+    dialog = _choose_from_the_message(startup, other_folder, monkeypatch)
+
+    # Nothing local to set aside (§3.17).
+    assert dialog.get_heading() == "Use the data in this folder?"
+    assert dialog.get_body() == ""
+    assert dialog.parent is None
+    dialog.press("Use This Folder")
+
+    (window,) = startup.windows()
+    assert window.app.data_dir == other_folder
+    assert Gio.Settings.new(APP_ID).get_string("data-folder") == str(other_folder)
+    assert startup.holds == startup.releases == 1
+    assert not chosen_folder.exists()
+
+
+def test_a_folder_without_data_starts_empty_from_the_out_of_reach_message(
+    startup: _Startup,
+    chosen_folder: Path,
+    other_folder: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dialog = _choose_from_the_message(startup, other_folder, monkeypatch)
+
+    assert dialog.get_heading() == "Start from an empty day?"
+    dialog.press("Start Empty")
+
+    (window,) = startup.windows()
+    assert window.app.data_dir == other_folder
+    assert (other_folder / "data.json").exists()
+
+
+@pytest.mark.parametrize("leave", ["Close", "Cancel"])
+def test_leaving_the_join_leads_back_to_the_out_of_reach_message(
+    startup: _Startup,
+    chosen_folder: Path,
+    other_folder: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    leave: str,
+) -> None:
+    if leave == "Close":
+        (other_folder / "data.json").write_text("{half delivered")
+
+    _choose_from_the_message(startup, other_folder, monkeypatch).press(leave)
+
+    assert startup.message() == "Rature cannot reach its data folder."
+    assert len(FakeAlertDialog.shown) == 2
+    assert startup.windows() == []
+    assert Gio.Settings.new(APP_ID).get_string("data-folder") == str(chosen_folder)
+
+
+def test_a_dismissed_picker_leads_back_to_the_out_of_reach_message(
+    startup: _Startup, chosen_folder: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_folder_dialogs(monkeypatch)
+    startup.application.do_activate()
+    startup.dialog.press("Choose a Folder…")
+
+    FakeFileDialog.shown[-1].dismiss()
+
+    assert len(FakeAlertDialog.shown) == 2
+    assert startup.message() == "Rature cannot reach its data folder."

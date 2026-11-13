@@ -190,6 +190,23 @@ def examine_folder(
     )
 
 
+def confirm_folder(shown: FolderPreview, *, current: Path) -> None:
+    """Examine shown.folder again before joining it with no local data (§3.17).
+
+    The counterpart of the check App.join makes, for when no App exists: at
+    the moment of the shown examination, anything different from what the
+    user accepted raises FolderChangedError. Writes nothing.
+    """
+    try:
+        again = examine_folder(
+            shown.folder, current=current, clock=lambda: shown.examined_at
+        )
+    except JoinRefusedError as refused:
+        raise FolderChangedError(preview=None, refusal=refused.reason) from refused
+    if again != shown:
+        raise FolderChangedError(preview=again, refusal=None)
+
+
 def _parse(content: bytes, data_dir: Path) -> Store:
     try:
         return storage.parse_main(content, data_dir=data_dir)
