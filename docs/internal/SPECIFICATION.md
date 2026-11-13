@@ -1806,6 +1806,11 @@ ignorant les entrées propres à Syncthing (`.stfolder`, `.stignore`,
 L'examen n'écrit rien dans le dossier, pas même la sauvegarde avant
 migration de §2.7.10 : elle se fait au chargement qui suit la jonction.
 
+Le dossier est examiné de nouveau à la confirmation (§2.9). S'il a changé
+depuis que le dialogue s'est ouvert, rien n'est écrit et le dialogue se
+rouvre sur ce qu'il contient désormais : le nouveau constat, ou le refus et
+son motif. L'utilisateur confirme de nouveau, ou annule.
+
 Après avoir rejoint, les données sont rechargées depuis le nouveau
 dossier, toutes les vues se reconstruisent et la pile d'annulation se vide
 (§3.2) : ce ne sont plus les mêmes données. `Cancel` ne change rien.
