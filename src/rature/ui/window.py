@@ -19,12 +19,15 @@ from rature.core.app import (  # noqa: E402
     DataFileMissingError,
     DataFileUnreadableError,
     DataFolderUnreachableError,
+    FolderChangedError,
+    FolderPreview,
     GestureRefusedError,
     LockedError,
 )
 from rature.core.migrations import FutureVersionError  # noqa: E402
 from rature.ui import APP_ID  # noqa: E402
 from rature.ui.archives_window import ArchivesWindow  # noqa: E402
+from rature.ui.data_folder import FolderJoiner, alert  # noqa: E402
 from rature.ui.day_view import DayView  # noqa: E402
 from rature.ui.prepared_row import PreparedRow  # noqa: E402
 from rature.ui.recurring_view import RecurringView  # noqa: E402
@@ -194,6 +197,10 @@ class RatureWindow(Adw.ApplicationWindow):
         editor_closed = Gio.SimpleAction.new("row-editor-closed", None)
         editor_closed.connect("activate", self._on_row_editor_closed)
         self.add_action(editor_closed)
+
+        data_folder = Gio.SimpleAction.new("data-folder", None)
+        data_folder.connect("activate", lambda _a, _p: self._show_data_folder())
+        self.add_action(data_folder)
 
         help_action = Gio.SimpleAction.new("show-help-overlay", None)
         help_action.connect("activate", lambda _a, _p: self._help_overlay.present(self))
@@ -534,6 +541,61 @@ class RatureWindow(Adw.ApplicationWindow):
         # manifest gains no file system permission.
         folder = Gio.File.new_for_path(str(self.app.data_dir))
         Gtk.FileLauncher.new(folder).launch(self, None, self._on_data_folder_opened)
+
+    def _show_data_folder(self) -> None:
+        # SPECIFICATION.md §3.17: the Data Folder… entry of the main menu.
+        def on_response(response: str) -> None:
+            if response == "open":
+                self._open_data_folder()
+            elif response == "choose":
+                FolderJoiner(
+                    parent=self,
+                    examine=self.app.examine,
+                    join=self.join_folder,
+                    has_local_data=self.app.has_local_data,
+                    back=lambda: None,
+                ).choose()
+
+        alert(
+            self,
+            _("Data Folder"),
+            [_("Rature keeps its data in: %s") % self.app.data_dir],
+            [
+                ("close", _("Close")),
+                ("open", _("Open Folder")),
+                ("choose", _("Choose a Folder…")),
+            ],
+            on_response,
+            close_response="close",
+        )
+
+    def join_folder(self, preview: FolderPreview) -> FolderChangedError | None:
+        """Join the folder the dialog showed, as a gesture is run (§3.17).
+
+        Returns the change of a folder that changed since, with nothing
+        written. A failed read or write goes where a gesture's goes (§3.6).
+        """
+        changed: FolderChangedError | None = None
+        joined = False
+
+        def attempt() -> None:
+            nonlocal changed, joined
+            try:
+                self.app.join(preview)
+            except FolderChangedError as error:
+                changed = error
+            else:
+                joined = True
+
+        self._run_app_action(attempt)
+        if joined:
+            # Kept on this device, never in the data folder (§2.9).
+            self._settings.set_string("data-folder", str(preview.folder))
+            # They showed the previous folder's archives (§3.17).
+            for window in self.get_application().get_windows():
+                if isinstance(window, (ArchivesWindow, StatisticsWindow)):
+                    window.close()
+        return changed
 
     def _on_data_folder_opened(
         self, launcher: Gtk.FileLauncher, result: Gio.AsyncResult

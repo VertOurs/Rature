@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rature\n"
 "Report-Msgid-Bugs-To: https://github.com/VertOurs/Rature/issues\n"
-"POT-Creation-Date: 2026-11-12 15:53+0100\n"
+"POT-Creation-Date: 2026-11-13 18:01+0100\n"
 "PO-Revision-Date: 2026-10-29 16:30+0100\n"
 "Last-Translator: Machine translation\n"
 "Language-Team: German\n"
@@ -392,31 +392,35 @@ msgstr "Archiv"
 msgid "Statistics"
 msgstr "Statistik"
 
-#: data/ui/window.ui:20 data/ui/shortcuts.ui:22
+#: data/ui/window.ui:18
+msgid "Data Folder…"
+msgstr "Datenordner…"
+
+#: data/ui/window.ui:24 data/ui/shortcuts.ui:22
 msgid "Keyboard Shortcuts"
 msgstr "Tastenkürzel"
 
-#: data/ui/window.ui:24
+#: data/ui/window.ui:28
 msgid "About Rature"
 msgstr "Info zu Rature"
 
-#: data/ui/window.ui:45 data/ui/window.ui:47
+#: data/ui/window.ui:49 data/ui/window.ui:51
 msgid "Main menu"
 msgstr "Hauptmenü"
 
-#: data/ui/window.ui:65 data/ui/window.ui:127
+#: data/ui/window.ui:69 data/ui/window.ui:131
 msgid "Day"
 msgstr "Heute"
 
-#: data/ui/window.ui:81 data/ui/window.ui:150
+#: data/ui/window.ui:85 data/ui/window.ui:154
 msgid "Tomorrow"
 msgstr "Morgen"
 
-#: data/ui/window.ui:95 data/ui/window.ui:153
+#: data/ui/window.ui:99 data/ui/window.ui:157
 msgid "Reserve"
 msgstr "Reserve"
 
-#: data/ui/window.ui:109 data/ui/window.ui:156
+#: data/ui/window.ui:113 data/ui/window.ui:160
 msgid "Recurring"
 msgstr "Wiederkehrend"
 
@@ -500,7 +504,8 @@ msgstr "Bearbeiten"
 msgid "Recurring task"
 msgstr "Wiederkehrende Aufgabe"
 
-#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:255
+#: data/ui/recurring_form.ui:22 src/rature/ui/application.py:295
+#: src/rature/ui/data_folder.py:201
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -582,8 +587,8 @@ msgstr "Gesamt"
 msgid "General"
 msgstr "Allgemein"
 
-#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:203
-#: src/rature/ui/application.py:294
+#: data/ui/shortcuts.ui:15 src/rature/ui/application.py:243
+#: src/rature/ui/application.py:334
 msgid "Quit"
 msgstr "Beenden"
 
@@ -645,79 +650,88 @@ msgstr "%A, %-d. %B"
 msgid "%-d %B %Y"
 msgstr "%-d. %B %Y"
 
-#: src/rature/ui/application.py:127
+#: src/rature/ui/application.py:135
 msgid "This file was saved by a newer version of Rature."
 msgstr "Diese Datei wurde von einer neueren Version von Rature gespeichert."
 
-#: src/rature/ui/application.py:129
+#: src/rature/ui/application.py:137
 #, python-format
 msgid "Opening it could overwrite data. Update Rature to open this file: %s"
 msgstr ""
 "Das Öffnen könnte Daten überschreiben. Aktualisieren Sie Rature, um diese "
 "Datei zu öffnen: %s"
 
-#: src/rature/ui/application.py:162
+#: src/rature/ui/application.py:170
 msgid "The data file cannot be read."
 msgstr "Die Datendatei kann nicht gelesen werden."
 
-#: src/rature/ui/application.py:163
+#: src/rature/ui/application.py:171
 #, python-format
 msgid "It may still be syncing, or it may be damaged: %s"
 msgstr "Sie wird vielleicht noch synchronisiert oder ist beschädigt: %s"
 
-#: src/rature/ui/application.py:164
+#: src/rature/ui/application.py:172
 msgid "Set Aside and Start Empty"
 msgstr "Beiseitelegen und leer beginnen"
 
-#: src/rature/ui/application.py:166
+#: src/rature/ui/application.py:174
 msgid "Set Aside and Save This Device's Data"
 msgstr "Beiseitelegen und die Daten dieses Geräts speichern"
 
-#: src/rature/ui/application.py:173
+#: src/rature/ui/application.py:181
 msgid "The data file is missing."
 msgstr "Die Datendatei fehlt."
 
-#: src/rature/ui/application.py:174
+#: src/rature/ui/application.py:182
 #, python-format
 msgid "No data file was found in this folder: %s"
 msgstr "In diesem Ordner wurde keine Datendatei gefunden: %s"
 
-#: src/rature/ui/application.py:175 src/rature/ui/application.py:244
+#: src/rature/ui/application.py:183 src/rature/ui/application.py:284
+#: src/rature/ui/data_folder.py:175
 msgid "Start Empty"
 msgstr "Leer beginnen"
 
-#: src/rature/ui/application.py:177 src/rature/ui/application.py:251
+#: src/rature/ui/application.py:185 src/rature/ui/application.py:291
 msgid "Save This Device's Data"
 msgstr "Daten dieses Geräts speichern"
 
-#: src/rature/ui/application.py:186
+#: src/rature/ui/application.py:193
 msgid "Rature cannot reach its data folder."
 msgstr "Rature kann seinen Datenordner nicht erreichen."
 
-#: src/rature/ui/application.py:187
+#: src/rature/ui/application.py:194
 #, python-format
 msgid "It may have been moved or deleted, or access to it removed: %s"
-msgstr "Er wurde vielleicht verschoben oder gelöscht, oder der Zugriff darauf wurde entzogen: %s"
+msgstr ""
+"Er wurde vielleicht verschoben oder gelöscht, oder der Zugriff darauf wurde "
+"entzogen: %s"
 
-#: src/rature/ui/application.py:200
+#: src/rature/ui/application.py:196 src/rature/ui/window.py:566
+msgid "Choose a Folder…"
+msgstr "Ordner wählen…"
+
+#: src/rature/ui/application.py:243
 msgid "Try Again"
 msgstr "Erneut versuchen"
 
-#: src/rature/ui/application.py:239
+#. Nothing to set aside or copy: the empty day of §3.6, written
+#. into the folder as soon as it is confirmed.
+#: src/rature/ui/application.py:279 src/rature/ui/data_folder.py:168
 msgid "Start from an empty day?"
 msgstr "Mit einem leeren Tag beginnen?"
 
-#: src/rature/ui/application.py:241
+#: src/rature/ui/application.py:281 src/rature/ui/data_folder.py:171
 msgid "This empty day will also replace the data on your other synced devices."
 msgstr ""
 "Dieser leere Tag ersetzt auch die Daten auf Ihren anderen synchronisierten "
 "Geräten."
 
-#: src/rature/ui/application.py:246
+#: src/rature/ui/application.py:286
 msgid "Save this device's data?"
 msgstr "Daten dieses Geräts speichern?"
 
-#: src/rature/ui/application.py:248
+#: src/rature/ui/application.py:288
 msgid ""
 "It will also replace the data on your other synced devices. Recent changes "
 "made on them may be lost."
@@ -726,11 +740,11 @@ msgstr ""
 "vorgenommene neuere Änderungen können verloren gehen."
 
 #. SPECIFICATION.md §3.6 situation 4.
-#: src/rature/ui/application.py:263
+#: src/rature/ui/application.py:303
 msgid "Rature could not use its data folder."
 msgstr "Rature konnte seinen Datenordner nicht verwenden."
 
-#: src/rature/ui/application.py:266
+#: src/rature/ui/application.py:306
 #, python-format
 msgid ""
 "Check that this folder can be read and written, and that the disk is not "
@@ -739,9 +753,74 @@ msgstr ""
 "Prüfen Sie, ob dieser Ordner gelesen und beschrieben werden kann und ob der "
 "Datenträger nicht voll ist: %s"
 
-#: src/rature/ui/application.py:279
+#: src/rature/ui/application.py:319 src/rature/ui/data_folder.py:137
+#: src/rature/ui/window.py:564
 msgid "Close"
 msgstr "Schließen"
+
+#: src/rature/ui/data_folder.py:123
+#, python-format
+msgid "Its data file cannot be read: %s"
+msgstr "Seine Datendatei kann nicht gelesen werden: %s"
+
+#: src/rature/ui/data_folder.py:126
+#, python-format
+msgid "Its data file was saved by a newer version of Rature: %s"
+msgstr ""
+"Seine Datendatei wurde von einer neueren Version von Rature gespeichert: %s"
+
+#: src/rature/ui/data_folder.py:130
+#, python-format
+msgid "This is already the data folder: %s"
+msgstr "Dies ist bereits der Datenordner: %s"
+
+#: src/rature/ui/data_folder.py:132
+#, python-format
+msgid "This folder cannot be read: %s"
+msgstr "Dieser Ordner kann nicht gelesen werden: %s"
+
+#: src/rature/ui/data_folder.py:135
+msgid "This folder cannot be used."
+msgstr "Dieser Ordner kann nicht verwendet werden."
+
+#: src/rature/ui/data_folder.py:146
+msgid "Use the data in this folder?"
+msgstr "Die Daten in diesem Ordner verwenden?"
+
+#: src/rature/ui/data_folder.py:150
+#, python-format
+msgid "Your current data will be set aside as %s, in the previous folder."
+msgstr ""
+"Ihre aktuellen Daten werden als %s im bisherigen Ordner beiseitegelegt."
+
+#: src/rature/ui/data_folder.py:155
+msgid "Use This Folder"
+msgstr "Diesen Ordner verwenden"
+
+#: src/rature/ui/data_folder.py:157
+msgid "Copy your data to this folder?"
+msgstr "Ihre Daten in diesen Ordner kopieren?"
+
+#: src/rature/ui/data_folder.py:160
+msgid ""
+"If this folder is synced, wait until its first sync has finished before "
+"copying."
+msgstr ""
+"Wenn dieser Ordner synchronisiert wird, warten Sie vor dem Kopieren, bis "
+"seine erste Synchronisierung abgeschlossen ist."
+
+#: src/rature/ui/data_folder.py:164
+msgid "Copy Data Here"
+msgstr "Daten hierher kopieren"
+
+#: src/rature/ui/data_folder.py:179
+#, python-format
+msgid "Archives stay in the previous folder: %s"
+msgstr "Das Archiv bleibt im bisherigen Ordner: %s"
+
+#: src/rature/ui/data_folder.py:182
+msgid "This folder also contains other files."
+msgstr "Dieser Ordner enthält auch andere Dateien."
 
 #: src/rature/ui/day_view.py:106
 msgid "Unfreeze the list"
@@ -779,28 +858,37 @@ msgstr "Durchstreichen rückgängig machen"
 msgid "Strike through"
 msgstr "Durchstreichen"
 
-#: src/rature/ui/window.py:439
+#: src/rature/ui/window.py:446
 msgid "This task changed on another device."
 msgstr "Diese Aufgabe wurde auf einem anderen Gerät geändert."
 
-#: src/rature/ui/window.py:504
+#: src/rature/ui/window.py:511
 msgid "Changes could not be saved to disk."
 msgstr "Änderungen konnten nicht auf dem Datenträger gespeichert werden."
 
-#: src/rature/ui/window.py:510
+#: src/rature/ui/window.py:517
 msgid "Two devices changed the data at the same time. Both versions were kept."
 msgstr ""
 "Zwei Geräte haben die Daten gleichzeitig geändert. Beide Versionen wurden "
 "behalten."
 
-#: src/rature/ui/window.py:514
+#: src/rature/ui/window.py:521 src/rature/ui/window.py:565
 msgid "Open Folder"
 msgstr "Ordner öffnen"
 
-#: src/rature/ui/window.py:517
+#: src/rature/ui/window.py:524
 msgid "A new day has started."
 msgstr "Ein neuer Tag hat begonnen."
 
-#: src/rature/ui/window.py:518
+#: src/rature/ui/window.py:525
 msgid "Dismiss"
 msgstr "Schließen"
+
+#: src/rature/ui/window.py:561
+msgid "Data Folder"
+msgstr "Datenordner"
+
+#: src/rature/ui/window.py:562
+#, python-format
+msgid "Rature keeps its data in: %s"
+msgstr "Rature speichert seine Daten in: %s"

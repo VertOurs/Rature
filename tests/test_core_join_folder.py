@@ -24,6 +24,7 @@ from rature.core.app import (
     JoinOutcome,
     JoinRefusal,
     JoinRefusedError,
+    confirm_folder,
     examine_folder,
 )
 from rature.core.migrations import CURRENT_VERSION
@@ -208,7 +209,6 @@ def test_a_folder_with_data_is_taken_and_ours_set_aside(
     assert app.data_dir == folder
     assert outcome.set_aside == local / "data.json.20260824-100000.bak"
     assert _listing(local) == {"data.json.20260824-100000.bak"}
-    assert outcome.archives_left_in is None
     assert app.take_reloaded()
     assert not app.reread()
 
@@ -217,9 +217,8 @@ def test_local_archives_stay_behind_when_taking(local: Path, folder: Path) -> No
     _with_archive(local, date(2026, 8, 20))
     _with_data(folder)
 
-    outcome = _join(App.open(local, clock=_on(MONDAY)), folder)
+    _join(App.open(local, clock=_on(MONDAY)), folder)
 
-    assert outcome.archives_left_in == local
     assert not (folder / "archive").exists()
 
 
@@ -320,7 +319,6 @@ def test_an_empty_folder_receives_our_data_and_archives(
         date=date(2026, 8, 20)
     )
     assert outcome.set_aside is None
-    assert outcome.archives_left_in is None
     assert (local / "data.json").exists()
     assert app.data_dir == folder
     assert app.take_reloaded()
@@ -330,38 +328,44 @@ def test_an_empty_folder_receives_our_data_and_archives(
 def test_without_local_archives_no_archive_folder_is_made(
     local: Path, folder: Path
 ) -> None:
-    outcome = _join(App.open(local, clock=_on(MONDAY)), folder)
+    _join(App.open(local, clock=_on(MONDAY)), folder)
 
     assert _listing(folder) == {"data.json"}
-    assert outcome.archives_left_in is None
 
 
 def test_an_archive_folder_already_there_is_left_alone(
-    local: Path, folder: Path
+    local: Path, folder: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     _with_archive(local, date(2026, 8, 20))
     (folder / "archive").mkdir()
     theirs = folder / "archive" / "2026-08-20.json"
     theirs.write_text("theirs")
 
-    outcome = _join(App.open(local, clock=_on(MONDAY)), folder)
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        _join(App.open(local, clock=_on(MONDAY)), folder)
 
     assert theirs.read_text() == "theirs"
-    assert outcome.archives_left_in == local
+    # The preview said so: nothing unexpected to log.
+    assert "local archives stayed" not in caplog.text
 
 
-def test_archives_stay_if_archive_folder_arrives_during_the_join(
-    local: Path, folder: Path, monkeypatch: pytest.MonkeyPatch
+def test_archives_left_behind_against_the_preview_are_logged(
+    local: Path,
+    folder: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     _with_archive(local, date(2026, 8, 20))
     app = App.open(local, clock=_on(MONDAY))
     shown = app.examine(folder)
     assert shown.archives_stay_in is None
+    # archive/ arrived during the join: copy_archives found it there.
     monkeypatch.setattr(storage, "copy_archives", lambda **_kwargs: False)
 
-    outcome = app.join(shown)
+    with caplog.at_level(logging.WARNING, logger="rature.core.app"):
+        app.join(shown)
 
-    assert outcome.archives_left_in == local
+    assert f"local archives stayed in {local}" in caplog.text
 
 
 def test_a_first_launch_writes_its_empty_day_into_the_folder(
@@ -373,7 +377,7 @@ def test_a_first_launch_writes_its_empty_day_into_the_folder(
     outcome = _join(app, folder)
 
     assert load(data_dir=folder).day == Day(date=MONDAY)
-    assert outcome == type(outcome)(set_aside=None, archives_left_in=None)
+    assert outcome == JoinOutcome(set_aside=None)
     assert not local.exists()
 
 
@@ -491,11 +495,10 @@ def test_pending_archives_go_to_the_previous_folder_then_along(
     app.clock = _on(TUESDAY)
     app.ensure_day()
 
-    outcome = _join(app, folder)
+    _join(app, folder)
 
     assert load_archive(MONDAY, data_dir=local).tasks[0].text == "local task"
     assert load_archive(MONDAY, data_dir=folder).tasks[0].text == "local task"
-    assert outcome.archives_left_in is None
 
 
 def test_pending_archives_stay_behind_when_taking(local: Path, folder: Path) -> None:
@@ -504,10 +507,10 @@ def test_pending_archives_stay_behind_when_taking(local: Path, folder: Path) -> 
     app.clock = _on(TUESDAY)
     app.ensure_day()
 
-    outcome = _join(app, folder)
+    _join(app, folder)
 
     assert load_archive(MONDAY, data_dir=local).tasks[0].text == "local task"
-    assert outcome.archives_left_in == local
+    assert not (folder / "archive").exists()
 
 
 def test_a_first_launch_keeps_no_pending_archive(tmp_path: Path, folder: Path) -> None:
@@ -627,3 +630,75 @@ def test_no_local_archives_means_nothing_copied(tmp_path: Path, folder: Path) ->
 
     assert not storage.copy_archives(source=tmp_path / "source", target=folder)
     assert _listing(folder) == set()
+
+
+# Without local data
+
+
+def test_a_first_launch_has_no_local_data(tmp_path: Path) -> None:
+    app = App.open(tmp_path / "never created", clock=_on(MONDAY))
+
+    assert not app.has_local_data
+
+
+def test_a_first_gesture_makes_local_data(tmp_path: Path) -> None:
+    app = App.open(tmp_path / "never created", clock=_on(MONDAY))
+    app.add("first")
+
+    assert app.has_local_data
+
+
+def test_a_first_gesture_that_failed_to_write_counts_as_local_data(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = App.open(tmp_path / "never created", clock=_on(MONDAY))
+
+    def refuse(*_args: object, **_kwargs: object) -> str:
+        raise OSError("disk full")
+
+    monkeypatch.setattr(storage, "save", refuse)
+    with pytest.raises(OSError, match="disk full"):
+        app.add("first")
+
+    assert app.has_local_data
+
+
+def test_a_loaded_file_is_local_data(local: Path) -> None:
+    assert App.open(local, clock=_on(MONDAY)).has_local_data
+
+
+def test_an_unchanged_folder_is_confirmed(tmp_path: Path, folder: Path) -> None:
+    current = tmp_path / "gone"
+    shown = examine_folder(folder, current=current, clock=_on(MONDAY))
+
+    confirm_folder(shown, current=current)
+
+
+def test_a_data_file_that_arrived_changes_the_preview(
+    tmp_path: Path, folder: Path
+) -> None:
+    current = tmp_path / "gone"
+    shown = examine_folder(folder, current=current, clock=_on(MONDAY))
+    _with_data(folder)
+
+    with pytest.raises(FolderChangedError) as changed:
+        confirm_folder(shown, current=current)
+
+    assert changed.value.preview is not None
+    assert changed.value.preview.has_data
+    assert changed.value.preview.examined_at == shown.examined_at
+    assert changed.value.refusal is None
+
+
+def test_a_folder_that_became_unreadable_is_refused_on_confirming(
+    tmp_path: Path, folder: Path
+) -> None:
+    current = tmp_path / "gone"
+    shown = examine_folder(folder, current=current, clock=_on(MONDAY))
+    (folder / "data.json").write_text("{half delivered")
+
+    with pytest.raises(FolderChangedError) as changed:
+        confirm_folder(shown, current=current)
+
+    assert changed.value.preview is None
+    assert changed.value.refusal is JoinRefusal.UNREADABLE

@@ -3,9 +3,11 @@
 """Helpers shared by the UI tests. Imported only once conftest.py let gi in."""
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
-from gi.repository import GLib, GObject, Gtk
+import pytest
+from gi.repository import Adw, Gio, GLib, GObject, Gtk
 
 
 class FakeAlertDialog:
@@ -39,6 +41,88 @@ class FakeAlertDialog:
 
     def dismiss(self) -> None:
         self._callback(self, None)
+
+
+class FakeAdwAlertDialog:
+    """A real Adw.AlertDialog whose answer comes from the test."""
+
+    shown: list["FakeAdwAlertDialog"] = []  # noqa: RUF012
+    _real_class: Any = None
+
+    def __init__(self) -> None:
+        self._real = FakeAdwAlertDialog._real_class()
+        self._responses: dict[str, str] = {}
+        self._callback: Callable[[Any, Any], None] | None = None
+        self._choice: str | None = None
+        self.parent: Any = None
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._real, name)
+
+    def add_response(self, response_id: str, label: str) -> None:
+        self._responses[label] = response_id
+        self._real.add_response(response_id, label)
+
+    def labels(self) -> list[str]:
+        return list(self._responses)
+
+    def choose(self, parent: Any, _cancellable: Any, callback: Any) -> None:
+        self.parent = parent
+        self._callback = callback
+        FakeAdwAlertDialog.shown.append(self)
+
+    def choose_finish(self, _result: Any) -> str:
+        assert self._choice is not None
+        return self._choice
+
+    def press(self, label: str) -> None:
+        self._choice = self._responses[label]
+        self._callback(self, None)
+        process_events()
+
+    def dismiss(self) -> None:
+        self._choice = self._real.get_close_response()
+        self._callback(self, None)
+        process_events()
+
+
+class FakeFileDialog:
+    """Gtk.FileDialog's folder picker, answered by the test (the portal's)."""
+
+    shown: list["FakeFileDialog"] = []  # noqa: RUF012
+
+    def __init__(self) -> None:
+        self._callback: Callable[[Any, Any], None] | None = None
+        self._picked: Path | None = None
+        self.parent: Any = None
+
+    def select_folder(self, parent: Any, _cancellable: Any, callback: Any) -> None:
+        self.parent = parent
+        self._callback = callback
+        FakeFileDialog.shown.append(self)
+
+    def select_folder_finish(self, _result: Any) -> Gio.File:
+        if self._picked is None:
+            raise GLib.Error("dismissed")
+        return Gio.File.new_for_path(str(self._picked))
+
+    def pick(self, folder: Path) -> None:
+        self._picked = folder
+        self._callback(self, None)
+        process_events()
+
+    def dismiss(self) -> None:
+        self._callback(self, None)
+        process_events()
+
+
+def fake_folder_dialogs(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Answer the dialogs of SPECIFICATION.md §3.17 from the test."""
+    FakeAdwAlertDialog._real_class = Adw.AlertDialog
+    FakeAdwAlertDialog.shown = []
+    FakeFileDialog.shown = []
+    monkeypatch.setattr(Adw, "AlertDialog", FakeAdwAlertDialog)
+    monkeypatch.setattr(Gtk, "FileDialog", FakeFileDialog)
 
 
 def process_events() -> None:

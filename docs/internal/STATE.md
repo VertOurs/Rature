@@ -20,16 +20,25 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   vide). Découpage de l'implémentation consigné dans `ROADMAP.md` le
   1er novembre 2026, limite du geste perdu après un échec d'écriture
   ajoutée à §2.9. Essai de `os.link` sur le portail réussi le même jour,
-  sans repli. A1 (#218), A2 (#219), A3 (#221), A4 (#222), A5a (#223), A5b (#224), A6 (#225), A7 (#226), B1 (#227) et B2 faites.
+  sans repli. A1 (#218), A2 (#219), A3 (#221), A4 (#222), A5a (#223), A5b (#224), A6 (#225), A7 (#226), B1 (#227), B2 (#228) et B3 faites.
   Pendant l'exécution, la sortie du message écrit les données de l'appareil,
   jamais une journée vide (addendum à l'ADR 0009). B1 : clé `data-folder`
   réglable seulement par `gsettings` tant que B3 n'existe pas ; erreur de
   droits à la relecture avant un geste traitée en dossier inaccessible,
   quel que soit le dossier (§3.6). B2 : `App.examine` et `App.join`
   dans `core`, sans interface ; deux cas tranchés dans la spec (archives
-  en attente, dossier courant). Le chemin du portail
-  (`/run/user/…/doc/…`) face à `samefile` est à vérifier dans le Flatpak
-  au contrôle de B3. Étape suivante : B3.
+  en attente, dossier courant). B3, branche `feat/data-folder-dialogs`,
+  le 13 novembre 2026 : entrée Data Folder…, dialogues en
+  `AdwAlertDialog`, « Choose a Folder… » dans le message du dossier
+  inaccessible, au démarrage et en cours d'exécution (fenêtre laissée,
+  dossier rouvert comme au démarrage). `JoinOutcome.archives_left_in`
+  retiré, `App.has_local_data` et `confirm_folder` ajoutés. 107 tests
+  d'interface verts dans le SDK 51. Catalogues complétés en traduction
+  machine, français compris. **Reste à la charge de VertOurs** : contrôle
+  visuel des dialogues, relecture du français, essai dans le Flatpak du
+  chemin du portail (`/run/user/…/doc/…`) face à `samefile` (choisir le
+  dossier courant doit être refusé), et le point « À trancher » ajouté
+  sous B3 dans `ROADMAP.md`. Étape suivante : C1.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid

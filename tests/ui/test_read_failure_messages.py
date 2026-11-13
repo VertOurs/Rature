@@ -8,13 +8,20 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from gi.repository import Gtk
-from ui_helpers import FakeAlertDialog, process_events, type_into
+from gi.repository import Gio, Gtk
+from ui_helpers import (
+    FakeAdwAlertDialog,
+    FakeAlertDialog,
+    FakeFileDialog,
+    fake_folder_dialogs,
+    process_events,
+    type_into,
+)
 
 from rature.core import storage
 from rature.core.app import App
 from rature.core.storage import load
-from rature.ui import list_helpers
+from rature.ui import APP_ID, list_helpers
 from rature.ui.application import RatureApplication
 from rature.ui.window import RatureWindow
 
@@ -266,7 +273,11 @@ def test_a_read_refused_before_a_gesture_is_out_of_reach_not_a_failed_write(
 
     assert running.dialog.get_message() == "Rature cannot reach its data folder."
     assert str(running.app.data_dir) in running.dialog.get_detail()
-    assert list(running.dialog.get_buttons()) == ["Try Again", "Quit"]
+    assert list(running.dialog.get_buttons()) == [
+        "Try Again",
+        "Choose a Folder…",
+        "Quit",
+    ]
     assert running.dialog.parent is running.window
     assert not running.window.day_view.banner.get_revealed()
     assert running.path.read_bytes() == before
@@ -324,3 +335,47 @@ def test_a_chosen_folder_moved_while_running_is_out_of_reach(
         application._failing_window = None
         window.destroy()
         process_events()
+
+
+def test_choosing_a_folder_while_running_leaves_the_window_behind(
+    application: RatureApplication, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    FakeAlertDialog._real_class = Gtk.AlertDialog
+    FakeAlertDialog.shown = []
+    monkeypatch.setattr(Gtk, "AlertDialog", FakeAlertDialog)
+    fake_folder_dialogs(monkeypatch)
+    settings = Gio.Settings.new(APP_ID)
+    folder = tmp_path / "Sync"
+    folder.mkdir()
+    settings.set_string("data-folder", str(folder))
+    application._app = App.start_empty(folder, chosen=True)
+    window = RatureWindow(application=application, app=application._app)
+    window.present()
+    process_events()
+    other = tmp_path / "Other"
+    other.mkdir()
+    App.start_empty(other, chosen=True).add("other device")
+    try:
+        folder.rename(tmp_path / "moved")
+        type_into(window.day_view.entry, "never written")
+        FakeAlertDialog.shown[-1].press("Choose a Folder…")
+        assert FakeFileDialog.shown[-1].parent is window
+        FakeFileDialog.shown[-1].pick(other)
+        assert FakeAdwAlertDialog.shown[-1].parent is window
+
+        FakeAdwAlertDialog.shown[-1].press("Use This Folder")
+
+        (fresh,) = application.get_windows()
+        assert fresh is not window
+        assert fresh.app.data_dir == other
+        assert application._app is fresh.app
+        assert application._failing_window is None
+        assert settings.get_string("data-folder") == str(other)
+    finally:
+        for each in application.get_windows():
+            each.destroy()
+        process_events()
+        application._app = None
+        application._failing_window = None
+        application._held_for_dialogs = False
+        settings.reset("data-folder")
