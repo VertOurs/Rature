@@ -732,7 +732,8 @@ Dossier choisi :
 
 Clôture :
 
-- [ ] C1. README (Syncthing, `.stignore`), `ARCHITECTURE.md`, CHANGELOG
+- [x] C1. README (Syncthing, `.stignore`), `ARCHITECTURE.md`, CHANGELOG.
+      Le 13 novembre 2026
 - [ ] `2.2.0` coupée après C1, aucune version avant : A4 et A5a touchent à
       l'écriture des vraies données. Puis la semaine d'usage réel du
       critère de fin, Syncthing à installer sur les deux machines

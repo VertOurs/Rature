@@ -42,7 +42,8 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
   your archives if it has none. Archives left in the previous folder are
   named. A folder whose data cannot be read, or was saved by a newer
   version, is refused. A second computer with no data yet can join the
-  shared folder directly. The choice is kept on each device, never in the
+  shared folder directly, once its first sync has finished, which the
+  dialog reminds. The README explains the setup with Syncthing. The choice is kept on each device, never in the
   shared folder. Without Flatpak file system permissions: the folder is
   picked through the desktop portal.
 
