@@ -176,12 +176,40 @@ interface shows the startup messages on the main window, with one difference:
 memory holds the last successful read, so the way out is
 `App.save_device_data`, which writes it, rather than an empty day. The same
 `App` stays in place, since every view holds it (`SPECIFICATION.md` §3.6).
+The one exception is a folder out of reach, whose way out is another folder:
+there the window is left behind as Quit would leave it, and the chosen folder
+opens through a new `App`, as at startup.
 
 When the window regains focus, `App.catch_up` reads the file again and detects
 a due rollover, in memory. An unchanged file with no rollover rebuilds nothing.
 While a row's menu or rename is open, the catch-up waits for it to close, and
 so does the timer, so that no row is destroyed under the user's hands (ADR 0007,
 "Withdrawal").
+
+The data folder is the default one or a folder the user chose
+(`SPECIFICATION.md` §2.9, §3.17, ADR 0009), kept in the `data-folder`
+GSettings key and opened with `chosen=True`: a chosen folder that is gone is
+out of reach, never a first launch, and its permissions are never changed.
+Each read of the main file also looks for Syncthing's conflict copies
+(`*.sync-conflict-*`), which `has_conflict_copies` reports; Rature never reads
+or deletes them.
+
+Joining a folder goes through two steps, so that the dialog says what will
+happen before anything is written. `App.examine(folder)` writes nothing and
+returns a `FolderPreview`: what the folder holds, the name the local
+`data.json` will be set aside under, and where local archives will stay; a
+folder that cannot be joined raises `JoinRefusedError` with its reason,
+the current folder included (`os.path.samefile`, since the portal hands out its
+own path). `App.join(preview)` reads the previous folder again, like a
+gesture, then examines the folder once more at the moment of the preview:
+anything different raises `FolderChangedError` with the new preview or the
+refusal, nothing written. A folder with a `data.json` is loaded from the
+bytes just examined, and the local file is set aside; a folder without one
+receives memory, and the archives if it has no `archive/`. `has_local_data`
+tells a first launch before any gesture apart, where the dialog offers an
+empty day rather than a copy. With no `App` at all, a chosen folder out of
+reach at startup, `examine_folder` and `confirm_folder` play the same two
+steps, and the folder then opens through `App.open` or `App.start_empty`.
 
 A graphical application can be written calling only `App`: no
 product-behaviour decision is left to make in `ui/`.
@@ -198,9 +226,10 @@ Each `.ui` has the same name as the Python module that loads it
 only shows at launch.
 
 `reorder.py`, `weekdays.py` and `rature/i18n.py` import no `gi` and are
-unit tested directly; the rest of `ui/` is covered structurally
-(`tests/test_ui_wiring.py`) and by a human looking at the running app
-(`CLAUDE.md` §6).
+unit tested directly. The rest of `ui/` is covered structurally
+(`tests/test_ui_wiring.py`), by tests on real widgets under
+`gtk4-broadwayd` (`tests/ui/`, run in the GNOME SDK), and by a human
+looking at the running app for everything visual (`CLAUDE.md` §6).
 
 ---
 
@@ -220,7 +249,8 @@ asks `app` for the state to display again (`app.session`).
 
 ## Data model
 
-One versioned file, in `$XDG_DATA_HOME/rature/`.
+One versioned file, in `$XDG_DATA_HOME/rature/` or in the folder the user
+chose (`SPECIFICATION.md` §3.17).
 
 ```json
 {
@@ -385,7 +415,10 @@ Simplicity decisions, not to be revisited without a strong reason.
 - No sub-tasks
 - No database; one JSON file is enough at this scale. See
   [`docs/adr/0003-single-json-file.md`](adr/0003-single-json-file.md)
-- No network sync, mobile client or external capture file. See
+- No network sync of its own: a tool that copies whole files, such as
+  Syncthing, shares the data folder, and Rature only reads before it
+  writes. See [`docs/adr/0009-sync-through-a-chosen-folder.md`](adr/0009-sync-through-a-chosen-folder.md)
+- No mobile client or external capture file. See
   `docs/internal/ROADMAP.md`, "Repoussé volontairement"
 - No runtime dependency beyond the GNOME runtime and the Python standard
   library. See `CLAUDE.md` §4 rule 6
