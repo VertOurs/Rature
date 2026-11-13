@@ -1325,7 +1325,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Message bloquant, fichier illisible | `The data file cannot be read.`, `It may still be syncing, or it may be damaged: %s`, `Try Again`, `Set Aside and Start Empty`, `Quit` |
 | Message bloquant, fichier disparu | `The data file is missing.`, `No data file was found in this folder: %s`, `Try Again`, `Start Empty`, `Quit` |
 | Message bloquant, dossier inaccessible | `Rature cannot reach its data folder.`, `It may have been moved or deleted, or access to it removed: %s`, `Try Again`, `Choose a Folder…`, `Quit` |
-| Confirmation de journée vide | `Start from an empty day?`, `This empty day will also replace the data on your other synced devices.`, `Cancel`, `Start Empty` |
+| Confirmation de journée vide | `Start from an empty day?`, `This empty day will also replace the data on your other synced devices.`, `Cancel`, `Start Empty`. En rejoignant un dossier sans donnée locale (§3.17), plus la ligne d'attente de la première synchronisation du dialogue pour rejoindre |
 | Message bloquant en cours d'exécution, fichier illisible | mêmes titre et détail qu'au démarrage, `Try Again`, `Set Aside and Save This Device's Data`, `Quit` |
 | Message bloquant en cours d'exécution, fichier disparu | mêmes titre et détail qu'au démarrage, `Try Again`, `Save This Device's Data`, `Quit` |
 | Confirmation d'écriture des données de l'appareil | `Save this device's data?`, `It will also replace the data on your other synced devices. Recent changes made on them may be lost.`, `Cancel`, `Save This Device's Data` |
@@ -1824,7 +1824,11 @@ Le second est le parcours principal du README : une deuxième machine neuve
 rejoint le dossier synchronisé. Même examen du dossier, mais rien à mettre
 de côté ni à copier, et le dialogue ne parle pas de mise de côté. Un
 dossier qui contient un `data.json` lisible est pris tel quel. Un dossier
-sans `data.json` mène à la confirmation de journée vide de §3.6 ; après
+sans `data.json` mène à la confirmation de journée vide de §3.6, qui reçoit
+ici aussi la ligne `If this folder is synced, wait until its first sync has
+finished before copying.` : sur une deuxième machine neuve, un dossier
+encore vide est le plus souvent un dossier dont la première synchronisation
+n'est pas finie, et la journée vide partirait vers l'autre appareil. Après
 confirmation, la journée vide s'écrit tout de suite dans ce dossier (§3.6).
 Un dossier refusé ramène au message, ou laisse le premier lancement tel
 quel.

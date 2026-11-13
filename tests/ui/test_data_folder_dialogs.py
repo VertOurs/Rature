@@ -177,6 +177,11 @@ def test_a_first_launch_starts_the_folder_on_an_empty_day(
 
     dialog = _dialog()
     assert dialog.get_heading() == "Start from an empty day?"
+    assert dialog.get_body().split("\n\n") == [
+        "This empty day will also replace the data on your other synced devices.",
+        "If this folder is synced, wait until its first sync "
+        "has finished before copying.",
+    ]
     assert dialog.labels() == ["Cancel", "Start Empty"]
     dialog.press("Start Empty")
 

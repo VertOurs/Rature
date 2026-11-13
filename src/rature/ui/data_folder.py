@@ -66,6 +66,13 @@ def alert(
     dialog.choose(parent, None, on_chosen)
 
 
+def _wait_for_first_sync() -> str:
+    return _(
+        "If this folder is synced, wait until its first sync "
+        "has finished before copying."
+    )
+
+
 class FolderJoiner:
     """From the portal's folder picker to the join, one folder at a time.
 
@@ -155,16 +162,13 @@ class FolderJoiner:
             confirm = _("Use This Folder")
         elif self._has_local_data:
             heading = _("Copy your data to this folder?")
-            lines.append(
-                _(
-                    "If this folder is synced, wait until its first sync "
-                    "has finished before copying."
-                )
-            )
+            lines.append(_wait_for_first_sync())
             confirm = _("Copy Data Here")
         else:
             # Nothing to set aside or copy: the empty day of §3.6, written
-            # into the folder as soon as it is confirmed.
+            # into the folder as soon as it is confirmed. On a second
+            # computer, an empty folder has most often not finished its
+            # first sync: the empty day would go to the other device.
             heading = _("Start from an empty day?")
             lines.append(
                 _(
@@ -172,6 +176,7 @@ class FolderJoiner:
                     "on your other synced devices."
                 )
             )
+            lines.append(_wait_for_first_sync())
             confirm = _("Start Empty")
             destructive = _CONFIRM
         if preview.archives_stay_in is not None:
