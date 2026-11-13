@@ -73,6 +73,18 @@
   </screenshots>
 
   <releases>
+    <release version="2.2.0" date="2026-11-13">
+      <description>
+        <p>
+          Rature 2.2. Several computers can share the same data through a
+          sync tool such as Syncthing: choose the folder from Data Folder in
+          the main menu. Rature reads the data again before every change,
+          never replaces a file it cannot read without asking, and shows a
+          banner when the sync tool has kept two versions. No change to the
+          data format.
+        </p>
+      </description>
+    </release>
     <release version="2.1.1" date="2026-10-30">
       <description>
         <p>
