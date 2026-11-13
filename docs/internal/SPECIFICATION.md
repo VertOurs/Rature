@@ -1333,7 +1333,7 @@ visible absente de cette liste est une chaîne à ajouter ici d'abord.
 | Dialogue pour rejoindre, dossier avec données | `Use the data in this folder?`, `Your current data will be set aside as %s, in the previous folder.`, `Use This Folder` |
 | Dialogue pour rejoindre, dossier sans `data.json` | `Copy your data to this folder?`, `If this folder is synced, wait until its first sync has finished before copying.`, `Copy Data Here` |
 | Dialogue pour rejoindre, lignes communes | `This folder also contains other files.`, `Archives stay in the previous folder: %s` (dossier avec `data.json`, ou dossier qui contient déjà `archive/`), `Cancel` |
-| Dialogue pour rejoindre, refus | `This folder cannot be used.`, `Its data file cannot be read: %s`, `Its data file was saved by a newer version of Rature: %s`, `Close` |
+| Dialogue pour rejoindre, refus | `This folder cannot be used.`, `Its data file cannot be read: %s`, `Its data file was saved by a newer version of Rature: %s`, `This is already the data folder: %s`, `This folder cannot be read: %s`, `Close` |
 | Bouton de fermeture de bannière | `Dismiss` |
 | Alerte version future | `This file was saved by a newer version of Rature.`, `Opening it could overwrite data. Update Rature to open this file: %s`, `Quit` |
 | Alerte dossier de données inutilisable | `Rature could not use its data folder.`, `Check that this folder can be read and written, and that the disk is not full: %s`, `Quit` au démarrage, `Close` en cours d'exécution |
@@ -1813,7 +1813,9 @@ son motif. L'utilisateur confirme de nouveau, ou annule.
 
 Après avoir rejoint, les données sont rechargées depuis le nouveau
 dossier, toutes les vues se reconstruisent et la pile d'annulation se vide
-(§3.2) : ce ne sont plus les mêmes données. `Cancel` ne change rien.
+(§3.2) : ce ne sont plus les mêmes données. Les fenêtres Archives et
+Statistiques ouvertes se ferment : elles montraient les archives de l'ancien
+dossier, on les rouvre depuis le menu. `Cancel` ne change rien.
 
 **Sans donnée locale lisible.** Deux parcours : `Choose a Folder…` depuis
 le message d'un dossier inaccessible (§3.6, situation 2), et le premier
