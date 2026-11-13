@@ -643,6 +643,15 @@ y sont copiées, archives comprises si le dossier n'a pas encore de
 archive de l'autre appareil n'est jamais écrasée. Sans donnée locale
 lisible, rien n'est mis de côté ni copié. Détail du dialogue en §3.17.
 
+Rejoindre écrit, donc rejoindre relit d'abord, comme un geste : l'ancien
+dossier, puis le dossier choisi, réexaminé à la confirmation. Si la
+relecture de l'ancien dossier échoue, rien n'est écrit et l'erreur est
+celle d'un geste (§3.6). Les journées passées en mémoire et pas encore
+archivées (§2.5) sont des archives locales comme les autres : elles
+s'écrivent d'abord dans l'ancien dossier, puis suivent la règle des
+archives locales. Le dossier courant ne se rejoint pas : il est refusé,
+quel que soit le chemin qui y mène.
+
 ---
 
 ## 3. Spécification d'interface
@@ -1790,6 +1799,12 @@ ignorant les entrées propres à Syncthing (`.stfolder`, `.stignore`,
   le dialogue le dit
 - **Le `data.json` du dossier est illisible ou écrit par une version plus
   récente** : le dossier est refusé, avec le motif, et rien ne change
+- **Le dossier est le dossier de données courant**, quel que soit le
+  chemin rendu par le portail : refusé, avec le motif, et rien ne change.
+  Le rejoindre mettrait de côté le fichier même qu'on s'apprête à prendre
+
+L'examen n'écrit rien dans le dossier, pas même la sauvegarde avant
+migration de §2.7.10 : elle se fait au chargement qui suit la jonction.
 
 Après avoir rejoint, les données sont rechargées depuis le nouveau
 dossier, toutes les vues se reconstruisent et la pile d'annulation se vide

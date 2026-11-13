@@ -20,12 +20,16 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   vide). Découpage de l'implémentation consigné dans `ROADMAP.md` le
   1er novembre 2026, limite du geste perdu après un échec d'écriture
   ajoutée à §2.9. Essai de `os.link` sur le portail réussi le même jour,
-  sans repli. A1 (#218), A2 (#219), A3 (#221), A4 (#222), A5a (#223), A5b (#224), A6 (#225), A7 (#226) et B1 faites.
+  sans repli. A1 (#218), A2 (#219), A3 (#221), A4 (#222), A5a (#223), A5b (#224), A6 (#225), A7 (#226), B1 (#227) et B2 faites.
   Pendant l'exécution, la sortie du message écrit les données de l'appareil,
   jamais une journée vide (addendum à l'ADR 0009). B1 : clé `data-folder`
   réglable seulement par `gsettings` tant que B3 n'existe pas ; erreur de
   droits à la relecture avant un geste traitée en dossier inaccessible,
-  quel que soit le dossier (§3.6). Étape suivante : B2.
+  quel que soit le dossier (§3.6). B2 : `App.examine` et `App.join`
+  dans `core`, sans interface ; deux cas tranchés dans la spec (archives
+  en attente, dossier courant). Le chemin du portail
+  (`/run/user/…/doc/…`) face à `samefile` est à vérifier dans le Flatpak
+  au contrôle de B3. Étape suivante : B3.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid

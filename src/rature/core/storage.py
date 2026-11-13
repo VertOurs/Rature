@@ -130,11 +130,7 @@ def _atomic_write_json(path: Path, obj: dict[str, Any]) -> bytes:
     finally:
         # A no-op after a successful replace; removes the orphan on failure.
         tmp.unlink(missing_ok=True)
-    dir_fd = os.open(path.parent, os.O_RDONLY)
-    try:
-        os.fsync(dir_fd)
-    finally:
-        os.close(dir_fd)
+    _fsync_dir(path.parent)
     return content
 
 
@@ -163,13 +159,58 @@ def load(*, data_dir: Path | None = None) -> Store:
 
 def parse_main(original: bytes, *, data_dir: Path | None = None) -> Store:
     """Migrate and validate the main file's bytes, as read from data_dir."""
-    path = main_file_path(data_dir=data_dir)
+    store, version = _decode_main(original)
+    if version < CURRENT_VERSION:
+        _back_up_before_migration(main_file_path(data_dir=data_dir), original, version)
+    return store
+
+
+def _decode_main(original: bytes) -> tuple[Store, int]:
+    """The Store in the main file's bytes and the version they were written in.
+
+    Writes nothing: the backup before migration is parse_main's to make.
+    """
     raw = json.loads(original.decode("utf-8"))
     store = Store.from_dict(migrate(raw))
     # migrate has validated raw: a dict with an int version.
-    if raw["version"] < CURRENT_VERSION:
-        _back_up_before_migration(path, original, raw["version"])
-    return store
+    return store, raw["version"]
+
+
+@dataclass(frozen=True, kw_only=True)
+class FolderContents:
+    """What a folder holds before Rature joins it, SPECIFICATION.md §3.17."""
+
+    # The bytes of a valid data.json, None when there is none.
+    main: bytes | None
+    has_archive: bool
+    # A visible entry other than data.json and archive/.
+    other_files: bool
+
+
+def examine_folder(folder: Path) -> FolderContents:
+    """Look at a folder before joining it, writing nothing (§3.17).
+
+    Names starting with a dot are not visible, Syncthing's own .stfolder,
+    .stignore and .stversions included: otherwise no Syncthing folder would
+    ever be empty. A data.json is validated without the backup before
+    migration, which waits for the load that follows joining. Raises
+    OSError for a folder or file it cannot read, what parse_main raises for
+    a data.json that does not load, FutureVersionError included.
+    """
+    with os.scandir(folder) as entries:
+        names = {entry.name for entry in entries}
+    main: bytes | None = None
+    if _MAIN_FILE in names:
+        main = read_main(data_dir=folder)
+        _decode_main(main)
+    return FolderContents(
+        main=main,
+        has_archive=_ARCHIVE_DIR in names,
+        other_files=any(
+            not name.startswith(".") and name not in {_MAIN_FILE, _ARCHIVE_DIR}
+            for name in names
+        ),
+    )
 
 
 def _back_up_before_migration(path: Path, original: bytes, version: int) -> None:
@@ -181,26 +222,43 @@ def _back_up_before_migration(path: Path, original: bytes, version: int) -> None
     backup = path.with_name(f"{path.name}.v{version}.bak")
     if backup.exists():
         return
-    tmp = path.with_name(f".{backup.name}.{os.getpid()}.tmp")
     try:
-        with open(tmp, "wb", opener=_open_private) as handle:
-            handle.write(original)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.link(tmp, backup)
-    except FileExistsError:
-        return
+        written = _write_new(backup, original)
     except OSError:
         _logger.error("failed to back up %s before migration", path)
         raise
+    if written:
+        _fsync_dir(path.parent)
+        _logger.info("backed up the data file before migration: %s", backup)
+
+
+def _write_new(path: Path, content: bytes) -> bool:
+    """Write content to path only if no file has that name; return whether.
+
+    A temporary file then os.link, which never replaces an existing name:
+    an interrupted write leaves no truncated file under the final name. The
+    caller fsyncs the directory, once for however many files it writes.
+    """
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with open(tmp, "wb", opener=_open_private) as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.link(tmp, path)
+    except FileExistsError:
+        return False
     finally:
         tmp.unlink(missing_ok=True)
-    dir_fd = os.open(path.parent, os.O_RDONLY)
+    return True
+
+
+def _fsync_dir(directory: Path) -> None:
+    dir_fd = os.open(directory, os.O_RDONLY)
     try:
         os.fsync(dir_fd)
     finally:
         os.close(dir_fd)
-    _logger.info("backed up the data file before migration: %s", backup)
 
 
 def save(
@@ -298,24 +356,58 @@ def _holds_conflict_copy(directory: Path) -> bool:
         return False
 
 
-def set_aside(now: datetime, *, data_dir: Path | None = None) -> Path:
-    """Rename the main file to data.json.<stamp>.bak; return its new path.
+def set_aside_path(now: datetime, *, data_dir: Path | None = None) -> Path:
+    """The name set_aside would give the main file now: data.json.<stamp>.bak.
 
-    Only ever on the user's confirmation (SPECIFICATION.md §3.6). The stamp
-    comes from the caller, not the system clock: storage never reads it. On
-    a name collision (two within the same second), a numeric suffix is
-    added rather than overwriting the earlier file.
+    The stamp comes from the caller, not the system clock: storage never
+    reads it. On a name collision (two within the same second), a numeric
+    suffix is added rather than overwriting the earlier file.
     """
-    target = data_dir or xdg_data_dir()
-    path = target / _MAIN_FILE
+    path = (data_dir or xdg_data_dir()) / _MAIN_FILE
     stamp = now.strftime("%Y%m%d-%H%M%S")
     dest = path.with_name(f"{path.name}.{stamp}.bak")
     suffix = 2
     while dest.exists():
         dest = path.with_name(f"{path.name}.{stamp}-{suffix}.bak")
         suffix += 1
-    path.rename(dest)
     return dest
+
+
+def set_aside(now: datetime, *, data_dir: Path | None = None) -> Path:
+    """Rename the main file to set_aside_path's name; return its new path.
+
+    Only ever on the user's confirmation (SPECIFICATION.md §3.6).
+    """
+    dest = set_aside_path(now, data_dir=data_dir)
+    main_file_path(data_dir=data_dir).rename(dest)
+    return dest
+
+
+def copy_archives(*, source: Path, target: Path) -> bool:
+    """Copy source's archives into target, if target has no archive/ (§2.9).
+
+    Returns whether they were copied. archive/ is created here, never
+    entered if it already exists: the other device's archives may have
+    arrived since the folder was examined, and none is ever overwritten.
+    For the same reason a file already there is kept. Only exact
+    AAAA-MM-JJ.json names are copied. No local archive/, nothing to copy,
+    and nothing is created. Raises OSError for a copy that fails.
+    """
+    local = source / _ARCHIVE_DIR
+    if not local.is_dir():
+        return False
+    directory = target / _ARCHIVE_DIR
+    try:
+        directory.mkdir(mode=0o700)
+    except FileExistsError:
+        return False
+    for path in sorted(local.iterdir()):
+        if _ARCHIVE_NAME.match(path.name):
+            _write_new(directory / path.name, path.read_bytes())
+    _fsync_dir(directory)
+    _fsync_dir(target)
+    _logger.info("copied the archives into %s", directory)
+    return True
 
 
 def archive(

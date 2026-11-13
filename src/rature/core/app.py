@@ -14,6 +14,7 @@ import enum
 import logging
 import os
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 
@@ -76,6 +77,121 @@ class GestureRefusedError(Exception):
     """
 
 
+class JoinRefusal(enum.Enum):
+    """Why a folder cannot be joined (SPECIFICATION.md §2.9, §3.17)."""
+
+    CURRENT_FOLDER = enum.auto()
+    UNREACHABLE = enum.auto()
+    UNREADABLE = enum.auto()
+    NEWER_VERSION = enum.auto()
+
+
+class JoinRefusedError(Exception):
+    """A folder that cannot be joined: nothing was written (§3.17)."""
+
+    def __init__(self, folder: Path, reason: JoinRefusal) -> None:
+        super().__init__(folder, reason)
+        self.folder = folder
+        self.reason = reason
+
+
+@dataclass(frozen=True, kw_only=True)
+class FolderPreview:
+    """What joining a folder will do, for the dialog to say first (§3.17).
+
+    App.join takes it back and carries it out only if examining the folder
+    again gives the same preview.
+    """
+
+    folder: Path
+    # The moment of the examination, which names the set-aside file.
+    examined_at: datetime
+    has_data: bool
+    has_archive: bool
+    other_files: bool
+    # Where the local data.json will go, None when nothing is set aside.
+    set_aside_as: Path | None
+    # The previous folder, when local archives will stay there.
+    archives_stay_in: Path | None
+
+
+class FolderChangedError(Exception):
+    """The folder changed since the dialog showed it: nothing was written.
+
+    Either preview is what joining would now do, or refusal says why it
+    can no longer be joined. The interface shows the new state (§3.17).
+    """
+
+    def __init__(
+        self, *, preview: FolderPreview | None, refusal: JoinRefusal | None
+    ) -> None:
+        super().__init__(preview, refusal)
+        self.preview = preview
+        self.refusal = refusal
+
+
+@dataclass(frozen=True, kw_only=True)
+class JoinOutcome:
+    """What joining did, the preview's promise as actually kept (§3.17)."""
+
+    set_aside: Path | None
+    # Differs from the preview only if archive/ arrived during the join.
+    archives_left_in: Path | None
+
+
+def _default_clock() -> datetime:
+    return datetime.now().astimezone()
+
+
+def _same_folder(folder: Path, current: Path) -> bool:
+    # By identity, not by text: the portal hands out its own path to a
+    # folder (/run/user/…/doc/…). A current folder out of reach is not the
+    # one being examined, which then fails on its own.
+    try:
+        return os.path.samefile(folder, current)
+    except OSError:
+        return False
+
+
+def _examine(folder: Path, current: Path) -> storage.FolderContents:
+    if _same_folder(folder, current):
+        raise JoinRefusedError(folder, JoinRefusal.CURRENT_FOLDER)
+    try:
+        return storage.examine_folder(folder)
+    except FutureVersionError as error:
+        raise JoinRefusedError(folder, JoinRefusal.NEWER_VERSION) from error
+    except OSError as error:
+        _logger.warning("cannot examine the folder %s", folder)
+        raise JoinRefusedError(folder, JoinRefusal.UNREACHABLE) from error
+    except (ValueError, KeyError, TypeError) as error:
+        _logger.warning("the data file of %s cannot be read", folder)
+        raise JoinRefusedError(folder, JoinRefusal.UNREADABLE) from error
+
+
+def examine_folder(
+    folder: Path,
+    *,
+    current: Path,
+    clock: Callable[[], datetime] = _default_clock,
+) -> FolderPreview:
+    """Look at a folder before joining it with no local data (§3.17).
+
+    For when no App could open current, the data folder from the settings,
+    out of reach: nothing will be set aside or copied. Writes nothing.
+    Raises JoinRefusedError for a folder that cannot be joined.
+    """
+    contents = _examine(folder, current)
+    return FolderPreview(
+        folder=folder,
+        examined_at=clock(),
+        has_data=contents.main is not None,
+        has_archive=contents.has_archive,
+        other_files=contents.other_files,
+        set_aside_as=None,
+        archives_stay_in=None,
+    )
+
+
 def _parse(content: bytes, data_dir: Path) -> Store:
     try:
         return storage.parse_main(content, data_dir=data_dir)
@@ -93,10 +209,6 @@ def _check_reachable(data_dir: Path) -> None:
     except OSError as error:
         _logger.warning("cannot reach the data folder %s", data_dir)
         raise DataFolderUnreachableError(data_dir) from error
-
-
-def _default_clock() -> datetime:
-    return datetime.now().astimezone()
 
 
 class App:
@@ -481,6 +593,126 @@ class App:
         self._reloaded = True
         self.ensure_day()
         return True
+
+    def examine(self, folder: Path) -> FolderPreview:
+        """What joining folder would do, writing nothing (§3.17).
+
+        Raises JoinRefusedError for a folder that cannot be joined.
+        """
+        preview, _ = self._preview(folder, self.clock())
+        return preview
+
+    def _preview(
+        self, folder: Path, now: datetime
+    ) -> tuple[FolderPreview, storage.FolderContents]:
+        contents = _examine(folder, self.data_dir)
+        has_data = contents.main is not None
+        aside = None
+        if has_data and self._fingerprint is not None:
+            aside = storage.set_aside_path(now, data_dir=self.data_dir)
+        copies_archives = not has_data and not contents.has_archive
+        preview = FolderPreview(
+            folder=folder,
+            examined_at=now,
+            has_data=has_data,
+            has_archive=contents.has_archive,
+            other_files=contents.other_files,
+            set_aside_as=aside,
+            archives_stay_in=(
+                None
+                if copies_archives or not self._has_local_archives()
+                else self.data_dir
+            ),
+        )
+        return preview, contents
+
+    def _has_local_archives(self) -> bool:
+        # Days rolled over in memory count, unless the previous folder does
+        # not exist: a first launch before any gesture keeps none of them.
+        if not storage.data_dir_exists(data_dir=self.data_dir):
+            return False
+        return bool(self._pending_archives) or bool(self.archives())
+
+    def join(self, shown: FolderPreview) -> JoinOutcome:
+        """Make shown.folder the data folder, as the dialog said (§2.9, §3.17).
+
+        Joining writes, so it reads again first, like a gesture, and raises
+        what a gesture raises when that fails, with nothing written. Then the
+        folder is examined again, at the moment of the shown examination:
+        anything different from what the user accepted raises
+        FolderChangedError, with nothing written.
+
+        A data.json there is loaded from the bytes that examination read,
+        backup before migration included, before anything else is written:
+        a failure leaves the previous folder as it was. Then the local file
+        is set aside under the name the dialog gave. With no data.json,
+        memory is written there, and the archives go along if the folder has
+        no archive/. Days rolled over in memory are written to the previous
+        folder first: they are local archives like the others. An OSError on
+        a later write stops the join there and goes up; nothing before it is
+        undone.
+        """
+        self.try_again()
+        try:
+            preview, contents = self._preview(shown.folder, shown.examined_at)
+        except JoinRefusedError as refused:
+            raise FolderChangedError(preview=None, refusal=refused.reason) from refused
+        if preview != shown:
+            raise FolderChangedError(preview=preview, refusal=None)
+        folder = shown.folder
+        taken = None
+        if contents.main is not None:
+            taken = _parse(contents.main, folder), contents.main
+        if storage.data_dir_exists(data_dir=self.data_dir):
+            self._write_pending_archives()
+        # A first launch before any gesture: its folder does not exist, and
+        # its days rolled over in memory are empty. Nothing to keep.
+        self._pending_archives.clear()
+        if taken is None:
+            outcome = self._copy_into(folder)
+        else:
+            outcome = self._take(preview, *taken)
+        self.data_dir = folder
+        self._chosen = True
+        self._write_failed = False
+        self._undo_stack.clear()
+        self._reloaded = True
+        self._look_for_conflict_copies()
+        self.ensure_day()
+        _logger.info("joined the data folder %s", folder)
+        return outcome
+
+    def _write_pending_archives(self) -> None:
+        # The previous folder exists: never created here, whoever chose it.
+        while self._pending_archives:
+            storage.archive(
+                self._pending_archives[0],
+                data_dir=self.data_dir,
+                create_data_dir=False,
+            )
+            del self._pending_archives[0]
+
+    def _take(
+        self, preview: FolderPreview, store: Store, content: bytes
+    ) -> JoinOutcome:
+        aside = None
+        if preview.set_aside_as is not None:
+            aside = storage.set_aside(preview.examined_at, data_dir=self.data_dir)
+            _logger.info("set the local data file aside: %s", aside)
+        if self._write_failed:
+            # SPECIFICATION.md §2.9, known limits.
+            _logger.warning("joined data replaced a change that could not be saved")
+        self.session = store.into_session()
+        self._fingerprint = storage.fingerprint(content)
+        return JoinOutcome(set_aside=aside, archives_left_in=preview.archives_stay_in)
+
+    def _copy_into(self, folder: Path) -> JoinOutcome:
+        copied = storage.copy_archives(source=self.data_dir, target=folder)
+        self._fingerprint = storage.save(
+            Store.from_session(self.session), data_dir=folder, create_data_dir=False
+        )
+        left = None if copied or not self.archives() else self.data_dir
+        return JoinOutcome(set_aside=None, archives_left_in=left)
 
     def try_again(self) -> bool:
         """Read again before a gesture, or on Try Again while running (§3.6).
