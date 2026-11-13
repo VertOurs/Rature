@@ -40,7 +40,11 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   traduction machine), essai dans le Flatpak du chemin du portail
   (`/run/user/…/doc/…`) face à `samefile` (choisir le dossier courant doit
   être refusé), installation de Syncthing sur les deux machines pour la
-  semaine d'usage réel. Étape suivante : couper `2.2.0`.
+  semaine d'usage réel. `2.2.0` préparée le 13 novembre 2026 (release PR,
+  puis tag `v2.2.0` annoté et signé). Étape suivante : la semaine d'usage
+  réel du critère de fin, après sauvegarde du fichier de données de
+  chaque machine : `2.2.0` est la première version qui relit avant
+  d'écrire et diffère le passage du jour.
 - **`2.1.1` est publiée** (31 octobre 2026) : release PR #210 (squash
   `0999aac`), tag `v2.1.1` annoté et signé. Premier passage de `build`
   en échec pendant la mise à jour de `org.gnome.Sdk//51` (« Invalid
@@ -144,7 +148,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `2.1.1` | Corrective qui clôt le chantier 9 : fenêtre Archives rafraîchie au passage du jour, captures Demain et Réserve, sans changement de format. Coupée le 31 octobre 2026 |
+| Version du projet | `2.2.0` | Mineure qui clôt le chantier 10 : synchronisation entre appareils par un dossier choisi, sans changement de format (toujours la version 4). Coupée le 13 novembre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
