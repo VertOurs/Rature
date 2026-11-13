@@ -11,6 +11,14 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-13
+
+Closes chantier 10 (sync between devices). Several computers can now share
+the same data through a tool that copies whole files, such as Syncthing:
+Rature reads the data again before every change, never writes an empty day
+or renames a file on its own, and reports the conflict copies a sync tool
+keeps. No change to the data format.
+
 ### Added
 
 - Temporary files left behind by a crash during a save are now removed at
@@ -627,7 +635,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/VertOurs/Rature/releases/tag/v2.2.0
 [2.1.1]: https://github.com/VertOurs/Rature/releases/tag/v2.1.1
 [2.1.0]: https://github.com/VertOurs/Rature/releases/tag/v2.1.0
 [2.0.0]: https://github.com/VertOurs/Rature/releases/tag/v2.0.0
