@@ -742,10 +742,14 @@ Clôture :
 - [ ] La semaine d'usage réel du critère de fin se fait avec pCloud
       (fonction Sync, pas `~/pCloudDrive`), choix de VertOurs du
       17 novembre 2026, à la place de Syncthing. Commencée le
-      17 novembre 2026, fonction Sync sur `~/Rature-sync`. Jusqu'à
-      l'installation de `2.3.0`, qui reconnaît les copies `conflicted`,
-      VertOurs vérifie chaque jour à la main qu'aucune n'est apparue
-      dans le dossier ni dans `archive/`
+      17 novembre 2026, fonction Sync sur `~/Rature-sync`. Le même jour,
+      faute de temps, VertOurs remplace la semaine par une séance ciblée
+      entre les deux PC, sur `2.3.0` : scénario dans
+      `docs/internal/SEANCE-SYNC.md`. Le chantier 10 se clôt sur son
+      résultat, avant d'ouvrir le chantier 11. Défaut relevé en la
+      préparant : quitter un dossier synchronisé pour un dossier qui
+      contient des données renomme `data.json` sur tous les appareils
+      (issue #235)
 
 **Critère de fin** : deux machines de bureau sur le même dossier, gestes
 alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
