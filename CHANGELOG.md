@@ -11,6 +11,10 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-17
+
+pCloud joins Syncthing as a tested sync tool. No change to the data format.
+
 ### Added
 
 - pCloud's conflict copies are now recognized, next to Syncthing's: the
@@ -642,7 +646,8 @@ closes version 1 (ROADMAP.md).
   supply the reference date or timestamp explicitly. `core/` never reads
   the system clock.
 
-[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/VertOurs/Rature/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/VertOurs/Rature/releases/tag/v2.3.0
 [2.2.0]: https://github.com/VertOurs/Rature/releases/tag/v2.2.0
 [2.1.1]: https://github.com/VertOurs/Rature/releases/tag/v2.1.1
 [2.1.0]: https://github.com/VertOurs/Rature/releases/tag/v2.1.0
