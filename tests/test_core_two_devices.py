@@ -607,6 +607,14 @@ def test_a_conflict_copy_in_the_archives_is_seen(folder: Path) -> None:
     assert App.open(folder).has_conflict_copies
 
 
+@pytest.mark.parametrize("name", ["data.json.conflicted", "data [conflicted].json"])
+def test_a_pcloud_conflict_copy_is_seen(folder: Path, name: str) -> None:
+    _app_with_a_day(folder)
+    (folder / name).write_text("{}")
+
+    assert App.open(folder).has_conflict_copies
+
+
 def test_other_names_are_not_conflict_copies(folder: Path) -> None:
     _app_with_a_day(folder)
     (folder / "data.json.20260824-100000.bak").write_text("{}")

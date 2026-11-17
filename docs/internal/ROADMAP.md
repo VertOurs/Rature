@@ -534,7 +534,8 @@ qui le reformule en anglais et le complète des résultats de l'essai.
 
 1. **Outil** : conçu pour tout outil qui synchronise des fichiers
    entiers, testé et documenté avec Syncthing seul. Seuls ses fichiers de
-   conflit sont reconnus. Le client Android de Syncthing est à vérifier au
+   conflit sont reconnus. Élargi à pCloud le 17 novembre 2026 (ADR 0009,
+   addendum) : fonction Sync seulement, copies `conflicted` reconnues. Le client Android de Syncthing est à vérifier au
    chantier 11, pas de mémoire.
 2. **Dossier, plan A** : choisi par le portail
    (`Gtk.FileDialog.select_folder`), sans toucher aux `finish-args`.
@@ -734,9 +735,13 @@ Clôture :
 
 - [x] C1. README (Syncthing, `.stignore`), `ARCHITECTURE.md`, CHANGELOG.
       Le 13 novembre 2026
-- [ ] `2.2.0` coupée après C1, aucune version avant : A4 et A5a touchent à
-      l'écriture des vraies données. Puis la semaine d'usage réel du
-      critère de fin, Syncthing à installer sur les deux machines
+- [x] `2.2.0` coupée après C1, aucune version avant : A4 et A5a touchent à
+      l'écriture des vraies données. Le 13 novembre 2026
+- [x] Copies de conflit de pCloud reconnues, README et spec à jour
+      (ADR 0009, addendum du 17 novembre 2026)
+- [ ] La semaine d'usage réel du critère de fin se fait avec pCloud
+      (fonction Sync, pas `~/pCloudDrive`), choix de VertOurs du
+      17 novembre 2026, à la place de Syncthing
 
 **Critère de fin** : deux machines de bureau sur le même dossier, gestes
 alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
@@ -750,6 +755,10 @@ perdu, aucune écriture sans relecture préalable, chaque conflit signalé.
       « Version mobile » sous une forme limitée. Argument : le même
       `rature.core` (Python pur, sans `gi`) plus une interface légère, pas
       une deuxième base
+- [ ] À revoir dans l'ADR 0010 : ce chantier supposait Syncthing sur
+      Android (cadrage du chantier 10, point 1). La semaine d'usage réel
+      du chantier 10 se fait avec pCloud ; l'outil côté téléphone est à
+      choisir, et son comportement à vérifier, pas de mémoire
 - [ ] Prototype jetable avant tout : un écran qui lit une copie de
       `data.json`, ajoute et raye, en APK installé sur le téléphone de
       VertOurs. Il valide `core` sur Android, les formats de date (`%-d`

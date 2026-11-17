@@ -11,6 +11,13 @@ versions cannot read therefore shipped as a minor release (`1.6.0` to
 
 ## [Unreleased]
 
+### Added
+
+- pCloud's conflict copies are now recognized, next to Syncthing's: the
+  banner shows for a name containing `conflicted`, such as
+  `data.json.conflicted` or `data [conflicted].json`. The README explains
+  the setup with pCloud's Sync feature.
+
 ## [2.2.0] - 2026-11-13
 
 Closes chantier 10 (sync between devices). Several computers can now share

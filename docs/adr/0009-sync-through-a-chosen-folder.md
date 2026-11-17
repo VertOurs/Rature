@@ -331,3 +331,16 @@ loses too.
 Quitting discards that copy, so it takes a deliberate click: Escape means Try
 Again while running, and still means Quit at startup. For the same reason, a
 refused set-aside while running returns to the message instead of quitting.
+
+## Addendum (2026-11-17): pCloud
+
+VertOurs runs the week of real use with pCloud rather than Syncthing.
+Rature is therefore tested and documented with both, and recognises
+pCloud's conflict copies too: names containing `conflicted`, seen as
+`data.json.conflicted` and `data [conflicted].json`. Nothing else in this
+decision changes: no merge, and Rature never reads or deletes these copies.
+
+pCloud is used through its Sync feature, which keeps a real local folder.
+Its virtual drive `~/pCloudDrive` is not a supported data folder: it is a
+network file system whose files are fetched on demand, which the
+read-before-write and atomic-write rules were never designed for.

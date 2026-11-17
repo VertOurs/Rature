@@ -108,12 +108,15 @@ submitted. Flathub is deliberately not a target
 Rature syncs nothing itself: no account, no server, no network. It keeps
 its data in one folder, and a tool that copies whole files between
 computers can share that folder. Rature is tested with
-[Syncthing](https://syncthing.net/); any tool of that kind should work, but
-only Syncthing's conflict copies are recognized.
+[Syncthing](https://syncthing.net/) and with [pCloud](https://www.pcloud.com/)
+through its **Sync** feature, which keeps a real local folder. Do not use the
+virtual drive `~/pCloudDrive`. Any tool that copies whole files should work,
+but only the conflict copies of these two are recognized.
 
 On the first computer, the one that already holds your data:
 
-1. Share an empty folder with Syncthing, for example `~/Sync/rature`.
+1. Share an empty folder with your sync tool, for example `~/Sync/rature`.
+   With pCloud, add it as a sync pair in the **Sync** tab.
 2. In Rature, open **Data Folder…** in the main menu, choose **Choose a
    Folder…** and pick that folder.
 3. Confirm **Copy Data Here**. Your data, and your archives, are copied
@@ -121,16 +124,20 @@ On the first computer, the one that already holds your data:
 
 On each other computer:
 
-1. Accept the shared folder in Syncthing and **wait until its first sync
-   has finished**. A folder still empty at this point would start an empty
-   day that replaces the data on the first computer.
+1. Share the same folder on this computer (in Syncthing, accept it; in
+   pCloud, add the same sync pair) and **wait until its first sync has
+   finished**: `data.json` must be in the folder before you go on. A
+   folder still empty at this point would start an empty day that
+   replaces the data on the first computer.
 2. In Rature, choose the same folder through **Data Folder…**, then
    **Use This Folder**. If this computer already had data, its data file
    is set aside under a dated name, never deleted, and its archives stay
    in its previous folder.
 
-Add this line to the folder's `.stignore`, so that the temporary files a
-crash may leave behind stay on the computer where it happened:
+Keep the temporary files a crash may leave behind on the computer where it
+happened. With Syncthing, add this line to the folder's `.stignore`. With
+pCloud, add it to the list of excluded files in pCloud's settings, on each
+computer: that setting stays on the computer where it is made.
 
 ```
 .*.tmp
@@ -138,8 +145,8 @@ crash may leave behind stay on the computer where it happened:
 
 Rature reads the data again before every change, so it builds on what
 another computer wrote once that has arrived, instead of overwriting it.
-When both computers change the data before Syncthing has carried it
-across, Syncthing keeps both versions and Rature shows a banner until you
+When both computers change the data before the sync tool has carried it
+across, the tool keeps both versions and Rature shows a banner until you
 remove the conflict copy; it never reads, merges or deletes it. Which folder is used stays a setting of each
 computer: it never travels with the data. The design is in
 [ADR 0009](docs/adr/0009-sync-through-a-chosen-folder.md).
