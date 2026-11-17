@@ -534,7 +534,8 @@ qui le reformule en anglais et le complète des résultats de l'essai.
 
 1. **Outil** : conçu pour tout outil qui synchronise des fichiers
    entiers, testé et documenté avec Syncthing seul. Seuls ses fichiers de
-   conflit sont reconnus. Le client Android de Syncthing est à vérifier au
+   conflit sont reconnus. Élargi à pCloud le 17 novembre 2026 (ADR 0009,
+   addendum) : fonction Sync seulement, copies `conflicted` reconnues. Le client Android de Syncthing est à vérifier au
    chantier 11, pas de mémoire.
 2. **Dossier, plan A** : choisi par le portail
    (`Gtk.FileDialog.select_folder`), sans toucher aux `finish-args`.
@@ -734,9 +735,17 @@ Clôture :
 
 - [x] C1. README (Syncthing, `.stignore`), `ARCHITECTURE.md`, CHANGELOG.
       Le 13 novembre 2026
-- [ ] `2.2.0` coupée après C1, aucune version avant : A4 et A5a touchent à
-      l'écriture des vraies données. Puis la semaine d'usage réel du
-      critère de fin, Syncthing à installer sur les deux machines
+- [x] `2.2.0` coupée après C1, aucune version avant : A4 et A5a touchent à
+      l'écriture des vraies données. Le 13 novembre 2026
+- [x] Copies de conflit de pCloud reconnues, README et spec à jour
+      (ADR 0009, addendum du 17 novembre 2026)
+- [ ] La semaine d'usage réel du critère de fin se fait avec pCloud
+      (fonction Sync, pas `~/pCloudDrive`), choix de VertOurs du
+      17 novembre 2026, à la place de Syncthing. Commencée le
+      17 novembre 2026, fonction Sync sur `~/Rature-sync`. Jusqu'à
+      l'installation de `2.3.0`, qui reconnaît les copies `conflicted`,
+      VertOurs vérifie chaque jour à la main qu'aucune n'est apparue
+      dans le dossier ni dans `archive/`
 
 **Critère de fin** : deux machines de bureau sur le même dossier, gestes
 alternés et quasi simultanés pendant une semaine d'usage réel. Rien de
@@ -750,6 +759,30 @@ perdu, aucune écriture sans relecture préalable, chaque conflit signalé.
       « Version mobile » sous une forme limitée. Argument : le même
       `rature.core` (Python pur, sans `gi`) plus une interface légère, pas
       une deuxième base
+- [ ] À revoir dans l'ADR 0010 : ce chantier supposait Syncthing sur
+      Android (cadrage du chantier 10, point 1). La semaine d'usage réel
+      du chantier 10 se fait avec pCloud ; l'outil côté téléphone est à
+      choisir, et son comportement à vérifier, pas de mémoire. Aucune
+      source ne montre que l'application Android de pCloud synchronise un
+      dossier local dans les deux sens (ses notes de version ne citent que
+      l'envoi automatique). Trois pistes, relevées le 17 novembre 2026 :
+      - **Piste 1, recommandée** : un outil tiers, type FolderSync (sa
+        fiche liste pCloud parmi les services gérés), synchronise un vrai
+        dossier local avec pCloud. Le compagnon lit et écrit ce dossier
+        comme le bureau, l'ADR 0009 s'applique inchangé
+      - **Piste 2, déconseillée** : passer par le fournisseur de documents
+        de pCloud (Storage Access Framework). Pas de vrai chemin, donc pas
+        de `os.replace` : l'écriture atomique de l'ADR 0003 tombe
+      - **Piste 3, déconseillée** : parler à l'API de pCloud. Réseau et
+        compte dans l'application, contraire à `SPECIFICATION.md` §2.9
+        (Rature ne synchronise rien elle-même), et dépendance nouvelle
+
+      À vérifier sur le téléphone, en ouverture de l'ADR 0010 : la
+      synchronisation dans les deux sens de FolderSync avec pCloud, le nom
+      de ses copies de conflit, et l'accès du compagnon au dossier
+      (stockage limité d'Android). Si la piste 1 échoue, rouvrir le choix
+      de l'outil plutôt que tordre le design. Rien à coder pour Android
+      avant
 - [ ] Prototype jetable avant tout : un écran qui lit une copie de
       `data.json`, ajoute et raye, en APK installé sur le téléphone de
       VertOurs. Il valide `core` sur Android, les formats de date (`%-d`

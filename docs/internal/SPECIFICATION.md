@@ -529,8 +529,10 @@ cite encore.
 
 Plusieurs appareils partagent le même dossier de données, synchronisé par
 un outil extérieur qui copie des fichiers entiers. Rature est conçue pour
-tout outil de ce genre, testée et documentée avec Syncthing seul. Rature
-ne synchronise rien elle-même : pas de réseau, pas de compte, pas de
+tout outil de ce genre, testée et documentée avec Syncthing et pCloud.
+pCloud s'utilise avec sa fonction Sync, qui synchronise un dossier local,
+jamais par son lecteur virtuel `~/pCloudDrive`. Rature ne synchronise rien
+elle-même : pas de réseau, pas de compte, pas de
 serveur.
 
 **Pas de mode synchronisé.** Les règles de cette section s'appliquent
@@ -587,8 +589,9 @@ donc refusé au rejeu, avec le toast. Ce n'est pas un bogue.
 
 **Conflits.** Quand deux appareils modifient le fichier sans se voir,
 l'outil de synchronisation garde les deux versions et crée une copie de
-conflit. Rature reconnaît celles de Syncthing (`*.sync-conflict-*`), à côté
-de `data.json` et dans `archive/`, et le signale par un bandeau tant
+conflit. Rature reconnaît celles de Syncthing (`*.sync-conflict-*`) et
+celles de pCloud (noms qui contiennent `conflicted`, vus sous les formes
+`data.json.conflicted` et `data [conflicted].json`), à côté de `data.json` et dans `archive/`, et le signale par un bandeau tant
 qu'une telle copie existe (§3.17). Pas de fusion, pas de résolution dans
 l'application, et Rature ne supprime jamais une copie de conflit. Dans
 `archive/`, seuls les noms `AAAA-MM-JJ.json` exacts sont lus comme des
@@ -1833,7 +1836,8 @@ confirmation, la journée vide s'écrit tout de suite dans ce dossier (§3.6).
 Un dossier refusé ramène au message, ou laisse le premier lancement tel
 quel.
 
-**Copies de conflit.** Rature cherche les noms `*.sync-conflict-*` à côté
+**Copies de conflit.** Rature cherche les noms de copie de conflit de §2.9
+(Syncthing et pCloud) à côté
 de `data.json` et dans `archive/` à chaque lecture du fichier principal :
 au démarrage, à chaque relecture avant un geste et au retour du focus
 (§3.1), et après chaque écriture. La bannière de conflit (§3.6) s'affiche
@@ -1848,10 +1852,12 @@ et pour une annulation refusés (§2.9, §3.2). Une seule ligne au journal, au
 niveau `INFO`, sans texte de tâche.
 
 **Documentation utilisateur.** Le README explique la mise en place avec
-Syncthing : dossier vide sur la deuxième machine, attente de la première
-synchronisation, et un motif `.stignore` pour les fichiers temporaires de
+Syncthing et avec pCloud : dossier vide sur la deuxième machine, attente
+de la première synchronisation (pour pCloud, que `data.json` soit arrivé
+avant `Use This Folder`), et l'exclusion des fichiers temporaires de
 l'écriture atomique laissés par un plantage (`.*.tmp`), pour qu'ils ne
-partent pas sur les autres appareils.
+partent pas sur les autres appareils : motif `.stignore` pour Syncthing,
+liste d'exclusions de pCloud, à régler sur chaque machine.
 
 **Ce que l'interface ne contient pas.** Ni état de synchronisation, ni
 indicateur d'appareil connecté, ni date de dernière synchronisation, ni

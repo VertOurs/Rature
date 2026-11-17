@@ -29,8 +29,10 @@ _ARCHIVE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
 # folder (.syncthing.data.json.tmp), and removing one would break a delivery.
 _MAIN_TEMP_NAME = re.compile(r"\.data\.json(\.v\d+\.bak)?\.\d+\.tmp")
 _ARCHIVE_TEMP_NAME = re.compile(r"\.\d{4}-\d{2}-\d{2}\.json\.\d+\.tmp")
-# Syncthing's name for the version it kept aside (SPECIFICATION.md §2.9).
-_CONFLICT_COPY_NAME = re.compile(r".*\.sync-conflict-.*")
+# The names sync tools give the version they kept aside (SPECIFICATION.md
+# §2.9): Syncthing's .sync-conflict-, and pCloud's conflicted, seen both as
+# data.json.conflicted and as data [conflicted].json.
+_CONFLICT_COPY_NAME = re.compile(r".*(\.sync-conflict-|conflicted).*")
 _logger = logging.getLogger(__name__)
 
 # The whole key set of each file, after migration (validation.exact_keys).

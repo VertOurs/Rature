@@ -35,13 +35,17 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   journée vide sans donnée locale demande d'attendre la première
   synchronisation. C1 fait le même jour (README, `ARCHITECTURE.md`,
   CHANGELOG). Incident du runner « Invalid cross-device link » revu sur
-  le job `flatpak` de #230, vert à la relance. **Reste à la charge de
-  VertOurs** : relecture du catalogue français (chaînes de B3 en
-  traduction machine), essai dans le Flatpak du chemin du portail
-  (`/run/user/…/doc/…`) face à `samefile` (choisir le dossier courant doit
-  être refusé), installation de Syncthing sur les deux machines pour la
-  semaine d'usage réel. `2.2.0` préparée le 13 novembre 2026 (release PR,
-  puis tag `v2.2.0` annoté et signé). Étape suivante : la semaine d'usage
+  le job `flatpak` de #230, vert à la relance. Catalogue français
+  (chaînes de B3) relu et validé par VertOurs le 17 novembre 2026. Le
+  même jour, la semaine d'usage réel passe de Syncthing à pCloud
+  (fonction Sync) : copies `conflicted` reconnues, README, §2.9 et §3.17,
+  addendum à l'ADR 0009, branche `feat/pcloud-conflict-copies`. Le
+  chantier 11 supposait Syncthing sur Android : à revoir dans l'ADR 0010.
+  **Reste à la charge de VertOurs** : essai dans le Flatpak du chemin du
+  portail (`/run/user/…/doc/…`) face à `samefile` (choisir le dossier
+  courant doit être refusé), pCloud Sync et l'exclusion `.*.tmp` sur les
+  deux machines. `2.2.0` préparée le 13 novembre 2026 (release PR,
+  puis tag `v2.2.0` annoté et signé, release publiée). Étape suivante : la semaine d'usage
   réel du critère de fin, après sauvegarde du fichier de données de
   chaque machine : `2.2.0` est la première version qui relit avant
   d'écrire et diffère le passage du jour.

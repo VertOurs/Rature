@@ -190,8 +190,9 @@ The data folder is the default one or a folder the user chose
 (`SPECIFICATION.md` §2.9, §3.17, ADR 0009), kept in the `data-folder`
 GSettings key and opened with `chosen=True`: a chosen folder that is gone is
 out of reach, never a first launch, and its permissions are never changed.
-Each read of the main file also looks for Syncthing's conflict copies
-(`*.sync-conflict-*`), which `has_conflict_copies` reports; Rature never reads
+Each read of the main file also looks for the conflict copies of Syncthing
+(`*.sync-conflict-*`) and pCloud (names containing `conflicted`), which
+`has_conflict_copies` reports; Rature never reads
 or deletes them.
 
 Joining a folder goes through two steps, so that the dialog says what will
