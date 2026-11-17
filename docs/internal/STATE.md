@@ -39,7 +39,7 @@ condense en trois lignes. Ce qui est durable part dans un ADR ou dans
   (chaînes de B3) relu et validé par VertOurs le 17 novembre 2026. Le
   même jour, la semaine d'usage réel passe de Syncthing à pCloud
   (fonction Sync) : copies `conflicted` reconnues, README, §2.9 et §3.17,
-  addendum à l'ADR 0009, branche `feat/pcloud-conflict-copies`. Le
+  addendum à l'ADR 0009, PR #233 fusionnée, `2.3.0` préparée le même jour. Le
   chantier 11 supposait Syncthing sur Android : à revoir dans l'ADR 0010.
   **Reste à la charge de VertOurs** : essai dans le Flatpak du chemin du
   portail (`/run/user/…/doc/…`) face à `samefile` (choisir le dossier
@@ -152,7 +152,7 @@ environ un an, jusqu'à la sortie de la stable suivante.
 |---|---|---|
 | Runtime | `org.gnome.Platform//51` | Stable courante. SDK 51 : Python 3.14.7, Meson 1.12.0, GTK 4.24.0, libadwaita 1.10.0, PyGObject 3.58.0. Image CI `gnome-51` épinglée par digest |
 | Python cible | 3.13 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 est en 3.13.15 (Fedora 44 et Arch en 3.14). `requires-python` et ruff `py313`. Le job `test` de la CI tourne en matrice sur 3.13 (plancher) et 3.14 (runtime) : ruff `py313` bloque la syntaxe 3.14, pas une API de la bibliothèque standard apparue en 3.14. Le check exigé par le ruleset reste `test`, un job de synthèse qui ne passe que si les deux versions passent ; lint et meson restent en 3.14. Une cible `py314` ferait réécrire à `ruff format` des `except (A, B):` en syntaxe 3.14 seule (PEP 758) |
-| Version du projet | `2.2.0` | Mineure qui clôt le chantier 10 : synchronisation entre appareils par un dossier choisi, sans changement de format (toujours la version 4). Coupée le 13 novembre 2026 |
+| Version du projet | `2.3.0` | Mineure : copies de conflit de pCloud reconnues (#233), sans changement de format (toujours la version 4). Préparée le 17 novembre 2026 |
 | Meson minimal | 1.9 | Besoin du projet, jamais au-dessus de la plus ancienne distribution visée : Mageia 10 en 1.10.1, Fedora 44 (et la machine) en 1.11.2, Arch en 1.12.1, SDK 51 en 1.12.0. Aucune fonction postérieure à 1.9 utilisée |
 
 `0.10.0` (3 septembre 2026) publie les sept fonctionnalités du chantier 4
@@ -226,6 +226,11 @@ dépôt sert « Built from e9009d9 ». `flatpak update` par VertOurs le
 PKGBUILD et `.SRCINFO` recalés sur l'archive du tag (`sha256sum`
 identique sur deux téléchargements) dans un commit de suivi (PR #199),
 le dernier : la somme est désormais calculée par `release.yml`.
+
+`2.3.0` (17 novembre 2026) reconnaît les copies de conflit de pCloud
+(PR #233), pour la semaine d'usage réel du chantier 10, qui se fait avec
+pCloud. Mineure : un `feat` depuis `2.2.0`, aucun changement de format.
+Note de version traduite par machine dans les six catalogues.
 
 `1.9.0` (25 octobre 2026) publie les noms accessibles (PR #170) et la
 fenêtre Statistiques rafraîchie au passage du jour (PR #171). Mineure,

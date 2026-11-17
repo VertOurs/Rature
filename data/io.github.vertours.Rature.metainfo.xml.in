@@ -73,6 +73,14 @@
   </screenshots>
 
   <releases>
+    <release version="2.3.0" date="2026-11-17">
+      <description>
+        <p>
+          Rature 2.3. Conflict copies kept by pCloud are now recognized, next
+          to those of Syncthing. No change to the data format.
+        </p>
+      </description>
+    </release>
     <release version="2.2.0" date="2026-11-13">
       <description>
         <p>
